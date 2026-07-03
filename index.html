@@ -563,6 +563,112 @@
     }
     .prod-card dd{ margin: .25rem 0 0; color: var(--humo-72); font-size: .95rem; }
 
+    /* ---------- Selector de perfil + planes de inversión ---------- */
+    .titulo-oro{
+      background: linear-gradient(120deg, var(--oro) 15%, var(--oro-claro) 85%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .inv-header{ display: grid; gap: 2rem; align-items: start; margin-bottom: 2.8rem; }
+    @media (min-width: 980px){ .inv-header{ grid-template-columns: 1.1fr .9fr; gap: 3rem; } }
+
+    .perfil-card{
+      background: var(--carbon);
+      border: 1px solid var(--borde);
+      border-radius: var(--radio);
+      padding: 1.5rem 1.6rem;
+    }
+    .perfil-card h3{ font-size: 1.05rem; margin-bottom: .2rem; }
+    .perfil-card > p{ color: var(--humo-55); font-size: .9rem; margin-bottom: 1.3rem; }
+    #perfil-riesgo{
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 6px; border-radius: 99px;
+      background: linear-gradient(90deg, rgba(201,162,39,.22), var(--oro) 55%, var(--oro-claro));
+      outline: none; cursor: pointer;
+    }
+    #perfil-riesgo::-webkit-slider-thumb{
+      -webkit-appearance: none; appearance: none;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--oro), var(--oro-claro));
+      border: 3px solid var(--roca);
+      box-shadow: 0 0 0 1px var(--borde-oro), 0 4px 10px rgba(0,0,0,.45);
+    }
+    #perfil-riesgo::-moz-range-thumb{
+      width: 16px; height: 16px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--oro), var(--oro-claro));
+      border: 3px solid var(--roca);
+      box-shadow: 0 0 0 1px var(--borde-oro);
+    }
+    #perfil-riesgo:focus-visible{ outline: 2px solid var(--oro-claro); outline-offset: 5px; }
+    .perfil-labels{ display: flex; justify-content: space-between; margin-top: .9rem; }
+    .perfil-labels button{
+      background: none; border: none; cursor: pointer;
+      color: var(--humo-55); font-family: var(--f-cuerpo); font-size: .88rem;
+      padding: .25rem .45rem; border-radius: 6px;
+      transition: color .2s ease;
+    }
+    .perfil-labels button:hover{ color: var(--humo); }
+    .perfil-labels button.activo{ color: var(--oro-claro); font-weight: 700; }
+    .perfil-nota{ font-size: .78rem; color: var(--humo-55); margin: 1rem 0 0; }
+
+    .planes{ display: grid; gap: 1.4rem; }
+    @media (min-width: 900px){ .planes{ grid-template-columns: repeat(3, 1fr); align-items: stretch; } }
+    .plan-card{
+      position: relative;
+      background: var(--carbon);
+      border: 1px solid var(--borde);
+      border-radius: var(--radio);
+      padding: 2rem 1.5rem 1.5rem;
+      display: flex; flex-direction: column;
+      transition: border-color .3s ease, transform .3s ease, box-shadow .3s ease;
+    }
+    .plan-card.plan-activo{
+      border-color: var(--oro);
+      box-shadow: 0 18px 50px rgba(0,0,0,.4), 0 0 0 1px rgba(201,162,39,.25);
+    }
+    @media (min-width: 900px){ .plan-card.plan-activo{ transform: translateY(-6px); } }
+    @media (prefers-reduced-motion: reduce){ .plan-card, .plan-card.plan-activo{ transition: none; transform: none; } }
+    .plan-badge{
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--oro), var(--oro-claro));
+      color: var(--roca);
+      font-family: var(--f-display); font-weight: 700; font-size: .68rem;
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: .3rem .85rem; border-radius: 99px; white-space: nowrap;
+    }
+    .plan-card h3{ font-size: 1.3rem; margin-bottom: .15rem; }
+    .plan-perfil{ color: var(--humo-55); font-size: .88rem; margin-bottom: 1.1rem; }
+    .plan-riesgo{
+      display: flex; align-items: center; gap: .6rem;
+      padding-bottom: 1rem; border-bottom: 1px solid var(--borde); margin-bottom: 1rem;
+    }
+    .plan-riesgo .barras{ display: flex; gap: 4px; }
+    .plan-riesgo .barras i{ width: 22px; height: 6px; border-radius: 99px; background: rgba(237,234,227,.12); }
+    .plan-riesgo .barras i.on{ background: linear-gradient(90deg, var(--oro), var(--oro-claro)); }
+    .plan-riesgo > span:last-child{ font-size: .8rem; color: var(--humo-72); font-weight: 600; }
+    .plan-desc{ color: var(--humo-72); font-size: .94rem; margin-bottom: 1rem; }
+    .plan-desc strong{ color: var(--humo); }
+    .plan-features{ list-style: none; margin: 0 0 1.6rem; padding: 0; flex: 1; }
+    .plan-features li{ position: relative; padding: .45rem 0 .45rem 1.7rem; color: var(--humo-72); font-size: .92rem; }
+    .plan-features li svg{ position: absolute; left: 0; top: .68rem; }
+    .plan-cta{ width: 100%; }
+    .plan-card.plan-activo .plan-cta{
+      background: linear-gradient(135deg, var(--oro) 0%, var(--oro-claro) 100%);
+      color: var(--roca);
+      border-color: transparent;
+      box-shadow: 0 6px 22px rgba(201,162,39,.22);
+    }
+    .tesoreria-banner{
+      margin-top: 1.6rem;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: 1rem 1.5rem;
+      background: var(--carbon);
+      border: 1px solid var(--borde);
+      border-radius: var(--radio);
+      padding: 1.3rem 1.5rem;
+    }
+    .tesoreria-banner p{ margin: 0; color: var(--humo-72); font-size: .95rem; max-width: 62ch; }
+    .tesoreria-banner p strong{ color: var(--humo); }
+
     .disclaimer{
       display: flex; gap: .8rem; align-items: flex-start;
       background: rgba(201,162,39,.07);
@@ -1116,58 +1222,80 @@
     <section id="inversion" aria-labelledby="inversion-title">
       <div class="container">
         <i class="veta-anchor" data-veta-node style="--vx:90%; --vy:6%"></i>
-        <span class="eyebrow reveal">División de Inversión</span>
-        <h2 class="section-title reveal" id="inversion-title">Más allá del cambio: ordena tu patrimonio digital</h2>
-        <p class="section-lead reveal">Para quien ya convirtió su producción y quiere administrarla con estrategia, no con apuros. Tres formas de hacerlo, cada una con su nivel de riesgo claro.</p>
+        <div class="inv-header">
+          <div>
+            <span class="eyebrow reveal">División de Inversión</span>
+            <h2 class="section-title reveal" id="inversion-title">No solo conviertes: <span class="titulo-oro">construyes patrimonio.</span></h2>
+            <p class="section-lead reveal">Cuando tu efectivo ya está seguro en digital, nuestra División de Inversión te ayuda a administrarlo con estrategia y acompañamiento profesional. Tú eliges cuánto riesgo asumir — y lo entiendes antes de decidir.</p>
+          </div>
 
-        <div class="cards-3">
-          <article class="prod-card reveal">
-            <div class="prod-icon">
-              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="M13 3v20M8 7.5h7.5a3.5 3.5 0 0 1 0 7H9.5a3.5 3.5 0 0 0 0 7H18" stroke="#E8C766" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <div class="perfil-card reveal">
+            <h3 id="perfil-titulo">¿Qué perfil eres?</h3>
+            <p>Mueve el control y resaltamos el plan que mejor se ajusta a ti.</p>
+            <input type="range" id="perfil-riesgo" min="0" max="2" step="1" value="1" aria-labelledby="perfil-titulo" aria-valuetext="Balanceado">
+            <div class="perfil-labels" aria-hidden="false">
+              <button type="button">Conservador</button>
+              <button type="button">Balanceado</button>
+              <button type="button">Avanzado</button>
             </div>
-            <h3>Ahorro Digital (USDT)</h3>
-            <span class="prod-riesgo">Riesgo: bajo–moderado</span>
-            <dl>
-              <dt>Para quién es</dt>
-              <dd>El minero o comerciante que quiere proteger el valor de su efectivo sin complicarse.</dd>
-              <dt>Cómo funciona</dt>
-              <dd>Conviertes tus soles a USDT, una stablecoin que sigue el valor del dólar. Tu saldo queda disponible las 24 horas, sin plazos forzosos.</dd>
-              <dt>Qué riesgo asumes</dt>
-              <dd>Riesgo del emisor de la stablecoin y riesgo regulatorio. No genera intereses ni rentabilidad garantizada.</dd>
-            </dl>
+            <p class="perfil-nota">Referencial: tu plan se define contigo en la asesoría, según tu situación y tus objetivos.</p>
+          </div>
+        </div>
+
+        <div class="planes">
+          <article class="plan-card reveal">
+            <h3>Reserva</h3>
+            <p class="plan-perfil">Conservador · Proteger primero</p>
+            <div class="plan-riesgo">
+              <span class="barras" aria-hidden="true"><i class="on"></i><i></i><i></i></span>
+              <span>Riesgo bajo</span>
+            </div>
+            <p class="plan-desc">Para quien quiere, ante todo, <strong>resguardar lo trabajado</strong>.</p>
+            <ul class="plan-features">
+              <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3 8.5 3.2 3.2L13 5" stroke="#E8C766" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Resguardo en stablecoins (USDT), activos digitales que siguen el valor del dólar</li>
+              <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3 8.5 3.2 3.2L13 5" stroke="#E8C766" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Prioridad absoluta: proteger el capital</li>
+              <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3 8.5 3.2 3.2L13 5" stroke="#E8C766" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Liquidez: dispones de tu dinero cuando lo necesites</li>
+            </ul>
+            <a class="btn btn-secondary plan-cta" data-wa data-wa-msg="Hola VETA, quiero asesoría sobre el plan Reserva (perfil conservador)." href="#contacto">Quiero asesoría</a>
           </article>
 
-          <article class="prod-card reveal">
-            <div class="prod-icon">
-              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="M3.5 20.5 9 13.5l4 4.5 5-8 4.5 3" stroke="#E8C766" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 23h19" stroke="#C9A227" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <article class="plan-card reveal">
+            <span class="plan-badge">Más elegido</span>
+            <h3>Crecimiento</h3>
+            <p class="plan-perfil">Balanceado · Acumular con respaldo</p>
+            <div class="plan-riesgo">
+              <span class="barras" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i></span>
+              <span>Riesgo medio</span>
             </div>
-            <h3>Portafolio Patrimonial (BTC/ETH)</h3>
-            <span class="prod-riesgo">Riesgo: alto</span>
-            <dl>
-              <dt>Para quién es</dt>
-              <dd>Quien ya cubrió su liquidez y busca acumular activos digitales pensando en años, no en semanas.</dd>
-              <dt>Cómo funciona</dt>
-              <dd>Definimos contigo una estrategia de compras programadas de BTC y ETH, con custodia de firma múltiple y reportes periódicos.</dd>
-              <dt>Qué riesgo asumes</dt>
-              <dd>Alta volatilidad: el valor puede subir o bajar de forma pronunciada. Horizonte recomendado de 3 años o más.</dd>
-            </dl>
+            <p class="plan-desc">Para quien busca <strong>acumular a largo plazo</strong> con acompañamiento profesional.</p>
+            <ul class="plan-features">
+              <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3 8.5 3.2 3.2L13 5" stroke="#E8C766" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Cartera diversificada (BTC, ETH y stablecoins) con estrategia definida contigo</li>
+              <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3 8.5 3.2 3.2L13 5" stroke="#E8C766" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Equilibrio entre estabilidad y acumulación</li>
+              <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3 8.5 3.2 3.2L13 5" stroke="#E8C766" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Seguimiento y reportes periódicos</li>
+            </ul>
+            <a class="btn btn-secondary plan-cta" data-wa data-wa-msg="Hola VETA, quiero asesoría sobre el plan Crecimiento (perfil balanceado)." href="#contacto">Quiero asesoría</a>
           </article>
 
-          <article class="prod-card reveal">
-            <div class="prod-icon">
-              <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><rect x="3" y="8" width="20" height="14" rx="2.5" stroke="#E8C766" stroke-width="1.7"/><path d="M7 8V5.5A1.5 1.5 0 0 1 8.5 4h9A1.5 1.5 0 0 1 19 5.5V8" stroke="#E8C766" stroke-width="1.7"/><path d="M3 13.5h20" stroke="#C9A227" stroke-width="1.5"/><path d="M15.5 17.5h4" stroke="#C9A227" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <article class="plan-card reveal">
+            <h3>VETA Pro</h3>
+            <p class="plan-perfil">Avanzado · Gestión activa</p>
+            <div class="plan-riesgo">
+              <span class="barras" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></span>
+              <span>Riesgo alto, gestionado</span>
             </div>
-            <h3>Tesorería Empresarial</h3>
-            <span class="prod-riesgo">Riesgo: moderado</span>
-            <dl>
-              <dt>Para quién es</dt>
-              <dd>Empresas mineras y comercializadoras que mueven pagos entre sedes, proveedores y planillas.</dd>
-              <dt>Cómo funciona</dt>
-              <dd>Gestionamos tu liquidez en stablecoins para pagos y remesas entre regiones, con límites definidos por tu empresa y reportes listos para contabilidad.</dd>
-              <dt>Qué riesgo asumes</dt>
-              <dd>Riesgo operativo y regulatorio, gestionado con políticas de límites y doble aprobación.</dd>
-            </dl>
+            <p class="plan-desc">Para perfiles con experiencia que <strong>comprenden plenamente el riesgo</strong> que asumen.</p>
+            <ul class="plan-features">
+              <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3 8.5 3.2 3.2L13 5" stroke="#E8C766" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Gestión activa de cartera con límites definidos contigo</li>
+              <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3 8.5 3.2 3.2L13 5" stroke="#E8C766" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Mayor exposición a la volatilidad del mercado, con reglas claras</li>
+              <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3 8.5 3.2 3.2L13 5" stroke="#E8C766" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Asesor dedicado y estrategia personalizada</li>
+            </ul>
+            <a class="btn btn-secondary plan-cta" data-wa data-wa-msg="Hola VETA, quiero asesoría sobre el plan VETA Pro (perfil avanzado)." href="#contacto">Quiero asesoría</a>
           </article>
+        </div>
+
+        <div class="tesoreria-banner reveal">
+          <p><strong>¿Manejas una empresa minera o comercializadora?</strong> Tesorería Empresarial: liquidez digital para pagos a proveedores y remesas entre sedes, con límites definidos por tu empresa y reportes listos para contabilidad.</p>
+          <a class="btn btn-secondary btn-sm" data-wa data-wa-msg="Hola VETA, quiero información sobre Tesorería Empresarial para mi empresa." href="#contacto">Hablar con un asesor</a>
         </div>
 
         <div class="disclaimer reveal" role="note">
@@ -1175,9 +1303,6 @@
           <span><strong>Aviso importante:</strong> los activos digitales implican riesgo. Su valor puede subir o bajar y podrías perder parte del capital. VETA no garantiza rentabilidades ni retornos. Evalúa tu situación financiera antes de decidir y no comprometas fondos que necesites a corto plazo.</span>
         </div>
 
-        <div class="inv-cta reveal">
-          <a class="btn btn-primary" data-wa data-wa-msg="Hola VETA, quiero agendar una asesoría personalizada sobre la División de Inversión." href="#contacto">Agenda una asesoría personalizada</a>
-        </div>
       </div>
     </section>
 
@@ -1973,6 +2098,33 @@
       window.open('https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
       document.getElementById('form-note').classList.add('visible');
     });
+
+    /* ---------- Selector de perfil de inversión ---------- */
+    const perfilInput = document.getElementById('perfil-riesgo');
+    if (perfilInput){
+      const PERFILES = ['Conservador', 'Balanceado', 'Avanzado'];
+      const planCards = Array.from(document.querySelectorAll('.plan-card'));
+      const perfilBotones = Array.from(document.querySelectorAll('.perfil-labels button'));
+
+      function actualizarPerfil(){
+        const v = parseInt(perfilInput.value, 10);
+        perfilInput.setAttribute('aria-valuetext', PERFILES[v]);
+        planCards.forEach((card, i) => card.classList.toggle('plan-activo', i === v));
+        perfilBotones.forEach((btn, i) => {
+          btn.classList.toggle('activo', i === v);
+          btn.setAttribute('aria-pressed', String(i === v));
+        });
+      }
+
+      perfilInput.addEventListener('input', actualizarPerfil);
+      perfilBotones.forEach((btn, i) => {
+        btn.addEventListener('click', () => {
+          perfilInput.value = i;
+          actualizarPerfil();
+        });
+      });
+      actualizarPerfil();
+    }
 
     /* ---------- La Veta: trazado global ligado al scroll ---------- */
     const vetaSvg = document.getElementById('veta-svg');
