@@ -37,9 +37,9 @@ Quedan fuera de `CONFIG` (editar a mano):
 
 ## Precios en vivo
 
-El ticker muestra USDT/PEN, BTC/USD y ETH/USD, actualizados cada 60 s:
+El ticker muestra USDT/PEN, BTC/USD, ETH/USD y SOL/USD, actualizados cada 60 s:
 
-- **BTC y ETH en USD**: API pública de Binance (`api.binance.com`, con espejo
+- **BTC, ETH y SOL en USD**: API pública de Binance (`api.binance.com`, con espejo
   `data-api.binance.vision` de respaldo). Binance no tiene mercado spot en soles.
 - **USDT/PEN**: CoinGecko.
 - Si Binance falla, BTC/ETH caen a CoinGecko; si todo falla, se usan los valores

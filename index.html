@@ -1202,6 +1202,16 @@
               <span class="ticker-val-row"><span class="ticker-value" data-price="eth_usd">—</span><span class="ticker-chg" data-chg="eth">&nbsp;</span></span>
             </span>
           </div>
+          <div class="ticker-item">
+            <span class="coin" aria-hidden="true">
+              <!-- Símbolo Solana (tres barras) -->
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M4.9 2.9h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/><path d="M2.5 6.8h8.4l2.4 2.4H4.9L2.5 6.8Z" fill="#E8C766"/><path d="M4.9 10.7h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/></svg>
+            </span>
+            <span class="ticker-cols">
+              <span class="ticker-label">SOL / USD</span>
+              <span class="ticker-val-row"><span class="ticker-value" data-price="sol_usd">—</span><span class="ticker-chg" data-chg="sol">&nbsp;</span></span>
+            </span>
+          </div>
         </div>
       </div>
     </section>
@@ -1902,7 +1912,7 @@
       // Frecuencia de actualización de precios (ms)
       REFRESH_MS: 60000,
       // [EDITABLE] Valores de respaldo si las APIs de precios no responden
-      FALLBACK: { btc_usd: 95000, eth_usd: 3500, usdt_pen: 3.75, usdt_usd: 1.0 },
+      FALLBACK: { btc_usd: 95000, eth_usd: 3500, sol_usd: 150, usdt_pen: 3.75, usdt_usd: 1.0 },
 
       // [EDITABLE] Datos de la empresa
       RAZON_SOCIAL: 'VETA Activos Digitales S.A.C.',
@@ -1944,11 +1954,13 @@
     const precios = {
       btc_usd: CONFIG.FALLBACK.btc_usd,
       eth_usd: CONFIG.FALLBACK.eth_usd,
+      sol_usd: CONFIG.FALLBACK.sol_usd,
       btc_pen: CONFIG.FALLBACK.btc_usd * CONFIG.FALLBACK.usdt_pen,
       usdt_pen: CONFIG.FALLBACK.usdt_pen,
       usdt_usd: CONFIG.FALLBACK.usdt_usd,
       btc_chg: null,
       eth_chg: null,
+      sol_chg: null,
       fuente: null,
       enVivo: false,
       primerIntentoHecho: false
@@ -1964,6 +1976,7 @@
       set('usdt_pen', fmtPEN3.format(precios.usdt_pen));
       set('btc_usd', fmtUSD0.format(precios.btc_usd));
       set('eth_usd', fmtUSD0.format(precios.eth_usd));
+      set('sol_usd', fmtUSD0.format(precios.sol_usd));
       const pintaChg = (clave, valor) => {
         const el = document.querySelector('[data-chg="' + clave + '"]');
         if (el && typeof valor === 'number' && !isNaN(valor)){
@@ -1974,6 +1987,7 @@
       };
       pintaChg('btc', precios.btc_chg);
       pintaChg('eth', precios.eth_chg);
+      pintaChg('sol', precios.sol_chg);
       const status = document.getElementById('ticker-status');
       const statusText = document.getElementById('ticker-status-text');
       const hora = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
@@ -2001,7 +2015,7 @@
     // BTC y ETH en USD desde Binance (con espejo público de respaldo);
     // Binance no tiene mercado spot en soles, así que USDT/PEN viene de CoinGecko.
     function pedirBinance(){
-      const ruta = '/api/v3/ticker/24hr?symbols=' + encodeURIComponent('["BTCUSDT","ETHUSDT"]');
+      const ruta = '/api/v3/ticker/24hr?symbols=' + encodeURIComponent('["BTCUSDT","ETHUSDT","SOLUSDT"]');
       return pedirJson('https://api.binance.com' + ruta)
         .catch(() => pedirJson('https://data-api.binance.vision' + ruta));
     }
@@ -2009,7 +2023,7 @@
     async function traerPrecios(){
       const [binance, gecko] = await Promise.allSettled([
         pedirBinance(),
-        pedirJson('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether&vs_currencies=usd,pen&include_24hr_change=true')
+        pedirJson('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,tether&vs_currencies=usd,pen&include_24hr_change=true')
       ]);
 
       let fuente = null;
@@ -2017,11 +2031,14 @@
       if (binance.status === 'fulfilled' && Array.isArray(binance.value)){
         const btc = binance.value.find(d => d.symbol === 'BTCUSDT');
         const eth = binance.value.find(d => d.symbol === 'ETHUSDT');
-        if (btc && eth){
+        const sol = binance.value.find(d => d.symbol === 'SOLUSDT');
+        if (btc && eth && sol){
           precios.btc_usd = parseFloat(btc.lastPrice);
           precios.eth_usd = parseFloat(eth.lastPrice);
+          precios.sol_usd = parseFloat(sol.lastPrice);
           precios.btc_chg = parseFloat(btc.priceChangePercent);
           precios.eth_chg = parseFloat(eth.priceChangePercent);
+          precios.sol_chg = parseFloat(sol.priceChangePercent);
           precios.usdt_usd = 1.0; // los pares de Binance ya están expresados en USDT
           fuente = 'Binance';
         }
@@ -2032,11 +2049,13 @@
         precios.usdt_pen = g.tether.pen;
       }
       // Respaldo completo con CoinGecko si Binance no respondió
-      if (fuente !== 'Binance' && g && g.bitcoin && g.ethereum){
+      if (fuente !== 'Binance' && g && g.bitcoin && g.ethereum && g.solana){
         precios.btc_usd = g.bitcoin.usd;
         precios.eth_usd = g.ethereum.usd;
+        precios.sol_usd = g.solana.usd;
         precios.btc_chg = (typeof g.bitcoin.usd_24h_change === 'number') ? g.bitcoin.usd_24h_change : null;
         precios.eth_chg = (typeof g.ethereum.usd_24h_change === 'number') ? g.ethereum.usd_24h_change : null;
+        precios.sol_chg = (typeof g.solana.usd_24h_change === 'number') ? g.solana.usd_24h_change : null;
         precios.usdt_usd = (g.tether && g.tether.usd) || 1;
         fuente = 'CoinGecko';
       }
