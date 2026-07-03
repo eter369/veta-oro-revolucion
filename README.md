@@ -37,9 +37,14 @@ Quedan fuera de `CONFIG` (editar a mano):
 
 ## Precios en vivo
 
-El ticker y el cotizador usan la API pública de CoinGecko (BTC y USDT en USD y PEN),
-se actualizan cada 60 s y, si la API no responde, caen a los valores de `CONFIG.FALLBACK`
-mostrando el estado "Referencial (sin conexión)".
+El ticker muestra USDT/PEN, BTC/USD y ETH/USD, actualizados cada 60 s:
+
+- **BTC y ETH en USD**: API pública de Binance (`api.binance.com`, con espejo
+  `data-api.binance.vision` de respaldo). Binance no tiene mercado spot en soles.
+- **USDT/PEN**: CoinGecko.
+- Si Binance falla, BTC/ETH caen a CoinGecko; si todo falla, se usan los valores
+  de `CONFIG.FALLBACK` y el ticker muestra "Referencial (sin conexión)".
+- La fuente activa se muestra en el propio ticker ("En vivo · Binance · hh:mm").
 
 ## Textos legales
 

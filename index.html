@@ -1109,10 +1109,9 @@
             <span class="dot-live" aria-hidden="true"></span>
             <span id="ticker-status-text">Cargando precios…</span>
           </div>
-          <div class="ticker-item"><span class="ticker-label">BTC / USD</span><span class="ticker-value" data-price="btc_usd">—</span><span class="ticker-chg" data-chg="btc">&nbsp;</span></div>
-          <div class="ticker-item"><span class="ticker-label">BTC / PEN</span><span class="ticker-value" data-price="btc_pen">—</span></div>
           <div class="ticker-item"><span class="ticker-label">USDT / PEN</span><span class="ticker-value" data-price="usdt_pen">—</span></div>
-          <div class="ticker-item"><span class="ticker-label">USDT / USD</span><span class="ticker-value" data-price="usdt_usd">—</span></div>
+          <div class="ticker-item"><span class="ticker-label">BTC / USD</span><span class="ticker-value" data-price="btc_usd">—</span><span class="ticker-chg" data-chg="btc">&nbsp;</span></div>
+          <div class="ticker-item"><span class="ticker-label">ETH / USD</span><span class="ticker-value" data-price="eth_usd">—</span><span class="ticker-chg" data-chg="eth">&nbsp;</span></div>
         </div>
       </div>
     </section>
@@ -1211,7 +1210,7 @@
         <i class="veta-anchor" data-veta-node style="--vx:10%; --vy:8%"></i>
         <span class="eyebrow reveal">Cotizador en vivo</span>
         <h2 class="section-title reveal" id="cotizador-title">Cotiza en segundos, confirma por WhatsApp</h2>
-        <p class="section-lead reveal">Precios de referencia del mercado actualizados cada minuto. La tasa final se confirma con un asesor según tu volumen.</p>
+        <p class="section-lead reveal">Precios de referencia de Binance, actualizados cada minuto. La tasa final se confirma con un asesor según tu volumen.</p>
 
         <div class="cotizador-card reveal">
           <div class="cot-row">
@@ -1812,8 +1811,8 @@
       MONTO_MINIMO: 5000,
       // Frecuencia de actualización de precios (ms)
       REFRESH_MS: 60000,
-      // [EDITABLE] Valores de respaldo si la API de precios no responde
-      FALLBACK: { btc_usd: 95000, usdt_pen: 3.75, usdt_usd: 1.0 },
+      // [EDITABLE] Valores de respaldo si las APIs de precios no responden
+      FALLBACK: { btc_usd: 95000, eth_usd: 3500, usdt_pen: 3.75, usdt_usd: 1.0 },
 
       // [EDITABLE] Datos de la empresa
       RAZON_SOCIAL: 'VETA Activos Digitales S.A.C.',
@@ -1854,10 +1853,13 @@
     /* ---------- Estado de precios ---------- */
     const precios = {
       btc_usd: CONFIG.FALLBACK.btc_usd,
+      eth_usd: CONFIG.FALLBACK.eth_usd,
       btc_pen: CONFIG.FALLBACK.btc_usd * CONFIG.FALLBACK.usdt_pen,
       usdt_pen: CONFIG.FALLBACK.usdt_pen,
       usdt_usd: CONFIG.FALLBACK.usdt_usd,
       btc_chg: null,
+      eth_chg: null,
+      fuente: null,
       enVivo: false,
       primerIntentoHecho: false
     };
@@ -1869,21 +1871,23 @@
 
     function pintarTicker(){
       const set = (k, v) => document.querySelectorAll('[data-price="' + k + '"]').forEach(el => el.textContent = v);
-      set('btc_usd', fmtUSD0.format(precios.btc_usd));
-      set('btc_pen', fmtPEN0.format(precios.btc_pen));
       set('usdt_pen', fmtPEN3.format(precios.usdt_pen));
-      set('usdt_usd', '$ ' + fmtNum(precios.usdt_usd, 3));
-      const chgEl = document.querySelector('[data-chg="btc"]');
-      if (chgEl && precios.btc_chg !== null){
-        const signo = precios.btc_chg >= 0 ? '▲' : '▼';
-        chgEl.textContent = signo + ' ' + Math.abs(precios.btc_chg).toFixed(1) + '% 24h';
-      }
+      set('btc_usd', fmtUSD0.format(precios.btc_usd));
+      set('eth_usd', fmtUSD0.format(precios.eth_usd));
+      const pintaChg = (clave, valor) => {
+        const el = document.querySelector('[data-chg="' + clave + '"]');
+        if (el && typeof valor === 'number' && !isNaN(valor)){
+          el.textContent = (valor >= 0 ? '▲ ' : '▼ ') + Math.abs(valor).toFixed(1) + '% 24h';
+        }
+      };
+      pintaChg('btc', precios.btc_chg);
+      pintaChg('eth', precios.eth_chg);
       const status = document.getElementById('ticker-status');
       const statusText = document.getElementById('ticker-status-text');
       const hora = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
       if (precios.enVivo){
         status.classList.add('en-vivo'); status.classList.remove('referencial');
-        statusText.textContent = 'En vivo · ' + hora;
+        statusText.textContent = 'En vivo · ' + (precios.fuente || 'mercado') + ' · ' + hora;
       } else if (precios.primerIntentoHecho){
         status.classList.remove('en-vivo'); status.classList.add('referencial');
         statusText.textContent = 'Referencial (sin conexión)';
@@ -1891,28 +1895,64 @@
       recalcularCotizador();
     }
 
+    function pedirJson(url){
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 8000);
+      return fetch(url, { signal: ctrl.signal })
+        .then(res => {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .finally(() => clearTimeout(timer));
+    }
+
+    // BTC y ETH en USD desde Binance (con espejo público de respaldo);
+    // Binance no tiene mercado spot en soles, así que USDT/PEN viene de CoinGecko.
+    function pedirBinance(){
+      const ruta = '/api/v3/ticker/24hr?symbols=' + encodeURIComponent('["BTCUSDT","ETHUSDT"]');
+      return pedirJson('https://api.binance.com' + ruta)
+        .catch(() => pedirJson('https://data-api.binance.vision' + ruta));
+    }
+
     async function traerPrecios(){
-      try {
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 8000);
-        const res = await fetch(
-          'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,tether&vs_currencies=usd,pen&include_24hr_change=true',
-          { signal: ctrl.signal }
-        );
-        clearTimeout(timer);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        if (!data.bitcoin || !data.tether) throw new Error('respuesta incompleta');
-        precios.btc_usd = data.bitcoin.usd;
-        precios.btc_pen = data.bitcoin.pen;
-        precios.usdt_pen = data.tether.pen;
-        precios.usdt_usd = data.tether.usd;
-        precios.btc_chg = (typeof data.bitcoin.usd_24h_change === 'number') ? data.bitcoin.usd_24h_change : null;
-        precios.enVivo = true;
-      } catch (e) {
-        // Falla de red o API: mantenemos los últimos valores conocidos (o el respaldo)
-        precios.enVivo = false;
+      const [binance, gecko] = await Promise.allSettled([
+        pedirBinance(),
+        pedirJson('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether&vs_currencies=usd,pen&include_24hr_change=true')
+      ]);
+
+      let fuente = null;
+
+      if (binance.status === 'fulfilled' && Array.isArray(binance.value)){
+        const btc = binance.value.find(d => d.symbol === 'BTCUSDT');
+        const eth = binance.value.find(d => d.symbol === 'ETHUSDT');
+        if (btc && eth){
+          precios.btc_usd = parseFloat(btc.lastPrice);
+          precios.eth_usd = parseFloat(eth.lastPrice);
+          precios.btc_chg = parseFloat(btc.priceChangePercent);
+          precios.eth_chg = parseFloat(eth.priceChangePercent);
+          precios.usdt_usd = 1.0; // los pares de Binance ya están expresados en USDT
+          fuente = 'Binance';
+        }
       }
+
+      const g = (gecko.status === 'fulfilled') ? gecko.value : null;
+      if (g && g.tether && typeof g.tether.pen === 'number'){
+        precios.usdt_pen = g.tether.pen;
+      }
+      // Respaldo completo con CoinGecko si Binance no respondió
+      if (fuente !== 'Binance' && g && g.bitcoin && g.ethereum){
+        precios.btc_usd = g.bitcoin.usd;
+        precios.eth_usd = g.ethereum.usd;
+        precios.btc_chg = (typeof g.bitcoin.usd_24h_change === 'number') ? g.bitcoin.usd_24h_change : null;
+        precios.eth_chg = (typeof g.ethereum.usd_24h_change === 'number') ? g.ethereum.usd_24h_change : null;
+        precios.usdt_usd = (g.tether && g.tether.usd) || 1;
+        fuente = 'CoinGecko';
+      }
+
+      // Sin respuesta de ninguna API: se mantienen los últimos valores conocidos (o el respaldo)
+      precios.btc_pen = precios.btc_usd * precios.usdt_pen;
+      precios.fuente = fuente;
+      precios.enVivo = fuente !== null;
       precios.primerIntentoHecho = true;
       pintarTicker();
     }
