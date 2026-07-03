@@ -353,47 +353,110 @@
 
     /* ---------- Ticker ---------- */
     .ticker-wrap{
-      border-top: 1px solid var(--borde);
-      border-bottom: 1px solid var(--borde);
-      background: rgba(28,31,39,.5);
+      background: linear-gradient(180deg, rgba(28,31,39,.92), rgba(20,23,30,.65));
       margin-top: 3rem;
       position: relative; z-index: 1;
     }
+    /* Filos dorados en degradado: el detalle de lujo */
+    .ticker-wrap::before, .ticker-wrap::after{
+      content: ""; position: absolute; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,162,39,.45) 18%, rgba(232,199,102,.6) 50%, rgba(201,162,39,.45) 82%, transparent);
+    }
+    .ticker-wrap::before{ top: 0; }
+    .ticker-wrap::after{ bottom: 0; }
     .ticker{
-      display: flex; align-items: center; gap: 2.2rem;
+      display: flex; align-items: center; gap: 1.8rem;
       overflow-x: auto;
-      padding: .9rem 0;
+      padding: .85rem 0;
       scrollbar-width: none;
     }
     .ticker::-webkit-scrollbar{ display: none; }
-    .ticker-item{ display: flex; align-items: baseline; gap: .6rem; flex: none; }
-    .ticker-label{ font-size: .78rem; font-weight: 600; letter-spacing: .1em; color: var(--humo-55); text-transform: uppercase; }
-    .ticker-value{ font-family: var(--f-display); font-weight: 600; font-size: 1.02rem; }
-    .ticker-chg{ font-size: .8rem; color: var(--humo-55); }
-    .ticker-status{ display: flex; align-items: center; gap: .5rem; flex: none; font-size: .78rem; color: var(--humo-55); }
+    .ticker-item{
+      display: flex; align-items: center; gap: .75rem; flex: none;
+      padding-right: 1.8rem;
+      border-right: 1px solid rgba(237,234,227,.09);
+    }
+    .ticker-item:last-child{ border-right: none; padding-right: 0; }
+    .coin{
+      width: 32px; height: 32px; border-radius: 50%; flex: none;
+      background: var(--oro-suave);
+      border: 1px solid var(--borde-oro);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ticker-cols{ display: flex; flex-direction: column; gap: .12rem; }
+    .ticker-label{ font-size: .66rem; font-weight: 600; letter-spacing: .15em; color: var(--humo-55); text-transform: uppercase; }
+    .ticker-val-row{ display: flex; align-items: center; gap: .55rem; }
+    .ticker-value{ font-family: var(--f-display); font-weight: 700; font-size: 1.06rem; letter-spacing: .01em; }
+    .ticker-chg{ font-size: .72rem; font-weight: 600; }
+    .ticker-chg.sube{
+      color: var(--exito-texto);
+      background: rgba(46,125,107,.14);
+      border: 1px solid rgba(46,125,107,.4);
+      padding: .12rem .5rem; border-radius: 99px;
+    }
+    .ticker-chg.baja{
+      color: #D8987F;
+      background: rgba(176,93,74,.12);
+      border: 1px solid rgba(176,93,74,.35);
+      padding: .12rem .5rem; border-radius: 99px;
+    }
+    .ticker-status{
+      display: flex; align-items: center; gap: .5rem; flex: none;
+      font-size: .76rem; font-weight: 600; color: var(--humo-55);
+      padding: .3rem .8rem; border-radius: 99px;
+      border: 1px solid var(--borde);
+      background: rgba(18,20,26,.55);
+    }
+    .ticker-status.en-vivo{
+      border-color: rgba(46,125,107,.45);
+      background: rgba(46,125,107,.10);
+      color: #9CD9C6;
+    }
     .dot-live{
-      width: 8px; height: 8px; border-radius: 50%; background: var(--oro-claro);
+      width: 8px; height: 8px; border-radius: 50%; background: var(--exito-texto); flex: none;
     }
     @media (prefers-reduced-motion: no-preference){
       .ticker-status.en-vivo .dot-live{ animation: pulso 2s ease infinite; }
-      @keyframes pulso{ 0%,100%{ box-shadow: 0 0 0 0 rgba(232,199,102,.5);} 50%{ box-shadow: 0 0 0 6px rgba(232,199,102,0);} }
+      @keyframes pulso{ 0%,100%{ box-shadow: 0 0 0 0 rgba(91,198,168,.55);} 50%{ box-shadow: 0 0 0 6px rgba(91,198,168,0);} }
     }
-    .ticker-status.referencial .dot-live{ background: var(--humo-55); }
+    .ticker-status.referencial .dot-live{ background: var(--humo-55); animation: none; }
 
     /* ---------- Barra de confianza ---------- */
-    .trust{ padding: 3.2rem 0; }
+    .trust{ padding: 3.8rem 0; position: relative; }
+    .trust::before{
+      content: ""; position: absolute; inset: 0;
+      background: radial-gradient(640px 220px at 50% 50%, rgba(201,162,39,.055), transparent 72%);
+      pointer-events: none;
+    }
     .trust-grid{
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem 1rem;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.4rem 1rem;
       text-align: center;
+      position: relative;
     }
     @media (min-width: 780px){ .trust-grid{ grid-template-columns: repeat(4, 1fr); } }
+    .trust-item{ position: relative; }
+    /* Separadores verticales en degradado dorado (solo escritorio) */
+    @media (min-width: 780px){
+      .trust-item + .trust-item::before{
+        content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+        width: 1px; height: 62px;
+        background: linear-gradient(180deg, transparent, rgba(201,162,39,.45), transparent);
+      }
+    }
     .trust-item .counter{
       display: block;
       font-family: var(--f-display); font-weight: 700;
-      font-size: clamp(1.8rem, 4.5vw, 2.6rem);
-      color: var(--oro-claro);
+      font-size: clamp(2rem, 5vw, 3rem);
+      letter-spacing: -.01em;
+      background: linear-gradient(120deg, var(--oro) 5%, var(--oro-claro) 55%, var(--oro) 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      filter: drop-shadow(0 3px 16px rgba(201,162,39,.16));
+      margin-bottom: .4rem;
     }
-    .trust-item .trust-label{ color: var(--humo-55); font-size: .88rem; }
+    .trust-item .trust-label{
+      color: var(--humo-55); font-size: .74rem;
+      text-transform: uppercase; letter-spacing: .17em; font-weight: 600;
+    }
 
     /* ---------- Protocolo (5 pasos) ---------- */
     .pasos{ list-style: none; margin: 3rem 0 0; padding: 0; display: grid; gap: 2.2rem; }
@@ -1109,9 +1172,36 @@
             <span class="dot-live" aria-hidden="true"></span>
             <span id="ticker-status-text">Cargando precios…</span>
           </div>
-          <div class="ticker-item"><span class="ticker-label">USDT / PEN</span><span class="ticker-value" data-price="usdt_pen">—</span></div>
-          <div class="ticker-item"><span class="ticker-label">BTC / USD</span><span class="ticker-value" data-price="btc_usd">—</span><span class="ticker-chg" data-chg="btc">&nbsp;</span></div>
-          <div class="ticker-item"><span class="ticker-label">ETH / USD</span><span class="ticker-value" data-price="eth_usd">—</span><span class="ticker-chg" data-chg="eth">&nbsp;</span></div>
+          <div class="ticker-item">
+            <span class="coin" aria-hidden="true">
+              <!-- Símbolo ₮ (Tether) -->
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2.5 3h11M8 3v10M4.8 6h6.4" stroke="#E8C766" stroke-width="1.7" stroke-linecap="round"/></svg>
+            </span>
+            <span class="ticker-cols">
+              <span class="ticker-label">USDT / PEN</span>
+              <span class="ticker-val-row"><span class="ticker-value" data-price="usdt_pen">—</span></span>
+            </span>
+          </div>
+          <div class="ticker-item">
+            <span class="coin" aria-hidden="true">
+              <!-- Símbolo ₿ (Bitcoin) -->
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M4.5 2.5h5a2.4 2.4 0 0 1 0 4.8h-5M4.5 7.3h5.6a2.4 2.4 0 0 1 0 4.8H4.5M5.8 2.5v9.6M6.5 1v1.5M9 1v1.5M6.5 12.1v1.5M9 12.1v1.5" stroke="#E8C766" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="ticker-cols">
+              <span class="ticker-label">BTC / USD</span>
+              <span class="ticker-val-row"><span class="ticker-value" data-price="btc_usd">—</span><span class="ticker-chg" data-chg="btc">&nbsp;</span></span>
+            </span>
+          </div>
+          <div class="ticker-item">
+            <span class="coin" aria-hidden="true">
+              <!-- Símbolo Ξ (Ethereum) -->
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1.5 12.5 8 8 10.8 3.5 8 8 1.5Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 12.2 12 9.6 8 15 4 9.6l4 2.6Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="ticker-cols">
+              <span class="ticker-label">ETH / USD</span>
+              <span class="ticker-val-row"><span class="ticker-value" data-price="eth_usd">—</span><span class="ticker-chg" data-chg="eth">&nbsp;</span></span>
+            </span>
+          </div>
         </div>
       </div>
     </section>
@@ -1878,6 +1968,8 @@
         const el = document.querySelector('[data-chg="' + clave + '"]');
         if (el && typeof valor === 'number' && !isNaN(valor)){
           el.textContent = (valor >= 0 ? '▲ ' : '▼ ') + Math.abs(valor).toFixed(1) + '% 24h';
+          el.classList.toggle('sube', valor >= 0);
+          el.classList.toggle('baja', valor < 0);
         }
       };
       pintaChg('btc', precios.btc_chg);
