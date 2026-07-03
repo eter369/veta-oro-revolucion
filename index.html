@@ -56,7 +56,7 @@
       { "@type": "Question", "name": "¿Qué documentos necesito?", "acceptedAnswer": { "@type": "Answer", "text": "Tu DNI vigente si operas como persona natural, o tu RUC y los documentos de tu empresa si operas como persona jurídica. Para montos altos, la normativa nos exige documentar el origen de los fondos." } },
       { "@type": "Question", "name": "¿Cuál es el monto mínimo y máximo?", "acceptedAnswer": { "@type": "Answer", "text": "El monto mínimo referencial es S/ 5,000. No hay un máximo fijo: los montos altos pasan por una debida diligencia reforzada según normativa y reciben tipo de cambio preferencial." } },
       { "@type": "Question", "name": "¿Qué es USDT y por qué conviene?", "acceptedAnswer": { "@type": "Answer", "text": "USDT es una stablecoin: un activo digital diseñado para seguir el valor del dólar. Sirve para proteger el valor de tu efectivo sin cargar billetes, con disponibilidad las 24 horas." } },
-      { "@type": "Question", "name": "¿Cuánto cobran de comisión?", "acceptedAnswer": { "@type": "Answer", "text": "Trabajamos con un spread transparente sobre el precio de mercado que baja según tu volumen. Se te informa el número exacto antes de confirmar y no hay costos ocultos." } },
+      { "@type": "Question", "name": "¿Cuánto cobran de comisión?", "acceptedAnswer": { "@type": "Answer", "text": "Depende del método de entrega: 7% en operaciones con efectivo (cubre la logística de entrega segura, el personal verificado y los puntos aliados) y 5% si transfieres desde la app Lemon Cash. El número exacto se confirma antes de operar, sin costos ocultos, y los volúmenes altos acceden a tasa preferencial con asesor." } },
       { "@type": "Question", "name": "¿Cuánto demora la operación?", "acceptedAnswer": { "@type": "Answer", "text": "La primera vez, entre 30 y 45 minutos por la verificación de identidad. A partir de la segunda operación, la entrega y confirmación toman minutos." } },
       { "@type": "Question", "name": "¿Qué pasa si no tengo wallet?", "acceptedAnswer": { "@type": "Answer", "text": "Te ayudamos a crear una billetera digital gratuita y te enseñamos a custodiarla. Importante: VETA nunca te pedirá tu frase semilla ni tus claves." } },
       { "@type": "Question", "name": "¿Por qué me piden verificación de identidad?", "acceptedAnswer": { "@type": "Answer", "text": "Porque te protege y porque es ley. La verificación garantiza que la operación quede registrada a tu nombre, con comprobante y respaldo, y es un requisito de la normativa PLAFT que cumplimos como sujeto obligado ante la UIF-Perú." } },
@@ -1172,7 +1172,7 @@
           <div class="receipt-head"><span>Comprobante de operación</span><span>VETA</span></div>
           <dl>
             <div class="receipt-row"><dt>Entregado</dt><dd class="num" data-rec="entregado">S/ 50,000.00 en efectivo</dd></div>
-            <div class="receipt-row"><dt>Recibido</dt><dd class="num" data-rec="recibido">13,148.90 USDT</dd></div>
+            <div class="receipt-row"><dt>Recibido</dt><dd class="num" data-rec="recibido">12,269.13 USDT</dd></div>
             <div class="receipt-row"><dt>Punto de entrega</dt><dd data-rec="punto">Oficina Lima · verificado</dd></div>
             <div class="receipt-row"><dt>Estado</dt><dd><span class="estado-ok">Confirmado on-chain</span></dd></div>
             <div class="receipt-row"><dt>Hash</dt><dd><span class="receipt-hash" data-rec="hash">0x9f3c…a27b</span></dd></div>
@@ -1344,6 +1344,13 @@
                 <label><input type="radio" name="activo" value="BTC">BTC</label>
               </div>
             </div>
+            <div class="cot-field" style="grid-column: 1 / -1;">
+              <span class="cot-legend" id="lbl-metodo">¿Cómo entregas tu dinero?</span>
+              <div class="segmented" role="radiogroup" aria-labelledby="lbl-metodo">
+                <label><input type="radio" name="metodo" value="efectivo" checked>Efectivo</label>
+                <label><input type="radio" name="metodo" value="lemon">Lemon Cash</label>
+              </div>
+            </div>
           </div>
 
           <div class="cot-field">
@@ -1358,7 +1365,7 @@
             <p class="cot-result-label">Recibirás aproximadamente</p>
             <p class="cot-result-value num" id="cot-result">—</p>
             <div class="cot-detail"><span>Tipo de cambio aplicado</span><strong class="num" id="cot-rate">—</strong></div>
-            <div class="cot-detail"><span>Spread incluido</span><strong class="num"><span data-spread>1.5</span>%</strong></div>
+            <div class="cot-detail"><span>Comisión incluida</span><strong class="num" id="cot-comision">7%</strong></div>
             <div class="cot-detail"><span>Precio congelado al confirmar</span><strong><span data-lock>15</span> min</strong></div>
           </div>
 
@@ -1678,7 +1685,7 @@
           <details name="faq">
             <summary>¿Cuánto cobran de comisión?</summary>
             <div class="faq-body">
-              <p>Trabajamos con un <strong>spread transparente</strong> sobre el precio de mercado (referencialmente <span data-spread>1.5</span>%), que baja según tu volumen. Antes de confirmar cualquier operación te informamos el número exacto. Sin costos ocultos ni sorpresas en la entrega.</p>
+              <p>Depende de cómo nos entregues tu dinero: <strong>7% en operaciones con efectivo</strong> —cubre la logística de entrega segura, el personal verificado y los puntos aliados— y <strong>5% si transfieres desde la app Lemon Cash</strong>. Antes de confirmar cualquier operación te informamos el número exacto. Sin costos ocultos ni sorpresas en la entrega, y los volúmenes altos acceden a tasa preferencial con un asesor dedicado.</p>
             </div>
           </details>
           <details name="faq">
@@ -1840,8 +1847,8 @@
       <p><span data-razon>VETA Activos Digitales S.A.C.</span> («VETA») presta servicios de intercambio de moneda de curso legal por activos virtuales (USDT, BTC y otros) bajo modalidad OTC, así como servicios de acompañamiento en gestión patrimonial digital, en el territorio peruano.</p>
       <h3>2. Requisitos para operar</h3>
       <p>Solo operamos con personas mayores de 18 años y empresas debidamente constituidas, previa verificación de identidad (KYC) conforme a nuestra Política PLAFT. VETA puede rechazar o suspender operaciones cuando no se supere la debida diligencia.</p>
-      <h3>3. Cotizaciones y spread</h3>
-      <p>Las cotizaciones del sitio son referenciales y se calculan sobre precios públicos de mercado más un spread informado antes de confirmar. La cotización pactada se bloquea por el tiempo indicado al cliente; vencido el plazo, debe solicitarse una nueva.</p>
+      <h3>3. Cotizaciones y comisiones</h3>
+      <p>Las cotizaciones del sitio son referenciales y se calculan sobre precios públicos de mercado más una comisión según el método de entrega del dinero (operaciones con efectivo o transferencia desde aplicativos como Lemon Cash), informada siempre antes de confirmar. La cotización pactada se bloquea por el tiempo indicado al cliente; vencido el plazo, debe solicitarse una nueva.</p>
       <h3>4. Naturaleza del servicio</h3>
       <p>VETA realiza operaciones de compraventa de activos virtuales por cuenta propia. No captamos depósitos del público, no otorgamos créditos ni garantizamos rentabilidades. Los servicios de la División de Inversión son de ejecución y acompañamiento según instrucciones del cliente.</p>
       <h3>5. Responsabilidad</h3>
@@ -1918,8 +1925,8 @@
     const CONFIG = {
       // [EDITABLE] Número de WhatsApp con código de país, sin "+" ni espacios
       WHATSAPP: '51999999999',
-      // [EDITABLE] Spread porcentual aplicado en el cotizador
-      SPREAD_PCT: 1.5,
+      // [EDITABLE] Comisiones por método de entrega (fracción: 0.07 = 7%)
+      COMISIONES: { efectivo: 0.07, lemon: 0.05 },
       // [EDITABLE] Minutos de cotización bloqueada (se muestra en el copy)
       LOCK_MINUTES: 15,
       // [EDITABLE] Monto mínimo referencial en soles (FAQ visible + schema FAQPage;
@@ -2094,14 +2101,23 @@
     function valoresCotizador(){
       const moneda = document.querySelector('input[name="moneda"]:checked').value;
       const activo = document.querySelector('input[name="activo"]:checked').value;
+      const metodo = document.querySelector('input[name="metodo"]:checked').value; // 'efectivo' | 'lemon'
       const monto = parseFloat(montoInput.value);
-      return { moneda, activo, monto };
+      return { moneda, activo, metodo, monto };
     }
+
+    const METODO_NOMBRES = { efectivo: 'Efectivo', lemon: 'Lemon Cash' };
 
     function recalcularCotizador(){
       if (!montoInput) return;
-      const { moneda, activo, monto } = valoresCotizador();
+      const { moneda, activo, metodo, monto } = valoresCotizador();
       prefixEl.textContent = moneda === 'PEN' ? 'S/' : '$';
+
+      // Comisión según método de entrega (descuento neto exacto: 7% ó 5%)
+      const comision = CONFIG.COMISIONES[metodo];
+      const comisionTxt = parseFloat((comision * 100).toFixed(2)) + '%';
+      const comisionEl = document.getElementById('cot-comision');
+      if (comisionEl) comisionEl.textContent = comisionTxt;
 
       if (!monto || monto <= 0){
         resultEl.textContent = '—';
@@ -2112,8 +2128,8 @@
 
       // 1) Monto a USD
       const montoUSD = moneda === 'PEN' ? monto / precios.usdt_pen : monto;
-      // 2) Spread a favor de la casa
-      const usdNeto = montoUSD * (1 - CONFIG.SPREAD_PCT / 100);
+      // 2) Comisión del método elegido
+      const usdNeto = montoUSD * (1 - comision);
       // 3) USD al activo elegido
       let resultado, resultadoTxt;
       if (activo === 'USDT'){
@@ -2133,7 +2149,7 @@
         rateEl.textContent = '1 BTC = ' + (moneda === 'PEN' ? fmtPEN0.format(precios.btc_pen) : fmtUSD0.format(precios.btc_usd));
       }
 
-      actualizarWaCotizador({ moneda, activo, monto, resultadoTxt });
+      actualizarWaCotizador({ moneda, activo, metodo, comisionTxt, monto, resultadoTxt });
     }
 
     function actualizarWaCotizador(datos){
@@ -2143,7 +2159,8 @@
       } else {
         const simbolo = datos.moneda === 'PEN' ? 'S/ ' : '$ ';
         msg = 'Hola VETA, quiero cotizar: entrego ' + simbolo + fmtNum(datos.monto, 0) +
-              ' en efectivo y deseo recibir ' + datos.activo +
+              ' y deseo recibir ' + datos.activo +
+              '. Método: ' + METODO_NOMBRES[datos.metodo] + ' (' + datos.comisionTxt + ')' +
               '. El cotizador me mostró ≈ ' + datos.resultadoTxt + '.';
       }
       cotWa.href = 'https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent(msg);
@@ -2151,7 +2168,7 @@
 
     if (montoInput){
       montoInput.addEventListener('input', recalcularCotizador);
-      document.querySelectorAll('input[name="moneda"], input[name="activo"]').forEach(r => {
+      document.querySelectorAll('input[name="moneda"], input[name="activo"], input[name="metodo"]').forEach(r => {
         r.addEventListener('change', recalcularCotizador);
       });
     }
@@ -2168,7 +2185,6 @@
     cotWa.rel = 'noopener';
 
     /* ---------- Textos derivados de CONFIG ---------- */
-    document.querySelectorAll('[data-spread]').forEach(el => el.textContent = CONFIG.SPREAD_PCT);
     document.querySelectorAll('[data-lock]').forEach(el => el.textContent = CONFIG.LOCK_MINUTES);
     document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -2350,14 +2366,14 @@
 
     /* ---------- Comprobante del hero: ejemplos rotativos ---------- */
     // [EDITABLE] Ejemplos ilustrativos del comprobante. Montos coherentes con
-    // un spread de 1.5% y tipo de cambio referencial ~S/ 3.79 por USDT.
+    // la comisión de efectivo (7%) y tipo de cambio referencial ~S/ 3.79 por USDT.
     const COMPROBANTES = [
-      { entregado: 'S/ 50,000.00 en efectivo', recibido: '13,148.90 USDT', punto: 'Oficina Lima · verificado', hash: '0x9f3c…a27b' },
-      { entregado: 'S/ 120,000.00 en efectivo', recibido: '31,186.40 USDT', punto: 'Punto aliado Juliaca · verificado', hash: '0x4e81…c93d' },
-      { entregado: '$ 25,000.00 en efectivo', recibido: '0.259210 BTC', punto: 'Oficina Arequipa · verificado', hash: 'f7a2…19be' },
-      { entregado: 'S/ 18,500.00 en efectivo', recibido: '4,808.05 USDT', punto: 'Punto aliado Trujillo · verificado', hash: '0x71d0…5fa4' },
-      { entregado: 'S/ 260,000.00 en efectivo', recibido: '67,572.10 USDT', punto: 'Oficina Lima · verificado', hash: '0xb3c7…e610' },
-      { entregado: '$ 8,000.00 en efectivo', recibido: '7,880.00 USDT', punto: 'Punto aliado Tarapoto · verificado', hash: '0x25aa…d1f8' }
+      { entregado: 'S/ 50,000.00 en efectivo', recibido: '12,269.13 USDT', punto: 'Oficina Lima · verificado', hash: '0x9f3c…a27b' },
+      { entregado: 'S/ 120,000.00 en efectivo', recibido: '29,445.91 USDT', punto: 'Punto aliado Juliaca · verificado', hash: '0x4e81…c93d' },
+      { entregado: '$ 25,000.00 en efectivo', recibido: '0.244737 BTC', punto: 'Oficina Arequipa · verificado', hash: 'f7a2…19be' },
+      { entregado: 'S/ 18,500.00 en efectivo', recibido: '4,539.58 USDT', punto: 'Punto aliado Trujillo · verificado', hash: '0x71d0…5fa4' },
+      { entregado: 'S/ 260,000.00 en efectivo', recibido: '63,799.47 USDT', punto: 'Oficina Lima · verificado', hash: '0xb3c7…e610' },
+      { entregado: '$ 8,000.00 en efectivo', recibido: '7,440.00 USDT', punto: 'Punto aliado Tarapoto · verificado', hash: '0x25aa…d1f8' }
     ];
     const reciboCard = document.querySelector('.receipt');
     if (reciboCard){

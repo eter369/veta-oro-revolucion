@@ -13,7 +13,7 @@ formulario, textos legales, schema.org):
 | Qué | Clave en `CONFIG` |
 |---|---|
 | **Número de WhatsApp** (código de país sin `+`) | `WHATSAPP` |
-| **Spread del cotizador** | `SPREAD_PCT` |
+| **Comisiones por método** (efectivo 7% / Lemon Cash 5%) | `COMISIONES` |
 | **Minutos de cotización bloqueada** | `LOCK_MINUTES` |
 | **Precios de respaldo** (si la API falla) | `FALLBACK` |
 | **Razón social** (footer + términos) | `RAZON_SOCIAL` |
