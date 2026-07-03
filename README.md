@@ -42,6 +42,9 @@ El ticker muestra USDT/PEN, BTC/USD, ETH/USD y SOL/USD, actualizados cada 60 s:
 - **BTC, ETH y SOL en USD**: API pública de Binance (`api.binance.com`, con espejo
   `data-api.binance.vision` de respaldo). Binance no tiene mercado spot en soles.
 - **USDT/PEN**: CoinGecko.
+- **Tipo de cambio oficial USD/PEN (cotizador)**: `open.er-api.com` (agregador de
+  tasas oficiales), con respaldo CoinGecko. Se puede fijar a mano con
+  `CONFIG.TC_OFICIAL_MANUAL` (ej. `3.75`) para anular la API.
 - Si Binance falla, BTC/ETH caen a CoinGecko; si todo falla, se usan los valores
   de `CONFIG.FALLBACK` y el ticker muestra "Referencial (sin conexión)".
 - La fuente activa se muestra en el propio ticker ("En vivo · Binance · hh:mm").

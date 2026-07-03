@@ -1419,7 +1419,7 @@
         <i class="veta-anchor" data-veta-node style="--vx:10%; --vy:8%"></i>
         <span class="eyebrow reveal">Cotizador en vivo</span>
         <h2 class="section-title reveal" id="cotizador-title">Cotiza en segundos, confirma por WhatsApp</h2>
-        <p class="section-lead reveal">Precios de referencia de Binance, actualizados cada minuto. La tasa final se confirma con un asesor según tu volumen.</p>
+        <p class="section-lead reveal">Precios de Binance y tipo de cambio oficial, actualizados cada minuto. La tasa final se confirma con un asesor según tu volumen.</p>
 
         <div class="cotizador-card reveal">
           <div class="cot-row">
@@ -1457,7 +1457,7 @@
           <div class="cot-result" aria-live="polite">
             <p class="cot-result-label">Recibirás aproximadamente</p>
             <p class="cot-result-value num" id="cot-result">—</p>
-            <div class="cot-detail"><span>Tipo de cambio aplicado</span><strong class="num" id="cot-rate">—</strong></div>
+            <div class="cot-detail"><span>Tipo de cambio (oficial)</span><strong class="num" id="cot-rate">—</strong></div>
             <div class="cot-detail"><span>Comisión incluida</span><strong class="num" id="cot-comision">7%</strong></div>
             <div class="cot-detail"><span>Precio congelado al confirmar</span><strong><span data-lock>15</span> min</strong></div>
           </div>
@@ -2015,6 +2015,9 @@
       WHATSAPP: '51999999999',
       // [EDITABLE] Comisiones por método de entrega (fracción: 0.07 = 7%)
       COMISIONES: { efectivo: 0.07, lemon: 0.05 },
+      // [EDITABLE] Tipo de cambio oficial USD/PEN manual: pon un número
+      // (ej. 3.75) para fijarlo a mano y anular la API; null = automático
+      TC_OFICIAL_MANUAL: null,
       // [EDITABLE] Minutos de cotización bloqueada (se muestra en el copy)
       LOCK_MINUTES: 15,
       // [EDITABLE] Monto mínimo referencial en soles (FAQ visible + schema FAQPage;
@@ -2023,7 +2026,7 @@
       // Frecuencia de actualización de precios (ms)
       REFRESH_MS: 60000,
       // [EDITABLE] Valores de respaldo si las APIs de precios no responden
-      FALLBACK: { btc_usd: 95000, eth_usd: 3500, sol_usd: 150, usdt_pen: 3.75, usdt_usd: 1.0 },
+      FALLBACK: { btc_usd: 95000, eth_usd: 3500, sol_usd: 150, usdt_pen: 3.75, usd_pen: 3.75, usdt_usd: 1.0 },
 
       // [EDITABLE] Datos de la empresa
       RAZON_SOCIAL: 'VETA Activos Digitales S.A.C.',
@@ -2068,6 +2071,7 @@
       sol_usd: CONFIG.FALLBACK.sol_usd,
       btc_pen: CONFIG.FALLBACK.btc_usd * CONFIG.FALLBACK.usdt_pen,
       usdt_pen: CONFIG.FALLBACK.usdt_pen,
+      usd_pen: CONFIG.FALLBACK.usd_pen,
       usdt_usd: CONFIG.FALLBACK.usdt_usd,
       btc_chg: null,
       eth_chg: null,
@@ -2132,9 +2136,11 @@
     }
 
     async function traerPrecios(){
-      const [binance, gecko] = await Promise.allSettled([
+      const [binance, gecko, fx] = await Promise.allSettled([
         pedirBinance(),
-        pedirJson('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,tether&vs_currencies=usd,pen&include_24hr_change=true')
+        pedirJson('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,tether&vs_currencies=usd,pen&include_24hr_change=true'),
+        // Tipo de cambio oficial USD/PEN (agregador de tasas oficiales, sin clave)
+        pedirJson('https://open.er-api.com/v6/latest/USD')
       ]);
 
       let fuente = null;
@@ -2158,6 +2164,13 @@
       const g = (gecko.status === 'fulfilled') ? gecko.value : null;
       if (g && g.tether && typeof g.tether.pen === 'number'){
         precios.usdt_pen = g.tether.pen;
+      }
+
+      // Tipo de cambio oficial USD/PEN: API oficial → respaldo CoinGecko → último conocido
+      if (fx.status === 'fulfilled' && fx.value && fx.value.rates && typeof fx.value.rates.PEN === 'number'){
+        precios.usd_pen = fx.value.rates.PEN;
+      } else if (g && g.tether && typeof g.tether.pen === 'number'){
+        precios.usd_pen = g.tether.pen;
       }
       // Respaldo completo con CoinGecko si Binance no respondió
       if (fuente !== 'Binance' && g && g.bitcoin && g.ethereum && g.solana){
@@ -2196,6 +2209,13 @@
 
     const METODO_NOMBRES = { efectivo: 'Efectivo', lemon: 'Lemon Cash' };
 
+    // Tipo de cambio oficial aplicado: manual si el negocio lo fijó, si no el de la API
+    function tcOficial(){
+      return (typeof CONFIG.TC_OFICIAL_MANUAL === 'number' && CONFIG.TC_OFICIAL_MANUAL > 0)
+        ? CONFIG.TC_OFICIAL_MANUAL
+        : precios.usd_pen;
+    }
+
     function recalcularCotizador(){
       if (!montoInput) return;
       const { moneda, activo, metodo, monto } = valoresCotizador();
@@ -2207,15 +2227,19 @@
       const comisionEl = document.getElementById('cot-comision');
       if (comisionEl) comisionEl.textContent = comisionTxt;
 
+      // Tipo de cambio oficial: siempre visible y actualizado (no la tasa efectiva)
+      const tc = tcOficial();
+      const tcTxt = 'S/ ' + fmtNum(tc, 3) + ' por USD';
+      rateEl.textContent = tcTxt;
+
       if (!monto || monto <= 0){
         resultEl.textContent = '—';
-        rateEl.textContent = '—';
         actualizarWaCotizador(null);
         return;
       }
 
-      // 1) Monto a USD
-      const montoUSD = moneda === 'PEN' ? monto / precios.usdt_pen : monto;
+      // 1) Monto a USD al tipo de cambio oficial
+      const montoUSD = moneda === 'PEN' ? monto / tc : monto;
       // 2) Comisión del método elegido
       const usdNeto = montoUSD * (1 - comision);
       // 3) USD al activo elegido
@@ -2229,15 +2253,7 @@
       }
       resultEl.textContent = '≈ ' + resultadoTxt;
 
-      // Tasa efectiva mostrada al cliente
-      if (activo === 'USDT'){
-        const tasa = monto / resultado;
-        rateEl.textContent = (moneda === 'PEN' ? 'S/ ' : '$ ') + fmtNum(tasa, 3) + ' por USDT';
-      } else {
-        rateEl.textContent = '1 BTC = ' + (moneda === 'PEN' ? fmtPEN0.format(precios.btc_pen) : fmtUSD0.format(precios.btc_usd));
-      }
-
-      actualizarWaCotizador({ moneda, activo, metodo, comisionTxt, monto, resultadoTxt });
+      actualizarWaCotizador({ moneda, activo, metodo, comisionTxt, tc, monto, resultadoTxt });
     }
 
     function actualizarWaCotizador(datos){
@@ -2249,6 +2265,7 @@
         msg = 'Hola VETA, quiero cotizar: entrego ' + simbolo + fmtNum(datos.monto, 0) +
               ' y deseo recibir ' + datos.activo +
               '. Método: ' + METODO_NOMBRES[datos.metodo] + ' (' + datos.comisionTxt + ')' +
+              '. TC oficial: S/ ' + fmtNum(datos.tc, 3) +
               '. El cotizador me mostró ≈ ' + datos.resultadoTxt + '.';
       }
       cotWa.href = 'https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent(msg);
