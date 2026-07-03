@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "veta-static",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "serve", "-l", "4173", "."],
+      "port": 4173
+    },
+    {
+      "name": "veta-hero",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "veta-hero", "run", "dev"],
+      "port": 5199
+    }
+  ]
+}

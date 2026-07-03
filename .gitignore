@@ -1,0 +1,13 @@
+# Dependencias
+node_modules/
+
+# Builds
+veta-hero/dist/
+
+# Sistema
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Logs
+*.log
