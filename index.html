@@ -333,7 +333,21 @@
       padding: .55rem 0;
       font-size: .92rem;
     }
-    .receipt dl{ margin: 0; }
+    .receipt dl{ margin: 0; transition: opacity .32s ease, transform .32s ease; }
+    .receipt dl.cambiando{ opacity: 0; transform: translateY(6px); }
+    @media (prefers-reduced-motion: reduce){
+      .receipt dl{ transition: none; }
+      .receipt dl.cambiando{ opacity: 1; transform: none; }
+    }
+    .receipt-nota{
+      margin: .95rem 0 0;
+      padding-top: .8rem;
+      border-top: 1px solid var(--borde);
+      font-size: .72rem;
+      color: var(--humo-55);
+      text-align: center;
+      letter-spacing: .05em;
+    }
     .receipt-row dt{ color: var(--humo-55); }
     .receipt-row dd{ margin: 0; font-weight: 600; text-align: right; }
     .estado-ok{
@@ -1152,16 +1166,18 @@
           <p class="hero-tagline hero-enter d4">Tu producción, protegida en activos digitales.</p>
         </div>
 
-        <!-- Visual: comprobante de operación (demuestra el diferencial: trazabilidad) -->
-        <div class="receipt hero-enter d3" role="img" aria-label="Ejemplo de comprobante de operación: entrega de S/ 50,000 en efectivo, recepción de 13,148.90 USDT, confirmado on-chain con hash">
+        <!-- Visual: comprobante de operación (demuestra el diferencial: trazabilidad).
+             Rota entre los ejemplos de COMPROBANTES en el script. -->
+        <div class="receipt hero-enter d3" role="img" aria-label="Ejemplos ilustrativos de comprobantes de operación VETA con confirmación on-chain">
           <div class="receipt-head"><span>Comprobante de operación</span><span>VETA</span></div>
           <dl>
-            <div class="receipt-row"><dt>Entregado</dt><dd class="num">S/ 50,000.00 en efectivo</dd></div>
-            <div class="receipt-row"><dt>Recibido</dt><dd class="num">13,148.90 USDT</dd></div>
-            <div class="receipt-row"><dt>Punto de entrega</dt><dd>Oficina Lima · verificado</dd></div>
+            <div class="receipt-row"><dt>Entregado</dt><dd class="num" data-rec="entregado">S/ 50,000.00 en efectivo</dd></div>
+            <div class="receipt-row"><dt>Recibido</dt><dd class="num" data-rec="recibido">13,148.90 USDT</dd></div>
+            <div class="receipt-row"><dt>Punto de entrega</dt><dd data-rec="punto">Oficina Lima · verificado</dd></div>
             <div class="receipt-row"><dt>Estado</dt><dd><span class="estado-ok">Confirmado on-chain</span></dd></div>
-            <div class="receipt-row"><dt>Hash</dt><dd><span class="receipt-hash">0x9f3c…a27b</span></dd></div>
+            <div class="receipt-row"><dt>Hash</dt><dd><span class="receipt-hash" data-rec="hash">0x9f3c…a27b</span></dd></div>
           </dl>
+          <p class="receipt-nota">Ejemplos ilustrativos · así se ve tu comprobante</p>
         </div>
       </div>
 
@@ -2331,6 +2347,48 @@
       window.open('https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
       document.getElementById('form-note').classList.add('visible');
     });
+
+    /* ---------- Comprobante del hero: ejemplos rotativos ---------- */
+    // [EDITABLE] Ejemplos ilustrativos del comprobante. Montos coherentes con
+    // un spread de 1.5% y tipo de cambio referencial ~S/ 3.79 por USDT.
+    const COMPROBANTES = [
+      { entregado: 'S/ 50,000.00 en efectivo', recibido: '13,148.90 USDT', punto: 'Oficina Lima · verificado', hash: '0x9f3c…a27b' },
+      { entregado: 'S/ 120,000.00 en efectivo', recibido: '31,186.40 USDT', punto: 'Punto aliado Juliaca · verificado', hash: '0x4e81…c93d' },
+      { entregado: '$ 25,000.00 en efectivo', recibido: '0.259210 BTC', punto: 'Oficina Arequipa · verificado', hash: 'f7a2…19be' },
+      { entregado: 'S/ 18,500.00 en efectivo', recibido: '4,808.05 USDT', punto: 'Punto aliado Trujillo · verificado', hash: '0x71d0…5fa4' },
+      { entregado: 'S/ 260,000.00 en efectivo', recibido: '67,572.10 USDT', punto: 'Oficina Lima · verificado', hash: '0xb3c7…e610' },
+      { entregado: '$ 8,000.00 en efectivo', recibido: '7,880.00 USDT', punto: 'Punto aliado Tarapoto · verificado', hash: '0x25aa…d1f8' }
+    ];
+    const reciboCard = document.querySelector('.receipt');
+    if (reciboCard){
+      const reciboDl = reciboCard.querySelector('dl');
+      const camposRecibo = {
+        entregado: reciboCard.querySelector('[data-rec="entregado"]'),
+        recibido: reciboCard.querySelector('[data-rec="recibido"]'),
+        punto: reciboCard.querySelector('[data-rec="punto"]'),
+        hash: reciboCard.querySelector('[data-rec="hash"]')
+      };
+      let idxRecibo = 0;
+
+      function pintarRecibo(){
+        const c = COMPROBANTES[idxRecibo];
+        camposRecibo.entregado.textContent = c.entregado;
+        camposRecibo.recibido.textContent = c.recibido;
+        camposRecibo.punto.textContent = c.punto;
+        camposRecibo.hash.textContent = c.hash;
+      }
+
+      setInterval(() => {
+        if (document.hidden) return; // no rotar en pestañas ocultas
+        idxRecibo = (idxRecibo + 1) % COMPROBANTES.length;
+        if (reducedMotion){ pintarRecibo(); return; }
+        reciboDl.classList.add('cambiando');
+        setTimeout(() => {
+          pintarRecibo();
+          reciboDl.classList.remove('cambiando');
+        }, 320);
+      }, 4500);
+    }
 
     /* ---------- Selector de perfil de inversión ---------- */
     const opcionesPerfil = Array.from(document.querySelectorAll('input[name="perfil-opcion"]'));
