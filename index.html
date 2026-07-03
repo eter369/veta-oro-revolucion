@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VETA — Cambio OTC seguro de efectivo a USDT y BTC para el sector minero | Perú</title>
   <meta name="description" content="VETA es la plataforma OTC del sector minero peruano: convierte tu efectivo en USDT o BTC con verificación de identidad, cotización bloqueada, entrega segura y confirmación en blockchain. Operamos bajo normativa PLAFT como sujeto obligado ante la UIF-Perú.">
-  <meta name="theme-color" content="#12141A">
+  <meta name="theme-color" content="#0C0E13">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Crect x='1' y='1' width='28' height='28' rx='7' fill='%231C1F27' stroke='%23C9A227' stroke-opacity='.45'/%3E%3Cpath d='M4 21 L11 12 L15 17 L21 7 L26 10' stroke='%23E8C766' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
   <link rel="canonical" href="https://veta.pe/"><!-- [EDITABLE] dominio real -->
 
@@ -71,6 +71,11 @@
        Paleta: roca (grafito), carbón, oro metálico, humo, verde mineral
        ========================================================== */
     :root{
+      --rock-0: #06070A;
+      --rock-1: #0C0E13;
+      --rock-2: #141924;
+      --oro-brillo: #F0C75E;
+      --oro-destello: #FFF3CB;
       --roca: #12141A;
       --carbon: #1C1F27;
       --carbon-2: #22262F;
@@ -97,7 +102,7 @@
     }
     body{
       margin: 0;
-      background: var(--roca);
+      background: var(--rock-1);
       color: var(--humo);
       font-family: var(--f-cuerpo);
       font-size: 1rem;
@@ -139,6 +144,52 @@
     .section-title{ font-size: clamp(1.7rem, 4.2vw, 2.6rem); font-weight: 700; max-width: 22ch; }
     .section-lead{ color: var(--humo-72); max-width: 58ch; font-size: 1.05rem; }
 
+    /* ============================================================
+       LA VETA VIVA · Sistema de fondo en 7 capas
+       1 profundidad de mina · 2 estratos · 3 la veta (halo+pulso+
+       cristales) · 4 polvo de oro · 5 grano · 6 barrido+viñeta ·
+       7 lámpara de minero
+       ============================================================ */
+    .mina-fondo{
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(1200px 800px at 78% 12%, rgba(201,162,39,.07), transparent 62%),
+        radial-gradient(900px 700px at 12% 88%, rgba(58,76,110,.06), transparent 60%),
+        radial-gradient(1700px 1200px at 50% 28%, var(--rock-2), var(--rock-1) 52%, var(--rock-0) 100%);
+    }
+    .estratos{
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        repeating-linear-gradient(112deg,
+          transparent 0 110px, rgba(255,255,255,.014) 110px 111px, transparent 111px 230px),
+        repeating-linear-gradient(104deg,
+          transparent 0 170px, rgba(201,162,39,.02) 170px 171px, transparent 171px 340px);
+    }
+    #polvo-oro{ position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .veta-sheen{
+      position: fixed; inset: -15%; z-index: 0; pointer-events: none;
+      background: linear-gradient(100deg, transparent 42%, rgba(240,199,94,.05) 50%, transparent 58%);
+      mix-blend-mode: screen;
+      animation: barridoLuz 16s ease-in-out infinite;
+    }
+    @keyframes barridoLuz{ 0%,100%{ transform: translateX(-55%); } 50%{ transform: translateX(55%); } }
+    .grano{
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: .05; mix-blend-mode: overlay;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.6"/></svg>');
+    }
+    .vineta{
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: radial-gradient(120% 95% at 50% 38%, transparent 52%, rgba(0,0,0,.5) 100%);
+    }
+    #lampara{
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0; transition: opacity .8s ease;
+      background: radial-gradient(540px circle at var(--mx,50%) var(--my,40%),
+        rgba(240,199,94,.06), transparent 62%);
+    }
+    #lampara.encendida{ opacity: 1; }
+
     /* ---------- La Veta (SVG global) ---------- */
     #veta-svg{
       position: absolute;
@@ -149,6 +200,24 @@
     #veta-glow{ opacity: .14; }
     #veta-path, #veta-glow{
       transition: stroke-dashoffset .9s cubic-bezier(.22, 1, .36, 1);
+    }
+    /* Halo difuso: la veta dormida en la roca, respirando */
+    #veta-halo{ opacity: .07; animation: respiraVeta 7s ease-in-out infinite; }
+    @keyframes respiraVeta{ 0%,100%{ opacity: .05; } 50%{ opacity: .12; } }
+    /* Pulso de oro líquido recorriendo la veta */
+    #veta-pulse{
+      stroke-dasharray: 42 958; stroke-dashoffset: 1000;
+      opacity: .9;
+      animation: fluyeOro 8s linear 2.5s infinite;
+    }
+    @keyframes fluyeOro{ from{ stroke-dashoffset: 1000; } to{ stroke-dashoffset: 0; } }
+    /* Cristales que titilan en los nudos del protocolo */
+    .veta-glint{ fill: var(--oro-destello); animation: titila 3.4s ease-in-out infinite; }
+    .veta-glint-halo{ fill: var(--oro-brillo); opacity: .18; }
+    @keyframes titila{ 0%,100%{ opacity: .25; } 50%{ opacity: 1; } }
+    /* Las capas costosas se apagan en pantallas pequeñas (Android gama media) */
+    @media (max-width: 900px){
+      #veta-halo, #veta-pulse, .veta-sheen, #lampara{ display: none; }
     }
     .veta-anchor{
       position: absolute;
@@ -1053,6 +1122,8 @@
       .hero-enter{ opacity: 1; transform: none; animation: none; }
       #veta-path, #veta-glow{ transition: none; }
       .btn, .paso-card, .prod-card, .wa-float{ transition: none; }
+      #veta-halo, #veta-pulse, .veta-sheen, #lampara, #polvo-oro{ display: none; }
+      .veta-glint{ animation: none; opacity: .8; }
     }
 
     .noscript-banner{
@@ -1070,7 +1141,13 @@
 </head>
 <body>
 
-  <!-- ============ LA VETA: SVG global, trazado por JS ============ -->
+  <!-- ============ LA VETA VIVA: capas de fondo ============ -->
+  <!-- CAPA 1 · Profundidad de mina -->
+  <div class="mina-fondo" aria-hidden="true"></div>
+  <!-- CAPA 2 · Estratos geológicos -->
+  <div class="estratos" aria-hidden="true"></div>
+
+  <!-- CAPA 3 · La veta de oro (trazado por JS, ligada al scroll) -->
   <svg id="veta-svg" aria-hidden="true" focusable="false">
     <defs>
       <linearGradient id="veta-grad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1">
@@ -1078,11 +1155,37 @@
         <stop offset=".45" stop-color="#C9A227"/>
         <stop offset=".75" stop-color="#E8C766"/>
         <stop offset="1" stop-color="#C9A227"/>
+        <animateTransform attributeName="gradientTransform" type="translate"
+          values="0,0; 0,-140; 0,0" dur="9s" repeatCount="indefinite"/>
       </linearGradient>
+      <filter id="veta-halo-blur" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="12"/>
+      </filter>
+      <filter id="veta-pulse-glow" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
     </defs>
+    <!-- halo difuso que respira (la veta completa, dormida en la roca) -->
+    <path id="veta-halo" fill="none" stroke="#C9A227" stroke-width="16" stroke-linecap="round" filter="url(#veta-halo-blur)"/>
     <path id="veta-glow" fill="none" stroke="#E8C766" stroke-width="9" stroke-linecap="round"/>
     <path id="veta-path" fill="none" stroke="url(#veta-grad)" stroke-width="2.2" stroke-linecap="round"/>
+    <!-- pulso de oro líquido -->
+    <path id="veta-pulse" pathLength="1000" fill="none" stroke="#FFF3CB" stroke-width="4" stroke-linecap="round" filter="url(#veta-pulse-glow)"/>
+    <!-- cristales en los nudos del protocolo (los coloca el JS) -->
+    <g id="veta-glints"></g>
   </svg>
+
+  <!-- CAPA 4 · Polvo de oro -->
+  <canvas id="polvo-oro" aria-hidden="true"></canvas>
+  <!-- CAPA 6 · Barrido de luz -->
+  <div class="veta-sheen" aria-hidden="true"></div>
+  <!-- CAPA 5 · Grano mineral -->
+  <div class="grano" aria-hidden="true"></div>
+  <!-- CAPA 6b · Viñeta -->
+  <div class="vineta" aria-hidden="true"></div>
+  <!-- CAPA 7 · Lámpara de minero -->
+  <div id="lampara" aria-hidden="true"></div>
 
   <!-- ============ HEADER ============ -->
   <header class="site-header">
@@ -2407,6 +2510,9 @@
     /* ---------- La Veta: trazado global ligado al scroll ---------- */
     const vetaSvg = document.getElementById('veta-svg');
     const vetaPaths = [document.getElementById('veta-path'), document.getElementById('veta-glow')];
+    const vetaHalo = document.getElementById('veta-halo');
+    const vetaPulse = document.getElementById('veta-pulse');
+    const vetaGlints = document.getElementById('veta-glints');
     let vetaTotal = 0, vetaMinY = 0, vetaMaxY = 1;
 
     function construirVeta(){
@@ -2421,7 +2527,11 @@
 
       const pts = nodos.map(el => {
         const r = el.getBoundingClientRect();
-        return { x: r.left + r.width / 2 + window.scrollX, y: r.top + r.height / 2 + window.scrollY };
+        return {
+          x: r.left + r.width / 2 + window.scrollX,
+          y: r.top + r.height / 2 + window.scrollY,
+          esNodo: el.classList.contains('paso-nodo')
+        };
       }).sort((a, b) => a.y - b.y);
 
       let d = 'M ' + pts[0].x + ' ' + pts[0].y;
@@ -2432,6 +2542,17 @@
       }
 
       vetaPaths.forEach(p => p.setAttribute('d', d));
+      // Halo: la veta completa, sin recorte por scroll (respira en la roca)
+      if (vetaHalo) vetaHalo.setAttribute('d', d);
+      // Pulso de oro líquido: dasharray propio normalizado con pathLength=1000
+      if (vetaPulse) vetaPulse.setAttribute('d', d);
+      // Cristales que titilan en los nudos del protocolo
+      if (vetaGlints){
+        vetaGlints.innerHTML = pts.filter(p => p.esNodo).map((p, i) =>
+          '<circle class="veta-glint-halo" cx="' + p.x + '" cy="' + p.y + '" r="6"/>' +
+          '<circle class="veta-glint" cx="' + p.x + '" cy="' + p.y + '" r="2.2" style="animation-delay:' + (i * 0.85) + 's"/>'
+        ).join('');
+      }
       vetaTotal = vetaPaths[0].getTotalLength();
       vetaMinY = pts[0].y;
       vetaMaxY = pts[pts.length - 1].y;
@@ -2471,6 +2592,82 @@
     document.querySelectorAll('.faq-list details').forEach(d => {
       d.addEventListener('toggle', () => construirVeta());
     });
+
+    /* ---------- La Veta Viva: polvo de oro en suspensión ---------- */
+    (function(){
+      if (reducedMotion) return;
+      const cv = document.getElementById('polvo-oro');
+      if (!cv) return;
+      const cx2 = cv.getContext('2d');
+      if (!cx2) return;
+      let W, H, parts = [], running = !document.hidden, last = performance.now();
+
+      function redimensionar(){
+        // DPR limitado a 1.75 para cuidar equipos Android de gama media
+        const DPR = Math.min(window.devicePixelRatio || 1, 1.75);
+        W = window.innerWidth; H = window.innerHeight;
+        cv.width = W * DPR; cv.height = H * DPR;
+        cv.style.width = W + 'px'; cv.style.height = H + 'px';
+        cx2.setTransform(DPR, 0, 0, DPR, 0, 0);
+        sembrar();
+      }
+      function sembrar(){
+        const n = W < 720 ? 14 : 30; // menos partículas en móvil
+        parts = [];
+        for (let i = 0; i < n; i++){
+          const brillante = Math.random() < .16;
+          parts.push({
+            x: Math.random() * W, y: Math.random() * H,
+            r: brillante ? 1.6 + Math.random() * .9 : .6 + Math.random() * 1.1,
+            a: .12 + Math.random() * .34,
+            ph: Math.random() * 6.28, f: .4 + Math.random() * .9,
+            vy: -(5 + Math.random() * 9) / 60, dx: 6 + Math.random() * 14,
+            brillante: brillante
+          });
+        }
+      }
+      function cuadro(t){
+        if (running){
+          const dt = Math.min(t - last, 50); last = t;
+          cx2.clearRect(0, 0, W, H);
+          for (const p of parts){
+            p.y += p.vy * (dt / 16.7);
+            const x = p.x + Math.sin(t / 2400 + p.ph) * p.dx;
+            if (p.y < -12){ p.y = H + 12; p.x = Math.random() * W; }
+            const tw = .55 + .45 * Math.sin(t / 1000 * p.f + p.ph);
+            const col = p.brillante ? '255,240,200' : '214,178,84';
+            cx2.beginPath(); // halo suave
+            cx2.fillStyle = 'rgba(' + col + ',' + (p.a * tw * .16).toFixed(3) + ')';
+            cx2.arc(x, p.y, p.r * 3.2, 0, 6.29); cx2.fill();
+            cx2.beginPath(); // núcleo
+            cx2.fillStyle = 'rgba(' + col + ',' + (p.a * tw).toFixed(3) + ')';
+            cx2.arc(x, p.y, p.r, 0, 6.29); cx2.fill();
+          }
+        } else { last = t; }
+        requestAnimationFrame(cuadro);
+      }
+      window.addEventListener('resize', redimensionar);
+      document.addEventListener('visibilitychange', () => { running = !document.hidden; last = performance.now(); });
+      redimensionar();
+      requestAnimationFrame(cuadro);
+    })();
+
+    /* ---------- La Veta Viva: lámpara de minero (solo escritorio) ---------- */
+    (function(){
+      if (reducedMotion || !window.matchMedia('(pointer: fine)').matches) return;
+      const lampara = document.getElementById('lampara');
+      if (!lampara) return;
+      let mx = 0, my = 0, raf = null;
+      window.addEventListener('pointermove', e => {
+        mx = e.clientX; my = e.clientY;
+        lampara.classList.add('encendida');
+        if (!raf) raf = requestAnimationFrame(() => {
+          lampara.style.setProperty('--mx', mx + 'px');
+          lampara.style.setProperty('--my', my + 'px');
+          raf = null;
+        });
+      });
+    })();
 
     /* ---------- Arranque ---------- */
     pintarTicker();
