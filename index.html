@@ -588,6 +588,31 @@
       letter-spacing: .16em; text-transform: uppercase; font-weight: 600;
       margin-top: -.3rem;
     }
+    /* [EXPERIMENTO] Franja de logos de marcas — colocados a pedido del
+       propietario como prueba visual. NO representan alianzas reales:
+       retirar o sustituir por aliados autorizados antes del lanzamiento. */
+    .marcas-exp{
+      margin-top: 2rem;
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      border: 1px solid rgba(237,234,227,.10);
+      border-radius: 20px; overflow: hidden;
+      background: rgba(0,0,0,.4);
+    }
+    @media (min-width: 780px){ .marcas-exp{ grid-template-columns: repeat(4, 1fr); } }
+    .marca-exp{
+      display: flex; align-items: center; justify-content: center;
+      padding: 2.6rem 1rem; min-height: 116px;
+      transition: background .25s ease;
+    }
+    .marca-exp:hover{ background: rgba(255,255,255,.02); }
+    .marca-exp:nth-child(even){ border-left: 1px solid rgba(237,234,227,.10); }
+    .marca-exp:nth-child(n+3){ border-top: 1px solid rgba(237,234,227,.10); }
+    @media (min-width: 780px){
+      .marca-exp:nth-child(n+3){ border-top: none; }
+      .marca-exp + .marca-exp{ border-left: 1px solid rgba(237,234,227,.10); }
+    }
+    .marca-exp svg{ width: auto; max-width: 82%; height: 38px; }
+
     /* Franja de respaldo institucional (estilo franja de logos de referencia,
        solo con relaciones reales y verificables) */
     .respaldo-strip{
@@ -1447,6 +1472,45 @@
             </span>
             <span class="trust-label">Años en el sector</span>
             <span class="trust-sub">desde <span data-fundacion>2001</span></span>
+          </div>
+        </div>
+
+        <!-- [EXPERIMENTO] Franja de logos de marcas — a pedido del propietario.
+             No representan alianzas reales; retirar antes del lanzamiento. -->
+        <div class="marcas-exp reveal" role="region" aria-label="Marcas (experimento visual)">
+          <div class="marca-exp">
+            <!-- Western Union -->
+            <svg viewBox="0 0 250 44" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Western Union">
+              <path d="M4 9 L13 35 L21 17 L29 35 L38 9" fill="none" stroke="#FFDD00" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+              <text x="52" y="30" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="21" fill="#ffffff">Western Union</text>
+            </svg>
+          </div>
+          <div class="marca-exp">
+            <!-- VISA -->
+            <svg viewBox="0 0 150 46" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="VISA">
+              <path d="M6 14 h14 l-4 18 h-14 z" fill="#F7B600"/>
+              <text x="26" y="35" font-family="Arial, Helvetica, sans-serif" font-style="italic" font-weight="800" font-size="34" letter-spacing="1.5" fill="#3B5CA8">VISA</text>
+            </svg>
+          </div>
+          <div class="marca-exp">
+            <!-- PayPal -->
+            <svg viewBox="0 0 190 46" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PayPal">
+              <path d="M20 8 h14 c7 0 11 4 9 11 -2 8 -8 11 -15 11 h-4 l-2 8 h-9 z" fill="#6C8FD6"/>
+              <path d="M28 12 h14 c7 0 11 4 9 11 -2 8 -8 11 -15 11 h-4 l-2 8 h-9 z" fill="#2AA9E0"/>
+              <text x="58" y="33" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="26" fill="#6C8FD6">Pay</text>
+              <text x="112" y="33" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="26" fill="#2AA9E0">Pal</text>
+            </svg>
+          </div>
+          <div class="marca-exp">
+            <!-- Franklin Templeton -->
+            <svg viewBox="0 0 230 50" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Franklin Templeton">
+              <circle cx="24" cy="25" r="18" fill="none" stroke="#ffffff" stroke-width="1.4"/>
+              <path d="M14 20 q4 -9 10 -9 q6 0 10 9" fill="none" stroke="#ffffff" stroke-width="1.2"/>
+              <circle cx="24" cy="24" r="6.5" fill="none" stroke="#ffffff" stroke-width="1.2"/>
+              <path d="M17 34 q7 5 14 0" fill="none" stroke="#ffffff" stroke-width="1.2"/>
+              <text x="52" y="22" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="17" letter-spacing="1" fill="#ffffff">FRANKLIN</text>
+              <text x="52" y="41" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="17" letter-spacing="1" fill="#ffffff">TEMPLETON</text>
+            </svg>
           </div>
         </div>
 
