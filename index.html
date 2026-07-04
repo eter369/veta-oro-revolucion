@@ -30,6 +30,7 @@
     "@context": "https://schema.org",
     "@type": "FinancialService",
     "name": "VETA",
+    "foundingDate": "2001",
     "slogan": "Tu producción, protegida en activos digitales.",
     "description": "Plataforma OTC de cambio de efectivo a activos digitales (USDT, BTC) y gestión patrimonial digital para el sector minero peruano. Sujeto obligado ante la UIF-Perú bajo normativa PLAFT.",
     "url": "https://veta.pe/",
@@ -1344,8 +1345,8 @@
             <span class="trust-label">Regiones con cobertura</span>
           </div>
           <div class="trust-item reveal">
-            <span class="counter num" data-metric="anios" data-target="5">0</span>
-            <span class="trust-label">Años en el sector</span>
+            <span class="counter num" data-metric="anios" data-target="25">0</span>
+            <span class="trust-label">Años en el sector · desde <span data-fundacion>2001</span></span>
           </div>
         </div>
       </div>
@@ -2040,7 +2041,7 @@
         volumen_millones: 120,   // "S/ 120 M+"
         operaciones: 3400,       // "3,400+"
         regiones: 6,
-        anios: 5
+        anio_fundacion: 2001     // los "años en el sector" se calculan solos cada año
       },
 
       // [EDITABLE] Ciudades de cobertura (alimentan el formulario y la lista)
@@ -2311,8 +2312,10 @@
       volumen: CONFIG.METRICAS.volumen_millones,
       operaciones: CONFIG.METRICAS.operaciones,
       regiones: CONFIG.METRICAS.regiones,
-      anios: CONFIG.METRICAS.anios
+      // Años en el sector: se actualizan solos con el año en curso
+      anios: new Date().getFullYear() - CONFIG.METRICAS.anio_fundacion
     };
+    document.querySelectorAll('[data-fundacion]').forEach(el => el.textContent = CONFIG.METRICAS.anio_fundacion);
     document.querySelectorAll('.counter[data-metric]').forEach(el => {
       const valor = METRICA_VALORES[el.dataset.metric];
       if (typeof valor === 'number') el.dataset.target = valor;
@@ -2346,6 +2349,7 @@
         datos.telephone = CONFIG.TELEFONO_VISIBLE;
         datos.email = CONFIG.EMAIL;
         datos.areaServed = CONFIG.CIUDADES.map(c => c.nombre);
+        datos.foundingDate = String(CONFIG.METRICAS.anio_fundacion);
         ldFinanciero.textContent = JSON.stringify(datos);
       } catch (e) {
         // Si el JSON estático se edita a mano y queda inválido, no romper la página
