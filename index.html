@@ -22,7 +22,7 @@
   <!-- Tipografías: Space Grotesk (display) + Inter (cuerpo) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Schema.org: FinancialService (url, teléfono, correo y cobertura se sincronizan desde CONFIG) -->
   <script type="application/ld+json" id="ld-financial">
@@ -142,7 +142,9 @@
       color: var(--oro);
       margin-bottom: 1rem;
     }
-    .section-title{ font-size: clamp(1.7rem, 4.2vw, 2.6rem); font-weight: 700; max-width: 22ch; }
+    .section-title{ font-size: clamp(1.9rem, 4.8vw, 3.3rem); font-weight: 600; letter-spacing: -.02em; max-width: 24ch; }
+    /* Patrón editorial de dos pesos: frase fuerte + remate ligero */
+    .ti-light{ font-weight: 300; }
     .section-lead{ color: var(--humo-72); max-width: 58ch; font-size: 1.05rem; }
 
     /* ============================================================
@@ -292,8 +294,8 @@
     /* ---------- Botones ---------- */
     .btn{
       display: inline-flex; align-items: center; justify-content: center; gap: .55rem;
-      padding: .95rem 1.6rem;
-      border-radius: 12px;
+      padding: .95rem 1.75rem;
+      border-radius: 999px;
       font-family: var(--f-display);
       font-weight: 600; font-size: 1rem;
       border: 1px solid transparent;
@@ -314,8 +316,18 @@
       border-color: var(--borde-oro);
     }
     .btn-secondary:hover{ background: var(--oro-suave); transform: translateY(-1px); }
-    .btn-sm{ padding: .55rem 1.1rem; font-size: .9rem; min-height: 40px; }
+    .btn-sm{ padding: .55rem 1.2rem; font-size: .9rem; min-height: 40px; }
     .btn svg{ flex: none; }
+    /* Chip circular con flecha dentro del botón (patrón editorial premium) */
+    .btn-chip{
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 2rem; height: 2rem; border-radius: 50%; flex: none;
+      background: var(--roca); color: var(--oro-claro);
+      margin-right: -0.9rem; margin-left: .3rem;
+      transition: transform .25s ease;
+    }
+    .btn:hover .btn-chip{ transform: translateX(3px); }
+    @media (prefers-reduced-motion: reduce){ .btn-chip, .btn:hover .btn-chip{ transition: none; transform: none; } }
 
     /* ---------- Hero ---------- */
     .hero{
@@ -344,10 +356,11 @@
     .badge-plaft svg{ flex: none; }
 
     .hero h1{
-      font-size: clamp(2.1rem, 5.6vw, 3.5rem);
-      font-weight: 700;
+      font-size: clamp(2.2rem, 5.8vw, 4.1rem);
+      font-weight: 600;
       letter-spacing: -.02em;
       max-width: 17ch;
+      line-height: 1.08;
     }
     .hero h1 .oro{
       background: linear-gradient(120deg, var(--oro) 20%, var(--oro-claro) 80%);
@@ -512,30 +525,37 @@
       background: radial-gradient(640px 220px at 50% 50%, rgba(201,162,39,.055), transparent 72%);
       pointer-events: none;
     }
+    /* Retícula institucional con bordes finos (patrón editorial de referencia) */
     .trust-grid{
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.4rem 1rem;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 0;
       text-align: center;
       position: relative;
+      border: 1px solid rgba(237,234,227,.10);
+      border-radius: 20px;
+      overflow: hidden;
+      background: rgba(12,14,19,.4);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
-    @media (min-width: 780px){ .trust-grid{ grid-template-columns: repeat(4, 1fr); } }
-    .trust-item{ position: relative; }
-    /* Separadores verticales en degradado dorado (solo escritorio) */
+    .trust-item{ position: relative; padding: 2.4rem 1rem 2.1rem; }
+    .trust-item:nth-child(even){ border-left: 1px solid rgba(237,234,227,.10); }
+    .trust-item:nth-child(n+3){ border-top: 1px solid rgba(237,234,227,.10); }
     @media (min-width: 780px){
-      .trust-item + .trust-item::before{
-        content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
-        width: 1px; height: 62px;
-        background: linear-gradient(180deg, transparent, rgba(201,162,39,.45), transparent);
-      }
+      .trust-grid{ grid-template-columns: repeat(4, 1fr); }
+      .trust-item{ padding: 2.8rem 1.2rem 2.5rem; }
+      .trust-item:nth-child(n+3){ border-top: none; }
+      .trust-item + .trust-item{ border-left: 1px solid rgba(237,234,227,.10); }
     }
     .trust-item .counter{
       display: block;
-      font-family: var(--f-display); font-weight: 700;
-      font-size: clamp(2rem, 5vw, 3rem);
+      font-family: var(--f-display); font-weight: 300;
+      font-size: clamp(2.2rem, 5.5vw, 3.4rem);
       letter-spacing: -.01em;
+      line-height: 1.05;
       background: linear-gradient(120deg, var(--oro) 5%, var(--oro-claro) 55%, var(--oro) 100%);
       -webkit-background-clip: text; background-clip: text; color: transparent;
       filter: drop-shadow(0 3px 16px rgba(201,162,39,.16));
-      margin-bottom: .4rem;
+      margin-bottom: .6rem;
     }
     .trust-item .trust-label{
       color: var(--humo-55); font-size: .74rem;
@@ -1037,7 +1057,7 @@
       background: radial-gradient(ellipse 420px 220px at 50% 0%, rgba(201,162,39,.14), transparent 70%);
       pointer-events: none;
     }
-    .cta-final h2{ font-size: clamp(1.5rem, 4vw, 2.1rem); position: relative; }
+    .cta-final h2{ font-size: clamp(1.8rem, 4.6vw, 2.8rem); font-weight: 600; letter-spacing: -.02em; position: relative; }
     .cta-final p{ color: var(--humo-72); max-width: 46ch; margin: 0 auto 1.6rem; position: relative; }
     .cta-final .btn{ position: relative; }
 
@@ -1248,12 +1268,13 @@
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5 13.5 3.7v3.6c0 3.4-2.3 6-5.5 7.2C4.8 13.3 2.5 10.7 2.5 7.3V3.7L8 1.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="m5.8 7.9 1.6 1.6 2.9-3.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Operamos bajo normativa PLAFT · Sujeto obligado ante la UIF-Perú
           </p>
-          <h1 id="hero-title" class="hero-enter d1">Convierte tu efectivo en <span class="oro">activos digitales</span> con la seguridad que tu trabajo merece.</h1>
+          <h1 id="hero-title" class="hero-enter d1">Convierte tu efectivo en <span class="oro">activos digitales</span> <span class="ti-light">con la seguridad que tu trabajo merece.</span></h1>
           <p class="hero-sub hero-enter d2">Somos la plataforma OTC del sector minero peruano. Cambiamos tu producción en efectivo por USDT o BTC con verificación de identidad, cotización bloqueada, puntos de entrega seguros y confirmación en blockchain.</p>
           <div class="hero-ctas hero-enter d3">
             <a class="btn btn-primary" data-wa data-wa-msg="Hola VETA, quiero cotizar un cambio de efectivo a activos digitales." href="#contacto">
               <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a9.9 9.9 0 0 0-8.5 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm5.7 14.1c-.24.68-1.4 1.3-1.93 1.35-.52.05-1.01.24-3.4-.7-2.87-1.14-4.7-4.06-4.84-4.25-.14-.19-1.16-1.55-1.16-2.95 0-1.4.73-2.09 1-2.37.24-.26.54-.32.72-.32h.52c.17 0 .4-.06.61.47.24.56.78 1.94.85 2.08.07.14.12.3.02.49-.42.85-.88.82-.65 1.21.86 1.48 1.72 1.99 3.02 2.65.22.11.35.1.48-.05.13-.14.56-.65.7-.87.15-.22.3-.19.5-.11.2.07 1.3.62 1.53.73.22.11.37.17.42.26.06.1.06.55-.18 1.08Z"/></svg>
               Cotizar por WhatsApp
+              <span class="btn-chip" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
             <a class="btn btn-secondary" href="#protocolo">Ver cómo funciona</a>
           </div>
@@ -1356,7 +1377,7 @@
     <section id="protocolo" aria-labelledby="protocolo-title">
       <div class="container">
         <span class="eyebrow reveal">Cómo funciona</span>
-        <h2 class="section-title reveal" id="protocolo-title">El Protocolo VETA: cinco pasos, cero improvisación</h2>
+        <h2 class="section-title reveal" id="protocolo-title">El Protocolo VETA: <span class="ti-light">cinco pasos, cero improvisación.</span></h2>
         <p class="section-lead reveal">Cada operación sigue el mismo camino documentado. Así como una veta guía al minero hasta el mineral, nuestro protocolo guía tu efectivo hasta tu billetera digital sin puntos ciegos.</p>
 
         <ol class="pasos">
@@ -1419,7 +1440,7 @@
       <div class="container">
         <i class="veta-anchor" data-veta-node style="--vx:10%; --vy:8%"></i>
         <span class="eyebrow reveal">Cotizador en vivo</span>
-        <h2 class="section-title reveal" id="cotizador-title">Cotiza en segundos, confirma por WhatsApp</h2>
+        <h2 class="section-title reveal" id="cotizador-title">Cotiza en segundos, <span class="ti-light">confirma por WhatsApp.</span></h2>
         <p class="section-lead reveal">Precios de Binance y tipo de cambio oficial, actualizados cada minuto. La tasa final se confirma con un asesor según tu volumen.</p>
 
         <div class="cotizador-card reveal">
@@ -1479,7 +1500,7 @@
         <div class="inv-header">
           <div>
             <span class="eyebrow reveal">División de Inversión</span>
-            <h2 class="section-title reveal" id="inversion-title">No solo conviertes: <span class="titulo-oro">construyes patrimonio.</span></h2>
+            <h2 class="section-title reveal" id="inversion-title">No solo conviertes: <span class="titulo-oro ti-light">construyes patrimonio.</span></h2>
             <p class="section-lead reveal">Tu efectivo ya está seguro en digital. Ahora decides qué hacer con él: cada plan te dice, en palabras simples, cuánto se moverá tu dinero y qué riesgo asumes. Nada de letra chiquita.</p>
           </div>
 
@@ -1604,7 +1625,7 @@
       <div class="container">
         <i class="veta-anchor" data-veta-node style="--vx:12%; --vy:5%"></i>
         <span class="eyebrow reveal">Seguridad y cumplimiento</span>
-        <h2 class="section-title reveal" id="seguridad-title">La confianza no se promete: se demuestra en cada paso</h2>
+        <h2 class="section-title reveal" id="seguridad-title">La confianza no se promete: <span class="ti-light">se demuestra en cada paso.</span></h2>
         <p class="section-lead reveal">Tres capas de protección cubren tu operación: el intercambio presencial, la custodia de los activos y el marco legal que lo respalda todo.</p>
 
         <div class="seg-grid">
@@ -1658,7 +1679,7 @@
       <div class="container">
         <i class="veta-anchor" data-veta-node style="--vx:86%; --vy:6%"></i>
         <span class="eyebrow reveal">Hecho para el sector minero</span>
-        <h2 class="section-title reveal" id="mineria-title">Entendemos tu operación porque venimos de ella</h2>
+        <h2 class="section-title reveal" id="mineria-title">Entendemos tu operación <span class="ti-light">porque venimos de ella.</span></h2>
         <!-- [EDITABLE] Mantener esta enumeración coherente con CONFIG.CIUDADES si cambia la cobertura -->
         <p class="section-lead reveal">No somos un exchange genérico. Diseñamos cada servicio pensando en cómo se mueve el dinero real en Lima, Arequipa, Puno, Madre de Dios, La Libertad y San Martín.</p>
 
@@ -1708,7 +1729,7 @@
       <div class="container">
         <i class="veta-anchor" data-veta-node style="--vx:14%; --vy:10%"></i>
         <span class="eyebrow reveal">Testimonios</span>
-        <h2 class="section-title reveal" id="testimonios-title">Lo que dicen quienes ya operan con VETA</h2>
+        <h2 class="section-title reveal" id="testimonios-title">Lo que dicen <span class="ti-light">quienes ya operan con VETA.</span></h2>
 
         <!-- [PLACEHOLDER] Testimonios de ejemplo: reemplazar con casos reales autorizados por escrito -->
         <div class="testi-grid">
@@ -1742,7 +1763,7 @@
       <div class="container">
         <i class="veta-anchor" data-veta-node style="--vx:82%; --vy:4%"></i>
         <span class="eyebrow reveal">Preguntas frecuentes</span>
-        <h2 class="section-title reveal" id="faq-title">Resolvemos tus dudas antes de que operes</h2>
+        <h2 class="section-title reveal" id="faq-title">Resolvemos tus dudas <span class="ti-light">antes de que operes.</span></h2>
 
         <div class="faq-list reveal">
           <details name="faq">
@@ -1809,7 +1830,7 @@
     <section id="contacto" aria-labelledby="contacto-title">
       <div class="container">
         <span class="eyebrow reveal">Contacto y cobertura</span>
-        <h2 class="section-title reveal" id="contacto-title">Empecemos con tu primera cotización</h2>
+        <h2 class="section-title reveal" id="contacto-title">Empecemos <span class="ti-light">con tu primera cotización.</span></h2>
         <p class="section-lead reveal">Déjanos tus datos y un asesor te contacta el mismo día. Sin compromiso y sin pedirte información sensible: nunca te solicitaremos claves ni frases semilla.</p>
 
         <div class="contacto-grid">
@@ -1858,11 +1879,12 @@
         <!-- CTA final: la veta desemboca aquí -->
         <div class="cta-final reveal">
           <i class="veta-anchor" data-veta-node style="--vx:50%; --vy:12%"></i>
-          <h2>Tu producción ya salió de la roca.<br>Ahora protégela.</h2>
+          <h2>Tu producción ya salió de la roca.<br><span class="ti-light">Ahora protégela.</span></h2>
           <p>Una conversación por WhatsApp basta para conocer tu tasa preferencial. Sin compromiso.</p>
           <a class="btn btn-primary" data-wa data-wa-msg="Hola VETA, quiero conocer mi tasa preferencial para cambiar efectivo por activos digitales." href="#contacto">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a9.9 9.9 0 0 0-8.5 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm5.7 14.1c-.24.68-1.4 1.3-1.93 1.35-.52.05-1.01.24-3.4-.7-2.87-1.14-4.7-4.06-4.84-4.25-.14-.19-1.16-1.55-1.16-2.95 0-1.4.73-2.09 1-2.37.24-.26.54-.32.72-.32h.52c.17 0 .4-.06.61.47.24.56.78 1.94.85 2.08.07.14.12.3.02.49-.42.85-.88.82-.65 1.21.86 1.48 1.72 1.99 3.02 2.65.22.11.35.1.48-.05.13-.14.56-.65.7-.87.15-.22.3-.19.5-.11.2.07 1.3.62 1.53.73.22.11.37.17.42.26.06.1.06.55-.18 1.08Z"/></svg>
             Cotizar por WhatsApp
+            <span class="btn-chip" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           </a>
         </div>
       </div>
