@@ -809,13 +809,18 @@
       border-radius: 12px; padding: 4px; gap: 4px;
     }
     .segmented label{
-      flex: 1; text-align: center; cursor: pointer;
+      flex: 1; min-width: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      text-align: center; cursor: pointer; white-space: nowrap;
       padding: .7rem .5rem; border-radius: 9px;
       font-family: var(--f-display); font-weight: 600; font-size: .95rem;
       color: var(--humo-55);
       transition: background .2s ease, color .2s ease;
       margin: 0; text-transform: none; letter-spacing: 0;
     }
+    /* Segmento de 3 opciones (monedas): tipografía un punto menor para respirar */
+    .segmented-3 label{ padding-left: .35rem; padding-right: .35rem; font-size: .9rem; }
+    @media (max-width: 430px){ .segmented-3 label{ font-size: .82rem; } }
     .segmented input{ position: absolute; opacity: 0; pointer-events: none; }
     .segmented label:has(input:checked){
       background: linear-gradient(135deg, var(--oro), var(--oro-claro));
@@ -1769,9 +1774,9 @@
         <div class="cotizador-card reveal">
           <span class="cot-vivo" id="cot-vivo"><i aria-hidden="true"></i><span>Conectando…</span></span>
           <div class="cot-row">
-            <div class="cot-field">
+            <div class="cot-field" style="grid-column: 1 / -1;">
               <span class="cot-legend" id="lbl-entrego">Entrego</span>
-              <div class="segmented" role="radiogroup" aria-labelledby="lbl-entrego">
+              <div class="segmented segmented-3" role="radiogroup" aria-labelledby="lbl-entrego">
                 <label><input type="radio" name="moneda" value="PEN" checked>Soles (S/)</label>
                 <label><input type="radio" name="moneda" value="USD">Dólares ($)</label>
                 <label><input type="radio" name="moneda" value="BRL">Reales (R$)</label>
@@ -1784,7 +1789,7 @@
                 <label><input type="radio" name="activo" value="BTC">BTC</label>
               </div>
             </div>
-            <div class="cot-field" style="grid-column: 1 / -1;">
+            <div class="cot-field">
               <span class="cot-legend" id="lbl-metodo">¿Cómo entregas tu dinero?</span>
               <div class="segmented" role="radiogroup" aria-labelledby="lbl-metodo">
                 <label><input type="radio" name="metodo" value="efectivo" checked>Efectivo</label>
