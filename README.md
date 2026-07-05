@@ -1,4 +1,7 @@
-# VETA — Sitio web OTC para el sector minero
+# KIPU — Sitio web OTC para el sector minero
+
+> KIPU: del quechua *khipu*, el sistema andino de cuerdas y nudos con el que se
+> registraba valor sin papel. La marca une ese legado con el registro en blockchain.
 
 Prototipo avanzado autocontenido: todo el sitio (HTML + CSS + JS) vive en **`index.html`**.
 No requiere instalación ni dependencias. Funciona en cualquier hosting estático
