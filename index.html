@@ -445,6 +445,46 @@
       background: var(--exito-texto);
       box-shadow: 0 0 0 4px rgba(46,125,107,.22);
     }
+
+    /* Composición visual del hero: Kori (mascota) + comprobante flotante */
+    .hero-visual{ position: relative; width: 100%; max-width: 460px; justify-self: center; }
+    .mascota-hero{
+      margin: 0; position: relative;
+      background: #08090C;
+      border: 1px solid var(--borde-oro);
+      border-radius: var(--radio);
+      overflow: hidden;
+      box-shadow: 0 30px 80px -24px rgba(0,0,0,.65);
+    }
+    .mascota-hero::before{ /* hilo de oro superior */
+      content: ""; position: absolute; top: 0; left: 12%; right: 12%; height: 1px; z-index: 2;
+      background: linear-gradient(90deg, transparent, var(--oro-claro), transparent);
+    }
+    .mascota-hero video{ display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+    .mascota-chip{
+      position: absolute; top: .85rem; left: .85rem; z-index: 2;
+      display: inline-flex; align-items: baseline; gap: .35rem;
+      padding: .4rem .9rem;
+      border: 1px solid var(--borde-oro);
+      border-radius: 100px;
+      background: rgba(12,14,19,.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      font-size: .78rem; color: var(--humo-72); letter-spacing: .02em;
+    }
+    .mascota-chip strong{ font-family: var(--f-display); font-weight: 600; color: var(--oro-claro); }
+    @media (min-width: 980px){
+      .hero-visual{ max-width: none; }
+      .mascota-hero{ width: 92%; }
+      .receipt{
+        position: relative; z-index: 2;
+        width: min(88%, 400px);
+        margin: -3.2rem 0 0 auto;
+        background: rgba(28,31,39,.86);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+      }
+    }
     .receipt-hash{
       font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
       font-size: .82rem; color: var(--oro-claro);
@@ -1070,35 +1110,7 @@
       padding: 1.6rem 1rem;
     }
 
-    /* ---------- Sector minero + mascota de la marca ---------- */
-    .mineria-cuerpo{ display: grid; gap: 1.4rem; margin-top: 2.5rem; align-items: start; }
-    @media (min-width: 980px){
-      .mineria-cuerpo{ grid-template-columns: .9fr 1.1fr; gap: 2rem; align-items: center; }
-    }
-    .mineria-cuerpo .sector-grid{ margin-top: 0; }
-    .mascota-card{
-      margin: 0; position: relative;
-      background: var(--carbon);
-      border: 1px solid var(--borde);
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 30px 70px -30px rgba(0,0,0,.6);
-    }
-    .mascota-card::before{ /* hilo de oro superior */
-      content: ""; position: absolute; top: 0; left: 14%; right: 14%; height: 1px; z-index: 2;
-      background: linear-gradient(90deg, transparent, var(--oro-claro), transparent);
-    }
-    .mascota-video{ aspect-ratio: 16 / 9; background: #08090C; }
-    .mascota-video video{ width: 100%; height: 100%; object-fit: cover; display: block; }
-    .mascota-card figcaption{ padding: 1.05rem 1.3rem 1.15rem; }
-    .mascota-card figcaption strong{
-      font-family: var(--f-display); font-weight: 600; font-size: 1.05rem;
-      color: var(--oro-claro);
-    }
-    .mascota-card figcaption span{
-      display: block; margin-top: .3rem;
-      font-size: .84rem; color: var(--humo-55); line-height: 1.5;
-    }
+    /* ---------- Sector minero ---------- */
     .sector-grid{ display: grid; gap: 1.4rem; margin-top: 2.5rem; }
     @media (min-width: 780px){ .sector-grid{ grid-template-columns: 1fr 1fr; } }
     .sector-item{
@@ -1471,9 +1483,17 @@
           <p class="hero-tagline hero-enter d4">Tu producción, protegida en activos digitales.</p>
         </div>
 
-        <!-- Visual: comprobante de operación (demuestra el diferencial: trazabilidad).
-             Rota entre los ejemplos de COMPROBANTES en el script. -->
-        <div class="receipt hero-enter d3" role="img" aria-label="Ejemplos ilustrativos de comprobantes de operación KIPU con confirmación on-chain">
+        <!-- Visual de entrada: Kori (mascota de la marca) + comprobante flotante (trazabilidad).
+             El comprobante rota entre los ejemplos de COMPROBANTES en el script. -->
+        <div class="hero-visual hero-enter d3">
+          <!-- [EDITABLE] Mascota de la marca: nombre y video (assets/mascota/) -->
+          <figure class="mascota-hero">
+            <video id="mascota-video" poster="assets/mascota/kori-poster.jpg" muted loop playsinline preload="metadata" aria-label="Kori, la alpaca de KIPU, con su visor digital">
+              <source src="assets/mascota/kori.mp4" type="video/mp4">
+            </video>
+            <figcaption class="mascota-chip"><strong>Kori</strong> · la alpaca de KIPU</figcaption>
+          </figure>
+          <div class="receipt" role="img" aria-label="Ejemplos ilustrativos de comprobantes de operación KIPU con confirmación on-chain">
           <div class="receipt-head"><span>Comprobante de operación</span><span>KIPU</span></div>
           <dl>
             <div class="receipt-row"><dt>Entregado</dt><dd class="num" data-rec="entregado">S/ 50,000.00 en efectivo</dd></div>
@@ -1483,7 +1503,8 @@
             <div class="receipt-row"><dt>Hash</dt><dd><span class="receipt-hash" data-rec="hash">0x9f3c…a27b</span></dd></div>
           </dl>
           <p class="receipt-nota">Ejemplos ilustrativos · así se ve tu comprobante</p>
-        </div>
+          </div>
+        </div><!-- /hero-visual -->
       </div>
 
       <!-- Ticker en vivo -->
@@ -1959,21 +1980,7 @@
         <!-- [EDITABLE] Mantener esta enumeración coherente con CONFIG.CIUDADES si cambia la cobertura -->
         <p class="section-lead reveal">No somos un exchange genérico. Diseñamos cada servicio pensando en cómo se mueve el dinero real en Lima, Arequipa, Puno, Madre de Dios, La Libertad y San Martín.</p>
 
-        <div class="mineria-cuerpo">
-          <!-- [EDITABLE] Mascota de la marca: nombre, lema y video (assets/mascota/) -->
-          <figure class="mascota-card reveal">
-            <div class="mascota-video">
-              <video id="mascota-video" poster="assets/mascota/kori-poster.jpg" muted loop playsinline preload="none" aria-label="Kori, la alpaca de KIPU, con su visor digital">
-                <source data-src="assets/mascota/kori.mp4" type="video/mp4">
-              </video>
-            </div>
-            <figcaption>
-              <strong>Kori</strong> · la alpaca de KIPU
-              <span>«Kori» significa oro en quechua. Nació en los Andes; vive en la blockchain.</span>
-            </figcaption>
-          </figure>
-
-          <div class="sector-grid">
+        <div class="sector-grid">
           <div class="sector-item reveal">
             <div class="prod-icon">
               <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="M4 21h18M6 21V10.5L13 5l7 5.5V21" stroke="#E8C766" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.5 21v-5h5v5" stroke="#C9A227" stroke-width="1.6" stroke-linejoin="round"/></svg>
@@ -2010,8 +2017,7 @@
               <p>Operar con un sujeto obligado que documenta cada transacción fortalece tu historial formal. Si estás en REINFO o ya formalizado, cada comprobante juega a tu favor.</p>
             </div>
           </div>
-          </div><!-- /sector-grid -->
-        </div><!-- /mineria-cuerpo -->
+        </div>
       </div>
     </section>
 
@@ -3189,34 +3195,24 @@
       requestAnimationFrame(cuadroCinta);
     })();
 
-    /* ---------- Mascota Kori: carga diferida y play al entrar en vista ---------- */
+    /* ---------- Mascota Kori (hero): autoplay respetuoso ---------- */
     (function(){
       const v = document.getElementById('mascota-video');
       if (!v) return;
-      const fuente = v.querySelector('source');
       const ahorroDatos = !!(navigator.connection && navigator.connection.saveData);
 
-      function cargarVideo(){
-        if (fuente && !fuente.src){ fuente.src = fuente.dataset.src; v.load(); }
-      }
-
       // Sin autoplay si el usuario pide menos movimiento o ahorra datos:
-      // se muestra el póster con controles y él decide.
+      // queda el póster con controles y él decide.
       if (reducedMotion || ahorroDatos){
         v.setAttribute('controls', '');
-        v.addEventListener('play', cargarVideo, { once: true });
-        v.addEventListener('click', cargarVideo, { once: true });
         return;
       }
 
+      // Reproduce al entrar en vista y pausa al salir (ahorra batería al hacer scroll).
       const ioMascota = new IntersectionObserver(entradas => {
         entradas.forEach(e => {
-          if (e.isIntersecting){
-            cargarVideo();
-            v.play().catch(() => {});
-          } else if (!v.paused){
-            v.pause();
-          }
+          if (e.isIntersecting){ v.play().catch(() => {}); }
+          else if (!v.paused){ v.pause(); }
         });
       }, { threshold: .25 });
       ioMascota.observe(v);
