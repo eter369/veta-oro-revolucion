@@ -275,6 +275,35 @@
     .nav-toggle[aria-expanded="true"] span:nth-child(3){ transform: translateY(-7px) rotate(-45deg); }
     @media (min-width: 900px){ .nav-toggle{ display: none; } }
 
+    /* Selector de idioma: ES (Perú) / PT (Brasil) */
+    .lang-switch{
+      display: inline-flex; align-items: center; gap: 2px;
+      padding: 3px;
+      border: 1px solid var(--borde);
+      border-radius: 100px;
+      background: rgba(255,255,255,.02);
+      flex: none;
+    }
+    .lang-btn{
+      display: inline-flex; align-items: center; gap: .38rem;
+      padding: .34rem .62rem;
+      border: 0; border-radius: 100px;
+      background: transparent;
+      color: var(--humo-55);
+      font-family: inherit; font-size: .78rem; font-weight: 600;
+      letter-spacing: .05em;
+      cursor: pointer;
+      transition: color .2s ease, background .2s ease;
+    }
+    .lang-btn:hover{ color: var(--humo); }
+    .lang-btn.activo{ background: var(--oro-suave); color: var(--oro-claro); }
+    .lang-btn .bandera{ display: block; border-radius: 2.5px; box-shadow: 0 0 0 1px rgba(255,255,255,.12); }
+    /* En pantallas angostas: solo banderas (el texto ES/PT se oculta) */
+    @media (max-width: 429px){
+      .lang-btn{ padding: .34rem .5rem; }
+      .lang-btn .lang-txt{ display: none; }
+    }
+
     #nav-panel{
       position: fixed;
       top: var(--header-h); left: 0; right: 0;
@@ -1440,6 +1469,25 @@
       <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-panel" aria-label="Abrir menú">
         <span></span><span></span><span></span>
       </button>
+
+      <!-- Selector de idioma: banderas Perú / Brasil -->
+      <div class="lang-switch" role="group" aria-label="Idioma del sitio">
+        <button type="button" class="lang-btn activo" data-lang="es" aria-pressed="true" title="Español (Perú)">
+          <svg class="bandera" width="18" height="13" viewBox="0 0 18 13" aria-hidden="true">
+            <rect width="18" height="13" fill="#D91023"/><rect x="6" width="6" height="13" fill="#F5F5F0"/>
+          </svg>
+          <span class="lang-txt">ES</span>
+        </button>
+        <button type="button" class="lang-btn" data-lang="pt" aria-pressed="false" title="Português (Brasil)">
+          <svg class="bandera" width="18" height="13" viewBox="0 0 18 13" aria-hidden="true">
+            <rect width="18" height="13" fill="#009B3A"/>
+            <path d="M9 1.6 16.2 6.5 9 11.4 1.8 6.5Z" fill="#FEDF00"/>
+            <circle cx="9" cy="6.5" r="2.6" fill="#002776"/>
+            <path d="M6.6 6.1c1.6-.5 3.3-.2 4.7.8" stroke="#F5F5F0" stroke-width=".55" fill="none"/>
+          </svg>
+          <span class="lang-txt">PT</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -2389,6 +2437,215 @@
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    /* ==================== Idiomas: ES (Perú) / PT (Brasil) ==================== */
+    // Diccionario generado por herramientas (scratchpad/ensamblar-i18n.js). No editar a mano.
+    const I18N_PT = /*[I18N-PT-DICT]*/ {"textos":{"a|Protocolo":"Protocolo","a|Cotizador":"Cotação","a|Inversión":"Investimentos","a|Seguridad":"Segurança","a|Preguntas":"Perguntas","a|Contacto":"Contato","a|Cotizar ahora":"Cotar agora","a|Cómo funciona":"Como funciona","a|Seguridad y cumplimiento":"Segurança e conformidade","a|Preguntas frecuentes":"Perguntas frequentes","p|Operamos bajo normativa PLAFT · Sujeto obligado ante la UIF-Perú":"<i data-tok=\"0\"><\/i> Operamos sob a normativa PLAFT · Sujeito obrigado perante a UIF-Perú","h1|Convierte tu efectivo en activos digitales con la seguridad que tu trabajo merece.":"Converta seu dinheiro em <span class=\"oro\">ativos digitais<\/span> <span class=\"ti-light\">com a segurança que o seu trabalho merece.<\/span>","p|Somos la plataforma OTC del sector minero peruano. Cambiamos tu producción en efectivo por USDT o BTC con verificación de identidad, cotización bloqueada, puntos de entrega seguros y confirmación en blockchain.":"Somos a plataforma OTC do setor de mineração peruano. Trocamos sua produção em espécie por USDT ou BTC com verificação de identidade, cotação travada, pontos de entrega seguros e confirmação na blockchain.","a|Cotizar por WhatsApp":"<i data-tok=\"0\"><\/i> Cotar pelo WhatsApp <span class=\"btn-chip\" aria-hidden=\"true\"><i data-tok=\"1\"><\/i><\/span>","a|Ver cómo funciona":"Ver como funciona","p|Tu producción, protegida en activos digitales.":"Sua produção, protegida em ativos digitais.","figcaption|Kori · la alpaca de KIPU":"<strong>Kori<\/strong> · a alpaca da KIPU","span|Comprobante de operación":"Comprovante de operação","dt|Entregado":"Entregue","dt|Recibido":"Recebido","dt|Punto de entrega":"Ponto de entrega","dt|Estado":"Status","p|Ejemplos ilustrativos · así se ve tu comprobante":"Exemplos ilustrativos · assim é o seu comprovante","span|Volumen operado":"Volume operado","span|Operaciones completadas":"Operações concluídas","span|Regiones con cobertura":"Regiões com cobertura","span|Años en el sector":"Anos no setor","span|UIF-PerúSujeto obligado":"<b>UIF-Perú<\/b><small>Sujeito obrigado<\/small>","span|SUNATRUC verificable":"<b>SUNAT<\/b><small>RUC verificável<\/small>","span|Ley N.º 29733Protección de datos":"<b>Lei N.º 29733<\/b><small>Proteção de dados<\/small>","span|BinanceDatos de mercado":"<b>Binance<\/b><small>Dados de mercado<\/small>","span|Lemon CashMétodo de pago":"<b>Lemon Cash<\/b><small>Método de pagamento<\/small>","span|Cómo funciona":"Como funciona","h2|El Protocolo KIPU: cinco pasos, cero improvisación.":"O Protocolo KIPU: <span class=\"ti-light\">cinco passos, zero improvisação.<\/span>","p|Cada operación sigue el mismo camino documentado. Como en un kipu, cada paso queda anudado en el registro: tu efectivo llega a tu billetera digital sin puntos ciegos.":"Cada operação segue o mesmo caminho documentado. Como em um kipu, cada passo fica atado no registro: seu dinheiro chega à sua carteira digital sem pontos cegos.","li|1 Contacto y cotización Escríbenos por WhatsApp o deja tus datos en el formulario. Te damos un tipo de cambio preferencial según tu volumen: a más monto, mejor tasa.":"<div class=\"paso-nodo\" data-veta-node=\"\"> <i data-tok=\"0\"><\/i> <span class=\"paso-num\" aria-hidden=\"true\">1<\/span> <\/div> <div class=\"paso-card\"> <h3>Contato e cotação<\/h3> <p>Escreva para nós pelo WhatsApp ou deixe seus dados no formulário. Damos a você uma taxa de câmbio preferencial conforme o seu volume: quanto maior o valor, melhor a taxa.<\/p> <\/div>","li|2 Verificación de identidad (KYC) Te registras una sola vez con tu DNI o RUC y una validación biométrica rápida. Este paso te protege: garantiza que tu operación quede documentada a tu nombre y respaldada ante cualquier reclamo.":"<div class=\"paso-nodo\" data-veta-node=\"\"> <i data-tok=\"0\"><\/i> <span class=\"paso-num\" aria-hidden=\"true\">2<\/span> <\/div> <div class=\"paso-card\"> <h3>Verificação de identidade (KYC)<\/h3> <p>Você se cadastra uma única vez com seu DNI ou RUC e uma validação biométrica rápida. Esse passo protege você: garante que sua operação fique documentada em seu nome e respaldada diante de qualquer reclamação.<\/p> <\/div>","li|3 Cotización bloqueada Congelamos el precio acordado por minutos. El monto que aceptaste es el monto que recibes: la volatilidad del mercado ya no es tu problema.":"<div class=\"paso-nodo\" data-veta-node=\"\"> <i data-tok=\"0\"><\/i> <span class=\"paso-num\" aria-hidden=\"true\">3<\/span> <\/div> <div class=\"paso-card\"> <h3>Cotação travada<\/h3> <p>Congelamos o preço acordado por <span data-lock=\"\">15<\/span> minutos. O valor que você aceitou é o valor que você recebe: a volatilidade do mercado deixa de ser problema seu.<\/p> <\/div>","li|4 Entrega segura del efectivo Entregas en nuestra oficina o en un punto aliado verificado, con personal identificado y protocolo de seguridad presencial. Nunca en lugares improvisados ni con intermediarios desconocidos.":"<div class=\"paso-nodo\" data-veta-node=\"\"> <i data-tok=\"0\"><\/i> <span class=\"paso-num\" aria-hidden=\"true\">4<\/span> <\/div> <div class=\"paso-card\"> <h3>Entrega segura do dinheiro<\/h3> <p>Você entrega em nosso escritório ou em um ponto aliado verificado, com pessoal identificado e protocolo de segurança presencial. Nunca em lugares improvisados nem com intermediários desconhecidos.<\/p> <\/div>","li|5 Recepción inmediata en tu wallet Recibes tus USDT o BTC en tu billetera digital al instante, con hash de confirmación —el código único que prueba tu transacción en la blockchain— y tu comprobante de operación.":"<div class=\"paso-nodo\" data-veta-node=\"\"> <i data-tok=\"0\"><\/i> <span class=\"paso-num\" aria-hidden=\"true\">5<\/span> <\/div> <div class=\"paso-card\"> <h3>Recebimento imediato na sua wallet<\/h3> <p>Você recebe seus USDT ou BTC na sua carteira digital na hora, com hash de confirmação —o código único que comprova sua transação na blockchain— e seu comprovante de operação.<\/p> <\/div>","span|Cotizador en vivo":"Cotação ao vivo","h2|Cotiza en segundos, confirma por WhatsApp.":"Faça a cotação em segundos, <span class=\"ti-light\">confirme pelo WhatsApp.<\/span>","p|Precios de Binance y tipo de cambio oficial, actualizados cada minuto. La tasa final se confirma con un asesor según tu volumen.":"Preços da Binance e taxa de câmbio oficial, atualizados a cada minuto. A taxa final é confirmada com um assessor conforme o seu volume.","span|Recibo":"Recebo","span|¿Cómo entregas tu dinero?":"Como você entrega seu dinheiro?","label|Efectivo":"<i data-tok=\"0\"><\/i>Dinheiro","label|Monto en efectivo":"Valor em espécie","span|Entregas":"Você entrega","span|Recibes aproximadamente":"Você recebe aproximadamente","span|Tipo de cambio (oficial)":"Taxa de câmbio (oficial)","span|Comisión incluida":"Comissão incluída","span|Precio congelado al confirmar":"Preço congelado ao confirmar","a|Confirmar cotización por WhatsApp":"<i data-tok=\"0\"><\/i> Confirmar cotação pelo WhatsApp","p|Cotización referencial, no constituye oferta final. Volúmenes mayores a $50,000 acceden a tasa preferencial con un asesor dedicado.":"Cotação referencial, não constitui oferta final. Volumes acima de $50,000 têm acesso a taxa preferencial com um assessor dedicado.","span|División de Inversión":"Divisão de Investimentos","h2|No solo conviertes: construyes patrimonio.":"Você não só converte: <span class=\"titulo-oro ti-light\">constrói patrimônio.<\/span>","p|Tu efectivo ya está seguro en digital. Ahora decides qué hacer con él: cada plan te dice, en palabras simples, cuánto se moverá tu dinero y qué riesgo asumes. Nada de letra chiquita.":"Seu dinheiro já está seguro no digital. Agora você decide o que fazer com ele: cada plano diz, em palavras simples, quanto seu dinheiro vai oscilar e que risco você assume. Nada de letras miúdas.","h3|¿Qué quieres hacer con tu dinero?":"O que você quer fazer com o seu dinheiro?","p|Toca una opción y te mostramos el plan que encaja contigo. Sin términos raros.":"Toque em uma opção e mostramos o plano que combina com você. Sem termos estranhos.","label|Guardarlo seguroque no suba ni baje fuerte":"<i data-tok=\"0\"><\/i> <span class=\"op-icono\" aria-hidden=\"true\"> <i data-tok=\"1\"><\/i> <\/span> <span class=\"op-texto\"><strong>Guardar com segurança<\/strong><small>que não suba nem desça forte<\/small><\/span>","label|Acumular de a pocospensando en los próximos años":"<i data-tok=\"0\"><\/i> <span class=\"op-icono\" aria-hidden=\"true\"> <i data-tok=\"1\"><\/i> <\/span> <span class=\"op-texto\"><strong>Acumular aos poucos<\/strong><small>pensando nos próximos anos<\/small><\/span>","label|Moverlo con estrategiatengo experiencia y acepto riesgo":"<i data-tok=\"0\"><\/i> <span class=\"op-icono\" aria-hidden=\"true\"> <i data-tok=\"1\"><\/i> <\/span> <span class=\"op-texto\"><strong>Movimentar com estratégia<\/strong><small>tenho experiência e aceito risco<\/small><\/span>","p|Referencial: tu plan se define contigo en la asesoría, según tu situación.":"Referencial: seu plano é definido com você na assessoria, conforme a sua situação.","p|Para guardar seguro · Riesgo bajo":"Para guardar com segurança · Risco baixo","p|Así se mueve tu dinero: casi nada":"<span>Assim se move o seu dinheiro:<\/span> <strong>quase nada<\/strong>","p|Tu plata en dólar digital (USDT): quieta, segura y disponible.":"Seu dinheiro em <strong>dólar digital (USDT)<\/strong>: parado, seguro e disponível.","p|Es para ti si recién empiezas y quieres cero complicaciones.":"<strong>É para você se<\/strong> está começando agora e quer zero complicações.","li|No depende de bancos ni de horarios":"<i data-tok=\"0\"><\/i>Não depende de bancos nem de horários","li|Lo sacas cuando quieras, las 24 horas":"<i data-tok=\"0\"><\/i>Você saca quando quiser, 24 horas por dia","li|Prioridad: que no se pierda":"<i data-tok=\"0\"><\/i>Prioridade: não perder","a|Quiero asesoría":"Quero assessoria","span|Más elegido":"Mais escolhido","h3|Crecimiento":"Crescimento","p|Para acumular con calma · Riesgo medio":"Para acumular com calma · Risco médio","p|Así se mueve tu dinero: sube y baja moderado":"<span>Assim se move o seu dinheiro:<\/span> <strong>sobe e desce moderado<\/strong>","p|Una mezcla equilibrada (BTC, ETH y dólar digital) que acumula pensando en años.":"Uma <strong>combinação equilibrada<\/strong> (BTC, ETH e dólar digital) que acumula pensando em anos.","p|Es para ti si ya tienes tu reserva y piensas en el futuro.":"<strong>É para você se<\/strong> já tem a sua reserva e pensa no futuro.","li|Estrategia definida contigo, paso a paso":"<i data-tok=\"0\"><\/i>Estratégia definida com você, passo a passo","li|Pensado para 3 años o más":"<i data-tok=\"0\"><\/i>Pensado para 3 anos ou mais","li|Reportes claros y periódicos":"<i data-tok=\"0\"><\/i>Relatórios claros e periódicos","p|Para expertos · Riesgo alto":"Para experientes · Risco alto","p|Así se mueve tu dinero: sube y baja fuerte":"<span>Assim se move o seu dinheiro:<\/span> <strong>sobe e desce forte<\/strong>","p|Estrategia activa para quien entiende las subidas y las caídas del mercado.":"<strong>Estratégia ativa<\/strong> para quem entende as altas e as quedas do mercado.","p|Es para ti si tienes experiencia y aceptas más riesgo.":"<strong>É para você se<\/strong> tem experiência e aceita mais risco.","li|Estrategia armada contigo, con límites claros":"<i data-tok=\"0\"><\/i>Estratégia montada com você, com limites claros","li|Asesor dedicado a tu cartera":"<i data-tok=\"0\"><\/i>Assessor dedicado à sua carteira","li|Puede subir y bajar fuerte: solo con experiencia":"<i data-tok=\"0\"><\/i>Pode subir e descer forte: só com experiência","span|1 Escríbenos por WhatsApp":"<b>1<\/b> Escreva para nós pelo WhatsApp","span|2 Armamos tu plan contigo":"<b>2<\/b> Montamos seu plano com você","span|3 Todo queda documentado":"<b>3<\/b> Tudo fica documentado","p|¿Manejas una empresa minera o comercializadora? Tesorería Empresarial: liquidez digital para pagos a proveedores y remesas entre sedes, con límites definidos por tu empresa y reportes listos para contabilidad.":"<strong>Você administra uma empresa de mineração ou comercializadora?<\/strong> Tesouraria Empresarial: liquidez digital para pagamentos a fornecedores e remessas entre sedes, com limites definidos pela sua empresa e relatórios prontos para a contabilidade.","a|Hablar con un asesor":"Falar com um assessor","span|Seguridad y cumplimiento":"Segurança e conformidade","h2|La confianza no se promete: se demuestra en cada paso.":"A confiança não se promete: <span class=\"ti-light\">se demonstra em cada passo.<\/span>","p|Tres capas de protección cubren tu operación: el intercambio presencial, la custodia de los activos y el marco legal que lo respalda todo.":"Três camadas de proteção cobrem sua operação: a troca presencial, a custódia dos ativos e o marco legal que respalda tudo.","h3|Seguridad en el intercambio":"<i data-tok=\"0\"><\/i> Segurança na troca","li|Puntos de entrega verificados: oficinas propias y aliados auditados, nunca lugares improvisados.":"Pontos de entrega verificados: escritórios próprios e aliados auditados, nunca lugares improvisados.","li|Personal identificado con credencial y código de operación único.":"Pessoal identificado com credencial e código de operação único.","li|Cotización bloqueada: el precio pactado no cambia durante la entrega.":"Cotação travada: o preço combinado não muda durante a entrega.","li|Doble confirmación de la operación: presencial y digital.":"Dupla confirmação da operação: presencial e digital.","li|Comprobante con hash on-chain: prueba pública e inalterable de tu transacción.":"Comprovante com hash on-chain: prova pública e inalterável da sua transação.","h3|Seguridad de los activos":"<i data-tok=\"0\"><\/i> Segurança dos ativos","li|Billeteras con firma múltiple (multi-sig): ninguna persona puede mover fondos sola.":"Carteiras com múltiplas assinaturas (multi-sig): ninguém pode mover fundos sozinho.","li|Almacenamiento en frío para custodia: los activos se guardan fuera de línea, lejos de ataques.":"Armazenamento a frio para custódia: os ativos ficam guardados offline, longe de ataques.","li|Trazabilidad completa: cada movimiento queda registrado en blockchain y en nuestros libros.":"Rastreabilidade completa: cada movimento fica registrado na blockchain e em nossos livros.","li|Nunca te pediremos tu frase semilla ni tus claves. Tu wallet es solo tuya.":"Nunca pediremos sua frase-semente nem suas chaves. Sua wallet é só sua.","h3|Cumplimiento normativo":"<i data-tok=\"0\"><\/i> Conformidade normativa","li|Política PLAFT: prevención de lavado de activos y financiamiento del terrorismo en cada operación.":"Política PLAFT: prevenção à lavagem de ativos e ao financiamento do terrorismo em cada operação.","li|Sujeto obligado ante la UIF-Perú como proveedor de servicios de activos virtuales.":"Sujeito obrigado perante a UIF-Perú como provedor de serviços de ativos virtuais.","li|Debida diligencia del cliente: verificamos identidad y, en montos altos, origen de fondos.":"Devida diligência do cliente: verificamos identidade e, em valores altos, a origem dos fundos.","li|Límites y reportes según normativa vigente, con oficial de cumplimiento designado.":"Limites e reportes conforme a normativa vigente, com oficial de compliance designado.","p|«La formalidad te protege: cada operación queda documentada y respaldada.»":"«A formalidade protege você: cada operação fica documentada e respaldada.»","span|Hecho para el sector minero":"Feito para o setor de mineração","h2|Entendemos tu operación porque venimos de ella.":"Entendemos a sua operação <span class=\"ti-light\">porque viemos dela.<\/span>","p|No somos un exchange genérico. Diseñamos cada servicio pensando en cómo se mueve el dinero real en Lima, Arequipa, Puno, Madre de Dios, La Libertad y San Martín.":"Não somos uma exchange genérica. Desenhamos cada serviço pensando em como o dinheiro real se move em Lima, Arequipa, Puno, Madre de Dios, La Libertad e San Martín.","h3|El efectivo en zona minera es un punto débil":"O dinheiro em espécie em zona de mineração é um ponto fraco","p|Trasladar y almacenar billetes expone tu producción a robos y pérdidas. Convertirla en activos digitales elimina el traslado físico: tu patrimonio viaja contigo, en tu wallet.":"Transportar e armazenar cédulas expõe sua produção a roubos e perdas. Convertê-la em ativos digitais elimina o traslado físico: seu patrimônio viaja com você, na sua wallet.","h3|Dolarización digital de tu esfuerzo":"Dolarização digital do seu esforço","p|El fruto de tu trabajo pierde valor guardado en billetes. Con USDT mantienes tu producción referenciada al dólar, disponible cuando la necesites, sin caja fuerte.":"O fruto do seu trabalho perde valor guardado em cédulas. Com USDT você mantém sua produção referenciada ao dólar, disponível quando precisar, sem cofre.","h3|Pagos entre regiones sin mover un billete":"Pagamentos entre regiões sem mover uma cédula","p|Paga a proveedores en Lima desde Madre de Dios, o envía liquidez de Puno a Arequipa en minutos. La transferencia es digital; el respaldo, verificable en blockchain.":"Pague fornecedores em Lima desde Madre de Dios, ou envie liquidez de Puno para Arequipa em minutos. A transferência é digital; o respaldo, verificável na blockchain.","h3|Suma a tu proceso de formalización":"Soma ao seu processo de formalização","p|Operar con un sujeto obligado que documenta cada transacción fortalece tu historial formal. Si estás en REINFO o ya formalizado, cada comprobante juega a tu favor.":"Operar com um sujeito obrigado que documenta cada transação fortalece seu histórico formal. Se você está no REINFO ou já é formalizado, cada comprovante joga a seu favor.","span|Testimonios":"Depoimentos","h2|Lo que dicen quienes ya operan con KIPU.":"O que dizem <span class=\"ti-light\">aqueles que já operam com a KIPU.<\/span>","p|Antes viajaba con el efectivo de cada campaña hasta Juliaca, con el corazón en la mano. Ahora entrego en el punto aliado y llego a mi casa con el patrimonio seguro en mi wallet.":"Antes eu viajava com o dinheiro de cada campanha até Juliaca, com o coração na mão. Agora entrego no ponto aliado e chego em casa com o patrimônio seguro na minha wallet.","span|Marcos Q.Minero formalizado · Puno":"<span class=\"testi-nombre\">Marcos Q.<\/span><span class=\"testi-rol\">Minerador formalizado · Puno<\/span>","p|Como acopiadora muevo montos grandes cada semana. La cotización bloqueada y el comprobante con hash me dieron una confianza que la banca nunca me ofreció.":"Como compradora de ouro, movimento valores grandes toda semana. A cotação travada e o comprovante com hash me deram uma confiança que os bancos nunca me ofereceram.","span|Rosa H.Comercializadora de oro · Madre de Dios":"<span class=\"testi-nombre\">Rosa H.<\/span><span class=\"testi-rol\">Comerciante de ouro · Madre de Dios<\/span>","p|Pagamos a proveedores de tres regiones desde una sola tesorería digital. Cada operación llega con su comprobante listo para contabilidad. Orden total.":"Pagamos fornecedores de três regiões a partir de uma única tesouraria digital. Cada operação chega com seu comprovante pronto para a contabilidade. Ordem total.","span|Jorge V.Gerente de administración, minera mediana · La Libertad":"<span class=\"testi-nombre\">Jorge V.<\/span><span class=\"testi-rol\">Gerente administrativo, mineradora média · La Libertad<\/span>","span|Preguntas frecuentes":"Perguntas frequentes","h2|Resolvemos tus dudas antes de que operes.":"Resolvemos suas dúvidas <span class=\"ti-light\">antes de você operar.<\/span>","summary|¿Es legal cambiar efectivo por criptomonedas en el Perú?":"É legal trocar dinheiro em espécie por criptomoedas no Peru?","p|Sí. El intercambio de activos virtuales es una actividad lícita en el Perú. Los proveedores de servicios de activos virtuales somos sujetos obligados ante la UIF-Perú: la norma nos exige verificar identidades, registrar cada operación y reportar según la política PLAFT.":"Sim. A troca de ativos virtuais é uma atividade lícita no Peru. Nós, provedores de serviços de ativos virtuais, somos <strong>sujeitos obrigados perante a UIF-Perú<\/strong>: a norma exige que verifiquemos identidades, registremos cada operação e reportemos conforme a política PLAFT.","p|Que tu operador cumpla estas reglas es tu mejor protección: cada operación queda documentada y con respaldo legal.":"Que seu operador cumpra essas regras é a sua melhor proteção: cada operação fica documentada e com respaldo legal.","summary|¿Qué documentos necesito?":"Quais documentos eu preciso?","p|Si operas como persona natural, tu DNI vigente. Si operas como empresa, tu RUC y los documentos de representación. Para montos altos, la normativa nos exige documentar el origen de los fondos: una declaración simple y sustento razonable, que nuestro equipo te ayuda a preparar.":"Se você opera como pessoa física, seu DNI vigente. Se opera como empresa, seu RUC e os documentos de representação. Para valores altos, a normativa exige documentar a origem dos fundos: uma declaração simples e comprovação razoável, que nossa equipe ajuda você a preparar.","summary|¿Cuál es el monto mínimo y máximo?":"Qual é o valor mínimo e máximo?","p|El monto mínimo referencial es S/ . No manejamos un máximo fijo: los volúmenes altos pasan por una debida diligencia reforzada, como exige la norma, y acceden a un tipo de cambio preferencial con asesor dedicado.":"O valor mínimo referencial é <strong>S/ <span data-monto-min=\"\">5,000<\/span><\/strong>. Não temos um máximo fixo: os volumes altos passam por uma devida diligência reforçada, como exige a norma, e têm acesso a uma taxa de câmbio preferencial com assessor dedicado.","summary|¿Qué es USDT y por qué conviene?":"O que é USDT e por que vale a pena?","p|USDT es una stablecoin: un activo digital diseñado para mantener el valor del dólar (1 USDT ≈ 1 USD). Te permite proteger el valor de tu efectivo sin cargar billetes ni abrir cuentas complicadas, con disponibilidad las 24 horas desde tu celular.":"USDT é uma <strong>stablecoin<\/strong>: um ativo digital desenhado para manter o valor do dólar (1 USDT ≈ 1 USD). Permite proteger o valor do seu dinheiro sem carregar cédulas nem abrir contas complicadas, com disponibilidade 24 horas no seu celular.","summary|¿Cuánto cobran de comisión?":"Quanto vocês cobram de comissão?","p|Depende de cómo nos entregues tu dinero: 7% en operaciones con efectivo —cubre la logística de entrega segura, el personal verificado y los puntos aliados— y 5% si transfieres desde la app Lemon Cash. Antes de confirmar cualquier operación te informamos el número exacto. Sin costos ocultos ni sorpresas en la entrega, y los volúmenes altos acceden a tasa preferencial con un asesor dedicado.":"Depende de como você nos entrega seu dinheiro: <strong>7% em operações com dinheiro em espécie<\/strong> —cobre a logística de entrega segura, o pessoal verificado e os pontos aliados— e <strong>5% se você transfere pelo app Lemon Cash<\/strong>. Antes de confirmar qualquer operação, informamos o número exato. Sem custos ocultos nem surpresas na entrega, e os volumes altos têm acesso a taxa preferencial com um assessor dedicado.","summary|¿Cuánto demora la operación?":"Quanto tempo demora a operação?","p|La primera vez, entre 30 y 45 minutos, porque incluye tu verificación de identidad. Desde la segunda operación, el proceso completo —entrega, transferencia y confirmación en blockchain— toma minutos.":"Na primeira vez, entre 30 e 45 minutos, porque inclui a sua verificação de identidade. A partir da segunda operação, o processo completo —entrega, transferência e confirmação na blockchain— leva minutos.","summary|¿Qué pasa si no tengo wallet?":"E se eu não tiver wallet?","p|Te ayudamos a crear una billetera digital gratuita en tu celular y te enseñamos a custodiarla con calma, paso a paso. Importante: KIPU nunca te pedirá tu frase semilla ni tus claves. Esa información es solo tuya y nadie legítimo te la pedirá jamás.":"Ajudamos você a criar uma carteira digital gratuita no seu celular e ensinamos a custodiá-la com calma, passo a passo. Importante: <strong>a KIPU nunca vai pedir sua frase-semente nem suas chaves<\/strong>. Essa informação é só sua e ninguém legítimo vai pedi-la jamais.","summary|¿Por qué me piden verificación de identidad?":"Por que pedem verificação de identidade?","p|Por dos razones. Primero, te protege: garantiza que la operación quede registrada a tu nombre, con comprobante y respaldo ante cualquier reclamo. Segundo, es un requisito legal de la normativa PLAFT que cumplimos como sujeto obligado ante la UIF-Perú. Un operador que no te pide identificación te está exponiendo, no ayudando.":"Por duas razões. Primeiro, <strong>protege você<\/strong>: garante que a operação fique registrada em seu nome, com comprovante e respaldo diante de qualquer reclamação. Segundo, é um requisito legal da normativa PLAFT que cumprimos como sujeito obrigado perante a UIF-Perú. Um operador que não pede sua identificação está expondo você, não ajudando.","summary|¿Puedo volver a convertir mi crypto en efectivo después?":"Posso converter minha crypto de volta em dinheiro depois?","p|Sí. Operamos en ambas direcciones. Cuando necesites soles o dólares en físico, seguimos el mismo protocolo: cotización bloqueada, punto de entrega seguro y comprobante de operación.":"Sim. Operamos em ambas as direções. Quando você precisar de soles ou dólares em espécie, seguimos o mesmo protocolo: cotação travada, ponto de entrega seguro e comprovante de operação.","span|Contacto y cobertura":"Contato e cobertura","h2|Empecemos con tu primera cotización.":"Vamos começar <span class=\"ti-light\">com a sua primeira cotação.<\/span>","p|Déjanos tus datos y un asesor te contacta el mismo día. Sin compromiso y sin pedirte información sensible: nunca te solicitaremos claves ni frases semilla.":"Deixe seus dados e um assessor entra em contato no mesmo dia. Sem compromisso e sem pedir informações sensíveis: nunca solicitaremos chaves nem frases-semente.","label|Nombre":"Nome","label|Ciudad":"Cidade","option|Elige tu ciudad":"Escolha sua cidade","label|Monto aproximado":"Valor aproximado","option|Elige un rango":"Escolha uma faixa","option|Más de S/ 200,000":"Mais de S/ 200,000","label|¿Cómo prefieres que te contactemos?":"Como você prefere que a gente entre em contato?","option|Llamada telefónica":"Ligação telefônica","button|Enviar y recibir cotización":"Enviar e receber cotação","p|Listo. Se abrió WhatsApp con tu solicitud: envíala y un asesor te responde el mismo día.":"Pronto. O WhatsApp foi aberto com a sua solicitação: envie-a e um assessor responde no mesmo dia.","p|Al enviar aceptas nuestra Política de privacidad. Tus datos se usan solo para contactarte.":"Ao enviar, você aceita nossa <button type=\"button\" class=\"footer-links-inline\" data-open-dialog=\"dlg-privacidad\" style=\"background:none;border:none;padding:0;color:var(--oro-claro);cursor:pointer;font-size:inherit;text-decoration:underline;text-underline-offset:2px\">Política de privacidade<\/button>. Seus dados são usados apenas para entrar em contato com você.","h3|Cobertura actual":"Cobertura atual","p|Oficinas propias y puntos aliados verificados en las principales regiones mineras del país.":"Escritórios próprios e pontos aliados verificados nas principais regiões de mineração do país.","h2|Tu producción ya salió de la roca.Ahora protégela.":"Sua produção já saiu da rocha.<br><span class=\"ti-light\">Agora proteja-a.<\/span>","p|Una conversación por WhatsApp basta para conocer tu tasa preferencial. Sin compromiso.":"Uma conversa pelo WhatsApp basta para conhecer sua taxa preferencial. Sem compromisso.","p|El kipu registraba valor con nudos, sin papel, quinientos años antes de internet. Hoy anudamos cada operación en blockchain: somos la plataforma OTC de cambio de efectivo a activos digitales y gestión patrimonial para el sector minero peruano, y operamos bajo normativa PLAFT como sujeto obligado ante la UIF-Perú.":"O kipu registrava valor com nós de corda, sem papel, quinhentos anos antes da internet. Hoje atamos cada operação na blockchain: somos a plataforma OTC de câmbio de dinheiro em espécie para ativos digitais e gestão patrimonial para o setor de mineração peruano, e operamos sob a normativa PLAFT como sujeito obrigado perante a UIF-Perú.","p|Los activos digitales implican riesgo. Su valor puede subir o bajar. KIPU no garantiza rentabilidades.":"Ativos digitais envolvem risco. Seu valor pode subir ou descer. A KIPU não garante rentabilidade.","li|Términos y condiciones":"<button type=\"button\" data-open-dialog=\"dlg-terminos\">Termos e condições<\/button>","li|Política de privacidad":"<button type=\"button\" data-open-dialog=\"dlg-privacidad\">Política de privacidade<\/button>","li|Aviso de riesgo":"<button type=\"button\" data-open-dialog=\"dlg-riesgo\">Aviso de risco<\/button>","h4|Contacto":"Contato","li|Cotizador en línea":"<a href=\"#cotizador\">Cotação on-line<\/a>","li|Preguntas frecuentes":"<a href=\"#faq\">Perguntas frequentes<\/a>","span|© · RUC · Lima, Perú":"© <span id=\"year\">2026<\/span> <span data-razon=\"\">KIPU Activos Digitales S.A.C.<\/span> · RUC <span data-ruc=\"\">20XXXXXXXXX<\/span> · Lima, Peru","span|Sujeto obligado ante la UIF-Perú · Normativa PLAFT":"Sujeito obrigado perante a UIF-Perú · Normativa PLAFT","h2|Términos y condiciones":"Termos e condições","p|(«KIPU») presta servicios de intercambio de moneda de curso legal por activos virtuales (USDT, BTC y otros) bajo modalidad OTC, así como servicios de acompañamiento en gestión patrimonial digital, en el territorio peruano.":"<span data-razon=\"\">KIPU Activos Digitales S.A.C.<\/span> («KIPU») presta serviços de troca de moeda de curso legal por ativos virtuais (USDT, BTC e outros) sob a modalidade OTC, bem como serviços de acompanhamento em gestão patrimonial digital, no território peruano.","p|Solo operamos con personas mayores de 18 años y empresas debidamente constituidas, previa verificación de identidad (KYC) conforme a nuestra Política PLAFT. KIPU puede rechazar o suspender operaciones cuando no se supere la debida diligencia.":"Operamos apenas com pessoas maiores de 18 anos e empresas devidamente constituídas, mediante verificação de identidade (KYC) conforme a nossa Política PLAFT. A KIPU pode recusar ou suspender operações quando a devida diligência não for superada.","h3|3. Cotizaciones y comisiones":"3. Cotações e comissões","p|Las cotizaciones del sitio son referenciales y se calculan sobre precios públicos de mercado más una comisión según el método de entrega del dinero (operaciones con efectivo o transferencia desde aplicativos como Lemon Cash), informada siempre antes de confirmar. La cotización pactada se bloquea por el tiempo indicado al cliente; vencido el plazo, debe solicitarse una nueva.":"As cotações do site são referenciais e são calculadas sobre preços públicos de mercado mais uma comissão conforme o método de entrega do dinheiro (operações em espécie ou transferência por aplicativos como o Lemon Cash), sempre informada antes de confirmar. A cotação combinada fica travada pelo tempo indicado ao cliente; vencido o prazo, é preciso solicitar uma nova.","h3|4. Naturaleza del servicio":"4. Natureza do serviço","p|KIPU realiza operaciones de compraventa de activos virtuales por cuenta propia. No captamos depósitos del público, no otorgamos créditos ni garantizamos rentabilidades. Los servicios de la División de Inversión son de ejecución y acompañamiento según instrucciones del cliente.":"A KIPU realiza operações de compra e venda de ativos virtuais por conta própria. Não captamos depósitos do público, não concedemos créditos nem garantimos rentabilidade. Os serviços da Divisão de Investimentos são de execução e acompanhamento conforme as instruções do cliente.","h3|5. Responsabilidad":"5. Responsabilidade","p|Una vez confirmada la transferencia on-chain a la billetera indicada por el cliente, la operación es irreversible por la naturaleza de la tecnología blockchain. Es responsabilidad del cliente custodiar su billetera, sus claves y su frase semilla.":"Uma vez confirmada a transferência on-chain para a carteira indicada pelo cliente, a operação é irreversível pela natureza da tecnologia blockchain. É responsabilidade do cliente custodiar sua carteira, suas chaves e sua frase-semente.","h3|6. Modificaciones":"6. Modificações","p|KIPU puede actualizar estos términos. La versión vigente estará siempre publicada en este sitio.":"A KIPU pode atualizar estes termos. A versão vigente estará sempre publicada neste site.","h2|Política de privacidad":"Política de privacidade","h3|1. Datos que tratamos":"1. Dados que tratamos","p|Datos de identificación (nombre, DNI/RUC), de contacto (teléfono, ciudad) y de las operaciones realizadas. Nunca solicitamos ni almacenamos claves, contraseñas ni frases semilla de billeteras.":"Dados de identificação (nome, DNI/RUC), de contato (telefone, cidade) e das operações realizadas. Nunca solicitamos nem armazenamos chaves, senhas nem frases-semente de carteiras.","h3|2. Finalidad":"2. Finalidade","p|Usamos tus datos para: (i) verificar tu identidad conforme a la normativa PLAFT; (ii) ejecutar y documentar tus operaciones; (iii) contactarte por el medio que elegiste. No vendemos tus datos a terceros.":"Usamos seus dados para: (i) verificar sua identidade conforme a normativa PLAFT; (ii) executar e documentar suas operações; (iii) entrar em contato pelo meio que você escolheu. Não vendemos seus dados a terceiros.","h3|3. Base legal y conservación":"3. Base legal e conservação","p|Tratamos tus datos conforme a la Ley N.º 29733, Ley de Protección de Datos Personales, y su reglamento. Los registros de operaciones se conservan por los plazos mínimos que exige la normativa de prevención de lavado de activos.":"Tratamos seus dados conforme a Lei N.º 29733, Lei de Proteção de Dados Pessoais do Peru, e seu regulamento. Os registros de operações são conservados pelos prazos mínimos exigidos pela normativa de prevenção à lavagem de ativos.","h3|4. Tus derechos":"4. Seus direitos","p|Puedes ejercer tus derechos de acceso, rectificación, cancelación y oposición escribiendo a contacto@kipu.pe. Respondemos dentro de los plazos legales.":"Você pode exercer seus direitos de acesso, retificação, cancelamento e oposição escrevendo para <span data-email-text=\"\">contacto@kipu.pe<\/span>. Respondemos dentro dos prazos legais.","h3|5. Seguridad":"5. Segurança","p|Aplicamos medidas técnicas y organizativas para proteger tu información: acceso restringido, cifrado en tránsito y registros de auditoría.":"Aplicamos medidas técnicas e organizacionais para proteger suas informações: acesso restrito, criptografia em trânsito e registros de auditoria.","p|KIPU mantiene un sistema de prevención de lavado de activos y financiamiento del terrorismo (PLAFT) acorde con la normativa peruana aplicable a los proveedores de servicios de activos virtuales.":"A KIPU mantém um sistema de prevenção à lavagem de ativos e ao financiamento do terrorismo (PLAFT) de acordo com a normativa peruana aplicável aos provedores de serviços de ativos virtuais.","h3|1. Condición de sujeto obligado":"1. Condição de sujeito obrigado","p|KIPU es sujeto obligado a informar ante la Unidad de Inteligencia Financiera del Perú (UIF-Perú) y cuenta con un oficial de cumplimiento designado.":"A KIPU é sujeito obrigado a informar perante a Unidade de Inteligência Financeira do Peru (UIF-Perú) e conta com um oficial de compliance designado.","h3|2. Debida diligencia del cliente":"2. Devida diligência do cliente","p|Identificamos y verificamos a cada cliente antes de operar: documento de identidad o RUC, validación biométrica y, según el monto y perfil, documentación del origen de los fondos. No realizamos operaciones anónimas.":"Identificamos e verificamos cada cliente antes de operar: documento de identidade ou RUC, validação biométrica e, conforme o valor e o perfil, documentação da origem dos fundos. Não realizamos operações anônimas.","h3|3. Monitoreo y reportes":"3. Monitoramento e reportes","p|Monitoreamos las operaciones para detectar señales de alerta y presentamos los reportes que exige la normativa, incluyendo reportes de operaciones sospechosas (ROS) cuando corresponde.":"Monitoramos as operações para detectar sinais de alerta e apresentamos os reportes exigidos pela normativa, incluindo reportes de operações suspeitas (ROS) quando corresponde.","h3|4. Registro y conservación":"4. Registro e conservação","p|Cada operación queda registrada con identidad del cliente, montos, fecha, punto de entrega y hash de la transacción on-chain. Los registros se conservan por los plazos legales.":"Cada operação fica registrada com a identidade do cliente, valores, data, ponto de entrega e hash da transação on-chain. Os registros são conservados pelos prazos legais.","h3|5. Capacitación":"5. Capacitação","p|Todo nuestro personal recibe capacitación periódica en prevención de lavado de activos y protocolos de seguridad presencial.":"Toda a nossa equipe recebe capacitação periódica em prevenção à lavagem de ativos e protocolos de segurança presencial.","p|La formalidad te protege: operar con un sujeto obligado significa que tu operación queda documentada y respaldada.":"<strong>A formalidade protege você:<\/strong> operar com um sujeito obrigado significa que sua operação fica documentada e respaldada.","h2|Aviso de riesgo":"Aviso de risco","p|Antes de operar con activos digitales, debes conocer y aceptar estos riesgos:":"Antes de operar com ativos digitais, você deve conhecer e aceitar estes riscos:","h3|1. Volatilidad":"1. Volatilidade","p|El precio de BTC, ETH y otros activos digitales puede subir o bajar de forma pronunciada en poco tiempo. Podrías perder parte del valor de tu capital. Las stablecoins como USDT buscan mantener el valor del dólar, pero dependen de su emisor.":"O preço de BTC, ETH e outros ativos digitais pode subir ou descer de forma acentuada em pouco tempo. Você pode perder parte do valor do seu capital. As stablecoins como USDT buscam manter o valor do dólar, mas dependem do seu emissor.","h3|2. Sin rentabilidad garantizada":"2. Sem rentabilidade garantida","p|KIPU no garantiza rentabilidades, retornos ni resultados. Ninguna comunicación nuestra constituye una promesa de ganancia. Desconfía de quien te prometa lo contrario.":"A KIPU não garante rentabilidade, retornos nem resultados. Nenhuma comunicação nossa constitui promessa de ganho. Desconfie de quem prometer o contrário.","h3|3. Irreversibilidad":"3. Irreversibilidade","p|Las transacciones en blockchain son irreversibles. Verifica siempre la dirección de tu billetera antes de confirmar. KIPU verifica contigo cada dato antes de ejecutar.":"As transações na blockchain são irreversíveis. Verifique sempre o endereço da sua carteira antes de confirmar. A KIPU confere com você cada dado antes de executar.","h3|4. Custodia":"4. Custódia","p|Si custodias tus propios activos, eres responsable de tu billetera, tus claves y tu frase semilla. KIPU nunca te las pedirá. No las compartas con nadie.":"Se você custodia seus próprios ativos, é responsável pela sua carteira, suas chaves e sua frase-semente. A KIPU nunca vai pedi-las. Não as compartilhe com ninguém.","h3|5. Riesgo regulatorio":"5. Risco regulatório","p|El marco normativo de los activos virtuales puede cambiar y afectar su tratamiento tributario o su liquidez.":"O marco normativo dos ativos virtuais pode mudar e afetar seu tratamento tributário ou sua liquidez.","h3|6. Recomendación":"6. Recomendação","p|No comprometas fondos que necesites a corto plazo ni tu capital de operación esencial. Ante cualquier duda, consulta con nuestro equipo o con un asesor independiente.":"Não comprometa fundos de que você precise no curto prazo nem seu capital de operação essencial. Em caso de dúvida, consulte nossa equipe ou um assessor independente."},"atributos":{"KIPU — inicio":"KIPU — início","Navegación principal":"Navegação principal","Abrir menú":"Abrir menu","Menú móvil":"Menu móvel","Kori, la alpaca de KIPU, con su visor digital":"Kori, a alpaca da KIPU, com seu visor digital","Ejemplos ilustrativos de comprobantes de operación KIPU con confirmación on-chain":"Exemplos ilustrativos de comprovantes de operação KIPU com confirmação on-chain","Precios de referencia en vivo":"Preços de referência ao vivo","Métricas de confianza":"Métricas de confiança","Respaldo institucional y estándares con los que operamos":"Respaldo institucional e padrões com os quais operamos","Montos rápidos":"Valores rápidos","Cómo empezar":"Como começar","Facebook de KIPU":"Facebook da KIPU","Instagram de KIPU":"Instagram da KIPU","TikTok de KIPU":"TikTok da KIPU","YouTube de KIPU":"YouTube da KIPU","Escribir a KIPU por WhatsApp":"Escrever para a KIPU pelo WhatsApp","Cerrar":"Fechar","Ej. Juan Mamani":"Ex.: Juan Mamani","Hola KIPU, quiero cotizar un cambio de efectivo a activos digitales.":"Olá KIPU, quero uma cotação de câmbio de dinheiro em espécie para ativos digitais.","Hola KIPU, quiero asesoría sobre el plan Reserva (guardar seguro).":"Olá KIPU, quero assessoria sobre o plano Reserva (guardar com segurança).","Hola KIPU, quiero asesoría sobre el plan Crecimiento (acumular de a pocos).":"Olá KIPU, quero assessoria sobre o plano Crescimento (acumular aos poucos).","Hola KIPU, quiero asesoría sobre el plan KIPU Pro (estrategia activa).":"Olá KIPU, quero assessoria sobre o plano KIPU Pro (estratégia ativa).","Hola KIPU, quiero información sobre Tesorería Empresarial para mi empresa.":"Olá KIPU, quero informações sobre a Tesouraria Empresarial para a minha empresa.","Hola KIPU, quiero conocer mi tasa preferencial para cambiar efectivo por activos digitales.":"Olá KIPU, quero conhecer minha taxa preferencial para trocar dinheiro em espécie por ativos digitais.","Hola KIPU, tengo una consulta.":"Olá KIPU, tenho uma dúvida.","Hola KIPU, quiero información para cambiar efectivo por activos digitales.":"Olá KIPU, quero informações para trocar dinheiro em espécie por ativos digitais."}};
+
+    let idioma = 'es';
+
+    // Textos que genera el JavaScript en runtime (ticker, cotizador, WhatsApp, recibo)
+    const UI_TXT = {
+      es: {
+        enVivo: 'En vivo',
+        masTC: ' + TC oficial',
+        sinConexion: 'Referencial (sin conexión)',
+        enEfectivo: 'en efectivo',
+        viaLemon: 'vía Lemon Cash',
+        enDolares: 'en dólares',
+        dolarDigital: 'dólar digital · disponible 24/7',
+        son: 'Son:',
+        waDefault: 'Hola KIPU, quiero más información.',
+        waCotBase: 'Hola KIPU, quiero cotizar un cambio de efectivo a activos digitales.',
+        waCot: d => 'Hola KIPU, quiero cotizar: entrego ' + d.simbolo + d.monto +
+                    ' y deseo recibir ' + d.activo + '. Método: ' + d.metodo + ' (' + d.comision + ')' +
+                    '. TC oficial: S/ ' + d.tc + '. El cotizador me mostró ≈ ' + d.resultado + '.',
+        waForm: d => 'Hola KIPU, soy ' + d.nombre + ', de ' + d.ciudad +
+                     '. Quiero cotizar un cambio. Monto aproximado: ' + d.monto +
+                     '. Prefiero contacto por ' + d.medio + '.',
+        metodo: { efectivo: 'Efectivo', lemon: 'Lemon Cash' }
+      },
+      pt: {
+        enVivo: 'Ao vivo',
+        masTC: ' + câmbio oficial',
+        sinConexion: 'Referencial (sem conexão)',
+        enEfectivo: 'em espécie',
+        viaLemon: 'via Lemon Cash',
+        enDolares: 'em dólares',
+        dolarDigital: 'dólar digital · disponível 24/7',
+        son: 'São:',
+        waDefault: 'Olá KIPU, quero mais informações.',
+        waCotBase: 'Olá KIPU, quero uma cotação de câmbio de dinheiro em espécie para ativos digitais.',
+        waCot: d => 'Olá KIPU, quero cotar: entrego ' + d.simbolo + d.monto +
+                    ' e desejo receber ' + d.activo + '. Método: ' + d.metodo + ' (' + d.comision + ')' +
+                    '. Câmbio oficial: S/ ' + d.tc + '. A calculadora me mostrou ≈ ' + d.resultado + '.',
+        waForm: d => 'Olá KIPU, sou ' + d.nombre + ', de ' + d.ciudad +
+                     '. Quero uma cotação de câmbio. Valor aproximado: ' + d.monto +
+                     '. Prefiro contato por ' + d.medio + '.',
+        metodo: { efectivo: 'Dinheiro em espécie', lemon: 'Lemon Cash' }
+      }
+    };
+    function tUI(clave){ return UI_TXT[idioma][clave]; }
+
+    // Traducción de los campos del comprobante rotatorio del hero
+    function i18nRecibo(s){
+      if (idioma !== 'pt') return s;
+      return s.replace('en efectivo', 'em espécie')
+              .replace('Oficina', 'Escritório')
+              .replace('Punto aliado', 'Ponto aliado');
+    }
+
+    // Números en palabras (pt-BR), espejo de numeroALetras (es)
+    function numeroALetrasPt(n){
+      n = Math.floor(Math.abs(n));
+      if (n === 0) return 'zero';
+      const U = ['', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove', 'dez',
+                 'onze', 'doze', 'treze', 'catorze', 'quinze', 'dezesseis', 'dezessete', 'dezoito', 'dezenove', 'vinte'];
+      const D = ['', '', '', 'trinta', 'quarenta', 'cinquenta', 'sessenta', 'setenta', 'oitenta', 'noventa'];
+      const C = ['', 'cento', 'duzentos', 'trezentos', 'quatrocentos', 'quinhentos', 'seiscentos', 'setecentos', 'oitocentos', 'novecentos'];
+      function tres(x){
+        if (x === 0) return '';
+        if (x === 100) return 'cem';
+        let s = '';
+        const c = Math.floor(x / 100), r = x % 100;
+        if (c) s = C[c];
+        if (r){
+          if (s) s += ' e ';
+          if (r <= 20) s += U[r];
+          else {
+            const d = Math.floor(r / 10), u = r % 10;
+            s += D[d] + (u ? ' e ' + U[u] : '');
+          }
+        }
+        return s;
+      }
+      const mi = Math.floor(n / 1e6), mil = Math.floor((n % 1e6) / 1000), resto = n % 1000;
+      let out = '';
+      if (mi) out = (mi === 1 ? 'um milhão' : tres(mi) + ' milhões');
+      if (mil) out += (out ? ' ' : '') + (mil === 1 ? 'mil' : tres(mil) + ' mil');
+      if (resto) out += (out ? (resto < 100 || resto % 100 === 0 ? ' e ' : ' ') : '') + tres(resto);
+      return out;
+    }
+    function montoEnLetras(n){ return idioma === 'pt' ? numeroALetrasPt(n) : numeroALetras(n); }
+
+    /* --- Motor de traducción del DOM (claves por texto normalizado, atómicos tokenizados) --- */
+    const I18N_TAGS = 'h1,h2,h3,h4,p,li,dt,dd,label,option,button,a,figcaption,legend,th,td,summary,span,small';
+    const I18N_ATOMICOS = 'svg,input,img,video,canvas,select';
+    const I18N_INYECTADOS = '[data-monto-min],[data-lock],[data-fundacion],[data-anios],[data-metric],[data-target],#year,[data-razon],[data-ruc],[data-email]';
+    const i18nOriginal = new Map();   // elemento -> innerHTML ES tokenizado
+    const i18nAttrsOrig = new Map();  // elemento -> { atributo: valor ES }
+
+    function i18nExcluido(el){
+      return !!(el.closest('[data-rec]') || el.closest('noscript') ||
+        el.closest('.ticker-item') || el.closest('#ticker-status') ||
+        el.id === 'ticker-status-text' || el.id === 'year' ||
+        el.closest('[data-razon], [data-ruc]') ||
+        el.classList.contains('receipt-hash') ||
+        el.closest('.lang-switch') || el.closest('#cot-vivo'));
+    }
+    function i18nCandidatos(){
+      const todos = [...document.querySelectorAll(I18N_TAGS)];
+      const set = new Set(todos);
+      return todos.filter(el => {
+        if (i18nExcluido(el)) return false;
+        let p = el.parentElement;
+        while (p){ if (set.has(p) && !i18nExcluido(p)) return false; p = p.parentElement; }
+        return true;
+      });
+    }
+    function i18nClave(el){
+      const clon = el.cloneNode(true);
+      clon.querySelectorAll(I18N_INYECTADOS).forEach(s => { s.textContent = ''; });
+      return el.tagName.toLowerCase() + '|' + clon.textContent.replace(/\s+/g, ' ').trim();
+    }
+    function i18nHtmlTokenizado(el){
+      const clon = el.cloneNode(true);
+      let n = 0;
+      clon.querySelectorAll(I18N_ATOMICOS).forEach(a => {
+        const t = document.createElement('i');
+        t.setAttribute('data-tok', String(n++));
+        a.replaceWith(t);
+      });
+      return clon.innerHTML;
+    }
+    // Aplica HTML traducido reinsertando los nodos atómicos VIVOS (conserva listeners y estado)
+    function i18nAplicarHTML(el, html){
+      const atomicos = [...el.querySelectorAll(I18N_ATOMICOS)];
+      const esperados = (html.match(/data-tok=/g) || []).length;
+      if (esperados !== atomicos.length) return; // estructura distinta: no tocar (a prueba de fallos)
+      el.innerHTML = html;
+      el.querySelectorAll('i[data-tok]').forEach(t => {
+        const nodo = atomicos[Number(t.getAttribute('data-tok'))];
+        if (nodo) t.replaceWith(nodo);
+      });
+    }
+    const I18N_ATTRS = ['aria-label', 'placeholder', 'data-wa-msg'];
+    function aplicarIdioma(nuevo){
+      if (!I18N_PT) return;
+      // 1) Textos del DOM
+      i18nCandidatos().forEach(el => {
+        if (nuevo === 'pt'){
+          const pt = I18N_PT.textos[i18nClave(el)];
+          if (!pt) return;
+          if (!i18nOriginal.has(el)) i18nOriginal.set(el, i18nHtmlTokenizado(el));
+          i18nAplicarHTML(el, pt);
+        } else if (i18nOriginal.has(el)){
+          i18nAplicarHTML(el, i18nOriginal.get(el));
+        }
+      });
+      // 2) Atributos (accesibilidad, placeholders, mensajes de WhatsApp)
+      document.querySelectorAll('[aria-label], [placeholder], [data-wa-msg]').forEach(el => {
+        if (el.closest('.lang-switch')) return;
+        I18N_ATTRS.forEach(a => {
+          if (!el.hasAttribute(a)) return;
+          if (nuevo === 'pt'){
+            const pt = I18N_PT.atributos[el.getAttribute(a)];
+            if (pt){
+              if (!i18nAttrsOrig.has(el)) i18nAttrsOrig.set(el, {});
+              const o = i18nAttrsOrig.get(el);
+              if (!(a in o)) o[a] = el.getAttribute(a);
+              el.setAttribute(a, pt);
+            }
+          } else {
+            const o = i18nAttrsOrig.get(el);
+            if (o && a in o) el.setAttribute(a, o[a]);
+          }
+        });
+      });
+      // 3) Estado global + regeneración de lo dinámico
+      idioma = nuevo;
+      document.documentElement.setAttribute('lang', nuevo === 'pt' ? 'pt-BR' : 'es-PE');
+      try{ localStorage.setItem('kipu_idioma', nuevo); }catch(e){}
+      document.querySelectorAll('.lang-btn').forEach(b => {
+        const activo = b.dataset.lang === nuevo;
+        b.classList.toggle('activo', activo);
+        b.setAttribute('aria-pressed', String(activo));
+      });
+      // Los swaps recrean nodos hijos: re-inyectar datos de CONFIG y rematar contadores
+      document.querySelectorAll('[data-lock]').forEach(el => el.textContent = CONFIG.LOCK_MINUTES);
+      document.querySelectorAll('[data-monto-min]').forEach(el => el.textContent = fmtNum(CONFIG.MONTO_MINIMO, 0));
+      document.querySelectorAll('[data-fundacion]').forEach(el => el.textContent = CONFIG.METRICAS.anio_fundacion);
+      document.querySelectorAll('[data-razon]').forEach(el => el.textContent = CONFIG.RAZON_SOCIAL);
+      document.querySelectorAll('[data-ruc]').forEach(el => el.textContent = CONFIG.RUC);
+      document.querySelectorAll('a[data-email]').forEach(el => { el.href = 'mailto:' + CONFIG.EMAIL; el.textContent = CONFIG.EMAIL; });
+      const elYear = document.getElementById('year');
+      if (elYear) elYear.textContent = new Date().getFullYear();
+      document.querySelectorAll('.counter[data-metric]').forEach(el => {
+        if (typeof METRICA_VALORES !== 'undefined' && typeof METRICA_VALORES[el.dataset.metric] === 'number'){
+          el.dataset.target = METRICA_VALORES[el.dataset.metric];
+        }
+        const objetivo = parseFloat(el.dataset.target || '0');
+        el.textContent = (el.dataset.prefix || '') + fmtNum(objetivo, parseInt(el.dataset.decimals || '0', 10)) + (el.dataset.suffix || '');
+      });
+      if (typeof vincularWhatsApp === 'function') vincularWhatsApp();
+      if (typeof pintarTicker === 'function') pintarTicker();
+      if (typeof recalcularCotizador === 'function') recalcularCotizador();
+      if (typeof pintarReciboActual === 'function') pintarReciboActual();
+      if (typeof construirVeta === 'function') setTimeout(construirVeta, 60); // el alto de la página cambió
+    }
+    document.querySelectorAll('.lang-btn').forEach(b => {
+      b.addEventListener('click', () => { if (b.dataset.lang !== idioma) aplicarIdioma(b.dataset.lang); });
+    });
+
     /* ---------- Estado de precios ---------- */
     const precios = {
       btc_usd: CONFIG.FALLBACK.btc_usd,
@@ -2433,18 +2690,18 @@
       const hora = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
       if (precios.enVivo){
         status.classList.add('en-vivo'); status.classList.remove('referencial');
-        statusText.textContent = 'En vivo · ' + (precios.fuente || 'mercado') + ' · ' + hora;
+        statusText.textContent = tUI('enVivo') + ' · ' + (precios.fuente || 'mercado') + ' · ' + hora;
       } else if (precios.primerIntentoHecho){
         status.classList.remove('en-vivo'); status.classList.add('referencial');
-        statusText.textContent = 'Referencial (sin conexión)';
+        statusText.textContent = tUI('sinConexion');
       }
       // Chip de estado dentro del cotizador
       const cotVivo = document.getElementById('cot-vivo');
       if (cotVivo){
         cotVivo.classList.toggle('activo', precios.enVivo);
         const cotVivoTxt = cotVivo.querySelector('span');
-        if (precios.enVivo) cotVivoTxt.textContent = 'En vivo · ' + (precios.fuente || 'mercado') + ' + TC oficial';
-        else if (precios.primerIntentoHecho) cotVivoTxt.textContent = 'Referencial (sin conexión)';
+        if (precios.enVivo) cotVivoTxt.textContent = tUI('enVivo') + ' · ' + (precios.fuente || 'mercado') + tUI('masTC');
+        else if (precios.primerIntentoHecho) cotVivoTxt.textContent = tUI('sinConexion');
       }
       recalcularCotizador();
     }
@@ -2680,15 +2937,15 @@
 
       // Lado "Entregas" + monto en palabras + equivalencia
       if (entregaEl) entregaEl.textContent = simbolo + fmtNum(monto, 0);
-      if (entregaSub) entregaSub.textContent = metodo === 'efectivo' ? 'en efectivo' : 'vía Lemon Cash';
+      if (entregaSub) entregaSub.textContent = metodo === 'efectivo' ? tUI('enEfectivo') : tUI('viaLemon');
       if (equivEl){
         equivEl.textContent = activo === 'BTC'
-          ? '≈ ' + fmtUSD0.format(usdNeto) + ' en dólares'
-          : 'dólar digital · disponible 24/7';
+          ? '≈ ' + fmtUSD0.format(usdNeto) + ' ' + tUI('enDolares')
+          : tUI('dolarDigital');
       }
       if (letrasEl){
         const monedaTxt = moneda === 'PEN' ? (monto === 1 ? 'sol' : 'soles') : (monto === 1 ? 'dólar' : 'dólares');
-        letrasEl.textContent = 'Son: ' + numeroALetras(monto) + ' ' + monedaTxt;
+        letrasEl.textContent = tUI('son') + ' ' + montoEnLetras(monto) + ' ' + monedaTxt;
       }
 
       actualizarWaCotizador({ moneda, activo, metodo, comisionTxt, tc, monto, resultadoTxt });
@@ -2697,14 +2954,17 @@
     function actualizarWaCotizador(datos){
       let msg;
       if (!datos){
-        msg = 'Hola KIPU, quiero cotizar un cambio de efectivo a activos digitales.';
+        msg = tUI('waCotBase');
       } else {
-        const simbolo = datos.moneda === 'PEN' ? 'S/ ' : '$ ';
-        msg = 'Hola KIPU, quiero cotizar: entrego ' + simbolo + fmtNum(datos.monto, 0) +
-              ' y deseo recibir ' + datos.activo +
-              '. Método: ' + METODO_NOMBRES[datos.metodo] + ' (' + datos.comisionTxt + ')' +
-              '. TC oficial: S/ ' + fmtNum(datos.tc, 3) +
-              '. El cotizador me mostró ≈ ' + datos.resultadoTxt + '.';
+        msg = tUI('waCot')({
+          simbolo: datos.moneda === 'PEN' ? 'S/ ' : '$ ',
+          monto: fmtNum(datos.monto, 0),
+          activo: datos.activo,
+          metodo: tUI('metodo')[datos.metodo],
+          comision: datos.comisionTxt,
+          tc: fmtNum(datos.tc, 3),
+          resultado: datos.resultadoTxt
+        });
       }
       cotWa.href = 'https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent(msg);
     }
@@ -2716,16 +2976,19 @@
       });
     }
 
-    /* ---------- Enlaces WhatsApp genéricos ---------- */
+    /* ---------- Enlaces WhatsApp genéricos (re-vinculables al cambiar de idioma) ---------- */
+    function vincularWhatsApp(){
     document.querySelectorAll('[data-wa]').forEach(el => {
       if (el.id === 'cot-wa') return; // el cotizador gestiona el suyo
-      const msg = el.getAttribute('data-wa-msg') || 'Hola KIPU, quiero más información.';
+      const msg = el.getAttribute('data-wa-msg') || tUI('waDefault');
       el.href = 'https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent(msg);
       el.target = '_blank';
       el.rel = 'noopener';
     });
     cotWa.target = '_blank';
     cotWa.rel = 'noopener';
+    }
+    vincularWhatsApp();
 
     /* ---------- Textos derivados de CONFIG ---------- */
     document.querySelectorAll('[data-lock]').forEach(el => el.textContent = CONFIG.LOCK_MINUTES);
@@ -2877,12 +3140,12 @@
       navPanel.hidden = true;
     }));
 
-    /* ---------- Diálogos legales ---------- */
-    document.querySelectorAll('[data-open-dialog]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const dlg = document.getElementById(btn.dataset.openDialog);
-        if (dlg) dlg.showModal();
-      });
+    /* ---------- Diálogos legales (delegado: sobrevive al cambio de idioma) ---------- */
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('[data-open-dialog]');
+      if (!btn) return;
+      const dlg = document.getElementById(btn.dataset.openDialog);
+      if (dlg) dlg.showModal();
     });
     document.querySelectorAll('dialog.legal').forEach(dlg => {
       dlg.querySelector('[data-close]').addEventListener('click', () => dlg.close());
@@ -2903,9 +3166,7 @@
       const ciudad = document.getElementById('f-ciudad').value;
       const monto = document.getElementById('f-monto').value;
       const medio = document.getElementById('f-medio').value;
-      const msg = 'Hola KIPU, soy ' + nombre + ', de ' + ciudad +
-                  '. Quiero cotizar un cambio. Monto aproximado: ' + monto +
-                  '. Prefiero contacto por ' + medio + '.';
+      const msg = tUI('waForm')({ nombre, ciudad, monto, medio });
       window.open('https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
       document.getElementById('form-note').classList.add('visible');
     });
@@ -2934,11 +3195,12 @@
 
       function pintarRecibo(){
         const c = COMPROBANTES[idxRecibo];
-        camposRecibo.entregado.textContent = c.entregado;
+        camposRecibo.entregado.textContent = i18nRecibo(c.entregado);
         camposRecibo.recibido.textContent = c.recibido;
-        camposRecibo.punto.textContent = c.punto;
+        camposRecibo.punto.textContent = i18nRecibo(c.punto);
         camposRecibo.hash.textContent = c.hash;
       }
+      window.pintarReciboActual = pintarRecibo; // para repintar al cambiar de idioma
 
       setInterval(() => {
         if (document.hidden) return; // no rotar en pestañas ocultas
@@ -3228,6 +3490,11 @@
       document.fonts.ready.then(construirVeta);
     }
     construirVeta();
+
+    // Idioma guardado: si el visitante eligió portugués, se aplica al entrar
+    try{
+      if (localStorage.getItem('kipu_idioma') === 'pt') aplicarIdioma('pt');
+    }catch(e){}
   </script>
 </body>
 </html>

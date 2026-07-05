@@ -52,6 +52,21 @@ El ticker muestra USDT/PEN, BTC/USD, ETH/USD y SOL/USD, actualizados cada 60 s:
   de `CONFIG.FALLBACK` y el ticker muestra "Referencial (sin conexión)".
 - La fuente activa se muestra en el propio ticker ("En vivo · Binance · hh:mm").
 
+## Idiomas (ES Perú / PT Brasil)
+
+El header tiene un selector con banderas 🇵🇪/🇧🇷 que traduce todo el sitio al
+portugués de Brasil en vivo (textos, atributos de accesibilidad, mensajes de
+WhatsApp, cotizador con montos en palabras). La preferencia se guarda en
+`localStorage` (`kipu_idioma`).
+
+- El diccionario vive en `index.html`, en la línea marcada `/*[I18N-PT-DICT]*/`.
+- **Si editas textos en español**, esa frase dejará de traducirse (se queda en
+  español — a prueba de fallos). Para regenerar: edita los `scratchpad/i18n-pt-*.json`
+  y corre `node extract-i18n.js && node ensamblar-i18n.js` (herramientas en el
+  scratchpad de la sesión; pídele a Claude regenerarlas si no las tienes).
+- Los textos que el JS genera en runtime (ticker, cotizador, WhatsApp) se
+  traducen desde el objeto `UI_TXT` en el propio `index.html`.
+
 ## Textos legales
 
 Los cuatro documentos del footer (Términos, Privacidad, PLAFT, Aviso de riesgo) son
