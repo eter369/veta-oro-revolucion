@@ -57,7 +57,7 @@
       { "@type": "Question", "name": "¿Qué documentos necesito?", "acceptedAnswer": { "@type": "Answer", "text": "Tu DNI vigente si operas como persona natural, o tu RUC y los documentos de tu empresa si operas como persona jurídica. Para montos altos, la normativa nos exige documentar el origen de los fondos." } },
       { "@type": "Question", "name": "¿Cuál es el monto mínimo y máximo?", "acceptedAnswer": { "@type": "Answer", "text": "El monto mínimo referencial es S/ 5,000. No hay un máximo fijo: los montos altos pasan por una debida diligencia reforzada según normativa y reciben tipo de cambio preferencial." } },
       { "@type": "Question", "name": "¿Qué es USDT y por qué conviene?", "acceptedAnswer": { "@type": "Answer", "text": "USDT es una stablecoin: un activo digital diseñado para seguir el valor del dólar. Sirve para proteger el valor de tu efectivo sin cargar billetes, con disponibilidad las 24 horas." } },
-      { "@type": "Question", "name": "¿Cuánto cobran de comisión?", "acceptedAnswer": { "@type": "Answer", "text": "Depende del método de entrega: 7% en operaciones con efectivo (cubre la logística de entrega segura, el personal verificado y los puntos aliados) y 5% si transfieres desde la app Lemon Cash. El número exacto se confirma antes de operar, sin costos ocultos, y los volúmenes altos acceden a tasa preferencial con asesor." } },
+      { "@type": "Question", "name": "¿Cuánto cobran de comisión?", "acceptedAnswer": { "@type": "Answer", "text": "Depende del método de entrega: 5% en operaciones con efectivo (cubre la logística de entrega segura, el personal verificado y los puntos aliados) y 3% si transfieres desde la app Lemon Cash. El número exacto se confirma antes de operar, sin costos ocultos, y los volúmenes altos acceden a tasa preferencial con asesor." } },
       { "@type": "Question", "name": "¿Cuánto demora la operación?", "acceptedAnswer": { "@type": "Answer", "text": "La primera vez, entre 30 y 45 minutos por la verificación de identidad. A partir de la segunda operación, la entrega y confirmación toman minutos." } },
       { "@type": "Question", "name": "¿Qué pasa si no tengo wallet?", "acceptedAnswer": { "@type": "Answer", "text": "Te ayudamos a crear una billetera digital gratuita y te enseñamos a custodiarla. Importante: KIPU nunca te pedirá tu frase semilla ni tus claves." } },
       { "@type": "Question", "name": "¿Por qué me piden verificación de identidad?", "acceptedAnswer": { "@type": "Answer", "text": "Porque te protege y porque es ley. La verificación garantiza que la operación quede registrada a tu nombre, con comprobante y respaldo, y es un requisito de la normativa PLAFT que cumplimos como sujeto obligado ante la UIF-Perú." } },
@@ -821,6 +821,20 @@
     /* Segmento de 3 opciones (monedas): tipografía un punto menor para respirar */
     .segmented-3 label{ padding-left: .35rem; padding-right: .35rem; font-size: .9rem; }
     @media (max-width: 430px){ .segmented-3 label{ font-size: .82rem; } }
+
+    /* Método Lemon Cash: logo de la marca, adaptado al estado del botón */
+    .metodo-lemon{ padding-top: .55rem; padding-bottom: .55rem; }
+    .lemon-logo{
+      height: 18px; width: auto; display: block;
+      filter: brightness(0) invert(1);        /* blanco sobre el botón oscuro (inactivo) */
+      opacity: .82; transition: filter .2s ease, opacity .2s ease;
+    }
+    .metodo-lemon:hover .lemon-logo{ opacity: 1; }
+    /* Hermano adyacente del input: invalidación sólida al marcar (sin depender de :has en descendiente) */
+    .metodo-lemon input:checked + .lemon-logo{
+      filter: brightness(0);                   /* negro sobre el dorado (activo) */
+      opacity: 1;
+    }
     .segmented input{ position: absolute; opacity: 0; pointer-events: none; }
     .segmented label:has(input:checked){
       background: linear-gradient(135deg, var(--oro), var(--oro-claro));
@@ -1855,7 +1869,8 @@
               <span class="cot-legend" id="lbl-metodo">¿Cómo entregas tu dinero?</span>
               <div class="segmented" role="radiogroup" aria-labelledby="lbl-metodo">
                 <label><input type="radio" name="metodo" value="efectivo" checked>Efectivo</label>
-                <label><input type="radio" name="metodo" value="lemon">Lemon Cash</label>
+                <!-- [EDITABLE] Método Lemon Cash: se muestra el logo de la marca -->
+                <label class="metodo-lemon"><input type="radio" name="metodo" value="lemon" aria-label="Lemon Cash"><img class="lemon-logo" src="assets/pagos/lemon.png" alt="" aria-hidden="true" width="70" height="18"></label>
               </div>
             </div>
           </div>
@@ -1892,7 +1907,7 @@
             </div>
             <div class="cot-detalles">
               <div class="cot-detail"><span>Tipo de cambio (oficial)</span><strong class="num" id="cot-rate">—</strong></div>
-              <div class="cot-detail"><span>Comisión incluida</span><strong class="num" id="cot-comision">7%</strong></div>
+              <div class="cot-detail"><span>Comisión incluida</span><strong class="num" id="cot-comision">5%</strong></div>
               <div class="cot-detail"><span>Precio congelado al confirmar</span><strong><span data-lock>15</span> min</strong></div>
             </div>
           </div>
@@ -2209,7 +2224,7 @@
           <details name="faq">
             <summary>¿Cuánto cobran de comisión?</summary>
             <div class="faq-body">
-              <p>Depende de cómo nos entregues tu dinero: <strong>7% en operaciones con efectivo</strong> —cubre la logística de entrega segura, el personal verificado y los puntos aliados— y <strong>5% si transfieres desde la app Lemon Cash</strong>. Antes de confirmar cualquier operación te informamos el número exacto. Sin costos ocultos ni sorpresas en la entrega, y los volúmenes altos acceden a tasa preferencial con un asesor dedicado.</p>
+              <p>Depende de cómo nos entregues tu dinero: <strong>5% en operaciones con efectivo</strong> —cubre la logística de entrega segura, el personal verificado y los puntos aliados— y <strong>3% si transfieres desde la app Lemon Cash</strong>. Antes de confirmar cualquier operación te informamos el número exacto. Sin costos ocultos ni sorpresas en la entrega, y los volúmenes altos acceden a tasa preferencial con un asesor dedicado.</p>
             </div>
           </details>
           <details name="faq">
@@ -2469,8 +2484,8 @@
     const CONFIG = {
       // [EDITABLE] Número de WhatsApp con código de país, sin "+" ni espacios
       WHATSAPP: '51999999999',
-      // [EDITABLE] Comisiones por método de entrega (fracción: 0.07 = 7%)
-      COMISIONES: { efectivo: 0.07, lemon: 0.05 },
+      // [EDITABLE] Comisiones por método de entrega (fracción: 0.05 = 5%)
+      COMISIONES: { efectivo: 0.05, lemon: 0.03 },
       // [EDITABLE] Tipo de cambio oficial USD/PEN manual: pon un número
       // (ej. 3.75) para fijarlo a mano y anular la API; null = automático
       TC_OFICIAL_MANUAL: null,
@@ -3001,7 +3016,7 @@
       const equivEl = document.getElementById('cot-equiv');
       const letrasEl = document.getElementById('cot-letras');
 
-      // Comisión según método de entrega (descuento neto exacto: 7% ó 5%)
+      // Comisión según método de entrega (descuento neto exacto: 5% ó 3%)
       const comision = CONFIG.COMISIONES[metodo];
       const comisionTxt = parseFloat((comision * 100).toFixed(2)) + '%';
       const comisionEl = document.getElementById('cot-comision');
@@ -3393,14 +3408,14 @@
 
     /* ---------- Comprobante del hero: ejemplos rotativos ---------- */
     // [EDITABLE] Ejemplos ilustrativos del comprobante. Montos coherentes con
-    // la comisión de efectivo (7%) y tipo de cambio referencial ~S/ 3.79 por USDT.
+    // la comisión de efectivo (5%) y tipo de cambio referencial ~S/ 3.79 por USDT.
     const COMPROBANTES = [
-      { entregado: 'S/ 50,000.00 en efectivo', recibido: '12,269.13 USDT', punto: 'Oficina Lima · verificado', hash: '0x9f3c…a27b' },
-      { entregado: 'S/ 120,000.00 en efectivo', recibido: '29,445.91 USDT', punto: 'Punto aliado Juliaca · verificado', hash: '0x4e81…c93d' },
-      { entregado: '$ 25,000.00 en efectivo', recibido: '0.244737 BTC', punto: 'Oficina Arequipa · verificado', hash: 'f7a2…19be' },
-      { entregado: 'S/ 18,500.00 en efectivo', recibido: '4,539.58 USDT', punto: 'Punto aliado Trujillo · verificado', hash: '0x71d0…5fa4' },
-      { entregado: 'S/ 260,000.00 en efectivo', recibido: '63,799.47 USDT', punto: 'Oficina Lima · verificado', hash: '0xb3c7…e610' },
-      { entregado: '$ 8,000.00 en efectivo', recibido: '7,440.00 USDT', punto: 'Punto aliado Tarapoto · verificado', hash: '0x25aa…d1f8' }
+      { entregado: 'S/ 50,000.00 en efectivo', recibido: '12,532.98 USDT', punto: 'Oficina Lima · verificado', hash: '0x9f3c…a27b' },
+      { entregado: 'S/ 120,000.00 en efectivo', recibido: '30,079.16 USDT', punto: 'Punto aliado Juliaca · verificado', hash: '0x4e81…c93d' },
+      { entregado: '$ 25,000.00 en efectivo', recibido: '0.250000 BTC', punto: 'Oficina Arequipa · verificado', hash: 'f7a2…19be' },
+      { entregado: 'S/ 18,500.00 en efectivo', recibido: '4,637.20 USDT', punto: 'Punto aliado Trujillo · verificado', hash: '0x71d0…5fa4' },
+      { entregado: 'S/ 260,000.00 en efectivo', recibido: '65,171.50 USDT', punto: 'Oficina Lima · verificado', hash: '0xb3c7…e610' },
+      { entregado: '$ 8,000.00 en efectivo', recibido: '7,600.00 USDT', punto: 'Punto aliado Tarapoto · verificado', hash: '0x25aa…d1f8' }
     ];
     const reciboCard = document.querySelector('.receipt');
     if (reciboCard){
