@@ -25,7 +25,7 @@ formulario, textos legales, schema.org):
 | **Dominio** (schema.org) | `DOMINIO` |
 | **Teléfono visible** (schema.org) | `TELEFONO_VISIBLE` |
 | **Métricas de confianza** (contadores) | `METRICAS` |
-| **Ciudades / cobertura** (formulario + lista + schema) | `CIUDADES` |
+| **Cobertura por país** (tabs Perú/Brasil, formulario + schema) | `UBICACIONES` |
 | **Monto mínimo** (FAQ + schema FAQPage) | `MONTO_MINIMO` |
 | **Redes sociales** | `REDES` |
 
