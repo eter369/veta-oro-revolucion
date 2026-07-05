@@ -782,6 +782,74 @@
     .cot-nota{ font-size: .84rem; color: var(--humo-55); margin: 1rem 0 0; }
     .cot-cta{ width: 100%; margin-top: 1.2rem; }
 
+    /* ---------- Cotizador nivel terminal ---------- */
+    .cotizador-card{ position: relative; }
+    .cotizador-card::before{ /* hilo de oro superior */
+      content: ""; position: absolute; top: 0; left: 14%; right: 14%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--oro-claro), transparent);
+    }
+    .cot-vivo{
+      display: inline-flex; align-items: center; gap: .45rem;
+      font-size: .72rem; font-weight: 600; letter-spacing: .06em;
+      color: var(--humo-55);
+      border: 1px solid var(--borde); border-radius: 99px;
+      padding: .3rem .8rem; margin-bottom: 1.4rem;
+    }
+    .cot-vivo i{ width: 7px; height: 7px; border-radius: 50%; background: var(--humo-55); flex: none; }
+    .cot-vivo.activo{ border-color: rgba(46,125,107,.45); background: rgba(46,125,107,.10); color: #9CD9C6; }
+    .cot-vivo.activo i{ background: var(--exito-texto); }
+    @media (prefers-reduced-motion: no-preference){
+      .cot-vivo.activo i{ animation: pulso 2s ease infinite; }
+    }
+    /* Montos rápidos: tocar en vez de teclear */
+    .cot-chips{ display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .7rem; }
+    .cot-chip{
+      font-family: var(--f-display); font-weight: 600; font-size: .88rem;
+      color: var(--humo-72);
+      background: var(--roca); border: 1px solid var(--borde); border-radius: 99px;
+      padding: .5rem .95rem; cursor: pointer;
+      transition: border-color .2s ease, color .2s ease, background .2s ease;
+      min-height: 40px;
+    }
+    .cot-chip:hover{ border-color: var(--borde-oro); color: var(--humo); }
+    .cot-chip.activo{
+      background: linear-gradient(135deg, var(--oro), var(--oro-claro));
+      color: var(--roca); border-color: transparent;
+    }
+    /* Monto en palabras (patrón de voucher bancario) */
+    .cot-letras{ margin: .55rem 0 0; font-size: .82rem; color: var(--humo-55); min-height: 1.2em; }
+    /* Flujo Entregas -> Recibes */
+    .cot-flujo{ display: grid; grid-template-columns: 1fr; gap: .9rem; align-items: center; }
+    @media (min-width: 640px){ .cot-flujo{ grid-template-columns: 1fr auto 1.25fr; gap: 1.1rem; } }
+    .cot-lado-label{
+      display: block; font-size: .7rem; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--humo-55); font-weight: 600; margin-bottom: .3rem;
+    }
+    .cot-lado-valor{
+      display: block; font-family: var(--f-display); font-weight: 600;
+      font-size: 1.25rem; color: var(--humo); line-height: 1.15;
+    }
+    .cot-lado-sub{ display: block; font-size: .78rem; color: var(--humo-55); margin-top: .2rem; }
+    .cot-lado-recibe .cot-lado-valor{
+      font-size: clamp(1.6rem, 5vw, 2.2rem); font-weight: 700;
+      background: linear-gradient(120deg, var(--oro) 10%, var(--oro-claro) 60%, var(--oro) 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      word-break: break-word;
+    }
+    .cot-flecha{ display: flex; align-items: center; justify-content: center; }
+    .cot-flecha svg{ width: 46px; height: 22px; transform: rotate(90deg); }
+    @media (min-width: 640px){ .cot-flecha svg{ transform: none; } }
+    .flecha-linea{ stroke-dasharray: 6 6; }
+    @media (prefers-reduced-motion: no-preference){
+      .flecha-linea{ animation: fluyeFlecha 1.1s linear infinite; }
+    }
+    @keyframes fluyeFlecha{ to{ stroke-dashoffset: -12; } }
+    .cot-detalles{ border-top: 1px solid var(--borde); margin-top: 1.1rem; padding-top: .6rem; }
+    /* Destello al recalcular */
+    .cot-result.flash{ animation: cotFlash .55s ease; }
+    @keyframes cotFlash{ 0%{ box-shadow: 0 0 0 0 rgba(232,199,102,.35); } 100%{ box-shadow: 0 0 0 14px rgba(232,199,102,0); } }
+    @media (prefers-reduced-motion: reduce){ .cot-result.flash{ animation: none; } }
+
     /* ---------- Inversión ---------- */
     .cards-3{ display: grid; gap: 1.4rem; margin-top: 2.5rem; }
     @media (min-width: 900px){ .cards-3{ grid-template-columns: repeat(3, 1fr); } }
@@ -1597,6 +1665,7 @@
         <p class="section-lead reveal">Precios de Binance y tipo de cambio oficial, actualizados cada minuto. La tasa final se confirma con un asesor según tu volumen.</p>
 
         <div class="cotizador-card reveal">
+          <span class="cot-vivo" id="cot-vivo"><i aria-hidden="true"></i><span>Conectando…</span></span>
           <div class="cot-row">
             <div class="cot-field">
               <span class="cot-legend" id="lbl-entrego">Entrego</span>
@@ -1627,14 +1696,35 @@
               <span class="cot-prefix" id="cot-prefix" aria-hidden="true">S/</span>
               <input type="number" id="cot-monto" inputmode="decimal" min="0" step="100" placeholder="50,000" value="50000">
             </div>
+            <!-- Montos rápidos: se generan desde CHIPS_MONTOS en el script -->
+            <div class="cot-chips" id="cot-chips" role="group" aria-label="Montos rápidos"></div>
+            <p class="cot-letras num" id="cot-letras"></p>
           </div>
 
-          <div class="cot-result" aria-live="polite">
-            <p class="cot-result-label">Recibirás aproximadamente</p>
-            <p class="cot-result-value num" id="cot-result">—</p>
-            <div class="cot-detail"><span>Tipo de cambio (oficial)</span><strong class="num" id="cot-rate">—</strong></div>
-            <div class="cot-detail"><span>Comisión incluida</span><strong class="num" id="cot-comision">7%</strong></div>
-            <div class="cot-detail"><span>Precio congelado al confirmar</span><strong><span data-lock>15</span> min</strong></div>
+          <div class="cot-result" id="cot-result-box" aria-live="polite">
+            <div class="cot-flujo">
+              <div class="cot-lado">
+                <span class="cot-lado-label">Entregas</span>
+                <span class="cot-lado-valor num" id="cot-entrega">—</span>
+                <span class="cot-lado-sub" id="cot-entrega-sub">&nbsp;</span>
+              </div>
+              <div class="cot-flecha" aria-hidden="true">
+                <svg viewBox="0 0 46 22" fill="none">
+                  <path class="flecha-linea" d="M2 11 H34" stroke="#E8C766" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M32 4 L42 11 L32 18" stroke="#E8C766" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="cot-lado cot-lado-recibe">
+                <span class="cot-lado-label">Recibes aproximadamente</span>
+                <span class="cot-lado-valor num" id="cot-result">—</span>
+                <span class="cot-lado-sub" id="cot-equiv">&nbsp;</span>
+              </div>
+            </div>
+            <div class="cot-detalles">
+              <div class="cot-detail"><span>Tipo de cambio (oficial)</span><strong class="num" id="cot-rate">—</strong></div>
+              <div class="cot-detail"><span>Comisión incluida</span><strong class="num" id="cot-comision">7%</strong></div>
+              <div class="cot-detail"><span>Precio congelado al confirmar</span><strong><span data-lock>15</span> min</strong></div>
+            </div>
           </div>
 
           <a class="btn btn-primary cot-cta" id="cot-wa" data-wa href="#contacto">
@@ -2289,6 +2379,14 @@
         status.classList.remove('en-vivo'); status.classList.add('referencial');
         statusText.textContent = 'Referencial (sin conexión)';
       }
+      // Chip de estado dentro del cotizador
+      const cotVivo = document.getElementById('cot-vivo');
+      if (cotVivo){
+        cotVivo.classList.toggle('activo', precios.enVivo);
+        const cotVivoTxt = cotVivo.querySelector('span');
+        if (precios.enVivo) cotVivoTxt.textContent = 'En vivo · ' + (precios.fuente || 'mercado') + ' + TC oficial';
+        else if (precios.primerIntentoHecho) cotVivoTxt.textContent = 'Referencial (sin conexión)';
+      }
       recalcularCotizador();
     }
 
@@ -2385,6 +2483,84 @@
 
     const METODO_NOMBRES = { efectivo: 'Efectivo', lemon: 'Lemon Cash' };
 
+    // [EDITABLE] Montos rápidos del cotizador, por moneda
+    const CHIPS_MONTOS = {
+      PEN: [5000, 10000, 20000, 50000, 100000, 200000],
+      USD: [1000, 5000, 10000, 25000, 50000]
+    };
+    const chipsWrap = document.getElementById('cot-chips');
+
+    function pintarChips(){
+      if (!chipsWrap) return;
+      const moneda = document.querySelector('input[name="moneda"]:checked').value;
+      const simbolo = moneda === 'PEN' ? 'S/ ' : '$ ';
+      const actual = parseFloat(montoInput.value);
+      chipsWrap.innerHTML = '';
+      CHIPS_MONTOS[moneda].forEach(v => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'cot-chip num' + (v === actual ? ' activo' : '');
+        b.textContent = simbolo + fmtNum(v, 0);
+        b.addEventListener('click', () => { montoInput.value = v; recalcularCotizador(); });
+        chipsWrap.appendChild(b);
+      });
+    }
+
+    // Monto en palabras (patrón de voucher bancario: evita errores de ceros)
+    function numeroALetras(n){
+      n = Math.floor(Math.abs(n));
+      if (n === 0) return 'cero';
+      const U = ['', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez',
+                 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve', 'veinte'];
+      const D = ['', '', '', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta', 'ochenta', 'noventa'];
+      const C = ['', 'ciento', 'doscientos', 'trescientos', 'cuatrocientos', 'quinientos', 'seiscientos', 'setecientos', 'ochocientos', 'novecientos'];
+      function tres(x){
+        if (x === 0) return '';
+        if (x === 100) return 'cien';
+        let s = '';
+        const c = Math.floor(x / 100), r = x % 100;
+        if (c) s = C[c];
+        if (r){
+          if (s) s += ' ';
+          if (r <= 20) s += U[r];
+          else if (r < 30) s += 'veinti' + (r === 21 ? 'ún' : U[r - 20]);
+          else {
+            const d = Math.floor(r / 10), u = r % 10;
+            s += D[d] + (u ? ' y ' + U[u] : '');
+          }
+        }
+        return s;
+      }
+      const mi = Math.floor(n / 1e6), mil = Math.floor((n % 1e6) / 1000), resto = n % 1000;
+      let out = '';
+      if (mi) out = (mi === 1 ? 'un millón' : tres(mi) + ' millones');
+      if (mil) out += (out ? ' ' : '') + (mil === 1 ? 'mil' : tres(mil) + ' mil');
+      if (resto) out += (out ? ' ' : '') + tres(resto);
+      return out;
+    }
+
+    // Resultado con conteo animado y destello (sensación de terminal en vivo)
+    function mostrarResultado(valor, dec, sufijo){
+      const caja = document.getElementById('cot-result-box');
+      if (caja && !reducedMotion){
+        caja.classList.remove('flash'); void caja.offsetWidth; caja.classList.add('flash');
+      }
+      const prev = parseFloat(resultEl.dataset.v);
+      resultEl.dataset.v = valor;
+      if (reducedMotion || !isFinite(prev) || prev <= 0){
+        resultEl.textContent = '≈ ' + fmtNum(valor, dec) + sufijo;
+        return;
+      }
+      const t0 = performance.now(), dur = 380;
+      function paso(t){
+        const p = Math.min(1, (t - t0) / dur);
+        const e = 1 - Math.pow(1 - p, 3);
+        resultEl.textContent = '≈ ' + fmtNum(prev + (valor - prev) * e, dec) + sufijo;
+        if (p < 1) requestAnimationFrame(paso);
+      }
+      requestAnimationFrame(paso);
+    }
+
     // Tipo de cambio oficial aplicado: manual si el negocio lo fijó, si no el de la API
     function tcOficial(){
       return (typeof CONFIG.TC_OFICIAL_MANUAL === 'number' && CONFIG.TC_OFICIAL_MANUAL > 0)
@@ -2396,6 +2572,12 @@
       if (!montoInput) return;
       const { moneda, activo, metodo, monto } = valoresCotizador();
       prefixEl.textContent = moneda === 'PEN' ? 'S/' : '$';
+      pintarChips();
+
+      const entregaEl = document.getElementById('cot-entrega');
+      const entregaSub = document.getElementById('cot-entrega-sub');
+      const equivEl = document.getElementById('cot-equiv');
+      const letrasEl = document.getElementById('cot-letras');
 
       // Comisión según método de entrega (descuento neto exacto: 7% ó 5%)
       const comision = CONFIG.COMISIONES[metodo];
@@ -2408,8 +2590,15 @@
       const tcTxt = 'S/ ' + fmtNum(tc, 3) + ' por USD';
       rateEl.textContent = tcTxt;
 
+      const simbolo = moneda === 'PEN' ? 'S/ ' : '$ ';
+
       if (!monto || monto <= 0){
         resultEl.textContent = '—';
+        delete resultEl.dataset.v;
+        if (entregaEl) entregaEl.textContent = '—';
+        if (entregaSub) entregaSub.innerHTML = '&nbsp;';
+        if (equivEl) equivEl.innerHTML = '&nbsp;';
+        if (letrasEl) letrasEl.textContent = '';
         actualizarWaCotizador(null);
         return;
       }
@@ -2423,11 +2612,25 @@
       if (activo === 'USDT'){
         resultado = usdNeto / precios.usdt_usd;
         resultadoTxt = fmtNum(resultado, 2) + ' USDT';
+        mostrarResultado(resultado, 2, ' USDT');
       } else {
         resultado = usdNeto / precios.btc_usd;
         resultadoTxt = fmtNum(resultado, 6) + ' BTC';
+        mostrarResultado(resultado, 6, ' BTC');
       }
-      resultEl.textContent = '≈ ' + resultadoTxt;
+
+      // Lado "Entregas" + monto en palabras + equivalencia
+      if (entregaEl) entregaEl.textContent = simbolo + fmtNum(monto, 0);
+      if (entregaSub) entregaSub.textContent = metodo === 'efectivo' ? 'en efectivo' : 'vía Lemon Cash';
+      if (equivEl){
+        equivEl.textContent = activo === 'BTC'
+          ? '≈ ' + fmtUSD0.format(usdNeto) + ' en dólares'
+          : 'dólar digital · disponible 24/7';
+      }
+      if (letrasEl){
+        const monedaTxt = moneda === 'PEN' ? (monto === 1 ? 'sol' : 'soles') : (monto === 1 ? 'dólar' : 'dólares');
+        letrasEl.textContent = 'Son: ' + numeroALetras(monto) + ' ' + monedaTxt;
+      }
 
       actualizarWaCotizador({ moneda, activo, metodo, comisionTxt, tc, monto, resultadoTxt });
     }
