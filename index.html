@@ -4171,8 +4171,29 @@
 
     /* ---------- Arranque ---------- */
     pintarTicker();
-    traerPrecios();
-    setInterval(traerPrecios, CONFIG.REFRESH_MS);
+
+    // Marca del último intento de fetch, para no saturar las APIs al recuperar el foco
+    let ultimoFetchTs = 0;
+    function refrescarPrecios(){
+      ultimoFetchTs = performance.now();
+      return traerPrecios();
+    }
+    refrescarPrecios();
+
+    // Refresco periódico. Los navegadores CONGELAN setInterval en pestañas en
+    // segundo plano, así que solo pedimos cuando la pestaña está visible (y abajo
+    // refrescamos al volver a ella para que los precios estén siempre frescos).
+    setInterval(() => { if (!document.hidden) refrescarPrecios(); }, CONFIG.REFRESH_MS);
+
+    // Precios siempre actualizados: cada vez que se mira la página (volver a la
+    // pestaña o recuperar el foco de la ventana) se re-piden, con un tope de 1 vez
+    // cada 15 s para no abusar de las APIs públicas.
+    function refrescarSiVisible(){
+      if (document.hidden) return;
+      if (performance.now() - ultimoFetchTs > 15000) refrescarPrecios();
+    }
+    document.addEventListener('visibilitychange', refrescarSiVisible);
+    window.addEventListener('focus', refrescarSiVisible);
 
     window.addEventListener('load', construirVeta);
     if (document.fonts && document.fonts.ready){
