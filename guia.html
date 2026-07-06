@@ -41,6 +41,7 @@
       --f-display: 'Space Grotesk', sans-serif;
       --f-cuerpo: 'Inter', sans-serif;
       --radio: 18px;
+      --ease: cubic-bezier(.22,1,.36,1);
     }
     *{ margin: 0; padding: 0; box-sizing: border-box; }
     html{ scroll-behavior: smooth; }
@@ -54,9 +55,21 @@
       font-size: 16.5px;
       line-height: 1.65;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
     a{ color: var(--oro-claro); text-decoration: none; }
     a:hover{ text-decoration: underline; text-underline-offset: 3px; }
+
+    /* Texto que se descifra (scramble) — la firma de la guía (decodificar el kipu) */
+    [data-scramble]{ font-variant-ligatures: none; }
+    .cifrando{ color: var(--oro-claro); }
+
+    /* Revelado cinemático al hacer scroll */
+    .reveal{ opacity: 0; transform: translateY(20px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+    .reveal.in{ opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce){
+      .reveal{ opacity: 1 !important; transform: none !important; transition: none; }
+    }
 
     /* ---------- Header ---------- */
     .cabecera{
@@ -87,20 +100,43 @@
     .volver:hover{ color: var(--oro-claro); text-decoration: none; }
 
     /* ---------- Contenido ---------- */
-    main{ max-width: 860px; margin: 0 auto; padding: 3.2rem 1.25rem 4rem; }
+    main{ max-width: 860px; margin: 0 auto; padding: 0 1.25rem 4rem; }
+
+    /* Hero cinemático */
+    .hero-guia{ position: relative; overflow: hidden; padding: 4rem 0 2.4rem; margin-bottom: 1rem; }
+    .hero-inner{ position: relative; z-index: 2; }
+    /* Rejilla de puntos dorada, difuminada */
+    .rejilla{
+      position: absolute; inset: -20% -30%; z-index: 0; pointer-events: none;
+      background-image: radial-gradient(var(--oro) 1px, transparent 1px);
+      background-size: 26px 26px; opacity: .07;
+      -webkit-mask-image: radial-gradient(ellipse 70% 65% at 28% 42%, #000, transparent 72%);
+      mask-image: radial-gradient(ellipse 70% 65% at 28% 42%, #000, transparent 72%);
+    }
+    /* Marca de agua gigante */
+    .watermark{
+      position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%);
+      z-index: 0; pointer-events: none; white-space: nowrap;
+      font-family: var(--f-display); font-weight: 700; text-transform: uppercase;
+      font-size: clamp(96px, 24vw, 340px); letter-spacing: -.05em; line-height: 1;
+      background: radial-gradient(circle, rgba(201,162,39,0) 0%, var(--oro) 78%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      opacity: .09;
+    }
+
     .eyebrow{
       font-family: var(--f-display); font-size: .78rem; font-weight: 600;
       letter-spacing: .22em; text-transform: uppercase; color: var(--oro);
-      margin-bottom: 1rem;
+      margin-bottom: 1.1rem;
     }
     h1{
       font-family: var(--f-display); font-weight: 600;
-      font-size: clamp(1.9rem, 5vw, 3rem);
-      line-height: 1.12; letter-spacing: -.02em;
+      font-size: clamp(2rem, 5.4vw, 3.2rem);
+      line-height: 1.1; letter-spacing: -.025em;
       max-width: 20ch;
     }
     .lead{
-      margin-top: 1rem; color: var(--humo-72); font-size: 1.08rem; max-width: 52ch;
+      margin-top: 1.1rem; color: var(--humo-72); font-size: 1.08rem; max-width: 52ch;
       font-style: italic;
     }
     .intro{ margin-top: 1.6rem; color: var(--humo-72); max-width: 62ch; }
@@ -205,7 +241,9 @@
       border: 1px solid var(--borde);
       border-radius: 14px;
       padding: 1.05rem 1.2rem;
+      transition: border-color .2s ease, transform .2s ease;
     }
+    .regla:hover{ border-color: var(--borde-oro); transform: translateX(3px); }
     .regla .num{
       flex: none;
       width: 1.9rem; height: 1.9rem; border-radius: 50%;
@@ -302,22 +340,28 @@
   </header>
 
   <main>
-    <p class="eyebrow">Guía para nuevos usuarios</p>
-    <h1>Las 7 preguntas clave sobre tu dinero digital</h1>
-    <p class="lead">Explicado en simple, para cualquier persona. Sin términos raros.</p>
-    <p class="intro">Antes de pasar tu efectivo a digital, es normal tener dudas. Aquí están las 7 preguntas que todos se hacen — y sus respuestas claras.</p>
+    <section class="hero-guia">
+      <div class="rejilla" aria-hidden="true"></div>
+      <span class="watermark" aria-hidden="true">DESCIFRA</span>
+      <div class="hero-inner">
+        <p class="eyebrow" data-scramble>Guía para nuevos usuarios</p>
+        <h1 data-scramble>Las 7 preguntas clave sobre tu dinero digital</h1>
+        <p class="lead reveal">Explicado en simple, para cualquier persona. Sin términos raros.</p>
+        <p class="intro reveal">Antes de pasar tu efectivo a digital, es normal tener dudas. Aquí están las 7 preguntas que todos se hacen — y sus respuestas claras.</p>
+      </div>
+    </section>
 
     <hr class="separador">
 
     <section class="pregunta">
-      <h2><span class="num">1</span>¿Qué es USDT y por qué le dicen «dólar digital»?</h2>
-      <p>USDT es una <strong>stablecoin</strong>: una moneda digital creada para valer siempre lo mismo que un dólar americano (<strong>1 USDT ≈ 1 USD</strong>). No sube ni baja fuerte como el Bitcoin.</p>
-      <div class="en-simple"><b>En simple:</b> es como tener billetes de dólar, pero dentro de tu celular. Sin billetes falsos, sin caja fuerte, sin ir a la casa de cambio.</div>
+      <h2><span class="num">1</span><span data-scramble>¿Qué es USDT y por qué le dicen «dólar digital»?</span></h2>
+      <p class="reveal">USDT es una <strong>stablecoin</strong>: una moneda digital creada para valer siempre lo mismo que un dólar americano (<strong>1 USDT ≈ 1 USD</strong>). No sube ni baja fuerte como el Bitcoin.</p>
+      <div class="en-simple reveal"><b>En simple:</b> es como tener billetes de dólar, pero dentro de tu celular. Sin billetes falsos, sin caja fuerte, sin ir a la casa de cambio.</div>
     </section>
 
     <section class="pregunta">
-      <h2><span class="num">2</span>¿En qué me beneficia tener mi dinero en USDT?</h2>
-      <ul>
+      <h2><span class="num">2</span><span data-scramble>¿En qué me beneficia tener mi dinero en USDT?</span></h2>
+      <ul class="reveal">
         <li><strong>Proteges el valor de tu trabajo.</strong> Tu plata queda referenciada al dólar. Si el dólar sube, tu ahorro ya está ahí.</li>
         <li><strong>Cero billetes encima.</strong> No cargas efectivo por la carretera ni lo guardas bajo el colchón. Tu patrimonio viaja contigo, en tu celular.</li>
         <li><strong>Disponible 24/7.</strong> Sin horarios de banco, sin colas, sin feriados.</li>
@@ -325,93 +369,93 @@
         <li><strong>Sin billetes falsos ni deterioro.</strong> Lo digital no se rompe, no se moja, no se falsifica.</li>
         <li><strong>Empiezas solo con tu DNI y un celular.</strong> No necesitas historial bancario.</li>
       </ul>
-      <div class="en-simple"><b>En simple:</b> tu dinero deja de ser un bulto que cuidar y se convierte en un patrimonio que te acompaña.</div>
+      <div class="en-simple reveal"><b>En simple:</b> tu dinero deja de ser un bulto que cuidar y se convierte en un patrimonio que te acompaña.</div>
     </section>
 
     <section class="pregunta">
-      <h2><span class="num">3</span>¿Cómo está seguro mi dinero a través de la blockchain?</h2>
-      <p>La blockchain es un <strong>registro público copiado en miles de computadoras</strong> de todo el mundo, al mismo tiempo. Cada transacción queda anotada para siempre.</p>
-      <ul>
+      <h2><span class="num">3</span><span data-scramble>¿Cómo está seguro mi dinero a través de la blockchain?</span></h2>
+      <p class="reveal">La blockchain es un <strong>registro público copiado en miles de computadoras</strong> de todo el mundo, al mismo tiempo. Cada transacción queda anotada para siempre.</p>
+      <ul class="reveal">
         <li><strong>Nadie puede borrarla ni alterarla.</strong> Si alguien intenta cambiar una copia, las miles de copias restantes lo delatan.</li>
         <li><strong>No hay una oficina central que hackear.</strong> La red no depende de una sola empresa ni de un solo servidor.</li>
         <li><strong>Todo es verificable.</strong> Cada operación genera un <strong>hash</strong>: un código único que prueba públicamente que tu transacción existe. Es tu comprobante inalterable.</li>
         <li><strong>Solo tú mueves tu dinero.</strong> Tus fondos están protegidos por criptografía: sin tus claves, nadie puede tocarlos.</li>
       </ul>
-      <div class="en-simple"><b>En simple:</b> es como un kipu gigante. Cada operación queda anudada para siempre, cualquiera puede verificar el nudo, pero nadie puede desatarlo.</div>
-      <div class="honesto"><b>Lo honesto:</b> la blockchain en sí nunca ha sido alterada. Los problemas ocurren cuando una persona comparte sus claves o cae en una estafa. Por eso, lee las reglas de oro al final de esta guía.</div>
+      <div class="en-simple reveal"><b>En simple:</b> es como un kipu gigante. Cada operación queda anudada para siempre, cualquiera puede verificar el nudo, pero nadie puede desatarlo.</div>
+      <div class="honesto reveal"><b>Lo honesto:</b> la blockchain en sí nunca ha sido alterada. Los problemas ocurren cuando una persona comparte sus claves o cae en una estafa. Por eso, lee las reglas de oro al final de esta guía.</div>
     </section>
 
     <section class="pregunta">
-      <h2><span class="num">4</span>¿Qué es mi billetera digital y cómo accedo a mis fondos?</h2>
-      <p>Tu billetera (wallet) es una <strong>app gratuita en tu celular</strong> — por ejemplo, Lemon. Funciona parecido a Yape o Plin, pero con dólares digitales y sin fronteras.</p>
-      <p><strong>Acceder a tu dinero toma segundos:</strong></p>
-      <ol>
+      <h2><span class="num">4</span><span data-scramble>¿Qué es mi billetera digital y cómo accedo a mis fondos?</span></h2>
+      <p class="reveal">Tu billetera (wallet) es una <strong>app gratuita en tu celular</strong> — por ejemplo, Lemon. Funciona parecido a Yape o Plin, pero con dólares digitales y sin fronteras.</p>
+      <p class="reveal"><strong>Acceder a tu dinero toma segundos:</strong></p>
+      <ol class="reveal">
         <li>Abres la app con tu clave, huella o rostro.</li>
         <li>Ves tu saldo al instante.</li>
         <li>Desde ahí puedes <strong>recibir</strong> (compartes tu dirección o código QR), <strong>enviar</strong> (a cualquier otra billetera) o <strong>cambiar a soles</strong> cuando lo necesites. Las 24 horas, cualquier día.</li>
       </ol>
-      <p class="dato-clave"><strong>Dato clave:</strong> tu dinero <strong>no vive en el celular</strong>, vive en la blockchain. El celular es solo la puerta de entrada.</p>
+      <p class="dato-clave reveal"><strong>Dato clave:</strong> tu dinero <strong>no vive en el celular</strong>, vive en la blockchain. El celular es solo la puerta de entrada.</p>
     </section>
 
     <section class="pregunta">
-      <h2><span class="num">5</span>¿Qué significa ahorrar «fuera del sistema»? ¿Es legal?</h2>
-      <p>Significa que <strong>tú custodias tu dinero directamente</strong>, sin depender de un banco:</p>
-      <ul>
+      <h2><span class="num">5</span><span data-scramble>¿Qué significa ahorrar «fuera del sistema»? ¿Es legal?</span></h2>
+      <p class="reveal">Significa que <strong>tú custodias tu dinero directamente</strong>, sin depender de un banco:</p>
+      <ul class="reveal">
         <li>Sin mantenimiento de cuenta ni horarios de oficina.</li>
         <li>Con tu propia billetera, el control es tuyo: no necesitas la aprobación de nadie para usar tu plata.</li>
         <li>Tu ahorro está disponible al toque, a cualquier hora.</li>
       </ul>
-      <p><strong>¿Y es legal? Sí.</strong> Tener y usar activos digitales es una actividad lícita en el Perú. Además, KIPU opera como <strong>sujeto obligado ante la UIF-Perú</strong> bajo normativa PLAFT: cada operación queda documentada a tu nombre, con comprobante y respaldo legal.</p>
-      <div class="en-simple"><b>En simple:</b> estar fuera del banco no es estar fuera de la ley. Es libertad con formalidad — y cada comprobante suma a tu historial formal (ideal si estás en REINFO o ya formalizado).</div>
+      <p class="reveal"><strong>¿Y es legal? Sí.</strong> Tener y usar activos digitales es una actividad lícita en el Perú. Además, KIPU opera como <strong>sujeto obligado ante la UIF-Perú</strong> bajo normativa PLAFT: cada operación queda documentada a tu nombre, con comprobante y respaldo legal.</p>
+      <div class="en-simple reveal"><b>En simple:</b> estar fuera del banco no es estar fuera de la ley. Es libertad con formalidad — y cada comprobante suma a tu historial formal (ideal si estás en REINFO o ya formalizado).</div>
     </section>
 
     <section class="pregunta">
-      <h2><span class="num">6</span>¿Qué pasa si pierdo mi celular? ¿Y si me equivoco al enviar?</h2>
-      <p><strong>Si pierdes el celular, no pierdes tu dinero.</strong> Tus fondos viven en la blockchain, no en el equipo. Recuperas tu billetera desde cualquier otro celular con tu <strong>frase semilla</strong> (las 12 palabras que la app te da al crearla) o con tu cuenta verificada.</p>
-      <div class="en-simple"><b>La regla de oro:</b> escribe tu frase semilla en papel y guárdala en un lugar seguro. Nunca le tomes foto, nunca la mandes por chat, nunca la compartas. <strong>Quien tiene esas 12 palabras, tiene tu dinero.</strong></div>
-      <p><strong>Si te equivocas al enviar:</strong> las transacciones en blockchain son irreversibles — no existe el botón «deshacer». Por eso en KIPU verificamos contigo cada dato antes de ejecutar, y tú siempre debes revisar la dirección antes de confirmar.</p>
+      <h2><span class="num">6</span><span data-scramble>¿Qué pasa si pierdo mi celular? ¿Y si me equivoco al enviar?</span></h2>
+      <p class="reveal"><strong>Si pierdes el celular, no pierdes tu dinero.</strong> Tus fondos viven en la blockchain, no en el equipo. Recuperas tu billetera desde cualquier otro celular con tu <strong>frase semilla</strong> (las 12 palabras que la app te da al crearla) o con tu cuenta verificada.</p>
+      <div class="en-simple reveal"><b>La regla de oro:</b> escribe tu frase semilla en papel y guárdala en un lugar seguro. Nunca le tomes foto, nunca la mandes por chat, nunca la compartas. <strong>Quien tiene esas 12 palabras, tiene tu dinero.</strong></div>
+      <p class="reveal"><strong>Si te equivocas al enviar:</strong> las transacciones en blockchain son irreversibles — no existe el botón «deshacer». Por eso en KIPU verificamos contigo cada dato antes de ejecutar, y tú siempre debes revisar la dirección antes de confirmar.</p>
     </section>
 
     <section class="pregunta">
-      <h2><span class="num">7</span>¿Cómo empiezo? ¿Y cómo vuelvo a soles cuando necesite?</h2>
-      <p>Empezar toma una sola tarde (mira los pasos abajo). Y cuando necesites efectivo, <strong>operamos en ambas direcciones</strong>: cambias tus USDT a soles con el mismo protocolo — cotización bloqueada, punto de entrega seguro y comprobante de operación.</p>
-      <p>Tu dinero entra a digital cuando quieres, y vuelve a físico cuando lo decides. Tú mandas.</p>
+      <h2><span class="num">7</span><span data-scramble>¿Cómo empiezo? ¿Y cómo vuelvo a soles cuando necesite?</span></h2>
+      <p class="reveal">Empezar toma una sola tarde (mira los pasos abajo). Y cuando necesites efectivo, <strong>operamos en ambas direcciones</strong>: cambias tus USDT a soles con el mismo protocolo — cotización bloqueada, punto de entrega seguro y comprobante de operación.</p>
+      <p class="reveal">Tu dinero entra a digital cuando quieres, y vuelve a físico cuando lo decides. Tú mandas.</p>
     </section>
 
     <hr class="separador">
 
-    <h2 class="bloque-titulo">Tus primeros pasos, en simple</h2>
+    <h2 class="bloque-titulo" data-scramble>Tus primeros pasos, en simple</h2>
     <ol class="pasos">
-      <li><strong>Escríbenos por WhatsApp.</strong><p>Te damos tu cotización al instante (monto mínimo referencial: S/ 5,000 — a más volumen, mejor tasa).</p></li>
-      <li><strong>Verifica tu identidad una sola vez.</strong><p>Tu DNI o RUC más una validación biométrica rápida. Esto te protege: la operación queda registrada a tu nombre.</p></li>
-      <li><strong>Crea tu billetera gratis.</strong><p>Si no tienes una, te enseñamos paso a paso, con calma. Guarda tu frase semilla en papel.</p></li>
-      <li><strong>Entrega tu efectivo en un punto seguro.</strong><p>Oficina propia o punto aliado verificado, con el precio congelado por 15 minutos: lo que aceptaste es lo que recibes.</p></li>
-      <li><strong>Recibe tus USDT al instante.</strong><p>Con hash de confirmación en blockchain y tu comprobante de operación. Listo: tu patrimonio ya es digital.</p></li>
+      <li class="reveal"><strong>Escríbenos por WhatsApp.</strong><p>Te damos tu cotización al instante (monto mínimo referencial: S/ 5,000 — a más volumen, mejor tasa).</p></li>
+      <li class="reveal"><strong>Verifica tu identidad una sola vez.</strong><p>Tu DNI o RUC más una validación biométrica rápida. Esto te protege: la operación queda registrada a tu nombre.</p></li>
+      <li class="reveal"><strong>Crea tu billetera gratis.</strong><p>Si no tienes una, te enseñamos paso a paso, con calma. Guarda tu frase semilla en papel.</p></li>
+      <li class="reveal"><strong>Entrega tu efectivo en un punto seguro.</strong><p>Oficina propia o punto aliado verificado, con el precio congelado por 15 minutos: lo que aceptaste es lo que recibes.</p></li>
+      <li class="reveal"><strong>Recibe tus USDT al instante.</strong><p>Con hash de confirmación en blockchain y tu comprobante de operación. Listo: tu patrimonio ya es digital.</p></li>
     </ol>
-    <div class="nota-pasos">
+    <div class="nota-pasos reveal">
       <p>La primera operación toma entre 30 y 45 minutos (incluye tu verificación). Desde la segunda, solo minutos.</p>
       <p><strong>Comisión transparente:</strong> 5% en operaciones con efectivo · 3% si transfieres desde Lemon. Siempre te informamos el número exacto antes de confirmar. Sin sorpresas.</p>
     </div>
 
     <hr class="separador">
 
-    <h2 class="bloque-titulo">Las 5 reglas de oro de seguridad</h2>
+    <h2 class="bloque-titulo" data-scramble>Las 5 reglas de oro de seguridad</h2>
     <ul class="reglas">
-      <li class="regla"><span class="num">1</span><div><strong>Tu frase semilla es solo tuya.</strong>En papel, nunca en foto ni chat. KIPU <b>nunca</b> te la pedirá.</div></li>
-      <li class="regla"><span class="num">2</span><div><strong>Nadie legítimo te pedirá tus claves.</strong>Quien lo haga, es un estafador. Corta la conversación.</div></li>
-      <li class="regla"><span class="num">3</span><div><strong>Verifica la dirección antes de enviar.</strong>En blockchain no hay «deshacer».</div></li>
-      <li class="regla"><span class="num">4</span><div><strong>Desconfía de ganancias garantizadas.</strong>KIPU no promete rentabilidades. Quien te las prometa, te está mintiendo.</div></li>
-      <li class="regla"><span class="num">5</span><div><strong>Empieza con calma.</strong>Primero asegura tu reserva; después, con asesoría, decides los siguientes pasos.</div></li>
+      <li class="regla reveal"><span class="num">1</span><div><strong>Tu frase semilla es solo tuya.</strong>En papel, nunca en foto ni chat. KIPU <b>nunca</b> te la pedirá.</div></li>
+      <li class="regla reveal"><span class="num">2</span><div><strong>Nadie legítimo te pedirá tus claves.</strong>Quien lo haga, es un estafador. Corta la conversación.</div></li>
+      <li class="regla reveal"><span class="num">3</span><div><strong>Verifica la dirección antes de enviar.</strong>En blockchain no hay «deshacer».</div></li>
+      <li class="regla reveal"><span class="num">4</span><div><strong>Desconfía de ganancias garantizadas.</strong>KIPU no promete rentabilidades. Quien te las prometa, te está mintiendo.</div></li>
+      <li class="regla reveal"><span class="num">5</span><div><strong>Empieza con calma.</strong>Primero asegura tu reserva; después, con asesoría, decides los siguientes pasos.</div></li>
     </ul>
 
-    <div class="nota-final">
-      <h3>Nota honesta (léela, es corta)</h3>
+    <div class="nota-final reveal">
+      <h3 data-scramble>Nota honesta (léela, es corta)</h3>
       <p>USDT busca mantener el valor del dólar, pero depende de su emisor. Los activos digitales implican riesgos y su normativa puede cambiar. No comprometas fondos que necesites de inmediato ni tu capital de operación esencial. Para temas de impuestos, consulta con tu contador: los comprobantes de KIPU te facilitan todo el orden. Ante cualquier duda, pregunta a nuestro equipo — para eso estamos.</p>
     </div>
 
-    <div class="cta">
+    <div class="cta reveal">
       <img src="assets/mascota/kori-poster.jpg" alt="Kori, la alpaca de KIPU">
-      <h2>¿Listo para tu primera operación?</h2>
+      <h2 data-scramble>¿Listo para tu primera operación?</h2>
       <p>Una conversación por WhatsApp basta. Sin compromiso.</p>
       <a class="btn-wa" href="https://wa.me/51918616580?text=Hola%20KIPU%2C%20le%C3%AD%20la%20gu%C3%ADa%20para%20nuevos%20usuarios%20y%20quiero%20empezar." target="_blank" rel="noopener">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a9.9 9.9 0 0 0-8.5 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm5.7 14.1c-.24.68-1.4 1.3-1.93 1.35-.52.05-1.01.24-3.4-.7-2.87-1.14-4.7-4.06-4.84-4.25-.14-.19-1.16-1.55-1.16-2.95 0-1.4.73-2.09 1-2.37.24-.26.54-.32.72-.32h.52c.17 0 .4-.06.61.47.24.56.78 1.94.85 2.08.07.14.12.3.02.49-.42.85-.88.82-.65 1.21.86 1.48 1.72 1.99 3.02 2.65.22.11.35.1.48-.05.13-.14.56-.65.7-.87.15-.22.3-.19.5-.11.2.07 1.3.62 1.53.73.22.11.37.17.42.26.06.1.06.55-.18 1.08Z"/></svg>
@@ -424,6 +468,65 @@
   <footer class="pie">
     <p>© <span id="year">2026</span> PROFIX CENTRAL BANK S.A.C. · RUC 20614585146 · <a href="https://kippuu.com">kippuu.com</a></p>
   </footer>
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    /* ---------- Guía cinemática: descifrado (scramble) + revelados ---------- */
+    (function(){
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const CHARS = 'ABCDEFGHIJKLMNPQRSTUVWXYZ0123456789#%&/<>{}[]?';
+      const rnd = () => CHARS[(Math.random() * CHARS.length) | 0];
+
+      const scrambles = [...document.querySelectorAll('[data-scramble]')];
+
+      // Estado inicial cifrado (misma longitud → sin saltos de ancho). El texto
+      // real queda en aria-label para lectores de pantalla.
+      if (!reduce){
+        scrambles.forEach(el => {
+          const real = el.textContent;
+          el.dataset.real = real;
+          el.setAttribute('aria-label', real);
+          el.textContent = [...real].map(c => c === ' ' ? ' ' : rnd()).join('');
+        });
+      }
+
+      function descifrar(el){
+        if (el.dataset.done) return; el.dataset.done = '1';
+        const real = el.dataset.real; if (real == null) return;
+        const chars = [...real], len = chars.length;
+        const speed = Math.max(0.7, len / 34); // se resuelve en ~1s sin importar el largo
+        let prog = 0;
+        el.classList.add('cifrando');
+        const id = setInterval(() => {
+          prog += speed;
+          const rev = prog | 0;
+          let out = '';
+          for (let i = 0; i < len; i++){
+            out += chars[i] === ' ' ? ' ' : (i < rev ? chars[i] : rnd());
+          }
+          el.textContent = out;
+          if (rev >= len){
+            clearInterval(id);
+            el.textContent = real;
+            el.classList.remove('cifrando');
+            el.removeAttribute('aria-label');
+          }
+        }, 25);
+      }
+
+      const io = new IntersectionObserver((entradas) => {
+        entradas.forEach(e => {
+          if (!e.isIntersecting) return;
+          const el = e.target;
+          if (el.classList.contains('reveal')) el.classList.add('in');
+          if (el.hasAttribute('data-scramble') && !reduce) descifrar(el);
+          io.unobserve(el);
+        });
+      }, { threshold: .18, rootMargin: '0px 0px -6% 0px' });
+
+      document.querySelectorAll('.reveal, [data-scramble]').forEach(el => io.observe(el));
+    })();
+  </script>
 </body>
 </html>
