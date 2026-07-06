@@ -1570,7 +1570,7 @@
       font-size: .8rem; color: var(--humo-55);
     }
 
-    /* ---------- WhatsApp flotante ---------- */
+    /* ---------- WhatsApp flotante (animado) ---------- */
     .wa-float{
       position: fixed;
       right: 1.1rem; bottom: 1.1rem;
@@ -1582,8 +1582,33 @@
       box-shadow: 0 10px 30px rgba(0,0,0,.5);
       transition: transform .2s ease;
     }
+    /* Onda de pulso verde que llama la atención (recrea el Lottie) */
+    .wa-float::before{
+      content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+      box-shadow: 0 0 0 0 rgba(37,211,102,.55);
+      animation: waPulso 2.6s cubic-bezier(.22,1,.36,1) infinite;
+    }
+    @keyframes waPulso{
+      0%{ box-shadow: 0 0 0 0 rgba(37,211,102,.55); }
+      70%{ box-shadow: 0 0 0 18px rgba(37,211,102,0); }
+      100%{ box-shadow: 0 0 0 0 rgba(37,211,102,0); }
+    }
     .wa-float:hover{ transform: scale(1.06); text-decoration: none; }
-    .wa-float svg{ width: 30px; height: 30px; }
+    .wa-float:hover::before{ animation-play-state: paused; }
+    /* El auricular hace un meneo breve cada ciclo (como el Lottie) */
+    .wa-float svg{ width: 30px; height: 30px; transform-origin: 52% 54%; animation: waMeneo 5s ease-in-out infinite; }
+    @keyframes waMeneo{
+      0%, 62%, 100%{ transform: rotate(0); }
+      66%{ transform: rotate(13deg); }
+      71%{ transform: rotate(-8deg); }
+      76%{ transform: rotate(7deg); }
+      81%{ transform: rotate(-3deg); }
+      86%{ transform: rotate(0); }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .wa-float::before{ animation: none; }
+      .wa-float svg{ animation: none; }
+    }
 
     /* ---------- Esfera flotante: guía para nuevos usuarios ---------- */
     .guia-orbe{
