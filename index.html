@@ -1596,27 +1596,32 @@
     .guia-orbe .orbe{
       position: relative; flex: none;
       width: 58px; height: 58px; border-radius: 50%;
-      background: radial-gradient(circle at 33% 28%, #F7E8AE 0%, #E8C766 34%, #C9A227 68%, #8A6D1A 100%);
-      box-shadow:
-        0 10px 30px rgba(201,162,39,.45),
-        inset 0 -6px 12px rgba(0,0,0,.28),
-        inset 0 5px 9px rgba(255,255,255,.35);
-      display: flex; align-items: center; justify-content: center;
+      background: #0A0A14;
+      box-shadow: 0 8px 26px -6px rgba(124,58,237,.55);
       transition: transform .2s ease;
     }
     .guia-orbe:hover .orbe{ transform: scale(1.07); }
-    .guia-orbe .orbe svg{ width: 28px; height: 28px; color: #2A2205; position: relative; z-index: 1; }
-    /* Anillo de pulso que llama la atención sin ser molesto */
+    .guia-orbe .orbe video{
+      width: 100%; height: 100%; border-radius: 50%;
+      object-fit: cover; display: block;
+    }
+    /* Aro dorado sobre el globo (amarra a la marca) */
     .guia-orbe .orbe::before{
-      content: ""; position: absolute; inset: 0; border-radius: 50%;
-      box-shadow: 0 0 0 0 rgba(232,199,102,.55);
+      content: ""; position: absolute; inset: 0; border-radius: 50%; z-index: 1;
+      border: 1.5px solid rgba(232,199,102,.45); pointer-events: none;
+    }
+    /* Pulso violeta a juego con el glow del globo */
+    .guia-orbe .orbe::after{
+      content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+      box-shadow: 0 0 0 0 rgba(139,92,246,.55);
       animation: pulsoOrbe 2.8s ease-out infinite;
     }
     @keyframes pulsoOrbe{
-      0%{ box-shadow: 0 0 0 0 rgba(232,199,102,.55); }
-      70%{ box-shadow: 0 0 0 15px rgba(232,199,102,0); }
-      100%{ box-shadow: 0 0 0 0 rgba(232,199,102,0); }
+      0%{ box-shadow: 0 0 0 0 rgba(139,92,246,.55); }
+      70%{ box-shadow: 0 0 0 15px rgba(139,92,246,0); }
+      100%{ box-shadow: 0 0 0 0 rgba(139,92,246,0); }
     }
+    @media (prefers-reduced-motion: reduce){ .guia-orbe .orbe::after{ animation: none; } }
     .guia-orbe .orbe-label{
       display: inline-flex; flex-direction: column; line-height: 1.15;
       padding: .5rem .85rem;
@@ -2716,10 +2721,7 @@
   <!-- ============ Esfera flotante: guía para nuevos usuarios (abre en pestaña nueva) ============ -->
   <a class="guia-orbe" href="guia.html" target="_blank" rel="noopener" aria-label="Abrir la guía para nuevos usuarios en una pestaña nueva">
     <span class="orbe" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5V5.5Z"/>
-        <path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5V5.5Z"/>
-      </svg>
+      <video id="orbe-globo" src="assets/orbe/globo.mp4" poster="assets/orbe/globo-poster.jpg" muted loop autoplay playsinline preload="auto"></video>
     </span>
     <span class="orbe-label"><b>¿Nuevo aquí?</b><span>Guía para empezar</span></span>
   </a>
@@ -4116,6 +4118,18 @@
         });
       }, { threshold: .25 });
       ioMascota.observe(v);
+    })();
+
+    /* ---------- Orbe de la guía: globo animado (respeta movimiento reducido) ---------- */
+    (function(){
+      const g = document.getElementById('orbe-globo');
+      if (!g) return;
+      const ahorroDatos = !!(navigator.connection && navigator.connection.saveData);
+      if (reducedMotion || ahorroDatos){
+        g.removeAttribute('autoplay'); g.pause(); // queda el póster estático
+      } else {
+        g.play().catch(() => {});
+      }
     })();
 
     /* ---------- Testimonios: duplicar el grupo para el bucle continuo ---------- */
