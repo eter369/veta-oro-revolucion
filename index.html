@@ -838,8 +838,25 @@
     .metodo-lemon:hover .lemon-logo{ opacity: 1; }
     /* Hermano adyacente del input: invalidación sólida al marcar (sin depender de :has en descendiente) */
     .metodo-lemon input:checked + .lemon-logo{
-      filter: brightness(0);                   /* negro sobre el dorado (activo) */
+      filter: brightness(0);                   /* negro sobre el verde (activo) */
       opacity: 1;
+    }
+    /* Promoción Lemon: etiqueta 3% siempre visible + verde de marca al seleccionar */
+    .metodo-lemon{ position: relative; }
+    .metodo-lemon::after{
+      content: "3%";
+      position: absolute; top: -9px; right: -6px;
+      padding: .13rem .5rem;
+      background: linear-gradient(135deg, #00E36B, #7CF5AE);
+      color: #05240F;
+      border-radius: 100px;
+      font-family: var(--f-display); font-size: .66rem; font-weight: 700; letter-spacing: .02em;
+      box-shadow: 0 4px 14px -4px rgba(0,227,107,.6);
+      pointer-events: none;
+    }
+    /* Estado activo: gradiente verde Lemon en lugar del dorado (mayor especificidad) */
+    .segmented label.metodo-lemon:has(input:checked){
+      background: linear-gradient(135deg, #00C860 0%, #66F0A3 100%);
     }
     .segmented input{ position: absolute; opacity: 0; pointer-events: none; }
     .segmented label:has(input:checked){
@@ -3254,7 +3271,10 @@
       const comision = CONFIG.COMISIONES[metodo];
       const comisionTxt = parseFloat((comision * 100).toFixed(2)) + '%';
       const comisionEl = document.getElementById('cot-comision');
-      if (comisionEl) comisionEl.textContent = comisionTxt;
+      if (comisionEl){
+        comisionEl.textContent = comisionTxt;
+        comisionEl.style.color = metodo === 'lemon' ? '#3BE388' : ''; // promoción Lemon en verde
+      }
 
       // Tipo de cambio oficial: siempre visible y actualizado (no la tasa efectiva).
       // Se muestra el de la moneda que el cliente entrega (S/ o R$ por USD).
