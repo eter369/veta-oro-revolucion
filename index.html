@@ -699,12 +699,14 @@
        panel oscuro; brightness 1.3 lo hace legible sin lavar el celeste. */
     .logo-paypal{ height: 30px; filter: brightness(1.3); }
     .logo-ft{ height: 36px; }
-    /* Celular: logos proporcionados a las celdas compactas */
+    /* Celular: logos proporcionados a las celdas compactas.
+       FT es denso (retrato + wordmark serif de 2 líneas): se reduce más
+       para equilibrar su peso visual con los demás. */
     @media (max-width: 779px){
-      .logo-wu{ height: 24px; }
-      .logo-visa{ height: 22px; }
-      .logo-paypal{ height: 24px; }
-      .logo-ft{ height: 29px; }
+      .logo-wu{ height: 22px; }
+      .logo-visa{ height: 21px; }
+      .logo-paypal{ height: 23px; }
+      .logo-ft{ height: 20px; }
     }
 
     /* Franja de respaldo institucional (estilo franja de logos de referencia,
