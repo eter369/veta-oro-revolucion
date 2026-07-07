@@ -6,6 +6,9 @@
   <title>Guía KIPU para nuevos usuarios — Tu dinero digital, explicado en simple</title>
   <meta name="description" content="Las 7 preguntas clave sobre tu dinero digital: qué es USDT, cómo funciona la blockchain, tu billetera, seguridad y cómo empezar. Explicado en simple, sin términos raros.">
   <meta name="theme-color" content="#0C0E13">
+  <!-- Marca "js": las animaciones de revelado solo ocultan contenido si hay JS.
+       Sin JS (deshabilitado o bloqueado) todo el contenido se ve igual. -->
+  <script>document.documentElement.classList.add('js');</script>
   <!-- Favicon: isotipo KIPU (vectorial, mismo logo del header) -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Crect x='1' y='1' width='28' height='28' rx='7' fill='%231C1F27' stroke='%23C9A227' stroke-opacity='.45'/%3E%3Crect x='5' y='5.4' width='20' height='3.4' rx='1.7' fill='%23E8C766'/%3E%3Cpath d='M9.5 8.8 V20.5 M15 8.8 V24 M20.5 8.8 V18.5' stroke='%23E8C766' stroke-width='1.7' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='9.5' cy='16' r='1.7' fill='%23E8C766'/%3E%3Ccircle cx='15' cy='12.5' r='1.7' fill='%23E8C766'/%3E%3Ccircle cx='15' cy='19.5' r='1.7' fill='%23E8C766'/%3E%3Ccircle cx='20.5' cy='14.5' r='1.7' fill='%23E8C766'/%3E%3Cpath d='M9.5 16 15 12.5 20.5 14.5 M15 12.5 15 19.5' stroke='%235FE0FF' stroke-width='.7' stroke-opacity='.9' fill='none'/%3E%3Ccircle cx='9.5' cy='16' r='.8' fill='%23BFF2FF'/%3E%3Ccircle cx='15' cy='12.5' r='.8' fill='%23BFF2FF'/%3E%3Ccircle cx='15' cy='19.5' r='.8' fill='%23BFF2FF'/%3E%3Ccircle cx='20.5' cy='14.5' r='.8' fill='%23BFF2FF'/%3E%3C/svg%3E">
   <link rel="canonical" href="https://kippuu.com/guia.html">
@@ -18,6 +21,23 @@
   <meta property="og:url" content="https://kippuu.com/guia.html">
   <meta property="og:image" content="https://kippuu.com/assets/marca/og-kipu.jpg">
   <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Datos estructurados: FAQ (schema.org/FAQPage) para resultados enriquecidos en Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "¿Qué es USDT y por qué le dicen «dólar digital»?", "acceptedAnswer": { "@type": "Answer", "text": "USDT es una stablecoin: una moneda digital diseñada para valer siempre lo mismo que un dólar americano (1 USDT ≈ 1 USD). No sube ni baja fuerte como el Bitcoin. Es como tener billetes de dólar, pero dentro de tu celular." } },
+      { "@type": "Question", "name": "¿En qué me beneficia tener mi dinero en USDT?", "acceptedAnswer": { "@type": "Answer", "text": "Proteges el valor de tu trabajo referenciándolo al dólar, no cargas efectivo encima, envías dinero a cualquier parte en minutos y empiezas solo con tu DNI y un celular, sin historial bancario." } },
+      { "@type": "Question", "name": "¿Cómo está seguro mi dinero a través de la blockchain?", "acceptedAnswer": { "@type": "Answer", "text": "La blockchain es un registro público copiado en miles de computadoras. Nadie puede borrarla ni alterarla, no hay una oficina central que hackear y cada operación genera un hash verificable. Solo tú, con tus claves, mueves tus fondos." } },
+      { "@type": "Question", "name": "¿Qué es mi billetera digital y cómo accedo a mis fondos?", "acceptedAnswer": { "@type": "Answer", "text": "Tu billetera es una app gratuita en tu celular (por ejemplo, Lemon). Abres con clave, huella o rostro y ves tu saldo al instante para recibir, enviar o cambiar a soles. Tu dinero vive en la blockchain, no en el equipo." } },
+      { "@type": "Question", "name": "¿Es legal tener mi dinero en cripto? ¿Y qué es la «autocustodia»?", "acceptedAnswer": { "@type": "Answer", "text": "Sí. Tener y usar activos digitales es una actividad lícita en el Perú. Con la autocustodia tú controlas tu dinero directamente. KIPU opera como sujeto obligado ante la UIF-Perú bajo normativa PLAFT: cada operación queda documentada a tu nombre, con comprobante." } },
+      { "@type": "Question", "name": "¿Qué pasa si pierdo mi celular? ¿Y si me equivoco al enviar?", "acceptedAnswer": { "@type": "Answer", "text": "Si pierdes el celular no pierdes tu dinero: recuperas tu billetera en otro equipo con tu frase semilla, que nunca debes compartir. Las transacciones en blockchain son irreversibles, por eso siempre se verifica la dirección antes de enviar." } },
+      { "@type": "Question", "name": "¿Cómo empiezo? ¿Y cómo vuelvo a soles cuando necesite?", "acceptedAnswer": { "@type": "Answer", "text": "Empezar toma una tarde: nos escribes, verificas tu identidad una vez, creas tu billetera, entregas tu efectivo en un punto seguro y recibes tus USDT con comprobante. Operamos en ambos sentidos: también cambias USDT a soles cuando lo necesites." } }
+    ]
+  }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,11 +52,14 @@
       --oro-claro: #E8C766;
       --oro-suave: rgba(201,162,39,.12);
       --humo: #EDEAE3;
-      --humo-72: rgba(237,234,227,.72);
-      --humo-55: rgba(237,234,227,.55);
-      --borde: rgba(237,234,227,.09);
+      /* Cuerpo y texto secundario: colores sólidos claros (alto contraste AA sobre
+         el fondo casi negro), no gris translúcido que se apaga. */
+      --humo-72: #D7D5CF;   /* cuerpo de texto */
+      --humo-55: #ABA9A3;   /* texto terciario / pies */
+      --borde: rgba(237,234,227,.11);
       --borde-oro: rgba(201,162,39,.38);
       --exito: #3BE388;
+      --wa: #25D366;
       --f-display: 'Space Grotesk', sans-serif;
       --f-cuerpo: 'Inter', sans-serif;
       --radio: 18px;
@@ -51,24 +74,39 @@
         var(--grafito);
       color: var(--humo);
       font-family: var(--f-cuerpo);
-      font-size: 16.5px;
-      line-height: 1.65;
+      font-size: 17px;
+      line-height: 1.7;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
     a{ color: var(--oro-claro); text-decoration: none; }
     a:hover{ text-decoration: underline; text-underline-offset: 3px; }
 
-    /* Texto que se descifra (scramble) — la firma de la guía (decodificar el kipu) */
+    /* Barra de progreso de lectura (fija arriba) */
+    .progreso{
+      position: fixed; top: 0; left: 0; height: 3px; width: 0; z-index: 70;
+      background: linear-gradient(90deg, var(--oro), var(--oro-claro));
+      box-shadow: 0 0 10px rgba(201,162,39,.5);
+      transition: width .12s linear;
+    }
+
+    /* Texto que se descifra (scramble) — SOLO en el título hero (la firma) */
     [data-scramble]{ font-variant-ligatures: none; }
     .cifrando{ color: var(--oro-claro); }
 
     /* Revelado cinemático al hacer scroll */
-    .reveal{ opacity: 0; transform: translateY(20px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+    .js .reveal{ opacity: 0; transform: translateY(18px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
     .reveal.in{ opacity: 1; transform: none; }
     @media (prefers-reduced-motion: reduce){
       .reveal{ opacity: 1 !important; transform: none !important; transition: none; }
+      .progreso{ transition: none; }
     }
+
+    /* Foco de teclado visible (alto contraste sobre el fondo oscuro) */
+    a:focus-visible, summary:focus-visible, .btn-wa:focus-visible, .wa-float:focus-visible{
+      outline: 2px solid var(--oro-claro); outline-offset: 3px; border-radius: 6px;
+    }
+    .wa-float:focus-visible{ outline-offset: 4px; }
 
     /* ---------- Header ---------- */
     .cabecera{
@@ -93,7 +131,7 @@
       color: var(--humo-55); border-left: 1px solid var(--borde); padding-left: .6rem; margin-left: .15rem;
     }
     .volver{
-      font-size: .85rem; font-weight: 600; color: var(--humo-72);
+      font-size: .88rem; font-weight: 600; color: var(--humo-72);
       display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap;
     }
     .volver:hover{ color: var(--oro-claro); text-decoration: none; }
@@ -114,7 +152,7 @@
     }
     /* Marca de agua gigante */
     .watermark{
-      position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%);
+      position: absolute; left: 50%; top: 44%; transform: translate(-50%, -50%);
       z-index: 0; pointer-events: none; white-space: nowrap;
       font-family: var(--f-display); font-weight: 700; text-transform: uppercase;
       font-size: clamp(96px, 24vw, 340px); letter-spacing: -.05em; line-height: 1;
@@ -124,21 +162,66 @@
     }
 
     .eyebrow{
-      font-family: var(--f-display); font-size: .78rem; font-weight: 600;
-      letter-spacing: .22em; text-transform: uppercase; color: var(--oro);
+      font-family: var(--f-display); font-size: .8rem; font-weight: 600;
+      letter-spacing: .22em; text-transform: uppercase; color: var(--oro-claro);
       margin-bottom: 1.1rem;
     }
     h1{
       font-family: var(--f-display); font-weight: 600;
       font-size: clamp(2rem, 5.4vw, 3.2rem);
       line-height: 1.1; letter-spacing: -.025em;
-      max-width: 20ch;
+      max-width: 20ch; color: var(--humo);
     }
     .lead{
-      margin-top: 1.1rem; color: var(--humo-72); font-size: 1.08rem; max-width: 52ch;
-      font-style: italic;
+      margin-top: 1.1rem; color: var(--humo); font-size: 1.12rem; max-width: 52ch;
+      font-style: italic; opacity: .92;
     }
-    .intro{ margin-top: 1.6rem; color: var(--humo-72); max-width: 62ch; }
+    .intro{ margin-top: 1.4rem; color: var(--humo-72); max-width: 62ch; }
+
+    /* Franja de confianza */
+    .sellos{
+      list-style: none; margin-top: 1.9rem;
+      display: flex; flex-wrap: wrap; gap: .55rem .6rem;
+    }
+    .sellos li{
+      display: inline-flex; align-items: center; gap: .45rem;
+      font-size: .85rem; color: var(--humo-72);
+      background: var(--oro-suave);
+      border: 1px solid var(--borde-oro);
+      border-radius: 999px; padding: .42rem .9rem;
+    }
+    .sellos li::before{
+      content: ''; width: 15px; height: 15px; flex: none;
+      background: no-repeat center/contain
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M4 12.5l5 5 11-11' stroke='%23E8C766' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
+    .sellos b{ color: var(--humo); font-weight: 600; }
+
+    /* Índice de preguntas */
+    .indice{
+      margin-top: 2.1rem; padding: 1.2rem 1.4rem;
+      background: var(--carbon); border: 1px solid var(--borde);
+      border-radius: var(--radio);
+    }
+    .indice-tit{
+      font-family: var(--f-display); font-weight: 600; font-size: .8rem;
+      letter-spacing: .14em; text-transform: uppercase; color: var(--oro-claro);
+      margin-bottom: .7rem;
+    }
+    .indice ol{ list-style: none; display: grid; gap: .05rem; counter-reset: idx; }
+    .indice li{ counter-increment: idx; }
+    .indice a{
+      display: flex; gap: .7rem; align-items: baseline;
+      padding: .5rem .5rem; border-radius: 8px;
+      color: var(--humo-72); font-size: .97rem;
+      transition: background .18s ease, color .18s ease;
+    }
+    .indice a::before{
+      content: counter(idx); color: var(--oro-claro);
+      font-family: var(--f-display); font-weight: 700; font-size: .82rem; flex: none; width: 1.1rem;
+    }
+    .indice a:hover{ background: var(--oro-suave); color: var(--humo); text-decoration: none; }
+    .indice a.activo{ background: var(--oro-suave); color: var(--oro-claro); }
 
     .separador{
       border: none; height: 1px; margin: 3rem 0;
@@ -146,12 +229,12 @@
     }
 
     /* Preguntas */
-    .pregunta{ margin-top: 2.6rem; }
+    .pregunta{ margin-top: 2.6rem; scroll-margin-top: 84px; }
     .pregunta h2{
       font-family: var(--f-display); font-weight: 600;
-      font-size: clamp(1.25rem, 3vw, 1.55rem);
+      font-size: clamp(1.3rem, 3vw, 1.6rem);
       line-height: 1.25; letter-spacing: -.01em;
-      display: flex; gap: .9rem; align-items: baseline;
+      display: flex; gap: .9rem; align-items: baseline; color: var(--humo);
     }
     .pregunta h2 .num{
       flex: none;
@@ -181,11 +264,11 @@
 
     .honesto{
       margin-top: 1.3rem; padding: 1rem 1.25rem;
-      background: rgba(237,234,227,.04);
+      background: rgba(237,234,227,.05);
       border: 1px solid var(--borde);
       border-radius: 12px;
       color: var(--humo-72);
-      font-size: .95rem;
+      font-size: .97rem;
       max-width: 62ch;
     }
     .honesto b{ color: var(--humo); }
@@ -193,10 +276,37 @@
     .dato-clave{ margin-top: 1.1rem; color: var(--humo-72); max-width: 66ch; }
     .dato-clave strong{ color: var(--oro-claro); }
 
+    /* Micro-CTA intermedio */
+    .mini-cta{
+      margin-top: 1.7rem; padding: .95rem 1.2rem;
+      border: 1px dashed var(--borde-oro); border-radius: 12px;
+      background: rgba(201,162,39,.05);
+      color: var(--humo-72); font-size: .98rem; max-width: 64ch;
+    }
+    .mini-cta a{ font-weight: 600; }
+
+    /* Otras dudas rápidas (acordeón) */
+    .otras{ margin-top: 1.8rem; display: grid; gap: .6rem; }
+    .otras details{
+      background: var(--carbon); border: 1px solid var(--borde); border-radius: 12px;
+      overflow: hidden;
+    }
+    .otras summary{
+      cursor: pointer; list-style: none; padding: .95rem 1.1rem;
+      font-family: var(--f-display); font-weight: 600; font-size: 1rem; color: var(--humo);
+      display: flex; justify-content: space-between; gap: 1rem; align-items: center;
+    }
+    .otras summary::-webkit-details-marker{ display: none; }
+    .otras summary::after{ content: '+'; color: var(--oro-claro); font-size: 1.4rem; line-height: 1; flex: none; }
+    .otras details[open] summary::after{ content: '\2013'; }
+    .otras details p{ padding: 0 1.1rem 1.1rem; color: var(--humo-72); font-size: .97rem; max-width: 64ch; }
+    .otras details p a{ font-weight: 600; }
+
     /* Pasos */
     .bloque-titulo{
-      font-family: var(--f-display); font-weight: 600;
+      font-family: var(--f-display); font-weight: 600; color: var(--humo);
       font-size: clamp(1.5rem, 4vw, 2rem); letter-spacing: -.015em;
+      scroll-margin-top: 84px;
     }
     .pasos{ list-style: none; margin-top: 1.8rem; counter-reset: paso; }
     .pasos li{
@@ -226,7 +336,7 @@
       background: var(--carbon);
       border: 1px solid var(--borde-oro);
       border-radius: var(--radio);
-      color: var(--humo-72); font-size: .95rem;
+      color: var(--humo-72); font-size: .97rem;
       max-width: 64ch;
     }
     .nota-pasos strong{ color: var(--oro-claro); }
@@ -251,7 +361,7 @@
       color: var(--roca);
       font-family: var(--f-display); font-weight: 700; font-size: .9rem;
     }
-    .regla div{ color: var(--humo-72); font-size: .97rem; }
+    .regla div{ color: var(--humo-72); font-size: 1rem; }
     .regla strong{ color: var(--humo); display: block; margin-bottom: .15rem; }
 
     /* CTA final */
@@ -273,7 +383,7 @@
       object-fit: cover; border: 1px solid var(--borde-oro);
       margin-bottom: 1rem;
     }
-    .cta h2{ font-family: var(--f-display); font-weight: 600; font-size: clamp(1.4rem, 4vw, 1.9rem); letter-spacing: -.015em; }
+    .cta h2{ font-family: var(--f-display); font-weight: 600; color: var(--humo); font-size: clamp(1.4rem, 4vw, 1.9rem); letter-spacing: -.015em; }
     .cta p{ margin-top: .6rem; color: var(--humo-72); }
     .btn-wa{
       display: inline-flex; align-items: center; gap: .55rem;
@@ -287,19 +397,46 @@
       transition: transform .18s ease, filter .18s ease;
     }
     .btn-wa:hover{ transform: translateY(-1px); filter: brightness(1.06); text-decoration: none; }
-    .cta .secundario{ display: block; margin-top: 1.1rem; font-size: .9rem; }
+    .cta-tel{ margin-top: 1rem; font-size: .92rem; color: var(--humo-72); }
+    .cta-tel a{ font-weight: 600; }
+    .cta-sello{
+      margin-top: 1.2rem; padding-top: 1.1rem; border-top: 1px solid var(--borde);
+      display: flex; flex-wrap: wrap; justify-content: center; gap: .3rem .8rem;
+      font-size: .8rem; color: var(--humo-55);
+    }
+    .cta .secundario{ display: block; margin-top: 1.2rem; font-size: .92rem; }
+
+    /* WhatsApp flotante */
+    .wa-float{
+      position: fixed; right: 18px; bottom: 18px; z-index: 60;
+      width: 56px; height: 56px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--wa); color: #fff;
+      box-shadow: 0 12px 30px -6px rgba(37,211,102,.55);
+    }
+    .wa-float:hover{ text-decoration: none; }
+    .wa-float::before{
+      content: ''; position: absolute; inset: 0; border-radius: 50%;
+      border: 2px solid var(--wa);
+      animation: waPulso 2.6s ease-out infinite;
+    }
+    @keyframes waPulso{ 0%{ transform: scale(1); opacity: .7 } 100%{ transform: scale(1.8); opacity: 0 } }
+    .wa-float svg{ width: 30px; height: 30px; }
+    @media (prefers-reduced-motion: reduce){ .wa-float::before{ animation: none; } }
 
     /* Footer */
     .pie{
       border-top: 1px solid var(--borde);
       padding: 1.6rem 1.25rem 2rem;
       text-align: center;
-      color: var(--humo-55); font-size: .8rem;
+      color: var(--humo-55); font-size: .82rem;
     }
     .pie a{ color: var(--humo-72); }
   </style>
 </head>
 <body>
+
+  <div class="progreso" id="progreso" aria-hidden="true"></div>
 
   <header class="cabecera">
     <div class="cabecera-inner">
@@ -329,27 +466,46 @@
       <div class="rejilla" aria-hidden="true"></div>
       <span class="watermark" aria-hidden="true">DESCIFRA</span>
       <div class="hero-inner">
-        <p class="eyebrow" data-scramble>Guía para nuevos usuarios</p>
+        <p class="eyebrow reveal">Guía para nuevos usuarios</p>
         <h1 data-scramble>Las 7 preguntas clave sobre tu dinero digital</h1>
         <p class="lead reveal">Explicado en simple, para cualquier persona. Sin términos raros.</p>
         <p class="intro reveal">Antes de pasar tu efectivo a digital, es normal tener dudas. Aquí están las 7 preguntas que todos se hacen — y sus respuestas claras.</p>
+
+        <ul class="sellos reveal" aria-label="Señales de confianza">
+          <li><b>Empresa formal</b> · RUC 20614585146</li>
+          <li>Registrada ante la UIF-Perú (PLAFT)</li>
+          <li>Comprobante en cada operación</li>
+        </ul>
+
+        <nav class="indice reveal" aria-label="Índice de las 7 preguntas">
+          <p class="indice-tit">Salta directo a tu duda</p>
+          <ol>
+            <li><a href="#p1">¿Qué es USDT?</a></li>
+            <li><a href="#p2">¿En qué me beneficia?</a></li>
+            <li><a href="#p3">¿Cómo me protege la blockchain?</a></li>
+            <li><a href="#p4">¿Qué es mi billetera?</a></li>
+            <li><a href="#p5">¿Es legal? La autocustodia</a></li>
+            <li><a href="#p6">¿Y si pierdo el celular?</a></li>
+            <li><a href="#p7">¿Cómo empiezo y cómo vuelvo a soles?</a></li>
+          </ol>
+        </nav>
       </div>
     </section>
 
     <hr class="separador">
 
-    <section class="pregunta">
-      <h2><span class="num">1</span><span data-scramble>¿Qué es USDT y por qué le dicen «dólar digital»?</span></h2>
+    <section class="pregunta" id="p1">
+      <h2 class="reveal"><span class="num">1</span><span>¿Qué es USDT y por qué le dicen «dólar digital»?</span></h2>
       <p class="reveal">USDT es una <strong>stablecoin</strong>: una moneda digital creada para valer siempre lo mismo que un dólar americano (<strong>1 USDT ≈ 1 USD</strong>). No sube ni baja fuerte como el Bitcoin.</p>
       <div class="en-simple reveal"><b>En simple:</b> es como tener billetes de dólar, pero dentro de tu celular. Sin billetes falsos, sin caja fuerte, sin ir a la casa de cambio.</div>
     </section>
 
-    <section class="pregunta">
-      <h2><span class="num">2</span><span data-scramble>¿En qué me beneficia tener mi dinero en USDT?</span></h2>
+    <section class="pregunta" id="p2">
+      <h2 class="reveal"><span class="num">2</span><span>¿En qué me beneficia tener mi dinero en USDT?</span></h2>
       <ul class="reveal">
         <li><strong>Proteges el valor de tu trabajo.</strong> Tu plata queda referenciada al dólar. Si el dólar sube, tu ahorro ya está ahí.</li>
         <li><strong>Cero billetes encima.</strong> No cargas efectivo por la carretera ni lo guardas bajo el colchón. Tu patrimonio viaja contigo, en tu celular.</li>
-        <li><strong>Disponible 24/7.</strong> Sin horarios de banco, sin colas, sin feriados.</li>
+        <li><strong>Disponible a toda hora, todos los días.</strong> Sin horarios de banco, sin colas, sin feriados.</li>
         <li><strong>Envías a cualquier parte en minutos.</strong> De Puno a Lima, o de Perú a Brasil, el mismo día.</li>
         <li><strong>Sin billetes falsos ni deterioro.</strong> Lo digital no se rompe, no se moja, no se falsifica.</li>
         <li><strong>Empiezas solo con tu DNI y un celular.</strong> No necesitas historial bancario.</li>
@@ -357,8 +513,8 @@
       <div class="en-simple reveal"><b>En simple:</b> tu dinero deja de ser un bulto que cuidar y se convierte en un patrimonio que te acompaña.</div>
     </section>
 
-    <section class="pregunta">
-      <h2><span class="num">3</span><span data-scramble>¿Cómo está seguro mi dinero a través de la blockchain?</span></h2>
+    <section class="pregunta" id="p3">
+      <h2 class="reveal"><span class="num">3</span><span>¿Cómo está seguro mi dinero a través de la blockchain?</span></h2>
       <p class="reveal">La blockchain es un <strong>registro público copiado en miles de computadoras</strong> de todo el mundo, al mismo tiempo. Cada transacción queda anotada para siempre.</p>
       <ul class="reveal">
         <li><strong>Nadie puede borrarla ni alterarla.</strong> Si alguien intenta cambiar una copia, las miles de copias restantes lo delatan.</li>
@@ -370,46 +526,73 @@
       <div class="honesto reveal"><b>Lo honesto:</b> la blockchain en sí nunca ha sido alterada. Los problemas ocurren cuando una persona comparte sus claves o cae en una estafa. Por eso, lee las reglas de oro al final de esta guía.</div>
     </section>
 
-    <section class="pregunta">
-      <h2><span class="num">4</span><span data-scramble>¿Qué es mi billetera digital y cómo accedo a mis fondos?</span></h2>
+    <section class="pregunta" id="p4">
+      <h2 class="reveal"><span class="num">4</span><span>¿Qué es mi billetera digital y cómo accedo a mis fondos?</span></h2>
       <p class="reveal">Tu billetera (wallet) es una <strong>app gratuita en tu celular</strong> — por ejemplo, Lemon. Funciona parecido a Yape o Plin, pero con dólares digitales y sin fronteras.</p>
       <p class="reveal"><strong>Acceder a tu dinero toma segundos:</strong></p>
       <ol class="reveal">
         <li>Abres la app con tu clave, huella o rostro.</li>
         <li>Ves tu saldo al instante.</li>
-        <li>Desde ahí puedes <strong>recibir</strong> (compartes tu dirección o código QR), <strong>enviar</strong> (a cualquier otra billetera) o <strong>cambiar a soles</strong> cuando lo necesites. Las 24 horas, cualquier día.</li>
+        <li>Desde ahí puedes <strong>recibir</strong> (compartes tu dirección o código QR), <strong>enviar</strong> (a cualquier otra billetera) o <strong>cambiar a soles</strong> cuando lo necesites.</li>
       </ol>
       <p class="dato-clave reveal"><strong>Dato clave:</strong> tu dinero <strong>no vive en el celular</strong>, vive en la blockchain. El celular es solo la puerta de entrada.</p>
     </section>
 
-    <section class="pregunta">
-      <h2><span class="num">5</span><span data-scramble>¿Qué significa ahorrar «fuera del sistema»? ¿Es legal?</span></h2>
-      <p class="reveal">Significa que <strong>tú custodias tu dinero directamente</strong>, sin depender de un banco:</p>
+    <section class="pregunta" id="p5">
+      <h2 class="reveal"><span class="num">5</span><span>¿Es legal tener mi dinero en cripto? ¿Y qué es la «autocustodia»?</span></h2>
+      <p class="reveal"><strong>Sí, es legal.</strong> Tener y usar activos digitales es una actividad lícita en el Perú. Y KIPU opera como <strong>sujeto obligado ante la UIF-Perú</strong> bajo normativa PLAFT: cada operación queda documentada a tu nombre, con comprobante y respaldo legal.</p>
+      <p class="reveal">La <strong>autocustodia</strong> significa que <strong>tú controlas tu dinero directamente</strong>, con tu propia billetera:</p>
       <ul class="reveal">
+        <li>El control es tuyo: no necesitas la aprobación de nadie para usar tu plata.</li>
         <li>Sin mantenimiento de cuenta ni horarios de oficina.</li>
-        <li>Con tu propia billetera, el control es tuyo: no necesitas la aprobación de nadie para usar tu plata.</li>
-        <li>Tu ahorro está disponible al toque, a cualquier hora.</li>
+        <li>Tu ahorro está disponible al toque, cuando lo necesites.</li>
       </ul>
-      <p class="reveal"><strong>¿Y es legal? Sí.</strong> Tener y usar activos digitales es una actividad lícita en el Perú. Además, KIPU opera como <strong>sujeto obligado ante la UIF-Perú</strong> bajo normativa PLAFT: cada operación queda documentada a tu nombre, con comprobante y respaldo legal.</p>
-      <div class="en-simple reveal"><b>En simple:</b> estar fuera del banco no es estar fuera de la ley. Es libertad con formalidad — y cada comprobante suma a tu historial formal (ideal si estás en REINFO o ya formalizado).</div>
+      <div class="en-simple reveal"><b>En simple:</b> tener el control de tu propio dinero no es estar fuera de la ley. Es libertad con formalidad — y cada operación queda documentada a tu nombre, con comprobante (un respaldo documental útil si te estás formalizando).</div>
+      <div class="honesto reveal"><b>Sobre impuestos:</b> cada operación queda documentada a tu nombre. Para tu declaración, consulta con tu contador según tu caso — nosotros te damos el respaldo en orden.</div>
     </section>
 
-    <section class="pregunta">
-      <h2><span class="num">6</span><span data-scramble>¿Qué pasa si pierdo mi celular? ¿Y si me equivoco al enviar?</span></h2>
-      <p class="reveal"><strong>Si pierdes el celular, no pierdes tu dinero.</strong> Tus fondos viven en la blockchain, no en el equipo. Recuperas tu billetera desde cualquier otro celular con tu <strong>frase semilla</strong> (las 12 palabras que la app te da al crearla) o con tu cuenta verificada.</p>
+    <p class="mini-cta reveal">¿Ya lo tienes más claro? <a href="https://wa.me/51918616580?text=Hola%20KIPU%2C%20estoy%20leyendo%20la%20gu%C3%ADa%20y%20quiero%20una%20cotizaci%C3%B3n." target="_blank" rel="noopener">Escríbenos por WhatsApp</a> y te cotizamos al instante, sin compromiso.</p>
+
+    <section class="pregunta" id="p6">
+      <h2 class="reveal"><span class="num">6</span><span>¿Qué pasa si pierdo mi celular? ¿Y si me equivoco al enviar?</span></h2>
+      <p class="reveal"><strong>Si pierdes el celular, no pierdes tu dinero.</strong> Tus fondos viven en la blockchain, no en el equipo. Recuperas tu billetera desde cualquier otro celular con tu <strong>frase semilla</strong>: las 12 palabras que la app te da al crearla.</p>
       <div class="en-simple reveal"><b>La regla de oro:</b> escribe tu frase semilla en papel y guárdala en un lugar seguro. Nunca le tomes foto, nunca la mandes por chat, nunca la compartas. <strong>Quien tiene esas 12 palabras, tiene tu dinero.</strong></div>
       <p class="reveal"><strong>Si te equivocas al enviar:</strong> las transacciones en blockchain son irreversibles — no existe el botón «deshacer». Por eso en KIPU verificamos contigo cada dato antes de ejecutar, y tú siempre debes revisar la dirección antes de confirmar.</p>
     </section>
 
-    <section class="pregunta">
-      <h2><span class="num">7</span><span data-scramble>¿Cómo empiezo? ¿Y cómo vuelvo a soles cuando necesite?</span></h2>
+    <section class="pregunta" id="p7">
+      <h2 class="reveal"><span class="num">7</span><span>¿Cómo empiezo? ¿Y cómo vuelvo a soles cuando necesite?</span></h2>
       <p class="reveal">Empezar toma una sola tarde (mira los pasos abajo). Y cuando necesites efectivo, <strong>operamos en ambas direcciones</strong>: cambias tus USDT a soles con el mismo protocolo — cotización bloqueada, punto de entrega seguro y comprobante de operación.</p>
       <p class="reveal">Tu dinero entra a digital cuando quieres, y vuelve a físico cuando lo decides. Tú mandas.</p>
     </section>
 
+    <h2 class="bloque-titulo reveal" style="margin-top:2.8rem">Otras dudas rápidas</h2>
+    <div class="otras">
+      <details class="reveal">
+        <summary>¿Cómo se fija la cotización? ¿Hay letra chica?</summary>
+        <p>Antes de operar te damos un <strong>precio cerrado</strong>: la cotización de mercado del momento más una comisión transparente. El número que aceptas es el que recibes, y queda congelado unos minutos para ejecutarlo. Sin sorpresas al final.</p>
+      </details>
+      <details class="reveal">
+        <summary>¿Hay monto mínimo o máximo?</summary>
+        <p>El mínimo referencial es <strong>S/ 5,000</strong>. No fijamos un techo: a mayor volumen, mejor tasa, y los montos grandes se coordinan con un asesor. ¿Menos de S/ 5,000? Escríbenos igual y vemos tu caso.</p>
+      </details>
+      <details class="reveal">
+        <summary>¿En qué ciudades operan?</summary>
+        <p>Tenemos puntos de entrega en <strong>Lima, Arequipa, Puno, Madre de Dios, La Libertad y San Martín</strong>. ¿Estás en otra ciudad? Coordinamos contigo por WhatsApp.</p>
+      </details>
+      <details class="reveal">
+        <summary>¿Qué billeteras puedo usar?</summary>
+        <p>Trabajamos con <strong>Lemon</strong> y con <strong>efectivo</strong>. Si usas otra billetera, escríbenos y lo vemos — lo importante es que tú tengas el control de tus fondos.</p>
+      </details>
+      <details class="reveal">
+        <summary>¿Cuánto tarda una operación?</summary>
+        <p>La primera toma entre <strong>30 y 45 minutos</strong> (incluye tu verificación por única vez). Desde la segunda, solo unos minutos.</p>
+      </details>
+    </div>
+
     <hr class="separador">
 
-    <h2 class="bloque-titulo" data-scramble>Tus primeros pasos, en simple</h2>
+    <h2 class="bloque-titulo reveal">Tus primeros pasos, en simple</h2>
     <ol class="pasos">
       <li class="reveal"><strong>Escríbenos por WhatsApp.</strong><p>Te damos tu cotización al instante (monto mínimo referencial: S/ 5,000 — a más volumen, mejor tasa).</p></li>
       <li class="reveal"><strong>Verifica tu identidad una sola vez.</strong><p>Tu DNI o RUC más una validación biométrica rápida. Esto te protege: la operación queda registrada a tu nombre.</p></li>
@@ -418,13 +601,13 @@
       <li class="reveal"><strong>Recibe tus USDT al instante.</strong><p>Con hash de confirmación en blockchain y tu comprobante de operación. Listo: tu patrimonio ya es digital.</p></li>
     </ol>
     <div class="nota-pasos reveal">
-      <p>La primera operación toma entre 30 y 45 minutos (incluye tu verificación). Desde la segunda, solo minutos.</p>
       <p><strong>Comisión transparente:</strong> 5% en operaciones con efectivo · 3% si transfieres desde Lemon. Siempre te informamos el número exacto antes de confirmar. Sin sorpresas.</p>
+      <p>¿Aún no llegas al mínimo de S/ 5,000? Escríbenos igual: vemos tu caso y te orientamos sin compromiso.</p>
     </div>
 
     <hr class="separador">
 
-    <h2 class="bloque-titulo" data-scramble>Las 5 reglas de oro de seguridad</h2>
+    <h2 class="bloque-titulo reveal">Las 5 reglas de oro de seguridad</h2>
     <ul class="reglas">
       <li class="regla reveal"><span class="num">1</span><div><strong>Tu frase semilla es solo tuya.</strong>En papel, nunca en foto ni chat. KIPU <b>nunca</b> te la pedirá.</div></li>
       <li class="regla reveal"><span class="num">2</span><div><strong>Nadie legítimo te pedirá tus claves.</strong>Quien lo haga, es un estafador. Corta la conversación.</div></li>
@@ -435,15 +618,25 @@
 
     <div class="cta reveal">
       <img src="assets/mascota/kori-poster.jpg" alt="Kori, la alpaca de KIPU">
-      <h2 data-scramble>¿Listo para tu primera operación?</h2>
+      <h2>¿Listo para tu primera operación?</h2>
       <p>Una conversación por WhatsApp basta. Sin compromiso.</p>
       <a class="btn-wa" href="https://wa.me/51918616580?text=Hola%20KIPU%2C%20le%C3%AD%20la%20gu%C3%ADa%20para%20nuevos%20usuarios%20y%20quiero%20empezar." target="_blank" rel="noopener">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a9.9 9.9 0 0 0-8.5 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm5.7 14.1c-.24.68-1.4 1.3-1.93 1.35-.52.05-1.01.24-3.4-.7-2.87-1.14-4.7-4.06-4.84-4.25-.14-.19-1.16-1.55-1.16-2.95 0-1.4.73-2.09 1-2.37.24-.26.54-.32.72-.32h.52c.17 0 .4-.06.61.47.24.56.78 1.94.85 2.08.07.14.12.3.02.49-.42.85-.88.82-.65 1.21.86 1.48 1.72 1.99 3.02 2.65.22.11.35.1.48-.05.13-.14.56-.65.7-.87.15-.22.3-.19.5-.11.2.07 1.3.62 1.53.73.22.11.37.17.42.26.06.1.06.55-.18 1.08Z"/></svg>
         Escribir a KIPU por WhatsApp
       </a>
+      <p class="cta-tel">O al teléfono <a href="tel:+51918616580">+51 918 616 580</a></p>
+      <div class="cta-sello">
+        <span>PROFIX CENTRAL BANK S.A.C.</span>
+        <span>RUC 20614585146</span>
+        <span>Sujeto obligado ante la UIF-Perú (PLAFT)</span>
+      </div>
       <a class="secundario" href="./">← Volver al sitio principal</a>
     </div>
   </main>
+
+  <a class="wa-float" href="https://wa.me/51918616580?text=Hola%20KIPU%2C%20le%C3%AD%20la%20gu%C3%ADa%20y%20tengo%20una%20consulta." target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a9.9 9.9 0 0 0-8.5 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm5.7 14.1c-.24.68-1.4 1.3-1.93 1.35-.52.05-1.01.24-3.4-.7-2.87-1.14-4.7-4.06-4.84-4.25-.14-.19-1.16-1.55-1.16-2.95 0-1.4.73-2.09 1-2.37.24-.26.54-.32.72-.32h.52c.17 0 .4-.06.61.47.24.56.78 1.94.85 2.08.07.14.12.3.02.49-.42.85-.88.82-.65 1.21.86 1.48 1.72 1.99 3.02 2.65.22.11.35.1.48-.05.13-.14.56-.65.7-.87.15-.22.3-.19.5-.11.2.07 1.3.62 1.53.73.22.11.37.17.42.26.06.1.06.55-.18 1.08Z"/></svg>
+  </a>
 
   <footer class="pie">
     <p>© <span id="year">2026</span> PROFIX CENTRAL BANK S.A.C. · RUC 20614585146 · <a href="https://kippuu.com">kippuu.com</a></p>
@@ -458,10 +651,10 @@
       const CHARS = 'ABCDEFGHIJKLMNPQRSTUVWXYZ0123456789#%&/<>{}[]?';
       const rnd = () => CHARS[(Math.random() * CHARS.length) | 0];
 
+      // Solo el título principal (H1) se descifra: es la firma de la marca.
+      // Las 7 preguntas y demás títulos se leen de inmediato (mejor escaneo).
       const scrambles = [...document.querySelectorAll('[data-scramble]')];
 
-      // Estado inicial cifrado (misma longitud → sin saltos de ancho). El texto
-      // real queda en aria-label para lectores de pantalla.
       if (!reduce){
         scrambles.forEach(el => {
           const real = el.textContent;
@@ -475,7 +668,7 @@
         if (el.dataset.done) return; el.dataset.done = '1';
         const real = el.dataset.real; if (real == null) return;
         const chars = [...real], len = chars.length;
-        const speed = Math.max(0.7, len / 34); // se resuelve en ~1s sin importar el largo
+        const speed = Math.max(0.7, len / 34);
         let prog = 0;
         el.classList.add('cifrando');
         const id = setInterval(() => {
@@ -506,6 +699,58 @@
       }, { threshold: .18, rootMargin: '0px 0px -6% 0px' });
 
       document.querySelectorAll('.reveal, [data-scramble]').forEach(el => io.observe(el));
+
+      /* ---------- Barra de progreso de lectura ---------- */
+      const prog = document.getElementById('progreso');
+      const root = document.documentElement;
+      let ticking = false;
+      function pintarProgreso(){
+        const max = root.scrollHeight - root.clientHeight;
+        prog.style.width = (max > 0 ? Math.min(100, root.scrollTop / max * 100) : 0) + '%';
+        ticking = false;
+      }
+      addEventListener('scroll', () => {
+        if (!ticking){ requestAnimationFrame(pintarProgreso); ticking = true; }
+      }, { passive: true });
+      pintarProgreso();
+
+      /* ---------- Scroll-spy: resalta (y anuncia) la pregunta activa ---------- */
+      const enlaces = new Map(
+        [...document.querySelectorAll('.indice a')].map(a => [a.getAttribute('href').slice(1), a])
+      );
+      const visibles = new Set();
+      let ultimoActivo = null;
+      const spy = new IntersectionObserver((entradas) => {
+        entradas.forEach(e => { if (e.isIntersecting) visibles.add(e.target); else visibles.delete(e.target); });
+        // Un único activo: la sección visible más cercana al centro del viewport.
+        // Si ninguna interseca (huecos entre secciones), se mantiene la última.
+        let elegido = null;
+        if (visibles.size){
+          const centro = innerHeight / 2;
+          let mejor = Infinity;
+          visibles.forEach(sec => {
+            const r = sec.getBoundingClientRect();
+            const d = Math.abs((r.top + r.bottom) / 2 - centro);
+            if (d < mejor){ mejor = d; elegido = sec; }
+          });
+          ultimoActivo = elegido;
+        } else {
+          // Nada interseca: por encima de la primera pregunta -> limpiar;
+          // en un hueco entre secciones -> mantener la última (sin parpadeo).
+          const primera = document.querySelector('.pregunta[id]');
+          if (primera && primera.getBoundingClientRect().top > innerHeight * 0.55){
+            elegido = null; ultimoActivo = null;
+          } else {
+            elegido = ultimoActivo;
+          }
+        }
+        enlaces.forEach((a, id) => {
+          const on = !!elegido && elegido.id === id;
+          a.classList.toggle('activo', on);
+          if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+        });
+      }, { rootMargin: '-30% 0px -45% 0px' });
+      document.querySelectorAll('.pregunta[id]').forEach(s => spy.observe(s));
     })();
   </script>
 </body>
