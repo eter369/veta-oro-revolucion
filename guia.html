@@ -139,26 +139,46 @@
     /* ---------- Contenido ---------- */
     main{ max-width: 860px; margin: 0 auto; padding: 0 1.25rem 4rem; }
 
-    /* Hero cinemático */
-    .hero-guia{ position: relative; overflow: hidden; padding: 4rem 0 2.4rem; margin-bottom: 1rem; }
-    .hero-inner{ position: relative; z-index: 2; }
-    /* Rejilla de puntos dorada, difuminada */
-    .rejilla{
-      position: absolute; inset: -20% -30%; z-index: 0; pointer-events: none;
-      background-image: radial-gradient(var(--oro) 1px, transparent 1px);
-      background-size: 26px 26px; opacity: .07;
-      -webkit-mask-image: radial-gradient(ellipse 70% 65% at 28% 42%, #000, transparent 72%);
-      mask-image: radial-gradient(ellipse 70% 65% at 28% 42%, #000, transparent 72%);
+    /* Hero cinemático con video de fondo (full-bleed) */
+    .hero-guia{
+      position: relative;
+      width: 100vw; margin-left: calc(50% - 50vw);
+      min-height: min(90vh, 760px);
+      display: flex; align-items: flex-end;
+      overflow: hidden; isolation: isolate;
+      margin-bottom: 1.4rem;
+      border-bottom: 1px solid var(--borde);
     }
-    /* Marca de agua gigante */
-    .watermark{
-      position: absolute; left: 50%; top: 44%; transform: translate(-50%, -50%);
-      z-index: 0; pointer-events: none; white-space: nowrap;
-      font-family: var(--f-display); font-weight: 700; text-transform: uppercase;
-      font-size: clamp(96px, 24vw, 340px); letter-spacing: -.05em; line-height: 1;
-      background: radial-gradient(circle, rgba(201,162,39,0) 0%, var(--oro) 78%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      opacity: .09;
+    .hero-video{
+      position: absolute; inset: 0; z-index: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: 66% 30%;
+      opacity: 0; transition: opacity 1.1s var(--ease);
+    }
+    .hero-video.lista{ opacity: 1; }
+    /* Degradado + viñeta: oscurece la izquierda (donde va el texto) y difumina el
+       borde inferior para fundir con el resto de la página. */
+    .hero-overlay{
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background:
+        linear-gradient(90deg, var(--grafito) 2%, rgba(12,14,19,.85) 30%, rgba(12,14,19,.4) 62%, rgba(12,14,19,.62) 100%),
+        linear-gradient(0deg, var(--grafito) 10%, rgba(12,14,19,.6) 40%, rgba(12,14,19,.12) 63%, transparent 78%),
+        radial-gradient(135% 95% at 30% 42%, transparent 40%, rgba(12,14,19,.5) 100%);
+    }
+    .hero-inner{
+      position: relative; z-index: 2;
+      max-width: 860px; width: 100%; margin: 0 auto;
+      padding: clamp(6rem, 17vh, 9.5rem) 1.25rem clamp(2.6rem, 7vh, 3.8rem);
+    }
+    @media (prefers-reduced-motion: reduce){ .hero-video{ opacity: 1; transition: none; } }
+    @media (max-width: 680px){
+      .hero-guia{ min-height: min(84vh, 660px); }
+      .hero-video{ object-position: 50% 16%; }
+      .hero-overlay{
+        background:
+          linear-gradient(0deg, var(--grafito) 15%, rgba(12,14,19,.74) 46%, rgba(12,14,19,.44) 70%, rgba(12,14,19,.4) 100%),
+          radial-gradient(130% 82% at 50% 28%, transparent 30%, rgba(12,14,19,.55) 100%);
+      }
     }
 
     .eyebrow{
@@ -185,8 +205,9 @@
     }
     .sellos li{
       display: inline-flex; align-items: center; gap: .45rem;
-      font-size: .85rem; color: var(--humo-72);
-      background: var(--oro-suave);
+      font-size: .85rem; color: var(--humo);
+      background: rgba(12,14,19,.5);
+      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
       border: 1px solid var(--borde-oro);
       border-radius: 999px; padding: .42rem .9rem;
     }
@@ -463,34 +484,35 @@
 
   <main>
     <section class="hero-guia">
-      <div class="rejilla" aria-hidden="true"></div>
-      <span class="watermark" aria-hidden="true">DESCIFRA</span>
+      <video class="hero-video" id="hero-video" autoplay muted loop playsinline preload="auto" poster="assets/guia/hero-poster.jpg" aria-hidden="true">
+        <source src="assets/guia/hero.mp4" type="video/mp4">
+      </video>
+      <div class="hero-overlay" aria-hidden="true"></div>
       <div class="hero-inner">
         <p class="eyebrow reveal">Guía para nuevos usuarios</p>
         <h1 data-scramble>Las 7 preguntas clave sobre tu dinero digital</h1>
         <p class="lead reveal">Explicado en simple, para cualquier persona. Sin términos raros.</p>
         <p class="intro reveal">Antes de pasar tu efectivo a digital, es normal tener dudas. Aquí están las 7 preguntas que todos se hacen — y sus respuestas claras.</p>
-
         <ul class="sellos reveal" aria-label="Señales de confianza">
           <li><b>Empresa formal</b> · RUC 20614585146</li>
           <li>Registrada ante la UIF-Perú (PLAFT)</li>
           <li>Comprobante en cada operación</li>
         </ul>
-
-        <nav class="indice reveal" aria-label="Índice de las 7 preguntas">
-          <p class="indice-tit">Salta directo a tu duda</p>
-          <ol>
-            <li><a href="#p1">¿Qué es USDT?</a></li>
-            <li><a href="#p2">¿En qué me beneficia?</a></li>
-            <li><a href="#p3">¿Cómo me protege la blockchain?</a></li>
-            <li><a href="#p4">¿Qué es mi billetera?</a></li>
-            <li><a href="#p5">¿Es legal? La autocustodia</a></li>
-            <li><a href="#p6">¿Y si pierdo el celular?</a></li>
-            <li><a href="#p7">¿Cómo empiezo y cómo vuelvo a soles?</a></li>
-          </ol>
-        </nav>
       </div>
     </section>
+
+    <nav class="indice reveal" aria-label="Índice de las 7 preguntas">
+      <p class="indice-tit">Salta directo a tu duda</p>
+      <ol>
+        <li><a href="#p1">¿Qué es USDT?</a></li>
+        <li><a href="#p2">¿En qué me beneficia?</a></li>
+        <li><a href="#p3">¿Cómo me protege la blockchain?</a></li>
+        <li><a href="#p4">¿Qué es mi billetera?</a></li>
+        <li><a href="#p5">¿Es legal? La autocustodia</a></li>
+        <li><a href="#p6">¿Y si pierdo el celular?</a></li>
+        <li><a href="#p7">¿Cómo empiezo y cómo vuelvo a soles?</a></li>
+      </ol>
+    </nav>
 
     <hr class="separador">
 
@@ -648,6 +670,22 @@
     /* ---------- Guía cinemática: descifrado (scramble) + revelados ---------- */
     (function(){
       const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* Video de fondo del hero: fade-in al estar listo; respeta reduced-motion */
+      const heroVid = document.getElementById('hero-video');
+      if (heroVid){
+        if (reduce){
+          heroVid.removeAttribute('autoplay'); heroVid.removeAttribute('loop');
+          try { heroVid.pause(); } catch(e){}
+          heroVid.classList.add('lista');   // muestra el poster estático, sin animar
+        } else {
+          const mostrar = () => heroVid.classList.add('lista');
+          if (heroVid.readyState >= 2) mostrar();
+          heroVid.addEventListener('loadeddata', mostrar, { once: true });
+          heroVid.addEventListener('playing', mostrar, { once: true });
+        }
+      }
+
       const CHARS = 'ABCDEFGHIJKLMNPQRSTUVWXYZ0123456789#%&/<>{}[]?';
       const rnd = () => CHARS[(Math.random() * CHARS.length) | 0];
 
