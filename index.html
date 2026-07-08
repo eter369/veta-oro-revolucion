@@ -25,7 +25,8 @@
   <!-- Tipografías: Space Grotesk (display) + Inter (cuerpo) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;600;700&family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;600;700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
 
   <!-- Schema.org: FinancialService (url, teléfono, correo y cobertura se sincronizan desde CONFIG) -->
   <script type="application/ld+json" id="ld-financial">
@@ -101,7 +102,12 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; }
-    html { -webkit-text-size-adjust: 100%; }
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    /* Experiencia táctil: quita el destello azul por defecto y da feedback sutil al tocar */
+    a, button, label, summary, input, select{ -webkit-tap-highlight-color: transparent; }
+    @media (hover: none){
+      a:active, button:active, summary:active{ opacity: .68; transition: opacity .06s ease; }
+    }
     @media (prefers-reduced-motion: no-preference){
       html { scroll-behavior: smooth; }
     }
@@ -308,7 +314,7 @@
     .lang-btn .bandera{ display: block; border-radius: 2.5px; box-shadow: 0 0 0 1px rgba(255,255,255,.12); }
     /* En pantallas angostas: solo banderas (el texto ES/PT se oculta) */
     @media (max-width: 429px){
-      .lang-btn{ padding: .34rem .5rem; }
+      .lang-btn{ padding: .55rem .5rem; }
       .lang-btn .lang-txt{ display: none; }
     }
 
