@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es-PE">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifica que somos reales — KIPU</title>
+  <meta name="description" content="Comprueba tú mismo que KIPU es una empresa real y formal: consulta nuestro RUC en SUNAT, confirma el dominio oficial y aprende a reconocer suplantaciones.">
+  <meta name="theme-color" content="#0C0E13">
+  <script>document.documentElement.classList.add('js');</script>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Crect x='5' y='5.4' width='20' height='3.4' rx='1.7' fill='%23E8C766'/%3E%3Cpath d='M9.5 8.8 V20.5 M15 8.8 V24 M20.5 8.8 V18.5' stroke='%23E8C766' stroke-width='1.7' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='9.5' cy='16' r='1.7' fill='%23E8C766'/%3E%3Ccircle cx='15' cy='12.5' r='1.7' fill='%23E8C766'/%3E%3Ccircle cx='15' cy='19.5' r='1.7' fill='%23E8C766'/%3E%3Ccircle cx='20.5' cy='14.5' r='1.7' fill='%23E8C766'/%3E%3Cpath d='M9.5 16 15 12.5 20.5 14.5 M15 12.5 15 19.5' stroke='%235FE0FF' stroke-width='.7' stroke-opacity='.9' fill='none'/%3E%3Ccircle cx='9.5' cy='16' r='.8' fill='%23BFF2FF'/%3E%3Ccircle cx='15' cy='12.5' r='.8' fill='%23BFF2FF'/%3E%3Ccircle cx='15' cy='19.5' r='.8' fill='%23BFF2FF'/%3E%3Ccircle cx='20.5' cy='14.5' r='.8' fill='%23BFF2FF'/%3E%3C/svg%3E">
+  <link rel="canonical" href="https://kippuu.com/verifica.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_PE">
+  <meta property="og:site_name" content="KIPU">
+  <meta property="og:title" content="Verifica que somos reales — KIPU">
+  <meta property="og:description" content="Consulta nuestro RUC en SUNAT, confirma el dominio oficial y aprende a reconocer suplantaciones.">
+  <meta property="og:url" content="https://kippuu.com/verifica.html">
+  <meta property="og:image" content="https://kippuu.com/assets/marca/og-kipu.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;600;700&family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;600;700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
+
+  <style>
+    :root{
+      --grafito: #0C0E13; --carbon: #1C1F27; --roca: #12141A;
+      --oro: #C9A227; --oro-claro: #E8C766; --oro-suave: rgba(201,162,39,.12);
+      --humo: #EDEAE3; --humo-72: #D7D5CF; --humo-55: #ABA9A3;
+      --borde: rgba(237,234,227,.11); --borde-oro: rgba(201,162,39,.38);
+      --exito: #3BE388; --alerta: #E8A0A0; --wa: #25D366;
+      --f-display: 'Space Grotesk', sans-serif; --f-cuerpo: 'Inter', sans-serif;
+      --radio: 18px; --ease: cubic-bezier(.22,1,.36,1);
+    }
+    *{ margin: 0; padding: 0; box-sizing: border-box; }
+    html{ scroll-behavior: smooth; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    a, button, summary, input{ -webkit-tap-highlight-color: transparent; }
+    @media (hover: none){ a:active, button:active{ opacity: .68; transition: opacity .06s ease; } }
+    body{
+      background:
+        radial-gradient(ellipse 700px 420px at 85% -5%, rgba(201,162,39,.08), transparent 60%),
+        var(--grafito);
+      color: var(--humo);
+      font-family: var(--f-cuerpo);
+      font-size: 17px; line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a{ color: var(--oro-claro); text-decoration: none; }
+    a:hover{ text-decoration: underline; text-underline-offset: 3px; }
+    a:focus-visible, button:focus-visible{ outline: 2px solid var(--oro-claro); outline-offset: 3px; border-radius: 6px; }
+
+    .cabecera{
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(12,14,19,.85);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--borde);
+    }
+    .cabecera-inner{
+      max-width: 860px; margin: 0 auto; padding: .8rem 1.25rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .logo{
+      display: inline-flex; align-items: center; gap: .55rem;
+      font-family: var(--f-display); font-weight: 700; font-size: 1.2rem;
+      letter-spacing: .06em; color: var(--humo);
+    }
+    .logo:hover{ text-decoration: none; }
+    .logo small{
+      font-weight: 500; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--humo-55); border-left: 1px solid var(--borde); padding-left: .6rem; margin-left: .15rem;
+    }
+    .volver{ font-size: .88rem; font-weight: 600; color: var(--humo-72); white-space: nowrap; }
+    .volver:hover{ color: var(--oro-claro); text-decoration: none; }
+
+    main{ max-width: 860px; margin: 0 auto; padding: 3.4rem 1.25rem 4rem; }
+
+    .eyebrow{
+      font-family: var(--f-display); font-size: .8rem; font-weight: 600;
+      letter-spacing: .22em; text-transform: uppercase; color: var(--oro-claro);
+      margin-bottom: 1rem;
+    }
+    h1{
+      font-family: var(--f-display); font-weight: 600;
+      font-size: clamp(1.9rem, 5vw, 2.8rem);
+      line-height: 1.12; letter-spacing: -.02em; max-width: 22ch;
+    }
+    .lead{ margin-top: 1.1rem; color: var(--humo-72); max-width: 60ch; }
+
+    .tarjeta{
+      margin-top: 1.6rem;
+      background: var(--carbon);
+      border: 1px solid var(--borde);
+      border-radius: var(--radio);
+      padding: 1.5rem 1.5rem 1.6rem;
+    }
+    .tarjeta h2{
+      font-family: var(--f-display); font-weight: 600; font-size: 1.2rem;
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .tarjeta h2 svg{ flex: none; }
+    .tarjeta p{ margin-top: .8rem; color: var(--humo-72); max-width: 64ch; }
+    .tarjeta ul{ margin: .8rem 0 0 1.2rem; color: var(--humo-72); max-width: 62ch; }
+    .tarjeta li{ margin-top: .45rem; }
+    .tarjeta strong, .tarjeta b{ color: var(--humo); }
+
+    .dato-fila{
+      display: flex; flex-wrap: wrap; align-items: center; gap: .7rem;
+      margin-top: 1rem;
+      background: var(--roca); border: 1px solid var(--borde); border-radius: 12px;
+      padding: .85rem 1rem;
+    }
+    .dato-fila .dato{
+      font-family: var(--f-display); font-weight: 700; font-size: 1.05rem; letter-spacing: .04em;
+      color: var(--oro-claro);
+    }
+    .mini-btn{
+      display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+      border: 1px solid var(--borde-oro); background: transparent; color: var(--oro-claro);
+      font: 600 .82rem/1 var(--f-cuerpo);
+      min-height: 44px;
+      padding: .55rem 1rem; border-radius: 999px; cursor: pointer;
+      transition: background .2s ease;
+    }
+    .visually-hidden{
+      position: absolute; width: 1px; height: 1px;
+      margin: -1px; padding: 0; overflow: hidden;
+      clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+    .mini-btn:hover{ background: var(--oro-suave); }
+    .accion{
+      display: inline-flex; align-items: center; gap: .5rem;
+      margin-top: 1.1rem;
+      border: 1px solid var(--borde-oro); border-radius: 999px;
+      padding: .7rem 1.2rem; font-weight: 600; font-size: .92rem;
+    }
+    .accion:hover{ background: var(--oro-suave); text-decoration: none; }
+    .paso-nota{ margin-top: .6rem; font-size: .85rem; color: var(--humo-55); }
+
+    .alerta-lista li{ color: var(--alerta); }
+    .alerta-lista li b{ color: var(--alerta); }
+    .ok-lista{ list-style: none; margin-left: 0 !important; }
+    .ok-lista li{
+      display: flex; gap: .6rem; align-items: flex-start;
+    }
+    .ok-lista li::before{
+      content: ''; flex: none; width: 16px; height: 16px; margin-top: .3rem;
+      background: no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M4 12.5l5 5 11-11' stroke='%23E8C766' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
+
+    .dominio-caja{
+      margin-top: 1rem;
+      display: flex; align-items: center; justify-content: center; gap: .6rem;
+      background: var(--roca); border: 1px dashed var(--borde-oro); border-radius: 12px;
+      padding: 1rem;
+      font-family: var(--f-display); font-weight: 700; font-size: clamp(1.2rem, 4vw, 1.6rem);
+      letter-spacing: .04em; color: var(--oro-claro);
+    }
+
+    .cta{
+      margin-top: 2.6rem; text-align: center;
+      background: var(--carbon); border: 1px solid var(--borde-oro); border-radius: 24px;
+      padding: 2rem 1.5rem;
+    }
+    .cta h2{ font-family: var(--f-display); font-weight: 600; font-size: clamp(1.3rem, 4vw, 1.7rem); }
+    .cta p{ margin-top: .5rem; color: var(--humo-72); }
+    .btn-wa{
+      display: inline-flex; align-items: center; gap: .55rem;
+      margin-top: 1.3rem; padding: .95rem 1.8rem; border-radius: 999px;
+      background: linear-gradient(135deg, var(--oro) 0%, var(--oro-claro) 100%);
+      color: var(--roca);
+      font-family: var(--f-display); font-weight: 600; font-size: 1rem;
+      box-shadow: 0 6px 22px rgba(201,162,39,.22);
+      transition: transform .18s ease, filter .18s ease;
+    }
+    .btn-wa:hover{ transform: translateY(-1px); filter: brightness(1.06); text-decoration: none; }
+
+    .pie{
+      border-top: 1px solid var(--borde);
+      padding: 1.6rem 1.25rem 2rem; text-align: center;
+      color: var(--humo-55); font-size: .82rem;
+    }
+    .pie a{ color: var(--humo-72); }
+  </style>
+</head>
+<body>
+
+  <header class="cabecera">
+    <div class="cabecera-inner">
+      <a class="logo" href="./" title="Volver al sitio KIPU">
+        <svg width="26" height="26" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="28" height="28" rx="7" fill="#1C1F27" stroke="#C9A227" stroke-opacity=".45"/>
+          <rect x="5" y="5.4" width="20" height="3.4" rx="1.7" fill="#E8C766"/>
+          <path d="M9.5 8.8 V20.5 M15 8.8 V24 M20.5 8.8 V18.5" stroke="#E8C766" stroke-width="1.7" stroke-linecap="round"/>
+          <circle cx="9.5" cy="16" r="1.7" fill="#E8C766"/><circle cx="15" cy="12.5" r="1.7" fill="#E8C766"/>
+          <circle cx="15" cy="19.5" r="1.7" fill="#E8C766"/><circle cx="20.5" cy="14.5" r="1.7" fill="#E8C766"/>
+          <path d="M9.5 16 15 12.5 20.5 14.5 M15 12.5 15 19.5" stroke="#5FE0FF" stroke-width=".7" stroke-opacity=".9"/>
+          <circle cx="9.5" cy="16" r=".8" fill="#BFF2FF"/><circle cx="15" cy="12.5" r=".8" fill="#BFF2FF"/>
+          <circle cx="15" cy="19.5" r=".8" fill="#BFF2FF"/><circle cx="20.5" cy="14.5" r=".8" fill="#BFF2FF"/>
+        </svg>
+        KIPU <small>Verificación</small>
+      </a>
+      <a class="volver" href="./">← Volver al sitio</a>
+    </div>
+  </header>
+
+  <main>
+    <p class="eyebrow">Transparencia</p>
+    <h1>Verifica que somos reales. No nos creas: compruébalo.</h1>
+    <p class="lead">En este sector hay estafadores que suplantan empresas serias. Por eso te damos las herramientas para que verifiques a KIPU por tu cuenta, en fuentes oficiales que no controlamos nosotros.</p>
+
+    <!-- 1. RUC / SUNAT -->
+    <section class="tarjeta" aria-labelledby="v-sunat">
+      <h2 id="v-sunat">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 21V5.5A2.5 2.5 0 0 1 7.5 3h9A2.5 2.5 0 0 1 19 5.5V21" stroke="#C9A227" stroke-width="1.6"/><path d="M3 21h18" stroke="#C9A227" stroke-width="1.6" stroke-linecap="round"/><path d="M9 7.5h6M9 11h6M9 14.5h6" stroke="#C9A227" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Somos una empresa registrada ante SUNAT
+      </h2>
+      <p>Operamos como <strong>PROFIX CENTRAL BANK S.A.C.</strong>, una sociedad constituida en el Perú. Puedes consultar nuestro registro directamente en el portal oficial de SUNAT — es público y gratuito:</p>
+      <div class="dato-fila">
+        <span>RUC:</span>
+        <span class="dato" id="ruc-num">20614585146</span>
+        <button type="button" class="mini-btn" id="btn-copiar-ruc">Copiar RUC</button>
+        <span class="visually-hidden" role="status" id="copiar-status"></span>
+      </div>
+      <a class="accion" href="https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp" target="_blank" rel="noopener">Abrir la consulta RUC de SUNAT ↗</a>
+      <p class="paso-nota">Se abre el portal oficial de SUNAT. Pega el RUC (ya lo copiaste con el botón) y verás nuestra razón social, nuestro estado ante SUNAT y el domicilio fiscal.</p>
+    </section>
+
+    <!-- 2. UIF / PLAFT -->
+    <section class="tarjeta" aria-labelledby="v-uif">
+      <h2 id="v-uif">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.5 20 5.7v5c0 4.8-3.3 8.5-8 10.3-4.7-1.8-8-5.5-8-10.3v-5l8-3.2Z" stroke="#C9A227" stroke-width="1.6" stroke-linejoin="round"/><path d="m8.8 11.8 2.2 2.2 4.2-4.4" stroke="#E8C766" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Operamos bajo normativa PLAFT (UIF-Perú)
+      </h2>
+      <p>Como proveedor de servicios de activos virtuales, KIPU es <strong>sujeto obligado ante la Unidad de Inteligencia Financiera del Perú</strong>: verificamos la identidad de cada cliente, documentamos cada operación y reportamos según la normativa de prevención de lavado de activos.</p>
+      <p>¿Dudas sobre nuestra condición de sujeto obligado? Escríbenos por WhatsApp y te informamos con gusto.</p>
+    </section>
+
+    <!-- 3. Dominio oficial -->
+    <section class="tarjeta" aria-labelledby="v-dominio">
+      <h2 id="v-dominio">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="#C9A227" stroke-width="1.6"/><path d="M3.5 12h17M12 3.5c2.6 2.4 3.9 5.4 3.9 8.5s-1.3 6.1-3.9 8.5c-2.6-2.4-3.9-5.4-3.9-8.5s1.3-6.1 3.9-8.5z" stroke="#C9A227" stroke-width="1.5"/></svg>
+        Nuestro único sitio web oficial
+      </h2>
+      <div class="dominio-caja">kippuu.com</div>
+      <p>Con doble «p» y doble «u». <strong>Cualquier otro dominio parecido no es KIPU</strong>, aunque copie nuestro diseño, nuestro logo o el nombre de nuestros asesores. Antes de operar, mira la barra de direcciones de tu navegador.</p>
+      <p>Nuestro único canal de atención es el WhatsApp <strong>+51 918 616 580</strong>. Verifica el número antes de enviar cualquier dato.</p>
+    </section>
+
+    <!-- 4. Cómo reconocer una suplantación -->
+    <section class="tarjeta" aria-labelledby="v-estafa">
+      <h2 id="v-estafa">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4.5l8 14H4l8-14z" stroke="#E8A0A0" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 10v4" stroke="#E8A0A0" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="16.6" r="0.9" fill="#E8A0A0"/></svg>
+        KIPU nunca hará esto
+      </h2>
+      <ul class="alerta-lista">
+        <li><b>Nunca</b> te pediremos tu frase semilla ni las claves de tu billetera.</li>
+        <li><b>Nunca</b> te prometeremos rentabilidades ni «ganancias garantizadas».</li>
+        <li><b>Nunca</b> te apuraremos con «ofertas que vencen en minutos».</li>
+        <li><b>Nunca</b> te pediremos pagos por adelantado para «liberar» fondos.</li>
+      </ul>
+      <p>Si alguien hace cualquiera de estas cosas en nombre de KIPU, <strong>es una estafa</strong>: corta la comunicación y avísanos por WhatsApp.</p>
+    </section>
+
+    <!-- 5. Verifica tus operaciones -->
+    <section class="tarjeta" aria-labelledby="v-onchain">
+      <h2 id="v-onchain">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="#C9A227" stroke-width="1.7"/><path d="m16 16 4.5 4.5" stroke="#C9A227" stroke-width="1.7" stroke-linecap="round"/><path d="m8.4 11 1.8 1.8 3.4-3.6" stroke="#E8C766" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Cada operación se puede verificar en blockchain
+      </h2>
+      <ul class="ok-lista">
+        <li>Tu comprobante KIPU incluye el <strong>hash</strong> de la transacción.</li>
+        <li>Ese hash se consulta en exploradores públicos que no dependen de nosotros.</li>
+        <li>Nadie —ni KIPU— puede alterar ese registro.</li>
+      </ul>
+      <a class="accion" href="./#verificador">Ir al verificador de comprobantes</a>
+    </section>
+
+    <div class="cta">
+      <h2>¿Te queda alguna duda?</h2>
+      <p>Pregunta directo, sin compromiso. Preferimos mil preguntas antes que un cliente inseguro.</p>
+      <a class="btn-wa" href="https://wa.me/51918616580?text=Hola%20KIPU%2C%20quiero%20verificar%20la%20identidad%20de%20la%20empresa%20antes%20de%20operar." target="_blank" rel="noopener">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a9.9 9.9 0 0 0-8.5 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm5.7 14.1c-.24.68-1.4 1.3-1.93 1.35-.52.05-1.01.24-3.4-.7-2.87-1.14-4.7-4.06-4.84-4.25-.14-.19-1.16-1.55-1.16-2.95 0-1.4.73-2.09 1-2.37.24-.26.54-.32.72-.32h.52c.17 0 .4-.06.61.47.24.56.78 1.94.85 2.08.07.14.12.3.02.49-.42.85-.88.82-.65 1.21.86 1.48 1.72 1.99 3.02 2.65.22.11.35.1.48-.05.13-.14.56-.65.7-.87.15-.22.3-.19.5-.11.2.07 1.3.62 1.53.73.22.11.37.17.42.26.06.1.06.55-.18 1.08Z"/></svg>
+        Escribir a KIPU por WhatsApp
+      </a>
+    </div>
+  </main>
+
+  <footer class="pie">
+    <p>© <span id="year">2026</span> PROFIX CENTRAL BANK S.A.C. · RUC 20614585146 · <a href="https://kippuu.com">kippuu.com</a> · <a href="libro-reclamaciones.html">Libro de Reclamaciones</a></p>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    // Copiar RUC al portapapeles (con confirmación en el propio botón)
+    (function(){
+      const btn = document.getElementById('btn-copiar-ruc');
+      const ruc = document.getElementById('ruc-num').textContent.trim();
+      btn.addEventListener('click', async () => {
+        let ok = false;
+        try { await navigator.clipboard.writeText(ruc); ok = true; }
+        catch(e){
+          // Respaldo para contextos sin Clipboard API
+          const ta = document.createElement('textarea');
+          ta.value = ruc; document.body.appendChild(ta); ta.select();
+          try { ok = document.execCommand('copy'); } catch(e2){}
+          ta.remove();
+        }
+        const original = 'Copiar RUC';
+        const status = document.getElementById('copiar-status');
+        btn.textContent = ok ? '✓ Copiado' : 'No se pudo copiar';
+        status.textContent = ok
+          ? 'RUC copiado al portapapeles'
+          : 'No se pudo copiar; selecciona el número manualmente';
+        setTimeout(() => { btn.textContent = original; status.textContent = ''; }, 2000);
+      });
+    })();
+  </script>
+</body>
+</html>

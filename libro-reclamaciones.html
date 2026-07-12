@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es-PE">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Libro de Reclamaciones — KIPU</title>
+  <meta name="description" content="Libro de Reclamaciones virtual de PROFIX CENTRAL BANK S.A.C. (KIPU), conforme al Código de Protección y Defensa del Consumidor del Perú.">
+  <meta name="theme-color" content="#0C0E13">
+  <meta name="robots" content="noindex, follow">
+  <script>document.documentElement.classList.add('js');</script>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Crect x='5' y='5.4' width='20' height='3.4' rx='1.7' fill='%23E8C766'/%3E%3Cpath d='M9.5 8.8 V20.5 M15 8.8 V24 M20.5 8.8 V18.5' stroke='%23E8C766' stroke-width='1.7' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='9.5' cy='16' r='1.7' fill='%23E8C766'/%3E%3Ccircle cx='15' cy='12.5' r='1.7' fill='%23E8C766'/%3E%3Ccircle cx='15' cy='19.5' r='1.7' fill='%23E8C766'/%3E%3Ccircle cx='20.5' cy='14.5' r='1.7' fill='%23E8C766'/%3E%3Cpath d='M9.5 16 15 12.5 20.5 14.5 M15 12.5 15 19.5' stroke='%235FE0FF' stroke-width='.7' stroke-opacity='.9' fill='none'/%3E%3Ccircle cx='9.5' cy='16' r='.8' fill='%23BFF2FF'/%3E%3Ccircle cx='15' cy='12.5' r='.8' fill='%23BFF2FF'/%3E%3Ccircle cx='15' cy='19.5' r='.8' fill='%23BFF2FF'/%3E%3Ccircle cx='20.5' cy='14.5' r='.8' fill='%23BFF2FF'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;600;700&family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;600;700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
+
+  <!-- [EDITABLE] Nota interna: formato basado en la Ley 29571 y su reglamento.
+       Validar con asesoría legal (campos, plazos y conservación del registro)
+       antes del lanzamiento comercial. Completar dirección física cuando exista. -->
+
+  <style>
+    :root{
+      --grafito: #0C0E13; --carbon: #1C1F27; --roca: #12141A;
+      --oro: #C9A227; --oro-claro: #E8C766; --oro-suave: rgba(201,162,39,.12);
+      --humo: #EDEAE3; --humo-72: #D7D5CF; --humo-55: #ABA9A3;
+      --borde: rgba(237,234,227,.11); --borde-oro: rgba(201,162,39,.38);
+      --exito: #3BE388; --wa: #25D366;
+      --f-display: 'Space Grotesk', sans-serif; --f-cuerpo: 'Inter', sans-serif;
+      --radio: 18px;
+    }
+    *{ margin: 0; padding: 0; box-sizing: border-box; }
+    html{ scroll-behavior: smooth; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    a, button, label, input, select, textarea{ -webkit-tap-highlight-color: transparent; }
+    body{
+      background: var(--grafito);
+      color: var(--humo);
+      font-family: var(--f-cuerpo);
+      font-size: 17px; line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a{ color: var(--oro-claro); text-decoration: none; }
+    a:hover{ text-decoration: underline; text-underline-offset: 3px; }
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{
+      outline: 2px solid var(--oro-claro); outline-offset: 3px;
+    }
+
+    .cabecera{
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(12,14,19,.85);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--borde);
+    }
+    .cabecera-inner{
+      max-width: 760px; margin: 0 auto; padding: .8rem 1.25rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .logo{
+      display: inline-flex; align-items: center; gap: .55rem;
+      font-family: var(--f-display); font-weight: 700; font-size: 1.2rem;
+      letter-spacing: .06em; color: var(--humo);
+    }
+    .logo:hover{ text-decoration: none; }
+    .logo small{
+      font-weight: 500; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--humo-55); border-left: 1px solid var(--borde); padding-left: .6rem; margin-left: .15rem;
+    }
+    .volver{ font-size: .88rem; font-weight: 600; color: var(--humo-72); white-space: nowrap; }
+    .volver:hover{ color: var(--oro-claro); text-decoration: none; }
+
+    main{ max-width: 760px; margin: 0 auto; padding: 3rem 1.25rem 4rem; }
+    h1{
+      font-family: var(--f-display); font-weight: 600;
+      font-size: clamp(1.7rem, 5vw, 2.3rem); line-height: 1.15; letter-spacing: -.02em;
+    }
+    .prov{
+      margin-top: 1rem; padding: 1rem 1.2rem;
+      background: var(--carbon); border: 1px solid var(--borde); border-radius: 12px;
+      font-size: .92rem; color: var(--humo-72);
+    }
+    .prov b{ color: var(--humo); }
+    .lead{ margin-top: 1rem; color: var(--humo-55); font-size: .95rem; max-width: 62ch; }
+
+    form{ margin-top: 2rem; }
+    fieldset{
+      border: 1px solid var(--borde); border-radius: var(--radio);
+      padding: 1.3rem 1.3rem 1.5rem; margin-top: 1.4rem;
+      background: var(--carbon);
+    }
+    legend{
+      font-family: var(--f-display); font-weight: 600; font-size: 1.02rem;
+      padding: 0 .6rem; color: var(--oro-claro);
+    }
+    .campo{ margin-top: 1rem; }
+    .campo label{
+      display: block; font-size: .85rem; font-weight: 600; color: var(--humo-72);
+      margin-bottom: .35rem;
+    }
+    .campo label .req{ color: var(--oro-claro); }
+    .campo input, .campo select, .campo textarea{
+      width: 100%;
+      background: var(--roca); border: 1px solid var(--borde); border-radius: 10px;
+      color: var(--humo); font-family: inherit; font-size: 1rem;
+      padding: .75rem .9rem; min-height: 48px;
+    }
+    .campo textarea{ min-height: 120px; resize: vertical; }
+    .campo input:focus, .campo select:focus, .campo textarea:focus{ border-color: var(--oro); outline: none; }
+    .dos-cols{ display: grid; gap: 1rem; grid-template-columns: 1fr; }
+    @media (min-width: 560px){ .dos-cols{ grid-template-columns: 1fr 1fr; } }
+
+    .radio-grupo{ display: grid; gap: .7rem; margin-top: 1rem; }
+    .radio-opcion{
+      display: flex; gap: .7rem; align-items: flex-start;
+      background: var(--roca); border: 1px solid var(--borde); border-radius: 12px;
+      padding: .9rem 1rem; cursor: pointer;
+      transition: border-color .2s ease;
+    }
+    .radio-opcion:has(input:checked){ border-color: var(--oro); background: var(--oro-suave); }
+    .radio-opcion input{ margin-top: .3rem; accent-color: var(--oro); width: 1.05rem; height: 1.05rem; flex: none; }
+    .radio-opcion b{ display: block; color: var(--humo); font-family: var(--f-display); }
+    .radio-opcion small{ color: var(--humo-55); font-size: .85rem; line-height: 1.5; display: block; }
+
+    .nota-envio{
+      margin-top: 1.4rem; padding: 1rem 1.2rem;
+      background: rgba(237,234,227,.04); border: 1px solid var(--borde); border-radius: 12px;
+      font-size: .88rem; color: var(--humo-55);
+    }
+    .nota-envio b{ color: var(--humo); }
+
+    .btn-enviar{
+      display: inline-flex; align-items: center; justify-content: center; gap: .55rem;
+      margin-top: 1.5rem; width: 100%;
+      padding: 1rem 1.8rem; border: none; border-radius: 999px; cursor: pointer;
+      background: linear-gradient(135deg, var(--oro) 0%, var(--oro-claro) 100%);
+      color: var(--roca);
+      font-family: var(--f-display); font-weight: 600; font-size: 1.05rem;
+      box-shadow: 0 6px 22px rgba(201,162,39,.22);
+      transition: transform .18s ease, filter .18s ease;
+    }
+    .btn-enviar:hover{ transform: translateY(-1px); filter: brightness(1.06); }
+
+    .confirmacion{
+      margin-top: 1.5rem; padding: 1.3rem 1.4rem;
+      border: 1px solid rgba(59,227,136,.4); border-radius: var(--radio);
+      background: rgba(59,227,136,.07);
+    }
+    .confirmacion[hidden]{ display: none; }
+    .confirmacion h2{ font-family: var(--f-display); font-size: 1.1rem; color: var(--exito); }
+    .confirmacion p{ margin-top: .5rem; color: var(--humo-72); font-size: .95rem; }
+    .confirmacion .codigo{
+      font-family: var(--f-display); font-weight: 700; font-size: 1.3rem; letter-spacing: .06em;
+      color: var(--humo); margin-top: .4rem;
+    }
+
+    .pie{
+      border-top: 1px solid var(--borde);
+      padding: 1.6rem 1.25rem 2rem; text-align: center;
+      color: var(--humo-55); font-size: .82rem;
+    }
+    .pie a{ color: var(--humo-72); }
+  </style>
+</head>
+<body>
+
+  <header class="cabecera">
+    <div class="cabecera-inner">
+      <a class="logo" href="./" title="Volver al sitio KIPU">
+        <svg width="26" height="26" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="28" height="28" rx="7" fill="#1C1F27" stroke="#C9A227" stroke-opacity=".45"/>
+          <rect x="5" y="5.4" width="20" height="3.4" rx="1.7" fill="#E8C766"/>
+          <path d="M9.5 8.8 V20.5 M15 8.8 V24 M20.5 8.8 V18.5" stroke="#E8C766" stroke-width="1.7" stroke-linecap="round"/>
+          <circle cx="9.5" cy="16" r="1.7" fill="#E8C766"/><circle cx="15" cy="12.5" r="1.7" fill="#E8C766"/>
+          <circle cx="15" cy="19.5" r="1.7" fill="#E8C766"/><circle cx="20.5" cy="14.5" r="1.7" fill="#E8C766"/>
+          <path d="M9.5 16 15 12.5 20.5 14.5 M15 12.5 15 19.5" stroke="#5FE0FF" stroke-width=".7" stroke-opacity=".9"/>
+          <circle cx="9.5" cy="16" r=".8" fill="#BFF2FF"/><circle cx="15" cy="12.5" r=".8" fill="#BFF2FF"/>
+          <circle cx="15" cy="19.5" r=".8" fill="#BFF2FF"/><circle cx="20.5" cy="14.5" r=".8" fill="#BFF2FF"/>
+        </svg>
+        KIPU <small>Libro de Reclamaciones</small>
+      </a>
+      <a class="volver" href="./">← Volver al sitio</a>
+    </div>
+  </header>
+
+  <main>
+    <h1>Libro de Reclamaciones</h1>
+    <div class="prov">
+      <b>Proveedor:</b> PROFIX CENTRAL BANK S.A.C. · <b>RUC:</b> 20614585146<br>
+      Domicilio fiscal registrado ante SUNAT (verificable con el RUC en <a href="verifica.html">nuestra página de verificación</a>).
+    </div>
+    <p class="lead">Conforme al Código de Protección y Defensa del Consumidor (Ley N.º 29571). Completa la hoja y al enviarla se abrirá tu WhatsApp con el registro listo para remitirnos. Te responderemos en un plazo máximo de <strong>15 días hábiles improrrogables</strong>.</p>
+    <p class="lead">La formulación del reclamo no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una denuncia ante el INDECOPI.</p>
+    <noscript><p class="lead" style="color:#E8A0A0">Este formulario necesita JavaScript para generar tu hoja. Si no puedes activarlo, envíanos tu reclamo directamente por WhatsApp al +51 918 616 580.</p></noscript>
+
+    <form id="form-libro">
+      <fieldset>
+        <legend>1 · Tus datos (consumidor)</legend>
+        <div class="dos-cols">
+          <div class="campo">
+            <label for="f-nombre">Nombre completo <span class="req">*</span></label>
+            <input type="text" id="f-nombre" required autocomplete="name">
+          </div>
+          <div class="campo">
+            <label for="f-doc">DNI / CE <span class="req">*</span></label>
+            <input type="text" id="f-doc" required inputmode="numeric" autocomplete="off">
+          </div>
+        </div>
+        <div class="dos-cols">
+          <div class="campo">
+            <label for="f-tel">Teléfono <span class="req">*</span></label>
+            <input type="tel" id="f-tel" required autocomplete="tel">
+          </div>
+          <div class="campo">
+            <label for="f-email">Correo electrónico</label>
+            <input type="email" id="f-email" autocomplete="email">
+          </div>
+        </div>
+        <div class="campo">
+          <label for="f-domicilio">Domicilio</label>
+          <input type="text" id="f-domicilio" autocomplete="street-address">
+        </div>
+        <p class="lead" style="margin-top:.8rem">Si eres menor de edad, indica también los datos de tu padre, madre o apoderado en el detalle.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>2 · Identificación del bien contratado</legend>
+        <div class="dos-cols">
+          <div class="campo">
+            <label for="f-bien">Tipo <span class="req">*</span></label>
+            <select id="f-bien" required>
+              <option value="Servicio" selected>Servicio</option>
+              <option value="Producto">Producto</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="f-monto">Monto reclamado (opcional)</label>
+            <input type="text" id="f-monto" inputmode="decimal" placeholder="S/ 0.00">
+          </div>
+        </div>
+        <div class="campo">
+          <label for="f-descripcion">Descripción (ej. operación de cambio, fecha, código) <span class="req">*</span></label>
+          <input type="text" id="f-descripcion" required>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>3 · Tipo de solicitud</legend>
+        <div class="radio-grupo" role="radiogroup" aria-label="Tipo de solicitud">
+          <label class="radio-opcion">
+            <input type="radio" name="tipo" value="RECLAMO" checked>
+            <span><b>Reclamo</b><small>Disconformidad relacionada con el servicio o producto recibido.</small></span>
+          </label>
+          <label class="radio-opcion">
+            <input type="radio" name="tipo" value="QUEJA">
+            <span><b>Queja</b><small>Malestar o descontento con la atención, no relacionado directamente con el servicio.</small></span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>4 · Detalle y pedido</legend>
+        <div class="campo">
+          <label for="f-detalle">Detalle de lo ocurrido <span class="req">*</span></label>
+          <textarea id="f-detalle" required></textarea>
+        </div>
+        <div class="campo">
+          <label for="f-pedido">¿Qué solicitas? <span class="req">*</span></label>
+          <textarea id="f-pedido" required></textarea>
+        </div>
+      </fieldset>
+
+      <div class="nota-envio">
+        <b>Cómo se envía:</b> al pulsar el botón se genera tu código de hoja y se abre tu WhatsApp con el registro completo, listo para enviárnoslo. Los datos viajan solo en tu mensaje: esta página no los almacena. Guarda una captura como constancia.
+        <br><br>
+        Tus datos serán tratados por PROFIX CENTRAL BANK S.A.C. únicamente para atender tu reclamo o queja, conforme a la Ley N.º 29733 de Protección de Datos Personales. El envío se realiza a través de WhatsApp, un servicio de Meta.
+      </div>
+
+      <button type="submit" class="btn-enviar">Generar hoja y enviar por WhatsApp</button>
+
+      <div class="confirmacion" id="confirmacion" role="status" tabindex="-1" hidden>
+        <h2>Hoja generada</h2>
+        <p>Tu código provisional de reclamación es:</p>
+        <p class="codigo" id="codigo-hoja">—</p>
+        <p>Envía el mensaje de WhatsApp para que tu hoja quede registrada: al recibirla te confirmaremos el número definitivo. Responderemos en un máximo de 15 días hábiles improrrogables. Guarda una captura de este código.</p>
+        <p><a id="wa-hoja-link" href="#" target="_blank" rel="noopener">¿No se abrió WhatsApp? Toca aquí para enviar tu hoja ↗</a></p>
+      </div>
+    </form>
+  </main>
+
+  <footer class="pie">
+    <p>© <span id="year">2026</span> PROFIX CENTRAL BANK S.A.C. · RUC 20614585146 · <a href="https://kippuu.com">kippuu.com</a> · <a href="verifica.html">Verifica que somos reales</a></p>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    (function(){
+      const WHATSAPP = '51918616580';
+      const form = document.getElementById('form-libro');
+      const conf = document.getElementById('confirmacion');
+      const codigoEl = document.getElementById('codigo-hoja');
+      const v = id => (document.getElementById(id).value || '').trim();
+
+      let codigoActual = null; // si el usuario reintenta (p. ej. popup bloqueado), se conserva el mismo código
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!form.reportValidity()) return;
+
+        // Código provisional de la hoja: fecha + sufijo. El número correlativo
+        // definitivo lo asigna KIPU al recibir el mensaje.
+        const d = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        const fecha = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
+        const codigo = (!conf.hidden && codigoActual)
+          ? codigoActual
+          : `LR-KIPU-${fecha}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+        codigoActual = codigo;
+        const fechaLegible = `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+        const tipo = form.querySelector('input[name="tipo"]:checked').value;
+        const lineas = [
+          `LIBRO DE RECLAMACIONES — HOJA ${codigo}`,
+          `Fecha: ${fechaLegible}`,
+          `Proveedor: PROFIX CENTRAL BANK S.A.C. · RUC 20614585146`,
+          ``,
+          `— DATOS DEL CONSUMIDOR —`,
+          `Nombre: ${v('f-nombre')}`,
+          `DNI/CE: ${v('f-doc')}`,
+          `Teléfono: ${v('f-tel')}`,
+          v('f-email') ? `Email: ${v('f-email')}` : null,
+          v('f-domicilio') ? `Domicilio: ${v('f-domicilio')}` : null,
+          ``,
+          `— BIEN CONTRATADO —`,
+          `Tipo: ${v('f-bien')}`,
+          `Descripción: ${v('f-descripcion')}`,
+          v('f-monto') ? `Monto reclamado: ${v('f-monto')}` : null,
+          ``,
+          `— SOLICITUD: ${tipo} —`,
+          `Detalle: ${v('f-detalle')}`,
+          ``,
+          `Pedido: ${v('f-pedido')}`,
+          ``,
+          `La formulación del reclamo no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una denuncia ante el INDECOPI.`
+        ].filter(l => l !== null);
+
+        const url = 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(lineas.join('\n'));
+        codigoEl.textContent = codigo;
+        document.getElementById('wa-hoja-link').href = url; // respaldo si el popup se bloquea
+        conf.hidden = false;
+        conf.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        try { conf.focus({ preventScroll: true }); } catch(err){}
+
+        window.open(url, '_blank', 'noopener');
+      });
+    })();
+  </script>
+</body>
+</html>
