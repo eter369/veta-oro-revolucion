@@ -434,8 +434,9 @@
     @media (prefers-reduced-motion: reduce){ .btn-chip, .btn:hover .btn-chip{ transition: none; transform: none; } }
 
     /* ---------- Hero ---------- */
+    /* La pasarela de precios (primer elemento de <main>) ya compensa el header fijo */
     .hero{
-      padding-top: calc(var(--header-h) + 3.5rem);
+      padding-top: 3.5rem;
       padding-bottom: 3rem;
       min-height: 88vh;
       display: flex; flex-direction: column; justify-content: center;
@@ -1836,6 +1837,50 @@
       clip: rect(0 0 0 0); white-space: nowrap; border: 0;
     }
 
+    /* ---------- Pasarela de precios bajo el header ---------- */
+    .pasarela-wrap{
+      position: relative; z-index: 2;
+      /* Compensa el header fijo: la pasarela es lo primero que se ve debajo de él */
+      margin-top: var(--header-h);
+      background: rgba(18,20,26,.72);
+      border-bottom: 1px solid var(--borde);
+    }
+    .pasarela-inner{ display: flex; align-items: center; gap: 1.1rem; padding: .5rem 0; }
+    .pasarela-inner .ticker-status{ flex: none; }
+    .pasarela{
+      flex: 1; min-width: 0; overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+    }
+    .pasarela-track{ display: flex; width: max-content; }
+    @media (prefers-reduced-motion: no-preference){
+      .pasarela-track{ animation: pasarelaDesfile 38s linear infinite; }
+      .pasarela:hover .pasarela-track{ animation-play-state: paused; }
+    }
+    @keyframes pasarelaDesfile{ to{ transform: translateX(-50%); } }
+    .pas-grupo{ display: flex; align-items: center; gap: 2.4rem; padding-right: 2.4rem; flex: none; }
+    .pas-item{ display: inline-flex; align-items: center; gap: .5rem; white-space: nowrap; }
+    .pas-item .coin{ display: inline-flex; flex: none; }
+    .pas-label{ font-size: .64rem; font-weight: 600; letter-spacing: .12em; color: var(--humo-55); text-transform: uppercase; }
+    .pas-value{ font-family: var(--f-display); font-weight: 700; font-size: .95rem; color: var(--humo); }
+    .pas-item .ticker-chg{ font-size: .7rem; font-weight: 600; }
+    /* Protagonistas: el dólar en soles y en reales */
+    .pas-item.principal{
+      background: var(--oro-suave); border: 1px solid var(--borde-oro);
+      border-radius: 999px; padding: .26rem .85rem;
+    }
+    .pas-item.principal .pas-value{ color: var(--oro-claro); font-size: 1.04rem; }
+    .pas-item.principal .pas-label{ color: var(--oro); }
+    .pas-item .bandera{ border-radius: 2px; box-shadow: 0 0 0 1px rgba(255,255,255,.12); flex: none; }
+    @media (prefers-reduced-motion: reduce){
+      .pasarela{ overflow-x: auto; scrollbar-width: none; }
+      .pasarela::-webkit-scrollbar{ display: none; }
+    }
+    @media (max-width: 560px){
+      .pasarela-inner{ gap: .7rem; }
+      .pasarela-inner .ticker-status span:last-child{ display: none; } /* solo el punto pulsante */
+    }
+
     /* ---------- Film de marca (click-to-play) ---------- */
     .film-player{
       position: relative;
@@ -2057,6 +2102,89 @@
   </noscript>
 
   <main id="main">
+    <!-- Pasarela de precios: dólar en soles y reales como protagonistas + BTC/ETH/SOL -->
+    <div class="pasarela-wrap" role="region" aria-label="Precios de referencia en vivo">
+      <div class="container pasarela-inner num">
+        <div class="ticker-status en-vivo" id="ticker-status">
+          <span class="dot-live" aria-hidden="true"></span>
+          <span id="ticker-status-text">Cargando precios…</span>
+        </div>
+        <div class="pasarela">
+          <div class="pasarela-track">
+            <div class="pas-grupo">
+              <span class="pas-item principal ticker-item">
+                <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#D91023"/><rect x="6" width="6" height="13" fill="#F5F5F0"/></svg>
+                <span class="pas-label">USD / PEN</span>
+                <span class="pas-value" data-price="usd_pen">—</span>
+              </span>
+              <span class="pas-item principal ticker-item">
+                <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#009B3A"/><path d="M9 1.6 16.2 6.5 9 11.4 1.8 6.5Z" fill="#FEDF00"/><circle cx="9" cy="6.5" r="2.6" fill="#002776"/></svg>
+                <span class="pas-label">USD / BRL</span>
+                <span class="pas-value" data-price="usd_brl">—</span>
+              </span>
+              <span class="pas-item ticker-item">
+                <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2.5 3h11M8 3v10M4.8 6h6.4" stroke="#E8C766" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+                <span class="pas-label">USDT / PEN</span>
+                <span class="pas-value" data-price="usdt_pen">—</span>
+              </span>
+              <span class="pas-item ticker-item">
+                <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4.5 2.5h5a2.4 2.4 0 0 1 0 4.8h-5M4.5 7.3h5.6a2.4 2.4 0 0 1 0 4.8H4.5M5.8 2.5v9.6M6.5 1v1.5M9 1v1.5M6.5 12.1v1.5M9 12.1v1.5" stroke="#E8C766" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="pas-label">BTC / USD</span>
+                <span class="pas-value" data-price="btc_usd">—</span>
+                <span class="ticker-chg" data-chg="btc">&nbsp;</span>
+              </span>
+              <span class="pas-item ticker-item">
+                <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1.5 12.5 8 8 10.8 3.5 8 8 1.5Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 12.2 12 9.6 8 15 4 9.6l4 2.6Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/></svg></span>
+                <span class="pas-label">ETH / USD</span>
+                <span class="pas-value" data-price="eth_usd">—</span>
+                <span class="ticker-chg" data-chg="eth">&nbsp;</span>
+              </span>
+              <span class="pas-item ticker-item">
+                <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4.9 2.9h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/><path d="M2.5 6.8h8.4l2.4 2.4H4.9L2.5 6.8Z" fill="#E8C766"/><path d="M4.9 10.7h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/></svg></span>
+                <span class="pas-label">SOL / USD</span>
+                <span class="pas-value" data-price="sol_usd">—</span>
+                <span class="ticker-chg" data-chg="sol">&nbsp;</span>
+              </span>
+            </div>
+            <div class="pas-grupo" aria-hidden="true">
+              <span class="pas-item principal ticker-item">
+                <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#D91023"/><rect x="6" width="6" height="13" fill="#F5F5F0"/></svg>
+                <span class="pas-label">USD / PEN</span>
+                <span class="pas-value" data-price="usd_pen">—</span>
+              </span>
+              <span class="pas-item principal ticker-item">
+                <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#009B3A"/><path d="M9 1.6 16.2 6.5 9 11.4 1.8 6.5Z" fill="#FEDF00"/><circle cx="9" cy="6.5" r="2.6" fill="#002776"/></svg>
+                <span class="pas-label">USD / BRL</span>
+                <span class="pas-value" data-price="usd_brl">—</span>
+              </span>
+              <span class="pas-item ticker-item">
+                <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2.5 3h11M8 3v10M4.8 6h6.4" stroke="#E8C766" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+                <span class="pas-label">USDT / PEN</span>
+                <span class="pas-value" data-price="usdt_pen">—</span>
+              </span>
+              <span class="pas-item ticker-item">
+                <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4.5 2.5h5a2.4 2.4 0 0 1 0 4.8h-5M4.5 7.3h5.6a2.4 2.4 0 0 1 0 4.8H4.5M5.8 2.5v9.6M6.5 1v1.5M9 1v1.5M6.5 12.1v1.5M9 12.1v1.5" stroke="#E8C766" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="pas-label">BTC / USD</span>
+                <span class="pas-value" data-price="btc_usd">—</span>
+                <span class="ticker-chg" data-chg="btc">&nbsp;</span>
+              </span>
+              <span class="pas-item ticker-item">
+                <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1.5 12.5 8 8 10.8 3.5 8 8 1.5Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 12.2 12 9.6 8 15 4 9.6l4 2.6Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/></svg></span>
+                <span class="pas-label">ETH / USD</span>
+                <span class="pas-value" data-price="eth_usd">—</span>
+                <span class="ticker-chg" data-chg="eth">&nbsp;</span>
+              </span>
+              <span class="pas-item ticker-item">
+                <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4.9 2.9h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/><path d="M2.5 6.8h8.4l2.4 2.4H4.9L2.5 6.8Z" fill="#E8C766"/><path d="M4.9 10.7h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/></svg></span>
+                <span class="pas-label">SOL / USD</span>
+                <span class="pas-value" data-price="sol_usd">—</span>
+                <span class="ticker-chg" data-chg="sol">&nbsp;</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- ============ 1. HERO ============ -->
     <section class="hero" id="inicio" aria-labelledby="hero-title" style="padding-bottom:0">
@@ -2104,55 +2232,6 @@
         </div><!-- /hero-visual -->
       </div>
 
-      <!-- Ticker en vivo -->
-      <div class="ticker-wrap" role="region" aria-label="Precios de referencia en vivo">
-        <div class="container ticker num">
-          <div class="ticker-status en-vivo" id="ticker-status">
-            <span class="dot-live" aria-hidden="true"></span>
-            <span id="ticker-status-text">Cargando precios…</span>
-          </div>
-          <div class="ticker-item">
-            <span class="coin" aria-hidden="true">
-              <!-- Símbolo ₮ (Tether) -->
-              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2.5 3h11M8 3v10M4.8 6h6.4" stroke="#E8C766" stroke-width="1.7" stroke-linecap="round"/></svg>
-            </span>
-            <span class="ticker-cols">
-              <span class="ticker-label">USDT / PEN</span>
-              <span class="ticker-val-row"><span class="ticker-value" data-price="usdt_pen">—</span></span>
-            </span>
-          </div>
-          <div class="ticker-item">
-            <span class="coin" aria-hidden="true">
-              <!-- Símbolo ₿ (Bitcoin) -->
-              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M4.5 2.5h5a2.4 2.4 0 0 1 0 4.8h-5M4.5 7.3h5.6a2.4 2.4 0 0 1 0 4.8H4.5M5.8 2.5v9.6M6.5 1v1.5M9 1v1.5M6.5 12.1v1.5M9 12.1v1.5" stroke="#E8C766" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="ticker-cols">
-              <span class="ticker-label">BTC / USD</span>
-              <span class="ticker-val-row"><span class="ticker-value" data-price="btc_usd">—</span><span class="ticker-chg" data-chg="btc">&nbsp;</span></span>
-            </span>
-          </div>
-          <div class="ticker-item">
-            <span class="coin" aria-hidden="true">
-              <!-- Símbolo Ξ (Ethereum) -->
-              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1.5 12.5 8 8 10.8 3.5 8 8 1.5Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 12.2 12 9.6 8 15 4 9.6l4 2.6Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="ticker-cols">
-              <span class="ticker-label">ETH / USD</span>
-              <span class="ticker-val-row"><span class="ticker-value" data-price="eth_usd">—</span><span class="ticker-chg" data-chg="eth">&nbsp;</span></span>
-            </span>
-          </div>
-          <div class="ticker-item">
-            <span class="coin" aria-hidden="true">
-              <!-- Símbolo Solana (tres barras) -->
-              <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M4.9 2.9h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/><path d="M2.5 6.8h8.4l2.4 2.4H4.9L2.5 6.8Z" fill="#E8C766"/><path d="M4.9 10.7h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/></svg>
-            </span>
-            <span class="ticker-cols">
-              <span class="ticker-label">SOL / USD</span>
-              <span class="ticker-val-row"><span class="ticker-value" data-price="sol_usd">—</span><span class="ticker-chg" data-chg="sol">&nbsp;</span></span>
-            </span>
-          </div>
-        </div>
-      </div>
     </section>
 
     <!-- ============ 2. BARRA DE CONFIANZA ============ -->
@@ -3568,17 +3647,21 @@
 
     function pintarTicker(){
       const set = (k, v) => document.querySelectorAll('[data-price="' + k + '"]').forEach(el => el.textContent = v);
+      // Protagonistas de la pasarela: el dólar en soles y en reales, con sus símbolos
+      set('usd_pen', 'S/ ' + fmtNum(precios.usd_pen, 3));
+      set('usd_brl', 'R$ ' + fmtNum(precios.usd_brl, 3));
       set('usdt_pen', fmtPEN3.format(precios.usdt_pen));
       set('btc_usd', fmtUSD0.format(precios.btc_usd));
       set('eth_usd', fmtUSD0.format(precios.eth_usd));
       set('sol_usd', fmtUSD0.format(precios.sol_usd));
       const pintaChg = (clave, valor) => {
-        const el = document.querySelector('[data-chg="' + clave + '"]');
-        if (el && typeof valor === 'number' && !isNaN(valor)){
-          el.textContent = (valor >= 0 ? '▲ ' : '▼ ') + Math.abs(valor).toFixed(1) + '% 24h';
-          el.classList.toggle('sube', valor >= 0);
-          el.classList.toggle('baja', valor < 0);
-        }
+        document.querySelectorAll('[data-chg="' + clave + '"]').forEach(el => {
+          if (typeof valor === 'number' && !isNaN(valor)){
+            el.textContent = (valor >= 0 ? '▲ ' : '▼ ') + Math.abs(valor).toFixed(1) + '% 24h';
+            el.classList.toggle('sube', valor >= 0);
+            el.classList.toggle('baja', valor < 0);
+          }
+        });
       };
       pintaChg('btc', precios.btc_chg);
       pintaChg('eth', precios.eth_chg);
