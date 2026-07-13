@@ -330,23 +330,21 @@
     @media (min-width: 900px){ .nav-toggle{ display: none; } }
 
     /* Selector de idioma: ES (Perú) / PT (Brasil) */
+    /* 6 idiomas en cuadrícula 3×2: ES PT EN arriba, 中文 한국어 日本語 debajo,
+       columnas alineadas (cada bandera nueva queda bajo su par) */
     .lang-switch{
-      display: inline-flex; align-items: center; gap: 2px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
       padding: 3px;
       border: 1px solid var(--borde);
-      border-radius: 100px;
+      border-radius: 14px;
       background: rgba(255,255,255,.02);
-      /* Con 6 idiomas: puede encogerse y deslizarse en horizontal sin romper el header */
-      flex: 0 1 auto; min-width: 0;
-      overflow-x: auto;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
+      flex: none;
     }
-    .lang-switch::-webkit-scrollbar{ display: none; }
-    .lang-btn{ flex: none; }
     .lang-btn{
-      display: inline-flex; align-items: center; gap: .38rem;
-      padding: .34rem .62rem;
+      display: inline-flex; align-items: center; justify-content: center; gap: .38rem;
+      padding: .3rem .55rem;
       border: 0; border-radius: 100px;
       background: transparent;
       color: var(--humo-55);
@@ -363,7 +361,7 @@
       .lang-btn .lang-txt{ display: none; }
     }
     @media (max-width: 429px){
-      .lang-btn{ padding: .55rem .42rem; }
+      .lang-btn{ padding: .4rem .42rem; }
     }
 
     #nav-panel{
