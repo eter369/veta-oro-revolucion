@@ -1871,6 +1871,8 @@
     }
     .pas-item.principal .pas-value{ color: var(--oro-claro); font-size: 1.04rem; }
     .pas-item.principal .pas-label{ color: var(--oro); }
+    /* El oro, con el borde más presente: es LA referencia del público minero */
+    .pas-item.principal.oro{ border-color: rgba(201,162,39,.7); background: rgba(201,162,39,.16); }
     .pas-item .bandera{ border-radius: 2px; box-shadow: 0 0 0 1px rgba(255,255,255,.12); flex: none; }
     @media (prefers-reduced-motion: reduce){
       .pasarela{ overflow-x: auto; scrollbar-width: none; }
@@ -2122,6 +2124,12 @@
                 <span class="pas-label">USD / BRL</span>
                 <span class="pas-value" data-price="usd_brl">—</span>
               </span>
+              <span class="pas-item principal oro ticker-item">
+                <span class="coin" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.6 3.2h4.8l1.3 3.2H4.3l1.3-3.2Z" fill="#E8C766"/><path d="M2.7 8h4.8l1.3 3.2H1.4L2.7 8Z" fill="#E8C766"/><path d="M8.5 8h4.8l1.3 3.2H7.2L8.5 8Z" fill="#E8C766"/></svg></span>
+                <span class="pas-label">ORO / OZ</span>
+                <span class="pas-value" data-price="oro_usd">—</span>
+                <span class="ticker-chg" data-chg="oro">&nbsp;</span>
+              </span>
               <span class="pas-item ticker-item">
                 <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4.5 2.5h5a2.4 2.4 0 0 1 0 4.8h-5M4.5 7.3h5.6a2.4 2.4 0 0 1 0 4.8H4.5M5.8 2.5v9.6M6.5 1v1.5M9 1v1.5M6.5 12.1v1.5M9 12.1v1.5" stroke="#E8C766" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 <span class="pas-label">BTC / USD</span>
@@ -2151,6 +2159,12 @@
                 <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#009B3A"/><path d="M9 1.6 16.2 6.5 9 11.4 1.8 6.5Z" fill="#FEDF00"/><circle cx="9" cy="6.5" r="2.6" fill="#002776"/></svg>
                 <span class="pas-label">USD / BRL</span>
                 <span class="pas-value" data-price="usd_brl">—</span>
+              </span>
+              <span class="pas-item principal oro ticker-item">
+                <span class="coin" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.6 3.2h4.8l1.3 3.2H4.3l1.3-3.2Z" fill="#E8C766"/><path d="M2.7 8h4.8l1.3 3.2H1.4L2.7 8Z" fill="#E8C766"/><path d="M8.5 8h4.8l1.3 3.2H7.2L8.5 8Z" fill="#E8C766"/></svg></span>
+                <span class="pas-label">ORO / OZ</span>
+                <span class="pas-value" data-price="oro_usd">—</span>
+                <span class="ticker-chg" data-chg="oro">&nbsp;</span>
               </span>
               <span class="pas-item ticker-item">
                 <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4.5 2.5h5a2.4 2.4 0 0 1 0 4.8h-5M4.5 7.3h5.6a2.4 2.4 0 0 1 0 4.8H4.5M5.8 2.5v9.6M6.5 1v1.5M9 1v1.5M6.5 12.1v1.5M9 12.1v1.5" stroke="#E8C766" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -3178,7 +3192,7 @@
       // Frecuencia de actualización de precios (ms)
       REFRESH_MS: 60000,
       // [EDITABLE] Valores de respaldo si las APIs de precios no responden
-      FALLBACK: { btc_usd: 95000, eth_usd: 3500, sol_usd: 150, usdt_pen: 3.75, usd_pen: 3.75, usd_brl: 5.40, usdt_usd: 1.0 },
+      FALLBACK: { btc_usd: 95000, eth_usd: 3500, sol_usd: 150, oro_usd: 4000, usdt_pen: 3.75, usd_pen: 3.75, usd_brl: 5.40, usdt_usd: 1.0 },
 
       // [EDITABLE] Datos de la empresa
       RAZON_SOCIAL: 'PROFIX CENTRAL BANK S.A.C.',
@@ -3617,6 +3631,7 @@
       btc_usd: CONFIG.FALLBACK.btc_usd,
       eth_usd: CONFIG.FALLBACK.eth_usd,
       sol_usd: CONFIG.FALLBACK.sol_usd,
+      oro_usd: CONFIG.FALLBACK.oro_usd,
       btc_pen: CONFIG.FALLBACK.btc_usd * CONFIG.FALLBACK.usdt_pen,
       usdt_pen: CONFIG.FALLBACK.usdt_pen,
       usd_pen: CONFIG.FALLBACK.usd_pen,
@@ -3625,6 +3640,7 @@
       btc_chg: null,
       eth_chg: null,
       sol_chg: null,
+      oro_chg: null,
       fuente: null,
       enVivo: false,
       primerIntentoHecho: false
@@ -3640,6 +3656,7 @@
       // Protagonistas de la pasarela: el dólar en soles y en reales, con sus símbolos
       set('usd_pen', 'S/ ' + fmtNum(precios.usd_pen, 3));
       set('usd_brl', 'R$ ' + fmtNum(precios.usd_brl, 3));
+      set('oro_usd', fmtUSD0.format(precios.oro_usd));
       set('usdt_pen', fmtPEN3.format(precios.usdt_pen));
       set('btc_usd', fmtUSD0.format(precios.btc_usd));
       set('eth_usd', fmtUSD0.format(precios.eth_usd));
@@ -3653,6 +3670,7 @@
           }
         });
       };
+      pintaChg('oro', precios.oro_chg);
       pintaChg('btc', precios.btc_chg);
       pintaChg('eth', precios.eth_chg);
       pintaChg('sol', precios.sol_chg);
@@ -3691,7 +3709,7 @@
     // BTC y ETH en USD desde Binance (con espejo público de respaldo);
     // Binance no tiene mercado spot en soles, así que USDT/PEN viene de CoinGecko.
     function pedirBinance(){
-      const ruta = '/api/v3/ticker/24hr?symbols=' + encodeURIComponent('["BTCUSDT","ETHUSDT","SOLUSDT"]');
+      const ruta = '/api/v3/ticker/24hr?symbols=' + encodeURIComponent('["BTCUSDT","ETHUSDT","SOLUSDT","PAXGUSDT"]');
       return pedirJson('https://api.binance.com' + ruta)
         .catch(() => pedirJson('https://data-api.binance.vision' + ruta));
     }
@@ -3699,7 +3717,7 @@
     async function traerPrecios(){
       const [binance, gecko, fx] = await Promise.allSettled([
         pedirBinance(),
-        pedirJson('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,tether&vs_currencies=usd,pen&include_24hr_change=true'),
+        pedirJson('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,tether,pax-gold&vs_currencies=usd,pen&include_24hr_change=true'),
         // Tipo de cambio oficial USD/PEN (agregador de tasas oficiales, sin clave)
         pedirJson('https://open.er-api.com/v6/latest/USD')
       ]);
@@ -3710,6 +3728,12 @@
         const btc = binance.value.find(d => d.symbol === 'BTCUSDT');
         const eth = binance.value.find(d => d.symbol === 'ETHUSDT');
         const sol = binance.value.find(d => d.symbol === 'SOLUSDT');
+        // Oro: PAXG (oro tokenizado, 1 token = 1 onza troy) como referencia del spot
+        const oro = binance.value.find(d => d.symbol === 'PAXGUSDT');
+        if (oro){
+          precios.oro_usd = parseFloat(oro.lastPrice);
+          precios.oro_chg = parseFloat(oro.priceChangePercent);
+        }
         if (btc && eth && sol){
           precios.btc_usd = parseFloat(btc.lastPrice);
           precios.eth_usd = parseFloat(eth.lastPrice);
@@ -3747,6 +3771,11 @@
         precios.sol_chg = (typeof g.solana.usd_24h_change === 'number') ? g.solana.usd_24h_change : null;
         precios.usdt_usd = (g.tether && g.tether.usd) || 1;
         fuente = 'CoinGecko';
+      }
+      // Respaldo del oro con CoinGecko si Binance no lo trajo
+      if (fuente !== 'Binance' && g && g['pax-gold'] && typeof g['pax-gold'].usd === 'number'){
+        precios.oro_usd = g['pax-gold'].usd;
+        precios.oro_chg = (typeof g['pax-gold'].usd_24h_change === 'number') ? g['pax-gold'].usd_24h_change : null;
       }
 
       // Sin respuesta de ninguna API: se mantienen los últimos valores conocidos (o el respaldo)
