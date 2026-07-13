@@ -67,7 +67,7 @@
       --ease: cubic-bezier(.22,1,.36,1);
     }
     *{ margin: 0; padding: 0; box-sizing: border-box; }
-    html{ scroll-behavior: smooth; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    html{ scroll-behavior: smooth; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-x: hidden; }
     /* Experiencia táctil: quita el destello azul por defecto y da feedback sutil al tocar */
     a, button, label, summary, input, select{ -webkit-tap-highlight-color: transparent; }
     @media (hover: none){
@@ -209,15 +209,23 @@
       list-style: none; margin-top: 1.9rem;
       display: flex; flex-wrap: wrap; gap: .55rem .6rem;
     }
-    .sellos li{
+    /* Píldoras clicables: cada afirmación lleva a su prueba */
+    .sellos a{
       display: inline-flex; align-items: center; gap: .45rem;
       font-size: .85rem; color: var(--humo);
       background: rgba(12,14,19,.5);
       -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
       border: 1px solid var(--borde-oro);
       border-radius: 999px; padding: .42rem .9rem;
+      transition: border-color .2s ease, background .2s ease;
     }
-    .sellos li::before{
+    .sellos a::after{
+      content: '→'; font-size: .82em; color: var(--oro-claro); opacity: .75;
+    }
+    .sellos a:hover{
+      border-color: var(--oro); background: rgba(201,162,39,.14); text-decoration: none;
+    }
+    .sellos a::before{
       content: ''; width: 15px; height: 15px; flex: none;
       background: no-repeat center/contain
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M4 12.5l5 5 11-11' stroke='%23E8C766' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -230,25 +238,52 @@
       background: var(--carbon); border: 1px solid var(--borde);
       border-radius: var(--radio);
     }
+    .indice-cab{
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 1rem; margin-bottom: .9rem;
+    }
     .indice-tit{
       font-family: var(--f-display); font-weight: 600; font-size: .8rem;
       letter-spacing: .14em; text-transform: uppercase; color: var(--oro-claro);
-      margin-bottom: .7rem;
     }
-    .indice ol{ list-style: none; display: grid; gap: .05rem; counter-reset: idx; }
-    .indice li{ counter-increment: idx; }
-    .indice a{
-      display: flex; gap: .7rem; align-items: baseline;
-      padding: .5rem .5rem; border-radius: 8px;
+    .indice-prog{ font-family: var(--f-display); font-size: .78rem; color: var(--humo-55); }
+    .indice-prog b{ color: var(--oro-claro); }
+
+    /* El hilo del kipu: cada pregunta es un nudo; se anuda al leerla */
+    .hilo-wrap{ position: relative; }
+    .hilo{ list-style: none; margin: 0; padding: 0 0 0 30px; display: grid; gap: .1rem; }
+    .hilo::before{
+      content: ''; position: absolute; left: 9px; top: 12px; bottom: 12px;
+      width: 2px; border-radius: 2px; background: rgba(237,234,227,.13);
+    }
+    .hilo-oro{
+      position: absolute; left: 9px; top: 12px; width: 2px; height: 0;
+      border-radius: 2px; background: linear-gradient(180deg, var(--oro-claro), var(--oro));
+      transition: height .4s var(--ease);
+    }
+    .hilo li{ position: relative; }
+    .hilo a{
+      display: flex; align-items: center; gap: .7rem;
+      padding: .48rem .6rem .48rem .35rem; border-radius: 8px;
       color: var(--humo-72); font-size: .97rem;
       transition: background .18s ease, color .18s ease;
     }
-    .indice a::before{
-      content: counter(idx); color: var(--oro-claro);
-      font-family: var(--f-display); font-weight: 700; font-size: .82rem; flex: none; width: 1.1rem;
+    .hilo a:hover{ background: var(--oro-suave); color: var(--humo); text-decoration: none; }
+    .nudo{
+      position: absolute; left: -28px; top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--grafito); border: 2px solid rgba(237,234,227,.28);
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color .25s ease, background .25s ease, box-shadow .25s ease;
     }
-    .indice a:hover{ background: var(--oro-suave); color: var(--humo); text-decoration: none; }
-    .indice a.activo{ background: var(--oro-suave); color: var(--oro-claro); }
+    .nudo svg{ opacity: 0; transition: opacity .25s ease; }
+    .hilo li.anudada .nudo{ background: var(--oro-claro); border-color: var(--oro-claro); }
+    .hilo li.anudada .nudo svg{ opacity: 1; }
+    .hilo li.anudada a{ color: var(--humo-55); }
+    .hilo li.actual .nudo{ border-color: var(--oro-claro); box-shadow: 0 0 10px rgba(232,199,102,.45); }
+    .hilo li.actual a{ color: var(--oro-claro); }
+    .hilo-min{ margin-left: auto; flex: none; font-family: var(--f-display); font-size: .72rem; color: var(--humo-55); }
+    .hilo li.actual .hilo-min{ color: var(--oro-claro); }
 
     .separador{
       border: none; height: 1px; margin: 3rem 0;
@@ -499,25 +534,31 @@
         <h1 data-scramble>Las 7 preguntas clave sobre tu dinero digital</h1>
         <p class="lead reveal">Explicado en simple, para cualquier persona. Sin términos raros.</p>
         <p class="intro reveal">Antes de pasar tu efectivo a digital, es normal tener dudas. Aquí están las 7 preguntas que todos se hacen — y sus respuestas claras.</p>
-        <ul class="sellos reveal" aria-label="Señales de confianza">
-          <li><b>Empresa formal</b> · RUC 20614585146</li>
-          <li>Registrada ante la UIF-Perú (PLAFT)</li>
-          <li>Comprobante en cada operación</li>
+        <ul class="sellos reveal" aria-label="Señales de confianza — toca cada una para comprobarla">
+          <li><a href="verifica.html" title="Comprueba nuestro RUC en SUNAT"><b>Empresa formal</b> · RUC 20614585146</a></li>
+          <li><a href="verifica.html#v-uif" title="Conoce nuestra condición de sujeto obligado">Registrada ante la UIF-Perú (PLAFT)</a></li>
+          <li><a href="./#verificador" title="Verifica un comprobante en la blockchain">Comprobante en cada operación</a></li>
         </ul>
       </div>
     </section>
 
     <nav class="indice reveal" aria-label="Índice de las 7 preguntas">
-      <p class="indice-tit">Salta directo a tu duda</p>
-      <ol>
-        <li><a href="#p1">¿Qué es USDT?</a></li>
-        <li><a href="#p2">¿En qué me beneficia?</a></li>
-        <li><a href="#p3">¿Cómo me protege la blockchain?</a></li>
-        <li><a href="#p4">¿Qué es mi billetera?</a></li>
-        <li><a href="#p5">¿Es legal? La autocustodia</a></li>
-        <li><a href="#p6">¿Y si pierdo el celular?</a></li>
-        <li><a href="#p7">¿Cómo empiezo y cómo vuelvo a soles?</a></li>
-      </ol>
+      <div class="indice-cab">
+        <p class="indice-tit">Desanuda tus dudas</p>
+        <p class="indice-prog"><b id="nudos-count" aria-live="polite">0</b> de 7 anudadas</p>
+      </div>
+      <div class="hilo-wrap">
+        <span class="hilo-oro" aria-hidden="true"></span>
+        <ol class="hilo">
+          <li><a href="#p1"><span class="nudo" aria-hidden="true"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M3 8.5l3 3 7-7.5" fill="none" stroke="#12141A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>¿Qué es USDT?<span class="hilo-min" data-t="1 min">1 min</span></a></li>
+          <li><a href="#p2"><span class="nudo" aria-hidden="true"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M3 8.5l3 3 7-7.5" fill="none" stroke="#12141A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>¿En qué me beneficia?<span class="hilo-min" data-t="2 min">2 min</span></a></li>
+          <li><a href="#p3"><span class="nudo" aria-hidden="true"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M3 8.5l3 3 7-7.5" fill="none" stroke="#12141A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>¿Cómo me protege la blockchain?<span class="hilo-min" data-t="2 min">2 min</span></a></li>
+          <li><a href="#p4"><span class="nudo" aria-hidden="true"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M3 8.5l3 3 7-7.5" fill="none" stroke="#12141A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>¿Qué es mi billetera?<span class="hilo-min" data-t="1 min">1 min</span></a></li>
+          <li><a href="#p5"><span class="nudo" aria-hidden="true"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M3 8.5l3 3 7-7.5" fill="none" stroke="#12141A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>¿Es legal? La autocustodia<span class="hilo-min" data-t="2 min">2 min</span></a></li>
+          <li><a href="#p6"><span class="nudo" aria-hidden="true"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M3 8.5l3 3 7-7.5" fill="none" stroke="#12141A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>¿Y si pierdo el celular?<span class="hilo-min" data-t="2 min">2 min</span></a></li>
+          <li><a href="#p7"><span class="nudo" aria-hidden="true"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M3 8.5l3 3 7-7.5" fill="none" stroke="#12141A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>¿Cómo empiezo y cómo vuelvo a soles?<span class="hilo-min" data-t="1 min">1 min</span></a></li>
+        </ol>
+      </div>
     </nav>
 
     <hr class="separador">
@@ -744,57 +785,70 @@
 
       document.querySelectorAll('.reveal, [data-scramble]').forEach(el => io.observe(el));
 
-      /* ---------- Barra de progreso de lectura ---------- */
+      /* ---------- Progreso de lectura + el hilo del kipu ---------- */
       const prog = document.getElementById('progreso');
       const root = document.documentElement;
+      const hiloSecs = [...document.querySelectorAll('.pregunta[id]')];
+      const hiloLinks = new Map(
+        [...document.querySelectorAll('.hilo a')].map(a => [a.getAttribute('href').slice(1), a])
+      );
+      const hiloOro = document.querySelector('.hilo-oro');
+      const hiloWrap = document.querySelector('.hilo-wrap');
+      const nudosCount = document.getElementById('nudos-count');
+      const nudosHechos = new Set();
+
+      function pintarHilo(){
+        if (!hiloOro || !hiloSecs.length) return;
+        const vh = innerHeight;
+        // "actual": la pregunta bajo la zona de lectura; "anudada": ya quedó atrás.
+        let actualSec = null, mejor = Infinity;
+        hiloSecs.forEach(sec => {
+          const r = sec.getBoundingClientRect();
+          if (r.bottom >= vh * .32 && r.top <= vh * .6){
+            const d = Math.abs((r.top + r.bottom) / 2 - vh * .42);
+            if (d < mejor){ mejor = d; actualSec = sec; }
+          }
+        });
+        let anudadas = 0, hiloY = 0;
+        const wrapTop = hiloWrap.getBoundingClientRect().top;
+        hiloSecs.forEach(sec => {
+          const a = hiloLinks.get(sec.id);
+          if (!a) return;
+          const li = a.parentElement;
+          // Una vez leída, la pregunta queda anudada aunque vuelvas arriba
+          if (sec.getBoundingClientRect().bottom < vh * .32) nudosHechos.add(sec.id);
+          const anudada = nudosHechos.has(sec.id);
+          const actual = actualSec === sec;
+          li.classList.toggle('anudada', anudada);
+          li.classList.toggle('actual', actual);
+          if (actual) a.setAttribute('aria-current', 'true');
+          else a.removeAttribute('aria-current');
+          const min = a.querySelector('.hilo-min');
+          if (min) min.textContent = actual ? 'leyendo…' : min.dataset.t;
+          if (anudada) anudadas++;
+          if (anudada || actual){
+            // El hilo dorado crece hasta el último nudo alcanzado
+            const rn = a.querySelector('.nudo').getBoundingClientRect();
+            hiloY = Math.max(hiloY, rn.top + rn.height / 2 - wrapTop);
+          }
+        });
+        if (nudosCount.textContent !== String(anudadas)) nudosCount.textContent = anudadas;
+        hiloOro.style.height = Math.max(0, hiloY - 12) + 'px';
+      }
+
       let ticking = false;
       function pintarProgreso(){
         const max = root.scrollHeight - root.clientHeight;
         prog.style.width = (max > 0 ? Math.min(100, root.scrollTop / max * 100) : 0) + '%';
+        pintarHilo();
         ticking = false;
       }
-      addEventListener('scroll', () => {
+      const alScroll = () => {
         if (!ticking){ requestAnimationFrame(pintarProgreso); ticking = true; }
-      }, { passive: true });
+      };
+      addEventListener('scroll', alScroll, { passive: true });
+      addEventListener('resize', alScroll, { passive: true });
       pintarProgreso();
-
-      /* ---------- Scroll-spy: resalta (y anuncia) la pregunta activa ---------- */
-      const enlaces = new Map(
-        [...document.querySelectorAll('.indice a')].map(a => [a.getAttribute('href').slice(1), a])
-      );
-      const visibles = new Set();
-      let ultimoActivo = null;
-      const spy = new IntersectionObserver((entradas) => {
-        entradas.forEach(e => { if (e.isIntersecting) visibles.add(e.target); else visibles.delete(e.target); });
-        // Un único activo: la sección visible más cercana al centro del viewport.
-        // Si ninguna interseca (huecos entre secciones), se mantiene la última.
-        let elegido = null;
-        if (visibles.size){
-          const centro = innerHeight / 2;
-          let mejor = Infinity;
-          visibles.forEach(sec => {
-            const r = sec.getBoundingClientRect();
-            const d = Math.abs((r.top + r.bottom) / 2 - centro);
-            if (d < mejor){ mejor = d; elegido = sec; }
-          });
-          ultimoActivo = elegido;
-        } else {
-          // Nada interseca: por encima de la primera pregunta -> limpiar;
-          // en un hueco entre secciones -> mantener la última (sin parpadeo).
-          const primera = document.querySelector('.pregunta[id]');
-          if (primera && primera.getBoundingClientRect().top > innerHeight * 0.55){
-            elegido = null; ultimoActivo = null;
-          } else {
-            elegido = ultimoActivo;
-          }
-        }
-        enlaces.forEach((a, id) => {
-          const on = !!elegido && elegido.id === id;
-          a.classList.toggle('activo', on);
-          if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
-        });
-      }, { rootMargin: '-30% 0px -45% 0px' });
-      document.querySelectorAll('.pregunta[id]').forEach(s => spy.observe(s));
     })();
   </script>
 </body>
