@@ -1298,6 +1298,22 @@
       letter-spacing: .12em; text-transform: uppercase;
       padding: .3rem .85rem; border-radius: 99px; white-space: nowrap;
     }
+    /* Viñeta Vortex 369 en la esquina de KIPU Pro (sello de tecnología, no de venta) */
+    .plan-vineta{
+      position: absolute; top: 1.15rem; right: 1.15rem;
+      display: inline-flex; align-items: center; gap: .38rem;
+      border: 1px solid rgba(232,199,102,.38);
+      background: rgba(7,8,11,.7);
+      border-radius: 999px; padding: .3rem .62rem;
+      font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+      font-size: 9px; letter-spacing: .14em; line-height: 1;
+      color: var(--oro-claro); pointer-events: none;
+    }
+    .plan-vineta .rombo{ color: #22D3EE; font-size: 10px; line-height: 1; }
+    @media (prefers-reduced-motion: no-preference){
+      .plan-card.in .plan-vineta .rombo{ animation: vinetaPulso 2.4s ease-in-out infinite; }
+    }
+    @keyframes vinetaPulso{ 0%, 100%{ opacity: 1; } 50%{ opacity: .35; } }
     .plan-card h3{ font-size: 1.3rem; margin-bottom: .15rem; }
     .plan-perfil{ color: var(--humo-55); font-size: .88rem; margin-bottom: 1.1rem; }
     .plan-riesgo{
@@ -2621,6 +2637,7 @@
           </article>
 
           <article class="plan-card reveal">
+            <span class="plan-vineta" aria-hidden="true"><span class="rombo">◆</span>VORTEX 369</span>
             <div class="plan-icono" aria-hidden="true">
               <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="11" stroke="rgba(237,234,227,.18)" stroke-width="1"/><circle cx="13" cy="13" r="7" stroke="rgba(34,211,238,.32)" stroke-width="1"/><circle cx="13" cy="13" r="2.8" fill="#E8C766"/><g class="orbita-sat"><circle cx="20.8" cy="5.2" r="1.4" fill="#22D3EE"/></g></svg>
             </div>
