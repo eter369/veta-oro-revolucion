@@ -3621,6 +3621,12 @@
       if (typeof activarPais === 'function') activarPais(nuevo === 'pt' ? 'BR' : 'PE', false);
       if (typeof pintarSelectCiudades === 'function') pintarSelectCiudades();
       if (typeof construirVeta === 'function') setTimeout(construirVeta, 60); // el alto de la página cambió
+      // Los swaps de innerHTML recrean nodos: los .reveal nuevos ya no estaban
+      // observados y quedaban invisibles para siempre (opacity 0). Re-observarlos
+      // (observar dos veces el mismo nodo es inocuo según la spec).
+      if (typeof ioReveal !== 'undefined'){
+        document.querySelectorAll('.reveal:not(.in)').forEach(el => ioReveal.observe(el));
+      }
     }
     document.querySelectorAll('.lang-btn').forEach(b => {
       b.addEventListener('click', () => { if (b.dataset.lang !== idioma) aplicarIdioma(b.dataset.lang); });
