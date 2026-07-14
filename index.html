@@ -1838,10 +1838,12 @@
     }
 
     /* ---------- Pasarela de precios bajo el header ---------- */
+    /* Compensación del header fijo: padding (no colapsa) en <main>. Un margin
+       aquí colapsaba hasta <body> y desplazaba 112px los overlays absolutos
+       (la veta quedaba corrida y sobresalía tras el footer). */
+    #main{ padding-top: var(--header-h); }
     .pasarela-wrap{
       position: relative; z-index: 2;
-      /* Compensa el header fijo: la pasarela es lo primero que se ve debajo de él */
-      margin-top: var(--header-h);
       background: rgba(18,20,26,.72);
       border-bottom: 1px solid var(--borde);
     }
@@ -4376,6 +4378,9 @@
       const nodos = Array.from(document.querySelectorAll('[data-veta-node]'));
       if (nodos.length < 2){ vetaSvg.style.display = 'none'; return; }
 
+      // Colapsar la veta antes de medir: si no, su altura anterior infla
+      // scrollHeight (trinquete) y deja un vacío de fondo tras el footer.
+      vetaSvg.setAttribute('height', 0);
       const docH = document.documentElement.scrollHeight;
       const docW = document.documentElement.clientWidth;
       vetaSvg.setAttribute('viewBox', '0 0 ' + docW + ' ' + docH);
