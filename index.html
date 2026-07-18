@@ -685,47 +685,136 @@
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
     }
+    /* Eco de la veta: línea de luz diagonal apenas visible en la esquina */
+    .trust-grid::after{
+      content: ""; position: absolute; top: -30px; right: -50px;
+      width: 260px; height: 120px; pointer-events: none;
+      background: linear-gradient(115deg, transparent 44%, rgba(232,199,102,.05) 50%, transparent 56%);
+    }
     .trust-item{
       position: relative; padding: 2.2rem .6rem 2rem;
       display: flex; flex-direction: column; align-items: center; gap: .55rem;
       transition: background .3s ease;
     }
     .trust-item:hover{ background: rgba(201,162,39,.05); }
-    .trust-item:nth-child(even){ border-left: 1px solid rgba(237,234,227,.10); }
-    .trust-item:nth-child(n+3){ border-top: 1px solid rgba(237,234,227,.10); }
+    /* Divisores de veta: hairline dorado que se desvanece en los extremos;
+       el divisor adyacente se enciende un poco más al pasar por la métrica */
+    .trust-item::before{
+      content: ""; position: absolute; left: 0; top: 14%; bottom: 14%; width: 1px;
+      background: linear-gradient(180deg, transparent, rgba(201,162,39,.36) 50%, transparent);
+      opacity: .65; transition: opacity .35s ease; pointer-events: none;
+      display: none;
+    }
+    .trust-item::after{
+      content: ""; position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,162,39,.32) 50%, transparent);
+      opacity: .65; transition: opacity .35s ease; pointer-events: none;
+      display: none;
+    }
+    .trust-item:nth-child(even)::before{ display: block; }
+    .trust-item:nth-child(n+3)::after{ display: block; }
+    .trust-item:hover::before, .trust-item:hover::after,
+    .trust-item:hover + .trust-item::before{ opacity: 1; }
+    @media (max-width: 479px){
+      .trust-grid{ grid-template-columns: 1fr; }
+      .trust-item{ padding: 1.9rem .8rem 1.7rem; }
+      .trust-item:nth-child(even)::before{ display: none; }
+      .trust-item:nth-child(n+2)::after{ display: block; }
+    }
     @media (min-width: 780px){
       .trust-grid{ grid-template-columns: repeat(4, 1fr); }
       .trust-item{ padding: 2.6rem 1.2rem 2.4rem; }
-      .trust-item:nth-child(n+3){ border-top: none; }
-      .trust-item + .trust-item{ border-left: 1px solid rgba(237,234,227,.10); }
+      .trust-item:nth-child(n+3)::after{ display: none; }
+      .trust-item + .trust-item::before{ display: block; }
     }
     .trust-icono{
       width: 44px; height: 44px; border-radius: 12px; flex: none;
       background: var(--oro-suave); border: 1px solid var(--borde-oro);
       display: flex; align-items: center; justify-content: center;
       margin-bottom: .25rem;
+      position: relative;
+      transition: box-shadow .35s ease, border-color .35s ease;
+    }
+    .trust-item:hover .trust-icono{
+      box-shadow: 0 0 18px rgba(232,199,102,.16);
+      border-color: rgba(201,162,39,.55);
+    }
+    /* Entrada escalonada de la franja (150ms por métrica, izq → der) */
+    .trust-item{ --d: 0ms; }
+    .trust-item:nth-child(2){ --d: 150ms; }
+    .trust-item:nth-child(3){ --d: 300ms; }
+    .trust-item:nth-child(4){ --d: 450ms; }
+    @media (prefers-reduced-motion: no-preference){
+      .trust-item.reveal .trust-icono{ opacity: 0; transform: scale(.8); }
+      .trust-item.reveal.in .trust-icono{
+        opacity: 1; transform: scale(1);
+        transition: box-shadow .35s ease, border-color .35s ease,
+                    opacity .5s ease var(--d), transform .5s cubic-bezier(.2,.8,.3,1) var(--d);
+      }
+      /* Brillo que recorre el borde del tile una sola vez al entrar */
+      .trust-icono::after{
+        content: ""; position: absolute; inset: -1px; border-radius: 13px; padding: 1px;
+        background: conic-gradient(transparent 0 300deg, rgba(232,199,102,.85) 332deg, transparent 360deg);
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask-composite: exclude;
+        opacity: 0; pointer-events: none;
+      }
+      .trust-item.in .trust-icono::after{ animation: aroEnsaye 1s ease-out calc(var(--d) + 300ms) 1; }
+    }
+    @keyframes aroEnsaye{
+      0%{ opacity: 1; transform: rotate(0deg); }
+      80%{ opacity: 1; }
+      100%{ opacity: 0; transform: rotate(360deg); }
+    }
+    /* Polvo de oro: 3 partículas lentas que flotan y se desvanecen */
+    .polvo{ display: none; }
+    @media (min-width: 900px) and (prefers-reduced-motion: no-preference){
+      .polvo{
+        display: block; position: absolute; width: 3px; height: 3px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(232,199,102,.85), rgba(232,199,102,0) 70%);
+        opacity: 0; pointer-events: none;
+        animation: polvoFlota 16s linear infinite;
+      }
+      .polvo:nth-of-type(1){ left: 18%; bottom: 10%; }
+      .polvo:nth-of-type(2){ left: 52%; bottom: 6%; animation-delay: 5s; animation-duration: 19s; }
+      .polvo:nth-of-type(3){ left: 83%; bottom: 12%; animation-delay: 11s; animation-duration: 14s; }
+    }
+    @keyframes polvoFlota{
+      0%{ transform: translateY(0); opacity: 0; }
+      12%{ opacity: .32; }
+      60%{ opacity: .1; }
+      100%{ transform: translateY(-110px); opacity: 0; }
     }
     /* Número de una sola pieza: cifra grande + unidades pequeñas */
     .trust-num{
       display: flex; align-items: baseline; justify-content: center; gap: .3rem;
       white-space: nowrap;
       font-family: var(--f-display); font-weight: 300;
-      font-size: clamp(1.9rem, 5vw, 3.8rem);
+      font-size: clamp(2.5rem, 5vw, 3.8rem);
       line-height: 1;
+      transition: transform .35s ease;
     }
+    .trust-item:hover .trust-num{ transform: scale(1.025); }
     .trust-num .counter{
       font-size: inherit; font-weight: 300; letter-spacing: -.01em;
-      background: linear-gradient(120deg, var(--oro) 5%, var(--oro-claro) 55%, var(--oro) 100%);
+      font-variant-numeric: tabular-nums;
+      /* Degradado vertical (claro arriba, profundo abajo). El brillo va en
+         drop-shadow: un text-shadow pintaría ENCIMA del degradado recortado */
+      background: linear-gradient(180deg, #F2D98E 0%, var(--oro-claro) 38%, var(--oro) 100%);
       -webkit-background-clip: text; background-clip: text; color: transparent;
       filter: drop-shadow(0 3px 16px rgba(201,162,39,.16));
+      transition: filter .35s ease;
     }
+    .trust-item:hover .trust-num .counter{ filter: drop-shadow(0 3px 18px rgba(201,162,39,.30)); }
     .trust-unidad{
       font-style: normal; font-size: .42em; font-weight: 500;
       color: var(--oro); letter-spacing: .02em;
     }
     .trust-item .trust-label{
-      color: var(--humo-55); font-size: .72rem;
-      text-transform: uppercase; letter-spacing: .16em; font-weight: 600;
+      color: #9AA3AF; font-size: .72rem;
+      text-transform: uppercase; letter-spacing: .15em; font-weight: 600;
       text-wrap: balance;
     }
     .trust-sub{
@@ -2327,6 +2416,7 @@
             <span class="trust-label">Años en el sector</span>
             <span class="trust-sub">desde <span data-fundacion>2001</span></span>
           </div>
+          <i class="polvo" aria-hidden="true"></i><i class="polvo" aria-hidden="true"></i><i class="polvo" aria-hidden="true"></i>
         </div>
 
         <!-- [EXPERIMENTO] Franja de logos de marcas — a pedido del propietario.
@@ -4266,7 +4356,7 @@
         el.textContent = prefix + fmtNum(target, dec) + suffix;
         return;
       }
-      const dur = 1400;
+      const dur = 2200; /* [EDITABLE] duración del conteo en ms */
       const t0 = performance.now();
       function frame(t){
         const p = Math.min(1, (t - t0) / dur);
@@ -4289,8 +4379,19 @@
     const ioContadores = new IntersectionObserver(entries => {
       entries.forEach(en => {
         if (en.isIntersecting){
-          animarContador(en.target);
-          ioContadores.unobserve(en.target);
+          const el = en.target;
+          ioContadores.unobserve(el);
+          // Franja de confianza: arranque escalonado izq→der ([EDITABLE] 150ms
+          // por métrica). La cifra se pone en 0 al disparar para que las
+          // últimas no salten del valor final a cero a mitad del escalonado.
+          const item = el.closest('.trust-item');
+          if (item && !reducedMotion){
+            const delay = [...document.querySelectorAll('.trust-grid .trust-item')].indexOf(item) * 150;
+            el.textContent = (el.dataset.prefix || '') + fmtNum(0, parseInt(el.dataset.decimals || '0', 10)) + (el.dataset.suffix || '');
+            setTimeout(() => animarContador(el), delay);
+          } else {
+            animarContador(el);
+          }
         }
       });
     }, { threshold: .4 });
