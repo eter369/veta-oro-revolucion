@@ -1987,16 +1987,21 @@
       background: radial-gradient(circle, rgba(99,84,160,.14), transparent 65%);
     }
     .br-mundo{ position: relative; width: min(300px, 64vw); aspect-ratio: 1/1; margin: 0 auto; }
-    .br-mundo::before{ /* cuerpo de la esfera */
+    .br-mundo::before{ /* cuerpo del planeta (como el mundo original del botón guía) */
       content: ""; position: absolute; inset: 5%; border-radius: 50%;
-      background: radial-gradient(circle at 37% 30%, rgba(72,60,110,.6), rgba(22,22,36,.94) 52%, #0A0B11 80%);
+      background: radial-gradient(circle at 36% 30%, rgba(84,72,140,.55), rgba(16,16,30,.96) 55%, #07070E 80%);
       box-shadow:
-        inset -20px -26px 60px rgba(0,0,0,.6),
-        inset 8px 10px 30px rgba(130,110,190,.12),
-        0 0 60px rgba(99,84,160,.18),
-        0 0 90px rgba(232,199,102,.07);
+        inset -22px -28px 70px rgba(0,0,0,.65),
+        inset 0 0 34px rgba(139,102,255,.22),
+        0 0 44px rgba(139,102,255,.38),
+        0 0 110px rgba(139,102,255,.16),
+        0 0 90px rgba(232,199,102,.05);
     }
-    .br-mundo canvas{ position: absolute; inset: 0; width: 100%; height: 100%; }
+    .br-mundo::after{ /* anillo atmosférico violeta sobre el limbo */
+      content: ""; position: absolute; inset: 2.5%; border-radius: 50%; pointer-events: none;
+      background: radial-gradient(circle, transparent 60%, rgba(150,116,255,.26) 70%, rgba(150,116,255,.10) 76%, transparent 82%);
+    }
+    .br-mundo canvas{ position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-14deg); }
     .br-texto .eyebrow{ margin-bottom: .6rem; }
     .br-texto .section-title{ margin-bottom: 1rem; }
     .br-lead{ color: var(--humo-72); font-size: 1.02rem; line-height: 1.65; max-width: 46ch; margin-bottom: 1.6rem; }
@@ -4487,38 +4492,58 @@
         R = W * 0.44;
       }
       medirMundo();
-      // Puntos repartidos en la esfera (espiral de Fibonacci); ~1 de cada 20
-      // es una luz dorada (propiedad) que titila; el resto, polvo plateado.
-      const N = 340, puntos = [];
-      for (let i = 0; i < N; i++){
-        const y = 1 - (i / (N - 1)) * 2;
-        const r = Math.sqrt(Math.max(0, 1 - y * y));
-        const th = i * 2.399963;
-        puntos.push({ x: Math.cos(th) * r, y, z: Math.sin(th) * r, oro: i % 20 === 4, fase: ((i * 137) % 628) / 100 });
+      // La Tierra en puntos: continentes aproximados por cajas [latMin, latMax,
+      // lonMin, lonMax]. Solo los puntos que caen en tierra se dibujan como
+      // polvo plateado; el océano lleva un polvo mínimo para dar volumen.
+      const TIERRA = [
+        [58,70,-165,-140],[50,70,-140,-60],[30,50,-125,-70],[15,30,-115,-90],[8,17,-92,-77],
+        [0,12,-80,-52],[-15,5,-75,-35],[-25,-15,-70,-40],[-40,-25,-73,-53],[-55,-40,-75,-63],
+        [36,44,-10,3],[44,55,-5,25],[55,70,5,30],[45,60,25,45],[50,59,-8,2],
+        [20,36,-17,35],[10,20,-17,40],[2,12,40,51],[-10,10,8,40],[-35,-10,12,40],[-25,-12,43,50],
+        [12,40,35,60],[50,70,45,90],[50,72,90,180],[8,32,68,88],[20,50,90,122],[8,22,95,110],[-8,5,95,140],[31,44,130,142],
+        [-38,-12,113,153],[-46,-35,166,178]
+      ];
+      const esTierra = (lat, lon) => TIERRA.some(cj => lat >= cj[0] && lat <= cj[1] && lon >= cj[2] && lon <= cj[3]);
+      // Luces doradas: presencia de la división (Lima, la casa de KIPU, la más brillante)
+      const CIUDADES = [
+        [-12.05,-77.04,1.7],[-13.53,-71.97,1],[-16.4,-71.54,1],[-23.55,-46.63,1.15],[19.43,-99.13,1],
+        [25.77,-80.19,1],[40.42,-3.7,1],[25.2,55.27,1],[1.35,103.82,1],[35.68,139.69,1],[-33.87,151.21,1]
+      ];
+      const G = Math.PI / 180;
+      const puntos = [], NT = 2600;
+      for (let i = 0; i < NT; i++){
+        const y = 1 - (i / (NT - 1)) * 2;
+        const lat = Math.asin(y) / G;
+        const lon = (((i * 137.50776) % 360) + 540) % 360 - 180;
+        if (esTierra(lat, lon)) puntos.push({ cl: Math.cos(lat * G), sl: y, lon: lon * G, oro: 0 });
+        else if (i % 9 === 0) puntos.push({ cl: Math.cos(lat * G), sl: y, lon: lon * G, oro: 0, agua: 1 });
       }
+      CIUDADES.forEach((cd, k) => puntos.push({ cl: Math.cos(cd[0] * G), sl: Math.sin(cd[0] * G), lon: cd[1] * G, oro: cd[2], fase: k * 0.8 }));
       let ang = 0, girando = false, rafMundo = 0;
       function dibujarMundo(t){
         const c = W / 2;
         ctx.clearRect(0, 0, W, W);
-        ang += 0.0022;
-        ctx.strokeStyle = 'rgba(232,199,102,.07)'; /* ecuador tenue */
-        ctx.lineWidth = DPR;
-        ctx.beginPath();
-        ctx.ellipse(c, c, R * .98, R * .30, -0.42, 0, Math.PI * 2);
-        ctx.stroke();
+        ang += 0.0018;
         for (const p of puntos){
-          const x = p.x * Math.cos(ang) + p.z * Math.sin(ang);
-          const z = p.z * Math.cos(ang) - p.x * Math.sin(ang);
-          const px = c + x * R, py = c + p.y * R * 0.97;
+          const lo = p.lon + ang;
+          const x = p.cl * Math.cos(lo), z = p.cl * Math.sin(lo);
+          const px = c + x * R, py = c - p.sl * R * 0.985;
           const prof = (z + 1) / 2; /* 0 = atrás, 1 = delante */
           if (p.oro){
-            const tw = 0.55 + 0.45 * Math.sin(t / 640 + p.fase);
-            const s = (1.4 + 2.2 * prof) * DPR;
-            ctx.fillStyle = 'rgba(232,199,102,' + (0.18 + 0.72 * prof * tw).toFixed(3) + ')';
+            const tw = 0.55 + 0.45 * Math.sin(t / 620 + p.fase);
+            const a = Math.min(1, (0.08 + 0.9 * prof) * tw);
+            const s = (1.1 + 2.1 * prof) * p.oro * DPR;
+            ctx.fillStyle = 'rgba(232,199,102,' + a.toFixed(3) + ')';
             ctx.beginPath(); ctx.arc(px, py, s, 0, 6.2832); ctx.fill();
-          } else {
-            ctx.fillStyle = 'rgba(186,180,210,' + (0.05 + 0.15 * prof).toFixed(3) + ')';
+            ctx.fillStyle = 'rgba(232,199,102,' + (a * 0.25).toFixed(3) + ')';
+            ctx.beginPath(); ctx.arc(px, py, s * 2.4, 0, 6.2832); ctx.fill();
+          } else if (p.agua){
+            ctx.fillStyle = 'rgba(150,150,200,' + (0.02 + 0.05 * prof).toFixed(3) + ')';
             ctx.fillRect(px, py, DPR, DPR);
+          } else {
+            const s = (0.7 + 0.9 * prof) * DPR;
+            ctx.fillStyle = 'rgba(202,196,230,' + (0.08 + 0.40 * prof).toFixed(3) + ')';
+            ctx.fillRect(px - s / 2, py - s / 2, s, s);
           }
         }
         if (girando) rafMundo = requestAnimationFrame(dibujarMundo);
