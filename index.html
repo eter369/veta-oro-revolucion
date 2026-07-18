@@ -1415,6 +1415,48 @@
     .plan-riesgo > span:last-child{ font-size: .8rem; color: var(--humo-72); font-weight: 600; }
     .plan-desc{ color: var(--humo-72); font-size: .94rem; margin-bottom: 1rem; }
     .plan-desc strong{ color: var(--humo); }
+    /* ---------- Esfera del oráculo: miniatura de la Esfera Mágica Cósmica (KIPU Pro) ---------- */
+    .esfera-oraculo{ position: relative; width: 140px; height: 140px; margin: 1.2rem auto 1.3rem; }
+    .eo-halo{
+      position: absolute; inset: -22%; border-radius: 50%; pointer-events: none;
+      background: radial-gradient(closest-side, rgba(120,80,255,.22), rgba(60,30,140,.09) 55%, transparent 72%);
+      filter: blur(8px);
+    }
+    .eo-nucleo{
+      position: absolute; inset: 12%; display: block;
+      border-radius: 50%; overflow: hidden; background: #070417;
+      box-shadow: 0 0 26px rgba(102,68,255,.32), 0 0 60px rgba(55,230,255,.10), inset 0 0 26px rgba(10,6,40,.9);
+    }
+    .eo-nucleo canvas{ position: absolute; inset: 0; width: 100%; height: 100%; }
+    .eo-cristal{
+      position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+      background:
+        radial-gradient(38% 30% at 30% 22%, rgba(255,255,255,.20), rgba(255,255,255,.04) 55%, transparent 72%),
+        radial-gradient(closest-side, transparent 64%, rgba(150,110,255,.08) 84%, rgba(255,255,255,.10) 96%, rgba(255,255,255,.22) 100%);
+      box-shadow: inset -8px -10px 26px rgba(2,0,20,.45), inset 5px 7px 20px rgba(255,255,255,.07);
+    }
+    .eo-ring{ position: absolute; border-radius: 50%; pointer-events: none; }
+    .eo-ring::before{ content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--eo-c); }
+    .eo-ring::after{
+      content: ""; position: absolute; inset: 0; border-radius: 50%;
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+      filter: blur(.5px) drop-shadow(0 0 7px var(--eo-g));
+    }
+    .eo-r1{ inset: 2%; transform: rotateX(72deg); --eo-c: rgba(139,233,255,.20); --eo-g: rgba(55,230,255,.7); }
+    .eo-r1::after{ background: conic-gradient(from 0deg, transparent 0deg, #37e6ff 52deg, rgba(139,233,255,.25) 92deg, transparent 128deg, transparent 168deg, #8be9ff 206deg, transparent 284deg, transparent 318deg, rgba(55,230,255,.85) 342deg, transparent 360deg); }
+    .eo-r2{ inset: -10%; transform: rotateX(64deg) rotateY(8deg); --eo-c: rgba(255,207,122,.18); --eo-g: rgba(255,207,122,.6); }
+    .eo-r2::after{ background: conic-gradient(from 200deg, transparent 0deg, rgba(255,233,184,.9) 68deg, rgba(255,207,122,.2) 110deg, transparent 150deg, transparent 200deg, rgba(255,207,122,.85) 238deg, transparent 320deg, transparent 345deg, rgba(255,233,184,.6) 355deg, transparent 380deg); }
+    @media (prefers-reduced-motion: no-preference){
+      .plan-card.in .esfera-oraculo{ animation: eoLevita 7s ease-in-out infinite; }
+      .plan-card.in .eo-r1::after{ animation: eoGiraCW 9s linear infinite; }
+      .plan-card.in .eo-r2::after{ animation: eoGiraCCW 22s linear infinite; }
+      .plan-card.in .eo-halo{ animation: eoRespira 5.5s ease-in-out infinite; }
+    }
+    @keyframes eoGiraCW{ to{ rotate: 360deg; } }
+    @keyframes eoGiraCCW{ to{ rotate: -360deg; } }
+    @keyframes eoLevita{ 0%, 100%{ transform: translateY(-2px); } 50%{ transform: translateY(2px); } }
+    @keyframes eoRespira{ 0%, 100%{ opacity: .7; } 50%{ opacity: 1; } }
     /* ---------- Firma Vortex 369 en KIPU Pro (procedencia del motor) ---------- */
     .plan-firma{ border-top: 1px solid var(--borde); padding-top: .95rem; margin-bottom: .6rem; }
     .firma-cejilla{
@@ -2768,8 +2810,13 @@
 
           <article class="plan-card reveal">
             <span class="plan-vineta" aria-hidden="true"><span class="rombo">◆</span>VORTEX 369</span>
-            <div class="plan-icono" aria-hidden="true">
-              <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="11" stroke="rgba(237,234,227,.18)" stroke-width="1"/><circle cx="13" cy="13" r="7" stroke="rgba(34,211,238,.32)" stroke-width="1"/><circle cx="13" cy="13" r="2.8" fill="#E8C766"/><g class="orbita-sat"><circle cx="20.8" cy="5.2" r="1.4" fill="#22D3EE"/></g></svg>
+            <!-- [EDITABLE] Esfera del oráculo: miniatura de la Esfera Mágica Cósmica del
+                 usuario, afinada a la casa (anillos oro+cyan; violeta solo en el halo) -->
+            <div class="esfera-oraculo" aria-hidden="true">
+              <span class="eo-halo"></span>
+              <span class="eo-ring eo-r2"></span>
+              <span class="eo-ring eo-r1"></span>
+              <span class="eo-nucleo"><canvas id="eo-galaxia"></canvas><span class="eo-cristal"></span></span>
             </div>
             <h3>KIPU Pro</h3>
             <p class="plan-perfil">Para expertos · Riesgo alto</p>
@@ -4477,6 +4524,89 @@
       });
     }, { threshold: .12 });
     document.querySelectorAll('.reveal').forEach(el => ioReveal.observe(el));
+
+    /* ---------- Esfera del oráculo (miniatura) en KIPU Pro ---------- */
+    (function(){
+      const cv = document.getElementById('eo-galaxia');
+      if (!cv || !cv.getContext) return;
+      const ctx = cv.getContext('2d');
+      const DPR = Math.min(2, window.devicePixelRatio || 1);
+      const TAU = Math.PI * 2;
+      let L = 0, arte = null;
+      // Semilla determinista: la galaxia luce idéntica en cada carga
+      let sem = 7;
+      const azar = () => { sem = (sem * 16807) % 2147483647; return sem / 2147483647; };
+      function construirArte(){
+        L = Math.round((cv.clientWidth || 106) * DPR);
+        cv.width = L; cv.height = L;
+        sem = 7;
+        arte = document.createElement('canvas');
+        arte.width = L; arte.height = L;
+        const a = arte.getContext('2d');
+        const c = L / 2, R = L * 0.48;
+        a.globalCompositeOperation = 'lighter';
+        const nubes = ['110,60,230', '50,90,240', '230,70,200', '40,180,220', '255,190,90'];
+        for (let i = 0; i < 26; i++){
+          const t = azar(), brazo = i % 3;
+          const ang = t * 3.2 + brazo * TAU / 3 + (azar() - .5);
+          const r = t * R * .9;
+          const x = c + Math.cos(ang) * r, y = c + Math.sin(ang) * r;
+          const tam = (0.12 + t * 0.24) * R;
+          const g = a.createRadialGradient(x, y, 0, x, y, tam);
+          g.addColorStop(0, 'rgba(' + nubes[i % 5] + ',.14)');
+          g.addColorStop(1, 'rgba(' + nubes[i % 5] + ',0)');
+          a.fillStyle = g;
+          a.beginPath(); a.arc(x, y, tam, 0, TAU); a.fill();
+        }
+        for (let i = 0; i < 700; i++){
+          const brazo = i % 3;
+          const t = Math.pow(azar(), 0.72);
+          const ang = t * 3.2 + brazo * TAU / 3 + (azar() - .5) * (0.2 + t * 0.6);
+          const r = t * R * 0.94;
+          const x = c + Math.cos(ang) * r, y = c + Math.sin(ang) * r;
+          const m = azar();
+          const col = m < .07 ? '255,110,220' : m < .14 ? '120,230,255' : m < .5 ? '255,205,120' : '190,160,255';
+          a.fillStyle = 'rgba(' + col + ',' + (0.35 + azar() * 0.55).toFixed(2) + ')';
+          const s = (azar() < .12 ? 1.4 : 0.7) * DPR * 0.55;
+          a.fillRect(x, y, s, s);
+        }
+      }
+      construirArte();
+      let angEO = 0, vivo = false, rafEO = 0;
+      function dibujarEO(t){
+        const c = L / 2, R = L / 2;
+        ctx.clearRect(0, 0, L, L);
+        const base = ctx.createRadialGradient(c, c, 0, c, c, R);
+        base.addColorStop(0, '#150c48'); base.addColorStop(.55, '#0b0530'); base.addColorStop(1, '#040215');
+        ctx.fillStyle = base; ctx.fillRect(0, 0, L, L);
+        angEO += 0.0035;
+        ctx.save();
+        ctx.translate(c, c); ctx.rotate(angEO);
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.drawImage(arte, -c, -c);
+        ctx.restore();
+        const pul = 0.85 + 0.15 * Math.sin(t / 430); /* núcleo pulsante */
+        const nuc = ctx.createRadialGradient(c, c, 0, c, c, R * 0.34 * pul);
+        nuc.addColorStop(0, 'rgba(255,252,236,' + (0.95 * pul).toFixed(2) + ')');
+        nuc.addColorStop(.35, 'rgba(255,220,150,' + (0.55 * pul).toFixed(2) + ')');
+        nuc.addColorStop(1, 'rgba(255,160,90,0)');
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.fillStyle = nuc;
+        ctx.beginPath(); ctx.arc(c, c, R * 0.34 * pul, 0, TAU); ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+        if (vivo) rafEO = requestAnimationFrame(dibujarEO);
+      }
+      window.addEventListener('resize', () => { construirArte(); if (!vivo) requestAnimationFrame(dibujarEO); });
+      if (reducedMotion){
+        requestAnimationFrame(dibujarEO); /* un solo fotograma, quieto */
+      } else {
+        new IntersectionObserver(ens => {
+          const v = ens[0].isIntersecting;
+          if (v && !vivo){ vivo = true; rafEO = requestAnimationFrame(dibujarEO); }
+          if (!v){ vivo = false; cancelAnimationFrame(rafEO); }
+        }, { threshold: .1 }).observe(cv);
+      }
+    })();
 
     /* ---------- Mundo Bienes Raíces: esfera de puntos con luces doradas ---------- */
     (function(){
