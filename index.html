@@ -2483,7 +2483,7 @@
           <!-- [EDITABLE] Portal a Bienes Raíces Santa Catarina: la esfera del oráculo
                como puerta dimensional hacia #bienes-raices (el mundo KIPU) -->
           <div class="portal-br">
-            <a class="portal-esfera" href="#bienes-raices" aria-label="Viajar a Bienes Raíces Santa Catarina">
+            <a class="portal-esfera" href="santa-catarina.html" aria-label="Viajar a Bienes Raíces Santa Catarina">
               <span class="esfera-oraculo" aria-hidden="true">
                 <span class="eo-halo"></span>
                 <span class="eo-ring eo-r2"></span>
@@ -4762,6 +4762,11 @@
       const portal = document.querySelector('.portal-esfera');
       if (!portal) return;
       let viajando = false;
+      // Al volver con el botón atrás (bfcache) retirar cualquier velo vivo
+      window.addEventListener('pageshow', () => {
+        document.querySelectorAll('.warp-velo').forEach(v => v.remove());
+        viajando = false;
+      });
       portal.addEventListener('click', (ev) => {
         // Con reduced-motion el ancla navega normal, sin teatro
         if (reducedMotion || viajando) return;
@@ -4803,22 +4808,9 @@
             if (e.d > Math.max(W, H) * .75) e.d = 10 + Math.random() * 60;
           }
           if (p >= 1){
+            // La otra dimensión es una página propia: el velo cubre la transición
             velo.classList.add('destello');
-            const destino = document.getElementById('bienes-raices');
-            const prev = document.documentElement.style.scrollBehavior;
-            document.documentElement.style.scrollBehavior = 'auto';
-            destino.scrollIntoView({ block: 'start' });
-            document.documentElement.style.scrollBehavior = prev;
-            if (history.replaceState) history.replaceState(null, '', '#bienes-raices');
-            const mundo = document.querySelector('.br-mundo');
-            if (mundo){
-              mundo.classList.remove('saludo');
-              void mundo.offsetWidth;
-              mundo.classList.add('saludo');
-            }
-            if (typeof saludarMundo === 'function') saludarMundo();
-            setTimeout(() => velo.classList.add('irse'), 180);
-            setTimeout(() => { velo.remove(); viajando = false; }, 800);
+            setTimeout(() => { location.href = 'santa-catarina.html'; }, 260);
             return;
           }
           requestAnimationFrame(paso);
