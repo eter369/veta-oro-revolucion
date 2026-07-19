@@ -1478,6 +1478,32 @@
       .portal-br{ position: absolute; top: -146px; left: 6%; margin: 0; }
       .portal-br .esfera-oraculo{ width: 116px; height: 116px; }
     }
+    /* ---------- Viaje dimensional: velo warp + eco de llegada ---------- */
+    .warp-velo{
+      position: fixed; inset: 0; z-index: 3000;
+      background: #050313;
+      animation: warpEntra .16s ease-out both;
+    }
+    .warp-velo canvas{ position: absolute; inset: 0; width: 100%; height: 100%; }
+    .warp-velo::after{ /* destello del salto */
+      content: ""; position: absolute; inset: 0; opacity: 0; pointer-events: none;
+      background: radial-gradient(circle at 50% 50%, rgba(233,228,255,.95), rgba(178,107,255,.5) 40%, transparent 75%);
+    }
+    .warp-velo.destello::after{ animation: warpDestello .45s ease-out both; }
+    .warp-velo.irse{ animation: warpSale .55s ease both; }
+    @keyframes warpEntra{ from{ opacity: 0; } to{ opacity: 1; } }
+    @keyframes warpDestello{ 0%{ opacity: 0; } 30%{ opacity: 1; } 100%{ opacity: 0; } }
+    @keyframes warpSale{ from{ opacity: 1; } to{ opacity: 0; } }
+    @media (prefers-reduced-motion: no-preference){
+      .br-mundo.saludo::before{ animation: brSaludoCuerpo 1.3s ease-out 1; }
+      .br-mundo.saludo::after{ animation: brSaludoAro 1.3s ease-out 2; }
+    }
+    @keyframes brSaludoAro{
+      0%{ transform: scale(1); filter: brightness(1); }
+      40%{ transform: scale(1.05); filter: brightness(1.9); }
+      100%{ transform: scale(1); filter: brightness(1); }
+    }
+    @keyframes brSaludoCuerpo{ 0%, 100%{ filter: brightness(1); } 40%{ filter: brightness(1.25); } }
     /* ---------- Firma Vortex 369 en KIPU Pro (procedencia del motor) ---------- */
     .plan-firma{ border-top: 1px solid var(--borde); padding-top: .95rem; margin-bottom: .6rem; }
     .firma-cejilla{
@@ -4679,6 +4705,10 @@
       }
       CIUDADES.forEach((cd, k) => puntos.push({ cl: Math.cos(cd[0] * G), sl: Math.sin(cd[0] * G), lon: cd[1] * G, oro: cd[2], fase: k * 0.8 }));
       let ang = 0, girando = false, rafMundo = 0;
+      // Eco de llegada: el warp del portal llama saludarMundo() y una ola de
+      // brillo recorre las ciudades doradas durante ~2s.
+      let saludo = -1e9;
+      window.saludarMundo = () => { saludo = performance.now(); };
       function dibujarMundo(t){
         const c = W / 2;
         ctx.clearRect(0, 0, W, W);
@@ -4690,7 +4720,12 @@
           const prof = (z + 1) / 2; /* 0 = atrás, 1 = delante */
           if (p.oro){
             const tw = 0.55 + 0.45 * Math.sin(t / 620 + p.fase);
-            const a = Math.min(1, (0.08 + 0.9 * prof) * tw);
+            let a = Math.min(1, (0.08 + 0.9 * prof) * tw);
+            const dSal = (performance.now() - saludo) / 1000;
+            if (dSal > 0 && dSal < 2){
+              const w = dSal * 2.2 - p.fase * 0.25;
+              if (w > 0 && w < 1) a = Math.min(1, a + Math.sin(w * Math.PI) * 0.6);
+            }
             const s = (1.1 + 2.1 * prof) * p.oro * DPR;
             ctx.fillStyle = 'rgba(232,199,102,' + a.toFixed(3) + ')';
             ctx.beginPath(); ctx.arc(px, py, s, 0, 6.2832); ctx.fill();
@@ -4720,6 +4755,75 @@
           if (!visible){ girando = false; cancelAnimationFrame(rafMundo); }
         }, { threshold: .1 }).observe(cv);
       }
+    })();
+
+    /* ---------- Viaje dimensional: warp del portal hacia Bienes Raíces ---------- */
+    (function(){
+      const portal = document.querySelector('.portal-esfera');
+      if (!portal) return;
+      let viajando = false;
+      portal.addEventListener('click', (ev) => {
+        // Con reduced-motion el ancla navega normal, sin teatro
+        if (reducedMotion || viajando) return;
+        ev.preventDefault();
+        viajando = true;
+        const velo = document.createElement('div');
+        velo.className = 'warp-velo';
+        velo.setAttribute('aria-hidden', 'true');
+        const cv = document.createElement('canvas');
+        velo.appendChild(cv);
+        document.body.appendChild(velo);
+        const ctx = cv.getContext('2d');
+        const DPR = Math.min(2, window.devicePixelRatio || 1);
+        const W = cv.width = Math.round(innerWidth * DPR);
+        const H = cv.height = Math.round(innerHeight * DPR);
+        const cx = W / 2, cy = H / 2;
+        const COLS = ['235,230,255', '235,230,255', '216,167,255', '255,207,122', '178,107,255'];
+        const estrellas = [];
+        for (let i = 0; i < 220; i++){
+          estrellas.push({ a: Math.random() * 6.2832, d: 20 + Math.random() * (W * .5), v: .6 + Math.random(), col: COLS[i % 5] });
+        }
+        const t0 = performance.now();
+        const DUR = 1050; /* [EDITABLE] duración del warp en ms */
+        requestAnimationFrame(function paso(t){
+          const p = Math.min(1, (t - t0) / DUR);
+          ctx.fillStyle = 'rgba(5,3,19,.5)'; /* estela */
+          ctx.fillRect(0, 0, W, H);
+          const vel = 2 + Math.pow(p, 2.2) * 90;
+          ctx.lineWidth = DPR;
+          for (const e of estrellas){
+            const len = vel * e.v * DPR;
+            const x = cx + Math.cos(e.a) * e.d, y = cy + Math.sin(e.a) * e.d;
+            ctx.strokeStyle = 'rgba(' + e.col + ',' + Math.min(1, .25 + p).toFixed(2) + ')';
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(cx + Math.cos(e.a) * (e.d + len), cy + Math.sin(e.a) * (e.d + len));
+            ctx.stroke();
+            e.d += vel * e.v;
+            if (e.d > Math.max(W, H) * .75) e.d = 10 + Math.random() * 60;
+          }
+          if (p >= 1){
+            velo.classList.add('destello');
+            const destino = document.getElementById('bienes-raices');
+            const prev = document.documentElement.style.scrollBehavior;
+            document.documentElement.style.scrollBehavior = 'auto';
+            destino.scrollIntoView({ block: 'start' });
+            document.documentElement.style.scrollBehavior = prev;
+            if (history.replaceState) history.replaceState(null, '', '#bienes-raices');
+            const mundo = document.querySelector('.br-mundo');
+            if (mundo){
+              mundo.classList.remove('saludo');
+              void mundo.offsetWidth;
+              mundo.classList.add('saludo');
+            }
+            if (typeof saludarMundo === 'function') saludarMundo();
+            setTimeout(() => velo.classList.add('irse'), 180);
+            setTimeout(() => { velo.remove(); viajando = false; }, 800);
+            return;
+          }
+          requestAnimationFrame(paso);
+        });
+      });
     })();
 
     /* ---------- Menú móvil ---------- */
