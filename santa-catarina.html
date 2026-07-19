@@ -328,6 +328,14 @@
     mix-blend-mode:overlay;opacity:.45;
   }
 
+  /* ---------- Llegada por el portal: estrellas desacelerando ---------- */
+  .warp-llegada{
+    position:fixed;inset:0;z-index:4000;
+    background:#050313;pointer-events:none;
+  }
+  .warp-llegada canvas{position:absolute;inset:0;width:100%;height:100%}
+  .warp-llegada.irse{opacity:0;transition:opacity .65s ease}
+
   /* ---------- Cursor personalizado ---------- */
   #cursor{
     position:fixed;left:0;top:0;z-index:400;pointer-events:none;
@@ -1116,11 +1124,63 @@ addEventListener("resize", () => {
   });
 });
 
+/* ---------- Llegada por el portal (desde el orbe de KIPU) ---------- */
+function iniciarLlegada(){
+  let viaja = false;
+  try{
+    viaja = sessionStorage.getItem("kipu_warp") === "1";
+    sessionStorage.removeItem("kipu_warp");
+  }catch(e){ return; }
+  if (!viaja || menosMovim) return;
+  const velo = document.createElement("div");
+  velo.className = "warp-llegada";
+  velo.setAttribute("aria-hidden","true");
+  const cv = document.createElement("canvas");
+  velo.appendChild(cv);
+  document.body.appendChild(velo);
+  const ctx = cv.getContext("2d");
+  const DPR = Math.min(2, devicePixelRatio || 1);
+  const W = cv.width = Math.round(innerWidth * DPR);
+  const H = cv.height = Math.round(innerHeight * DPR);
+  const cx = W/2, cy = H/2;
+  const COLS = ["235,230,255","235,230,255","216,167,255","255,207,122","178,107,255"];
+  const est = [];
+  for (let i = 0; i < 220; i++){
+    est.push({ a: Math.random()*6.2832, d: 20 + Math.random()*(W*.5), v: .6 + Math.random(), col: COLS[i%5] });
+  }
+  const t0 = performance.now(), DUR = 750; /* [EDITABLE] duración de la llegada en ms */
+  requestAnimationFrame(function paso(t){
+    const p = Math.min(1, (t - t0) / DUR);
+    ctx.fillStyle = "rgba(5,3,19,.5)";
+    ctx.fillRect(0, 0, W, H);
+    const vel = 2 + Math.pow(1 - p, 2.2) * 70; /* desacelera: saliendo del warp */
+    ctx.lineWidth = DPR;
+    for (const e of est){
+      const len = vel * e.v * DPR;
+      const x = cx + Math.cos(e.a)*e.d, y = cy + Math.sin(e.a)*e.d;
+      ctx.strokeStyle = "rgba(" + e.col + "," + (1 - p*.55).toFixed(2) + ")";
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(cx + Math.cos(e.a)*(e.d+len), cy + Math.sin(e.a)*(e.d+len));
+      ctx.stroke();
+      e.d += vel * e.v;
+      if (e.d > Math.max(W,H)*.75) e.d = 10 + Math.random()*60;
+    }
+    if (p >= 1){
+      velo.classList.add("irse");
+      setTimeout(() => velo.remove(), 700);
+      return;
+    }
+    requestAnimationFrame(paso);
+  });
+}
+
 /* ---------- Arranque ---------- */
 document.title = `${PERFIL.nombre} — Bienes Raíces KIPU`;
 $(".marca").innerHTML = `<a href="./" style="color:inherit;text-decoration:none">← ${PERFIL.nombre}</a><small>Bienes Raíces · KIPU</small>`;
 const fotoFondo = $("#foto-fondo");
 if (fotoFondo.getAttribute("src")) document.body.classList.add("con-foto");
+iniciarLlegada();
 renderIconos();
 renderDock();
 iniciarMotorRaton();

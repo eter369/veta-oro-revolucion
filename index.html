@@ -4808,9 +4808,14 @@
             if (e.d > Math.max(W, H) * .75) e.d = 10 + Math.random() * 60;
           }
           if (p >= 1){
-            // La otra dimensión es una página propia: el velo cubre la transición
+            // La otra dimensión es una página propia: el velo cubre la transición.
+            // La marca kipu_warp le dice al destino que reciba con la animación
+            // de llegada (estrellas desacelerando).
             velo.classList.add('destello');
-            setTimeout(() => { location.href = 'santa-catarina.html'; }, 260);
+            setTimeout(() => {
+              try{ sessionStorage.setItem('kipu_warp', '1'); }catch(err){}
+              location.href = 'santa-catarina.html';
+            }, 260);
             return;
           }
           requestAnimationFrame(paso);
