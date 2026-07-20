@@ -533,7 +533,7 @@ const PERFIL = {
 const PROYECTOS = [
   {
     id:"terrenos", etiqueta:"Catálogo de terrenos",
-    variante:"carpeta", acento:"#C9A227",
+    variante:"mapa", acento:"#C9A227",
     x:11, y:16,  xm:18, ym:13,
     categoria:"Terrenos · Santa Catarina", anio:"2026",
     enlacePagina:"terrenos.html", /* esta carpeta ABRE la página completa de la división */
@@ -616,6 +616,29 @@ function svgMiniatura(variante, acento){
         <rect x="6" y="18" width="52" height="33" rx="4.5" fill="url(#ca${n})"/>
         <rect x="6" y="18" width="52" height="5" rx="2.5" fill="rgba(255,255,255,.28)"/>
       </svg>`;
+    case "mapa": return `${abre}
+      <defs>
+        <linearGradient id="mp${n}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1a2233"/><stop offset="1" stop-color="#0d1220"/>
+        </linearGradient>
+        <linearGradient id="mpl${n}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#E8B24A"/><stop offset="1" stop-color="#a16b03"/>
+        </linearGradient>
+      </defs>
+      <rect width="100" height="100" fill="url(#mp${n})"/>
+      <g stroke="rgba(232,178,74,.32)" stroke-width="1.4" fill="rgba(232,178,74,.05)">
+        <rect x="14" y="20" width="22" height="20" rx="2"/>
+        <rect x="40" y="20" width="30" height="20" rx="2"/>
+        <rect x="14" y="44" width="30" height="22" rx="2"/>
+        <rect x="14" y="70" width="22" height="16" rx="2"/>
+        <rect x="66" y="70" width="20" height="16" rx="2"/>
+      </g>
+      <rect x="48" y="44" width="22" height="22" rx="2" fill="url(#mpl${n})" stroke="#F3CE86" stroke-width="1.4"/>
+      <path d="M62 26h20M28 52v18" stroke="rgba(255,255,255,.10)" stroke-width="3" stroke-linecap="round"/>
+      <g transform="translate(59,50)">
+        <path d="M6 0C2.7 0 0 2.7 0 6c0 4.2 6 11 6 11s6-6.8 6-11c0-3.3-2.7-6-6-6z" fill="#fff"/>
+        <circle cx="6" cy="6" r="2.4" fill="#0d1220"/>
+      </g>${cierra}`;
     case "avion": return `${abre}
       <defs><linearGradient id="av${n}" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#17405E"/><stop offset="1" stop-color="#0C1626"/>
