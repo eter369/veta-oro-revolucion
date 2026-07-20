@@ -561,12 +561,13 @@ const PROYECTOS = [
     enlace:"", portada:"", imagenes:[],
   },
   {
-    id:"prop04", etiqueta:"Propiedad 04",
-    variante:"rojo", acento:"#b3261e",
+    id:"vortex", etiqueta:"Vortex 369",
+    variante:"orbe", acento:"#37e6ff",
     x:39, y:46,  xm:36, ym:52,
-    categoria:"Local comercial", anio:"2026",
-    descripcion:"[EDITABLE] Ficha de la propiedad: ubicación, frente, área, zonificación y condiciones. Completar con datos reales.",
-    tags:["Ubicación","Área","Zonificación"],
+    categoria:"Oráculo · Análisis", anio:"2026",
+    enlacePagina:"https://www.vortex369.app/", /* externo: se abre en pestaña nueva */
+    descripcion:"El oráculo probabilístico de la casa: análisis de BTC · ETH · SOL. No predice. Sintoniza.",
+    tags:["Señales","BTC · ETH · SOL"],
     enlace:"", portada:"", imagenes:[],
   },
   {
@@ -615,6 +616,25 @@ function svgMiniatura(variante, acento){
         <rect x="6" y="18" width="52" height="33" rx="4.5" fill="url(#ca${n})"/>
         <rect x="6" y="18" width="52" height="5" rx="2.5" fill="rgba(255,255,255,.28)"/>
       </svg>`;
+    case "orbe": return `${abre}
+      <defs>
+        <radialGradient id="ob${n}" cx=".5" cy=".45" r=".6">
+          <stop offset="0" stop-color="#0b1f3a"/><stop offset=".6" stop-color="#061226"/><stop offset="1" stop-color="#02060f"/>
+        </radialGradient>
+        <radialGradient id="on${n}" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stop-color="#ecfcff"/><stop offset=".4" stop-color="#37e6ff" stop-opacity=".6"/><stop offset="1" stop-color="#37e6ff" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="100" height="100" fill="#04070f"/>
+      <circle cx="50" cy="50" r="30" fill="url(#ob${n})" stroke="rgba(139,233,255,.4)" stroke-width=".8"/>
+      <ellipse cx="50" cy="52" rx="44" ry="13" fill="none" stroke="#37e6ff" stroke-opacity=".75" stroke-width="1.6"/>
+      <ellipse cx="50" cy="50" rx="38" ry="10" fill="none" stroke="#ff4fd8" stroke-opacity=".55" stroke-width="1.2" transform="rotate(-8 50 50)"/>
+      <circle cx="50" cy="49" r="12" fill="url(#on${n})"/>
+      <path d="M50 36 61 55H39Z" fill="none" stroke="rgba(55,230,255,.7)" stroke-width="1.1"/>
+      <circle cx="50" cy="36" r="1.7" fill="#37e6ff"/><circle cx="61" cy="55" r="1.7" fill="#ff4fd8"/><circle cx="39" cy="55" r="1.7" fill="#ffcf7a"/>
+      <text x="76" y="26" font-size="11" font-weight="700" fill="#ffcf7a" font-family="ui-monospace,monospace">3</text>
+      <text x="82" y="78" font-size="11" font-weight="700" fill="#ff4fd8" font-family="ui-monospace,monospace">6</text>
+      <text x="12" y="78" font-size="11" font-weight="700" fill="#ffcf7a" font-family="ui-monospace,monospace">9</text>${cierra}`;
     case "montanas": return `${abre}
       <defs><linearGradient id="mo${n}" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#d3d3d3"/><stop offset="1" stop-color="#8a8a8a"/>
@@ -693,7 +713,11 @@ function renderIconos(){
     // redirigir el evento fuera del botón interno
     el.addEventListener("click", () => {
       if (el.dataset.arrastrado === "1") { el.dataset.arrastrado = ""; return; }
-      if (p.enlacePagina) { location.href = p.enlacePagina; return; }
+      if (p.enlacePagina) {
+        if (/^https?:/.test(p.enlacePagina)) window.open(p.enlacePagina, "_blank", "noopener");
+        else location.href = p.enlacePagina;
+        return;
+      }
       abrirProyecto(p, el);
     });
     hacerArrastrable(el, p);
