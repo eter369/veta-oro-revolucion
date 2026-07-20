@@ -552,7 +552,7 @@ const PROYECTOS = [
   },
   {
     id:"terrenos-sc", etiqueta:"Terrenos Santa Catarina",
-    variante:"carpeta", acento:"#E8B24A",
+    variante:"avion", acento:"#E8B24A",
     x:14, y:44,  xm:15, ym:34,
     categoria:"Lotes · Proyecto Landmark", anio:"2026",
     enlacePagina:"terrenos-santa-catarina.html", /* esta carpeta ABRE la página del proyecto */
@@ -616,6 +616,18 @@ function svgMiniatura(variante, acento){
         <rect x="6" y="18" width="52" height="33" rx="4.5" fill="url(#ca${n})"/>
         <rect x="6" y="18" width="52" height="5" rx="2.5" fill="rgba(255,255,255,.28)"/>
       </svg>`;
+    case "avion": return `${abre}
+      <defs><linearGradient id="av${n}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#17405E"/><stop offset="1" stop-color="#0C1626"/>
+      </linearGradient></defs>
+      <rect width="100" height="100" fill="url(#av${n})"/>
+      <ellipse cx="22" cy="26" rx="14" ry="4.5" fill="rgba(255,255,255,.10)"/>
+      <ellipse cx="74" cy="78" rx="16" ry="5" fill="rgba(255,255,255,.07)"/>
+      <path d="M14 88 C 34 76, 48 62, 60 44" fill="none" stroke="#F3CE86" stroke-opacity=".65" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="1 8"/>
+      <circle cx="14" cy="88" r="3" fill="rgba(243,206,134,.5)"/>
+      <g transform="translate(70,34) rotate(45)">
+        <path transform="scale(2.1) translate(-12,-12)" fill="#F3CE86" d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+      </g>${cierra}`;
     case "orbe": return `${abre}
       <defs>
         <radialGradient id="ob${n}" cx=".5" cy=".45" r=".6">
