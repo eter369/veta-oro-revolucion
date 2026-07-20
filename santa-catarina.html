@@ -2,1191 +2,1162 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0C0E13">
 <meta name="robots" content="noindex">
-<title>Santa Catarina — Bienes Raíces KIPU</title>
+<!-- [EDITABLE] KIPU Terrenos — Santa Catarina, Brasil. Catálogo DEMO con precios
+     referenciales (jul. 2026): reemplazar por inventario real antes del anuncio
+     oficial. Cifras de valorización citadas con fuente en el pie; textos legales
+     pendientes de validación por abogado habilitado en Brasil. -->
+<title>KIPU Terrenos — Invierte en Santa Catarina, Brasil desde Perú</title>
 <style>
-  /* ============================================================
-     PORTAFOLIO INTERACTIVO — estilo "escritorio"
-     Toda la información editable está al inicio del <script>,
-     en la sección marcada como  ZONA EDITABLE.
-     ============================================================ */
-
   :root{
-    --gris-fondo-1:#8f8f8f;
-    --gris-fondo-2:#6f6f6f;
-    --tinta:#161616;
-    --papel:rgba(246,246,246,.94);
-    --etiqueta:#f3f3f3;
-    --radio-ventana:16px;
-    --fuente:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;
+    color-scheme: dark;
+    --bg:#0C0E13;            /* fondo KIPU */
+    --surface-1:#12161F;     /* tarjetas */
+    --surface-2:#171C28;     /* paneles elevados */
+    --surface-3:#1D2331;     /* inputs / hover */
+    --chart-surface:#141926; /* superficie del gráfico */
+    --border:rgba(255,255,255,0.08);
+    --border-strong:rgba(255,255,255,0.14);
+    --gold:#E5B84E;          /* acento de marca (UI) */
+    --gold-strong:#F0C868;
+    --gold-deep:#C98500;     /* serie del gráfico (validada 3:1 sobre superficie oscura) */
+    --gold-soft:rgba(229,184,78,0.12);
+    --green:#2FBF71;         /* estado positivo (siempre con icono + texto) */
+    --green-soft:rgba(47,191,113,0.12);
+    --red:#E66767;
+    --text-1:#F4F6FA;
+    --text-2:#A8B0C2;
+    --text-3:#8A93A6;
+    --grid:#232936;
+    --radius:16px;
+    --font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text-1);font-family:var(--font);line-height:1.6;-webkit-font-smoothing:antialiased}
+  ::selection{background:rgba(229,184,78,.3)}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer}
+  input,select{font-family:inherit}
 
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{height:100%;overflow:hidden}
-  body{
-    font-family:var(--fuente);
-    background:linear-gradient(180deg,var(--gris-fondo-1) 0%,#828282 55%,var(--gris-fondo-2) 100%);
-    color:var(--etiqueta);
-    user-select:none;
-    -webkit-user-select:none;
-  }
-  html.cursor-oculto,
-  html.cursor-oculto *{cursor:none !important}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
 
-  /* ---------- Escena / fondo ---------- */
-  #escena{position:fixed;inset:0;overflow:hidden}
-  #fondo{
-    position:absolute;inset:-4%;
-    will-change:transform;
-  }
-  /* foco de luz que sigue al puntero */
-  #foco{
-    position:absolute;left:0;top:0;
-    width:54vmax;height:54vmax;
-    pointer-events:none;z-index:2;
-    background:radial-gradient(circle closest-side,rgba(255,255,255,.17),rgba(255,255,255,.05) 46%,transparent 72%);
-    mix-blend-mode:soft-light;
-    opacity:0;transition:opacity .8s ease;
-    will-change:transform;
-  }
-  body.raton-activo #foco{opacity:1}
-  .figura{
-    position:absolute;left:50%;top:54%;
-    width:min(148vmin,1400px);height:min(148vmin,1400px);
-    transform:translate(-50%,-50%);
-    opacity:.98;
-  }
-  /* FOTO PROPIA (opcional):
-     pega la URL de tu foto en el atributo src de la etiqueta
-     <img id="foto-fondo" ...> que está en el HTML más abajo.
-     Si tiene src, reemplaza automáticamente a la figura generada. */
-  #foto-fondo{
-    display:none;
-    position:absolute;inset:0;width:100%;height:100%;
-    object-fit:cover;object-position:center 20%;
-    filter:grayscale(1) contrast(1.04) brightness(.96);
-  }
-  body.con-foto #foto-fondo{display:block}
-  body.con-foto .figura{display:none}
+  /* ---------- Nav ---------- */
+  header.nav{position:sticky;top:0;z-index:50;background:rgba(12,14,19,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .logo{display:flex;align-items:baseline;gap:10px;font-weight:800;letter-spacing:.14em;font-size:1.05rem}
+  .logo .knot{display:inline-block;width:26px;height:26px;vertical-align:middle;transform:translateY(5px)}
+  .logo em{font-style:normal;color:var(--gold);letter-spacing:.2em;font-weight:700;font-size:.78rem;border-left:1px solid var(--border-strong);padding-left:10px}
+  nav.links{display:flex;gap:26px;font-size:.9rem;color:var(--text-2)}
+  nav.links a{padding:6px 2px;border-bottom:2px solid transparent;transition:.2s}
+  nav.links a:hover{color:var(--text-1);border-color:var(--gold)}
+  .btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:12px;font-weight:700;font-size:.92rem;padding:12px 20px;transition:.2s;white-space:nowrap}
+  .btn-gold{background:linear-gradient(135deg,var(--gold),#D9A63C);color:#141004}
+  .btn-gold:hover{background:linear-gradient(135deg,var(--gold-strong),var(--gold));transform:translateY(-1px)}
+  .btn-ghost{background:transparent;color:var(--text-1);border:1px solid var(--border-strong)}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+  .btn-sm{padding:9px 14px;font-size:.85rem;border-radius:10px}
 
-  /* viñeta */
-  #escena::after{
-    content:"";position:absolute;inset:0;pointer-events:none;
-    background:
-      radial-gradient(ellipse 120% 90% at 50% 42%,transparent 52%,rgba(18,18,18,.38) 100%),
-      linear-gradient(180deg,rgba(255,255,255,.05) 0%,transparent 18%,transparent 78%,rgba(0,0,0,.22) 100%);
-  }
+  /* ---------- Hero ---------- */
+  .hero{position:relative;padding:88px 0 64px;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:-40% -20% auto;height:120%;background:
+    radial-gradient(600px 320px at 78% 18%,rgba(229,184,78,.14),transparent 60%),
+    radial-gradient(520px 300px at 15% 8%,rgba(47,191,113,.07),transparent 60%);pointer-events:none}
+  .hero .wrap{position:relative}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.75rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);background:var(--gold-soft);border:1px solid rgba(229,184,78,.25);padding:7px 14px;border-radius:999px;margin-bottom:22px}
+  .hero h1{font-size:clamp(1.9rem,4.4vw,3.3rem);line-height:1.13;font-weight:800;letter-spacing:-.01em;max-width:820px}
+  .hero h1 span{color:var(--gold)}
+  .hero p.lead{margin:20px 0 30px;max-width:640px;color:var(--text-2);font-size:1.06rem}
+  .hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
 
-  /* sticker sonriente */
-  #sticker{
-    position:absolute;left:57%;top:63%;
-    width:54px;height:54px;border:none;background:transparent;
-    transform:rotate(14deg);
-    opacity:.85;cursor:grab;touch-action:none;
-    transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .2s;
-    z-index:4;
-  }
-  #sticker:hover{transform:rotate(-6deg) scale(1.12);opacity:1}
-  #sticker svg{width:100%;height:100%;filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:54px}
+  .stat{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .stat .v{font-size:1.55rem;font-weight:800;letter-spacing:-.01em}
+  .stat .v small{font-size:.9rem;font-weight:600;color:var(--text-3)}
+  .stat .l{font-size:.82rem;color:var(--text-3);margin-top:4px;line-height:1.45}
+  .stat.gold .v{color:var(--gold)}
 
-  /* ---------- Marca y reloj ---------- */
-  .marca{
-    position:fixed;top:22px;left:26px;z-index:20;
-    font-size:13px;letter-spacing:.16em;font-weight:600;
-    color:rgba(255,255,255,.92);text-transform:uppercase;
-    text-shadow:0 1px 8px rgba(0,0,0,.3);
-  }
-  .marca small{font-weight:400;opacity:.55;letter-spacing:.08em;margin-left:10px;text-transform:none}
-  #reloj{
-    position:fixed;top:22px;right:26px;z-index:20;
-    font-size:12px;letter-spacing:.12em;
-    color:rgba(255,255,255,.75);text-transform:uppercase;
-    font-variant-numeric:tabular-nums;
-    text-shadow:0 1px 8px rgba(0,0,0,.3);
-  }
+  /* ---------- Secciones ---------- */
+  section{padding:76px 0}
+  .sec-head{margin-bottom:38px;max-width:720px}
+  .sec-head .eyebrow{margin-bottom:14px}
+  .sec-head h2{font-size:clamp(1.5rem,2.8vw,2.2rem);font-weight:800;letter-spacing:-.01em}
+  .sec-head p{color:var(--text-2);margin-top:10px}
 
-  /* ---------- Iconos de proyectos ---------- */
-  #iconos{position:absolute;inset:0;will-change:transform}
-  .icono{
-    position:absolute;
-    transform:translate(-50%,-50%);
-    touch-action:none;
-    z-index:5;
-  }
-  .icono-inner{animation:flotar 7s ease-in-out infinite}
-  .icono:nth-child(2n) .icono-inner{animation-duration:8.5s;animation-delay:-2.2s}
-  .icono:nth-child(3n) .icono-inner{animation-duration:9.5s;animation-delay:-4.1s}
-  @keyframes flotar{
-    0%,100%{transform:translateY(0)}
-    50%{transform:translateY(-6px)}
-  }
-  .icono button{
-    display:flex;flex-direction:column;align-items:center;gap:8px;
-    background:none;border:none;font-family:inherit;color:inherit;
-    cursor:pointer;padding:6px;
-    will-change:translate; /* efecto imán */
-  }
-  .icono .mini{
-    width:58px;height:58px;border-radius:13px;overflow:hidden;
-    box-shadow:0 10px 26px rgba(0,0,0,.38),0 2px 6px rgba(0,0,0,.25);
-    outline:1px solid rgba(255,255,255,.28);outline-offset:-1px;
-    transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;
-    background:#555;
-  }
-  .icono .mini svg,.icono .mini img{width:100%;height:100%;display:block;object-fit:cover}
-  .icono .mini.carpeta{
-    background:transparent;
-    box-shadow:none;outline:none;border-radius:0;overflow:visible;
-    filter:drop-shadow(0 10px 22px rgba(0,0,0,.35));
-    width:64px;height:58px;
-  }
-  .icono button:hover .mini{
-    transform:perspective(430px) scale(1.16) translateY(-4px)
-              rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
-    box-shadow:0 18px 38px rgba(0,0,0,.45);
-  }
-  .icono button:active .mini{transform:perspective(430px) scale(1.04) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
-  .icono .nombre{
-    font-size:11.5px;letter-spacing:.02em;font-weight:500;
-    color:var(--etiqueta);
-    text-shadow:0 1px 4px rgba(0,0,0,.55),0 0 14px rgba(0,0,0,.25);
-    padding:3px 9px;border-radius:7px;white-space:nowrap;
-    transition:background .2s,color .2s,text-shadow .2s;
-  }
-  .icono.activo .nombre{background:rgba(250,250,250,.95);color:#111;text-shadow:none}
-  .icono.arrastrando{z-index:60}
-  .icono.arrastrando .icono-inner{animation-play-state:paused}
-  .icono.arrastrando .mini{transform:scale(1.18);box-shadow:0 26px 50px rgba(0,0,0,.5)}
+  /* ---------- Por qué SC ---------- */
+  .why{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .why .card{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+  .why .ic{width:42px;height:42px;border-radius:12px;background:var(--gold-soft);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .why h3{font-size:1rem;margin-bottom:6px}
+  .why p{font-size:.86rem;color:var(--text-2)}
 
-  .oculto-inicial{opacity:0;transform:translate(-50%,-50%) scale(.6)}
-  .aparecer{
-    transition:opacity .7s ease,transform .7s cubic-bezier(.34,1.4,.44,1);
-    opacity:1;transform:translate(-50%,-50%) scale(1);
-  }
+  /* ---------- Catálogo ---------- */
+  #catalogo{background:linear-gradient(180deg,transparent,rgba(255,255,255,.015) 20%,transparent)}
+  .filters{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px}
+  .f-group{display:flex;flex-direction:column;gap:6px}
+  .f-group label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
+  .f-group select,.f-group input[type=number]{background:var(--surface-3);border:1px solid var(--border-strong);color:var(--text-1);border-radius:10px;padding:9px 12px;font-size:.9rem;min-width:160px}
+  .f-group select:focus,.f-group input:focus{outline:2px solid rgba(229,184,78,.5);outline-offset:1px}
+  .f-range{min-width:210px}
+  .f-range input[type=range]{width:100%;accent-color:var(--gold)}
+  .f-range .rv{font-size:.85rem;color:var(--gold);font-weight:700}
+  .f-count{margin-left:auto;font-size:.85rem;color:var(--text-3);padding-bottom:8px}
+  .f-count b{color:var(--text-1)}
 
-  /* ---------- Ventana de proyecto ---------- */
-  #capa-ventanas{position:fixed;inset:0;z-index:100;pointer-events:none}
-  .ventana{
-    position:absolute;
-    width:min(760px,calc(100vw - 40px));
-    background:var(--papel);
-    color:var(--tinta);
-    border-radius:var(--radio-ventana);
-    box-shadow:0 40px 90px rgba(0,0,0,.5),0 6px 22px rgba(0,0,0,.3),inset 0 0 0 1px rgba(255,255,255,.55);
-    backdrop-filter:blur(22px) saturate(1.25);
-    -webkit-backdrop-filter:blur(22px) saturate(1.25);
-    pointer-events:auto;
-    overflow:hidden;
-    opacity:0;transform:scale(.94) translateY(12px);
-    rotate:0deg;
-    transition:opacity .28s ease,transform .32s cubic-bezier(.2,1.1,.3,1),rotate .32s ease;
-  }
-  .ventana.abierta{opacity:1;transform:scale(1) translateY(0)}
-  .ventana.cerrando{opacity:0;transform:scale(.95) translateY(10px)}
+  .grid-lotes{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;margin-top:18px}
+  .lote{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:.22s;display:flex;flex-direction:column}
+  .lote:hover{transform:translateY(-3px);border-color:rgba(229,184,78,.4);box-shadow:0 14px 34px rgba(0,0,0,.35)}
+  .lote .scene{position:relative;aspect-ratio:16/8.4;background:var(--surface-2)}
+  .lote .scene svg{display:block;width:100%;height:100%}
+  .badges{position:absolute;top:10px;left:10px;display:flex;gap:6px;flex-wrap:wrap}
+  .badge{font-size:.68rem;font-weight:700;letter-spacing:.05em;padding:4px 9px;border-radius:999px;background:rgba(12,14,19,.75);border:1px solid var(--border-strong);backdrop-filter:blur(4px)}
+  .badge.gold{color:var(--gold);border-color:rgba(229,184,78,.45)}
+  .badge.green{color:var(--green);border-color:rgba(47,191,113,.4)}
+  .lote .body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+  .lote h3{font-size:1.02rem;font-weight:750}
+  .lote .loc{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--text-3)}
+  .specs{display:flex;gap:14px;font-size:.8rem;color:var(--text-2);flex-wrap:wrap}
+  .specs b{color:var(--text-1);font-weight:700}
+  .price-row{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px dashed var(--border)}
+  .price-row .p{font-size:1.18rem;font-weight:800;color:var(--gold)}
+  .price-row .pen{display:block;font-size:.78rem;font-weight:600;color:var(--text-3)}
+  .empty{padding:44px;text-align:center;color:var(--text-3);border:1px dashed var(--border-strong);border-radius:var(--radius);margin-top:18px}
+  .note-demo{font-size:.78rem;color:var(--text-3);margin-top:16px}
 
-  .ventana-barra{
-    display:flex;align-items:center;gap:8px;
-    height:42px;padding:0 14px;
-    background:linear-gradient(180deg,rgba(255,255,255,.65),rgba(240,240,240,.35));
-    border-bottom:1px solid rgba(0,0,0,.08);
-    cursor:grab;
-  }
-  .ventana-barra:active{cursor:grabbing}
-  .luces{display:flex;gap:8px}
-  .luz{width:13px;height:13px;border-radius:50%;border:none;padding:0;position:relative}
-  .luz-roja{background:#ff5f57;cursor:pointer}
-  .luz-roja::after{
-    content:"×";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    font-size:11px;line-height:1;color:rgba(0,0,0,.55);opacity:0;font-weight:700;
-  }
-  .luz-roja:hover::after{opacity:1}
-  .luz-ambar{background:#febc2e}
-  .luz-verde{background:#28c840}
-  .ventana-titulo{
-    flex:1;text-align:center;font-size:12.5px;font-weight:600;
-    color:rgba(0,0,0,.55);letter-spacing:.03em;
-    margin-right:55px; /* compensa las luces para centrar */
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  }
+  /* ---------- Modal ---------- */
+  .modal-ov{position:fixed;inset:0;background:rgba(5,6,10,.72);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+  .modal-ov.open{display:flex}
+  .modal{background:var(--surface-2);border:1px solid var(--border-strong);border-radius:20px;max-width:680px;width:100%;max-height:92vh;overflow:auto}
+  .modal .scene{aspect-ratio:16/7;position:relative}
+  .modal .scene svg{width:100%;height:100%;display:block}
+  .modal .mbody{padding:22px 26px 26px}
+  .modal h3{font-size:1.35rem;margin-bottom:2px}
+  .modal .loc{color:var(--text-3);font-size:.88rem;margin-bottom:14px}
+  .kv{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+  .kv>div{background:var(--surface-1);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+  .kv .k{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3)}
+  .kv .v{font-weight:800;font-size:1.02rem;margin-top:2px}
+  .kv .v.gold{color:var(--gold)}
+  .hl{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+  .hl span{font-size:.78rem;background:var(--surface-3);border:1px solid var(--border);padding:5px 11px;border-radius:999px;color:var(--text-2)}
+  .m-close{position:absolute;top:12px;right:12px;background:rgba(12,14,19,.7);border:1px solid var(--border-strong);color:var(--text-1);width:34px;height:34px;border-radius:10px;font-size:1rem}
+  .m-actions{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}
 
-  .ventana-cuerpo{display:flex;max-height:min(66vh,540px)}
-  .ventana-hero{
-    flex:0 0 44%;position:relative;min-height:340px;overflow:hidden;
-    background:#dcdcdc;
-  }
-  .ventana-hero svg,.ventana-hero img{
-    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  }
-  .ventana-info{
-    flex:1;padding:26px 28px 24px;overflow-y:auto;
-    display:flex;flex-direction:column;gap:14px;align-items:flex-start;
-  }
-  .chips{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{
-    font-size:10.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
-    padding:5px 10px;border-radius:999px;
-    background:rgba(0,0,0,.07);color:rgba(0,0,0,.6);
-  }
-  .chip.acento{color:#fff}
-  .ventana-info h2{
-    font-size:26px;line-height:1.12;font-weight:700;letter-spacing:-.015em;
-  }
-  .ventana-info .desc{
-    font-size:13.5px;line-height:1.65;color:rgba(0,0,0,.68);
-    user-select:text;-webkit-user-select:text;
-  }
-  .tags{display:flex;gap:6px;flex-wrap:wrap;list-style:none}
-  .tags li{
-    font-size:11px;color:rgba(0,0,0,.5);
-    padding:4px 9px;border:1px solid rgba(0,0,0,.14);border-radius:999px;
-  }
-  .galeria{display:flex;gap:8px;width:100%}
-  .galeria .cuadro{
-    flex:1;aspect-ratio:4/3;border-radius:9px;overflow:hidden;
-    background:rgba(0,0,0,.05);
-  }
-  .galeria .cuadro img{width:100%;height:100%;object-fit:cover;display:block}
-  .galeria .cuadro.vacio{
-    border:1.5px dashed rgba(0,0,0,.18);background:transparent;
-    display:flex;align-items:center;justify-content:center;
-    font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:rgba(0,0,0,.35);
-  }
-  .boton{
-    margin-top:2px;
-    display:inline-flex;align-items:center;gap:7px;
-    font-size:12.5px;font-weight:600;letter-spacing:.02em;
-    color:#fff;background:#161616;text-decoration:none;
-    padding:10px 18px;border-radius:999px;border:none;cursor:pointer;font-family:inherit;
-    transition:transform .2s,background .2s;
-  }
-  .boton:hover{transform:translateY(-1px);background:#000}
-  .texto-libre{font-size:13.5px;line-height:1.7;color:rgba(0,0,0,.7);user-select:text;-webkit-user-select:text}
-  .texto-libre p+p{margin-top:10px}
-  .texto-libre a{color:inherit}
-  .texto-libre .fila-dato{display:flex;gap:10px;margin-top:6px;font-size:13px}
-  .texto-libre .fila-dato span:first-child{min-width:86px;font-weight:600;color:rgba(0,0,0,.45);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding-top:2px}
+  /* ---------- Simulador ---------- */
+  .sim{display:grid;grid-template-columns:390px 1fr;gap:20px;align-items:start}
+  .panel{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+  .panel h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:16px}
+  .fld{margin-bottom:18px}
+  .fld>label{display:flex;justify-content:space-between;align-items:baseline;font-size:.85rem;font-weight:650;margin-bottom:8px}
+  .fld>label .hint{font-size:.74rem;color:var(--text-3);font-weight:500}
+  .fld input[type=number],.fld select{width:100%;background:var(--surface-3);border:1px solid var(--border-strong);color:var(--text-1);border-radius:10px;padding:11px 13px;font-size:.95rem}
+  .fld input[type=range]{width:100%;accent-color:var(--gold)}
+  .fld input:focus,.fld select:focus{outline:2px solid rgba(229,184,78,.5);outline-offset:1px}
+  .seg{display:flex;background:var(--surface-3);border:1px solid var(--border-strong);border-radius:11px;padding:4px;gap:4px}
+  .seg button{flex:1;border:none;background:transparent;color:var(--text-2);font-weight:650;font-size:.84rem;padding:8px 6px;border-radius:8px;transition:.15s}
+  .seg button.on{background:var(--gold);color:#141004}
+  .scen{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .scen button{border:1px solid var(--border-strong);background:var(--surface-3);color:var(--text-2);border-radius:10px;padding:9px 6px;font-size:.8rem;font-weight:650;transition:.15s}
+  .scen button .pct{display:block;font-size:1.05rem;font-weight:800;color:var(--text-1)}
+  .scen button.on{border-color:var(--gold);background:var(--gold-soft);color:var(--gold)}
+  .scen button.on .pct{color:var(--gold)}
+  .fx-note{font-size:.76rem;color:var(--text-3);line-height:1.5;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+  .fx-note b{color:var(--text-2)}
 
-  /* ---------- Dock ---------- */
-  #dock{
-    position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
-    display:flex;align-items:flex-end;gap:10px;
-    padding:9px 14px;border-radius:22px;
-    background:rgba(250,250,250,.55);
-    backdrop-filter:blur(20px) saturate(1.4);
-    -webkit-backdrop-filter:blur(20px) saturate(1.4);
-    box-shadow:0 16px 40px rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,255,255,.4);
-    z-index:200;
-  }
-  .dock-icono{
-    position:relative;
-    width:46px;height:46px;border-radius:11px;overflow:hidden;
-    border:none;padding:0;cursor:pointer;background:transparent;
-    transform-origin:bottom center;
-    transition:transform .16s ease-out;
-    will-change:transform;
-  }
-  .dock-icono svg{width:100%;height:100%;display:block}
-  .dock-icono::after{
-    content:attr(data-nombre);
-    position:absolute;left:50%;bottom:calc(100% + 14px);transform:translateX(-50%) scale(.9);
-    background:rgba(30,30,30,.92);color:#fff;font-size:10.5px;letter-spacing:.04em;
-    padding:5px 10px;border-radius:7px;white-space:nowrap;
-    opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;
-  }
-  .dock-icono:hover::after{opacity:1;transform:translateX(-50%) scale(1)}
-  .dock-sep{width:1px;align-self:stretch;margin:4px 2px;background:rgba(0,0,0,.16)}
+  .results{display:flex;flex-direction:column;gap:16px}
+  .hero-num{background:linear-gradient(135deg,var(--surface-2),var(--surface-1));border:1px solid rgba(229,184,78,.3);border-radius:var(--radius);padding:22px 26px}
+  .hero-num .k{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3)}
+  .hero-num .v{font-size:clamp(1.7rem,3.4vw,2.5rem);font-weight:800;color:var(--gold);letter-spacing:-.01em;margin:2px 0}
+  .hero-num .sub{font-size:.86rem;color:var(--text-2)}
+  .hero-num .sub .up{color:var(--green);font-weight:750}
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .tile{background:var(--surface-1);border:1px solid var(--border);border-radius:14px;padding:15px 17px}
+  .tile .k{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3)}
+  .tile .v{font-weight:800;font-size:1.1rem;margin-top:3px}
+  .tile .s{font-size:.74rem;color:var(--text-3);margin-top:2px}
+  .tile .v.green{color:var(--green)}
+  .tile .v.gold{color:var(--gold)}
 
-  /* ---------- Ayuda ---------- */
-  #ayuda{
-    position:fixed;right:22px;bottom:22px;z-index:200;
-    width:34px;height:34px;border-radius:50%;
-    border:1px solid rgba(255,255,255,.35);
-    background:rgba(255,255,255,.14);color:rgba(255,255,255,.9);
-    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-    font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;
-    transition:background .2s,transform .2s;
-  }
-  #ayuda:hover{background:rgba(255,255,255,.28);transform:scale(1.08)}
+  .chart-card{background:var(--chart-surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px 14px;position:relative}
+  .chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:10px;flex-wrap:wrap}
+  .chart-head h4{font-size:.95rem;font-weight:750}
+  .chart-head .tgl{font-size:.78rem;color:var(--text-2);background:var(--surface-3);border:1px solid var(--border-strong);border-radius:8px;padding:6px 11px}
+  .chart-head .tgl:hover{color:var(--gold);border-color:var(--gold)}
+  #chart{width:100%;display:block}
+  .tip{position:absolute;pointer-events:none;background:#0B0D12;border:1px solid var(--border-strong);border-radius:10px;padding:9px 12px;font-size:.78rem;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.5);display:none;z-index:5;min-width:170px}
+  .tip .t-y{font-weight:750;color:var(--gold)}
+  .tip .row{display:flex;justify-content:space-between;gap:14px;color:var(--text-2)}
+  .tip .row b{color:var(--text-1);font-weight:700}
+  table.proj{width:100%;border-collapse:collapse;font-size:.83rem;margin-top:6px}
+  table.proj th{text-align:right;color:var(--text-3);font-weight:650;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-bottom:1px solid var(--border-strong)}
+  table.proj th:first-child,table.proj td:first-child{text-align:left}
+  table.proj td{padding:7px 10px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;color:var(--text-2)}
+  table.proj td:first-child{color:var(--text-1);font-weight:650}
+  table.proj tr:last-child td{border-bottom:none}
+  .desglose{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px}
+  .desglose h4{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:10px}
+  .d-row{display:flex;justify-content:space-between;gap:12px;font-size:.87rem;padding:7px 0;border-bottom:1px dashed var(--border);color:var(--text-2)}
+  .d-row b{color:var(--text-1);font-variant-numeric:tabular-nums;font-weight:700}
+  .d-row.total{border-bottom:none;padding-top:11px;font-weight:750;color:var(--text-1)}
+  .d-row.total b{color:var(--gold);font-size:1rem}
+  .alcance{font-size:.84rem;color:var(--text-2);background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 15px}
+  .alcance b{color:var(--gold)}
+  .alcance .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+  .alcance .chips button{font-size:.75rem;background:var(--surface-3);border:1px solid var(--border-strong);color:var(--text-2);border-radius:999px;padding:5px 11px;transition:.15s}
+  .alcance .chips button:hover{border-color:var(--gold);color:var(--gold)}
+  .disclaimer{font-size:.75rem;color:var(--text-3);line-height:1.55;border-left:2px solid var(--border-strong);padding-left:14px}
 
-  /* ---------- Toast ---------- */
-  #toast{
-    position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(8px);
-    background:rgba(25,25,25,.92);color:#f5f5f5;
-    font-size:12.5px;letter-spacing:.02em;
-    padding:10px 18px;border-radius:999px;
-    box-shadow:0 12px 30px rgba(0,0,0,.35);
-    opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
-    z-index:300;max-width:80vw;text-align:center;
-  }
-  #toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
+  /* ---------- Proceso ---------- */
+  .steps{position:relative;margin-top:8px}
+  .step{display:grid;grid-template-columns:56px 1fr;gap:18px;position:relative;padding-bottom:34px}
+  .step:last-child{padding-bottom:0}
+  .step::before{content:"";position:absolute;left:27px;top:52px;bottom:6px;width:2px;background:linear-gradient(180deg,rgba(229,184,78,.5),var(--border))}
+  .step:last-child::before{display:none}
+  .s-num{width:54px;height:54px;border-radius:16px;background:var(--surface-2);border:1px solid rgba(229,184,78,.4);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--gold);font-size:1.15rem}
+  .s-body{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px}
+  .s-body h3{font-size:1.03rem;margin-bottom:4px}
+  .s-body .meta{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 10px}
+  .s-body .meta span{font-size:.72rem;font-weight:700;background:var(--surface-3);border:1px solid var(--border);border-radius:999px;padding:4px 10px;color:var(--text-2)}
+  .s-body .meta span.gold{color:var(--gold);border-color:rgba(229,184,78,.35)}
+  .s-body p{font-size:.89rem;color:var(--text-2)}
+  .s-body p b{color:var(--text-1)}
+  .proceso-grid{display:grid;grid-template-columns:1.35fr .9fr;gap:22px;align-items:start}
+  .side-card{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:16px}
+  .side-card h4{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:12px}
+  .side-card ul{list-style:none}
+  .side-card li{font-size:.86rem;color:var(--text-2);padding:7px 0;border-bottom:1px dashed var(--border);display:flex;gap:9px;align-items:flex-start}
+  .side-card li:last-child{border-bottom:none}
+  .side-card li::before{content:"✓";color:var(--gold);font-weight:800;flex-shrink:0}
+  .side-card li.warn::before{content:"!";color:var(--red)}
+  .side-card p{font-size:.85rem;color:var(--text-2)}
+  .side-card .big{font-size:1.35rem;font-weight:800;color:var(--text-1)}
 
-  /* ---------- Grano de película ---------- */
-  #grano{
-    position:fixed;inset:0;width:100%;height:100%;
-    z-index:250;pointer-events:none;
-    mix-blend-mode:overlay;opacity:.45;
-  }
+  /* ---------- FAQ ---------- */
+  .faq{max-width:820px}
+  .q{border:1px solid var(--border);border-radius:14px;background:var(--surface-1);margin-bottom:10px;overflow:hidden}
+  .q button.qh{width:100%;display:flex;justify-content:space-between;align-items:center;gap:14px;background:transparent;border:none;color:var(--text-1);font-size:.96rem;font-weight:650;text-align:left;padding:17px 20px}
+  .q .plus{color:var(--gold);font-size:1.25rem;font-weight:700;transition:.2s;flex-shrink:0}
+  .q.open .plus{transform:rotate(45deg)}
+  .q .qa{max-height:0;overflow:hidden;transition:max-height .28s ease}
+  .q .qa p{padding:0 20px 18px;font-size:.89rem;color:var(--text-2)}
+  .q .qa b{color:var(--text-1)}
+
+  /* ---------- CTA final / footer ---------- */
+  .cta-fin{background:linear-gradient(135deg,var(--surface-2),#151A26);border:1px solid rgba(229,184,78,.3);border-radius:22px;padding:46px 40px;display:flex;justify-content:space-between;align-items:center;gap:26px;flex-wrap:wrap;position:relative;overflow:hidden}
+  .cta-fin::after{content:"";position:absolute;right:-80px;top:-80px;width:280px;height:280px;background:radial-gradient(circle,rgba(229,184,78,.18),transparent 70%)}
+  .cta-fin h2{font-size:clamp(1.3rem,2.6vw,1.9rem);max-width:520px}
+  .cta-fin p{color:var(--text-2);margin-top:8px;max-width:520px;font-size:.93rem}
+  footer{border-top:1px solid var(--border);padding:38px 0 46px;margin-top:70px}
+  footer .cols{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap}
+  footer .fine{font-size:.75rem;color:var(--text-3);line-height:1.6;max-width:640px;margin-top:20px}
+  footer .fine a{color:var(--text-2);text-decoration:underline}
+  .src{font-size:.74rem;color:var(--text-3);margin-top:10px}
+  .src a{text-decoration:underline}
 
   /* ---------- Llegada por el portal: estrellas desacelerando ---------- */
-  .warp-llegada{
-    position:fixed;inset:0;z-index:4000;
-    background:#050313;pointer-events:none;
-  }
+  .warp-llegada{position:fixed;inset:0;z-index:4000;background:#050313;pointer-events:none}
   .warp-llegada canvas{position:absolute;inset:0;width:100%;height:100%}
   .warp-llegada.irse{opacity:0;transition:opacity .65s ease}
 
-  /* ---------- Cursor personalizado ---------- */
-  #cursor{
-    position:fixed;left:0;top:0;z-index:400;pointer-events:none;
-    width:30px;height:30px;
-    display:none;
+  /* ---------- Responsive ---------- */
+  @media(max-width:980px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .why{grid-template-columns:repeat(2,1fr)}
+    .sim{grid-template-columns:1fr}
+    .proceso-grid{grid-template-columns:1fr}
+    .tiles{grid-template-columns:repeat(2,1fr)}
   }
-  html.cursor-oculto #cursor{display:block}
-  #cursor svg{
-    width:100%;height:100%;
-    filter:drop-shadow(0 2px 5px rgba(0,0,0,.35));
-    transform-origin:7px 5px;
-    transition:transform .22s cubic-bezier(.34,1.56,.64,1);
-  }
-  #cursor.grande svg{transform:scale(1.4)}
-  #cursor.presionado svg{transform:scale(.8)}
-  #cursor.grande.presionado svg{transform:scale(1.12)}
-
-  /* anillo que sigue al cursor con retardo */
-  #cursor-halo{
-    position:fixed;left:0;top:0;z-index:399;pointer-events:none;
-    width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;
-    border:1.5px solid rgba(255,255,255,.45);
-    background:rgba(255,255,255,.05);
-    display:none;
-    transition:width .28s cubic-bezier(.34,1.3,.5,1),height .28s cubic-bezier(.34,1.3,.5,1),
-               margin .28s cubic-bezier(.34,1.3,.5,1),border-color .28s,background .28s;
-  }
-  html.cursor-oculto #cursor-halo{display:block}
-  #cursor-halo.anillo{
-    width:56px;height:56px;margin:-28px 0 0 -28px;
-    border-color:rgba(255,255,255,.9);background:rgba(255,255,255,.10);
-  }
-  #cursor-halo.presionado{width:22px;height:22px;margin:-11px 0 0 -11px;background:rgba(255,255,255,.22)}
-
-  /* etiqueta contextual junto al cursor (Abrir / Cerrar) */
-  #cursor-etiqueta{position:fixed;left:0;top:0;z-index:401;pointer-events:none;display:none}
-  html.cursor-oculto #cursor-etiqueta{display:block}
-  #cursor-etiqueta span{
-    display:inline-block;
-    background:rgba(250,250,250,.97);color:#111;
-    font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-    padding:5px 11px;border-radius:999px;white-space:nowrap;
-    box-shadow:0 8px 22px rgba(0,0,0,.3);
-    transform:translate(17px,21px) scale(0);
-    transform-origin:left top;
-    transition:transform .24s cubic-bezier(.34,1.56,.64,1);
-  }
-  #cursor-etiqueta.visible span{transform:translate(17px,21px) scale(1)}
-
-  /* ---------- Móvil ---------- */
-  @media (max-width:720px){
-    .icono .mini{width:52px;height:52px}
-    .icono .nombre{font-size:10.5px}
-    .marca{top:16px;left:18px;font-size:11.5px}
-    .marca small{display:none}
-    #reloj{top:16px;right:18px;font-size:11px}
-    #sticker{width:44px;height:44px;left:24%;top:62%}
-    .ventana{
-      left:50% !important;top:auto !important;bottom:86px;
-      transform:translateX(-50%) scale(.94) translateY(12px);
-      width:calc(100vw - 24px);
-    }
-    .ventana.abierta{transform:translateX(-50%) scale(1) translateY(0)}
-    .ventana.cerrando{transform:translateX(-50%) scale(.95) translateY(10px)}
-    .ventana-cuerpo{flex-direction:column;max-height:calc(100dvh - 210px)}
-    .ventana-hero{flex:none;min-height:150px;height:150px}
-    .ventana-info{padding:18px 20px 20px;overflow-y:auto}
-    .ventana-info h2{font-size:21px}
-    #dock{gap:7px;padding:8px 11px;bottom:12px}
-    .dock-icono{width:42px;height:42px}
-    #ayuda{right:14px;bottom:74px}
-  }
-
-  @media (prefers-reduced-motion:reduce){
-    *{animation:none !important;transition:none !important}
+  @media(max-width:640px){
+    nav.links{display:none}
+    .nav-inner .btn{padding:9px 13px;font-size:.8rem}
+    .logo{font-size:.95rem}
+    .stats{grid-template-columns:1fr 1fr}
+    .why{grid-template-columns:1fr}
+    .kv{grid-template-columns:1fr 1fr}
+    .tiles{grid-template-columns:1fr 1fr}
+    .cta-fin{padding:32px 24px}
   }
 </style>
 </head>
 <body>
-
-  <div id="escena">
-    <div id="fondo">
-      <!-- Figura abstracta generada (monocromo). -->
-      <svg class="figura" viewBox="0 0 1000 1000" aria-hidden="true">
-        <defs>
-          <filter id="f14" filterUnits="userSpaceOnUse" x="-200" y="-200" width="1400" height="1400"><feGaussianBlur stdDeviation="14"/></filter>
-          <filter id="f26" filterUnits="userSpaceOnUse" x="-200" y="-200" width="1400" height="1400"><feGaussianBlur stdDeviation="26"/></filter>
-          <filter id="f55" filterUnits="userSpaceOnUse" x="-200" y="-200" width="1400" height="1400"><feGaussianBlur stdDeviation="55"/></filter>
-        </defs>
-        <!-- halo -->
-        <ellipse cx="500" cy="520" rx="470" ry="510" fill="#a3a3a3" filter="url(#f55)" opacity=".6"/>
-        <!-- brazos (suaves, detrás del cuerpo) -->
-        <g filter="url(#f26)">
-          <ellipse cx="195" cy="840" rx="160" ry="250" fill="#b2b2b2"/>
-          <ellipse cx="805" cy="830" rx="170" ry="255" fill="#cfcfcf"/>
-        </g>
-        <!-- estructura: cuerpo, costuras, capucha y abertura -->
-        <g filter="url(#f14)">
-          <path d="M110 1040 C130 750 260 585 500 575 C740 585 870 750 890 1040 Z" fill="#c4c4c4"/>
-          <path d="M175 730 C330 685 670 685 825 735" stroke="#999999" stroke-width="24" fill="none" opacity=".8"/>
-          <path d="M150 865 C330 810 670 810 850 870" stroke="#949494" stroke-width="26" fill="none" opacity=".75"/>
-          <path d="M140 990 C330 935 670 935 860 995" stroke="#8f8f8f" stroke-width="26" fill="none" opacity=".7"/>
-          <path d="M500 108 C650 118 730 255 722 395 C716 500 645 562 500 568 C355 562 284 500 278 395 C270 255 350 118 500 108 Z" fill="#c2c2c2"/>
-          <path d="M500 130 C635 140 706 262 699 390 C694 485 630 545 500 550 C370 545 306 485 301 390 C294 262 365 140 500 130 Z" fill="#cecece" opacity=".9"/>
-          <ellipse cx="500" cy="378" rx="88" ry="114" fill="#7e7e7e"/>
-        </g>
-        <!-- luces y matices sobre la estructura -->
-        <g filter="url(#f26)">
-          <ellipse cx="500" cy="392" rx="66" ry="88" fill="#9e9e9e" opacity=".9"/>
-          <ellipse cx="472" cy="342" rx="40" ry="28" fill="#ababab" opacity=".8"/>
-          <ellipse cx="500" cy="252" rx="90" ry="14" fill="#e2e2e2" opacity=".85"/>
-          <ellipse cx="420" cy="185" rx="135" ry="70" fill="#dedede" opacity=".8"/>
-          <ellipse cx="700" cy="600" rx="110" ry="150" fill="#d6d6d6" opacity=".55"/>
-        </g>
+<!-- ================= NAV ================= -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="logo" href="#top">
+      <svg class="knot" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <path d="M13 2v22" stroke="#E5B84E" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="13" cy="8" r="2.6" fill="#E5B84E"/>
+        <circle cx="13" cy="15" r="2" fill="#A8B0C2"/>
+        <circle cx="13" cy="21" r="1.5" fill="#2FBF71"/>
       </svg>
+      KIPU <em>TERRENOS</em>
+    </a>
+    <nav class="links">
+      <a href="./">← KIPU</a>
+      <a href="#catalogo">Catálogo</a>
+      <a href="#simulador">Simulador</a>
+      <a href="#proceso">Proceso</a>
+      <a href="#faq">Preguntas</a>
+    </nav>
+    <a class="btn btn-gold btn-sm" href="#simulador">Simular inversión</a>
+  </div>
+</header>
 
-      <!-- FOTO PROPIA (opcional): pega la URL de tu imagen aquí, en src="".
-           Ejemplo:  <img id="foto-fondo" src="mi-retrato.jpg" alt="">      -->
-      <img id="foto-fondo" src="" alt="">
-
-      <!-- Sticker sonriente (se puede arrastrar) -->
-      <button id="sticker" aria-label="Sticker">
-        <svg viewBox="0 0 60 60" fill="none">
-          <circle cx="30" cy="30" r="26" stroke="rgba(255,255,255,.95)" stroke-width="3.2"/>
-          <circle cx="21.5" cy="24.5" r="3.1" fill="rgba(255,255,255,.95)"/>
-          <circle cx="38.5" cy="24.5" r="3.1" fill="rgba(255,255,255,.95)"/>
-          <path d="M18 35c2.8 5.4 7 8.1 12 8.1s9.2-2.7 12-8.1" stroke="rgba(255,255,255,.95)" stroke-width="3.2" stroke-linecap="round"/>
-        </svg>
-      </button>
+<!-- ================= HERO ================= -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">◆ Nueva división de inversión · Perú → Brasil</span>
+    <h1>Invierte en terrenos de <span>Santa Catarina, Brasil</span> — desde Perú, en soles.</h1>
+    <p class="lead">La costa catarinense concentra hoy el metro cuadrado más valorizado del Brasil. Explora terrenos, simula tu inversión de soles a reales y conoce el proceso legal completo para comprar como peruano — incluso sin viajar.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-gold" href="#catalogo">Explorar terrenos →</a>
+      <a class="btn btn-ghost" href="#proceso">¿Cómo compro desde Perú?</a>
     </div>
-
-    <div id="foco" aria-hidden="true"></div>
-    <div id="iconos"></div>
+    <div class="stats">
+      <div class="stat gold"><div class="v">R$ 15.226<small> /m²</small></div><div class="l">Itapema: el m² residencial más caro de Brasil (may. 2026)</div></div>
+      <div class="stat"><div class="v">4 de 5</div><div class="l">De las ciudades más caras del país están en Santa Catarina</div></div>
+      <div class="stat gold"><div class="v">19–22%<small> anual</small></div><div class="l">Retorno efectivo en Itapema, Itajaí y B. Camboriú (2019–2024)</div></div>
+      <div class="stat"><div class="v">60–120<small> días</small></div><div class="l">Proceso completo de compra y registro para extranjeros</div></div>
+    </div>
   </div>
+</section>
 
-  <header class="marca">Santa Catarina<small>Bienes Raíces · KIPU</small></header>
-  <div id="reloj"></div>
-
-  <div id="capa-ventanas"></div>
-
-  <nav id="dock" aria-label="Dock"></nav>
-
-  <button id="ayuda" aria-label="Cómo personalizar">?</button>
-  <div id="toast" role="status"></div>
-
-  <!-- grano de película -->
-  <svg id="grano" aria-hidden="true">
-    <filter id="ruido">
-      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/>
-      <feColorMatrix type="saturate" values="0"/>
-    </filter>
-    <rect width="100%" height="100%" filter="url(#ruido)"/>
-  </svg>
-
-  <!-- cursor personalizado -->
-  <div id="cursor-halo" aria-hidden="true"></div>
-  <div id="cursor" aria-hidden="true">
-    <svg viewBox="0 0 28 28">
-      <path d="M5 2.5 L5 21 L10 16.6 L13 24 L16.4 22.6 L13.4 15.4 L20 15 Z"
-            fill="#fff" stroke="rgba(0,0,0,.45)" stroke-width="1.1" stroke-linejoin="round"/>
-    </svg>
+<!-- ================= POR QUÉ SC ================= -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">¿Por qué Santa Catarina?</span>
+      <h2>El mercado inmobiliario que lidera la valorización en Brasil</h2>
+    </div>
+    <div class="why">
+      <div class="card">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19L10 12l4 4 6-8" stroke="#E5B84E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8h5v5" stroke="#E5B84E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Valorización líder</h3>
+        <p>Itapema superó a Balneário Camboriú en 2026 como el m² más caro del país. Blumenau subió 12,96% en 2024 y Florianópolis 8,65% en 2025.</p>
+      </div>
+      <div class="card">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z" stroke="#E5B84E" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#E5B84E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Seguridad jurídica</h3>
+        <p>Sistema brasileño de matrícula y registro público (Cartório de Registro de Imóveis): cada terreno tiene historial verificable antes de comprar.</p>
+      </div>
+      <div class="card">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#E5B84E" stroke-width="2"/><path d="M3.5 9h17M3.5 15h17M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z" stroke="#E5B84E" stroke-width="1.6"/></svg></div>
+        <h3>Motor turístico</h3>
+        <p>Playas, Beto Carrero World y una costa que recibe millones de visitantes al año: demanda constante de lotes para vivienda, renta y desarrollo.</p>
+      </div>
+      <div class="card">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="5" height="10" rx="1" stroke="#E5B84E" stroke-width="2"/><rect x="10" y="6" width="5" height="14" rx="1" stroke="#E5B84E" stroke-width="2"/><rect x="17" y="3" width="4" height="17" rx="1" stroke="#E5B84E" stroke-width="2"/></svg></div>
+        <h3>Hub económico del sur</h3>
+        <p>Puertos (Itajaí, Navegantes), polo textil-tecnológico (Blumenau) y renta per cápita entre las más altas de Brasil sostienen el mercado.</p>
+      </div>
+    </div>
   </div>
-  <div id="cursor-etiqueta" aria-hidden="true"><span></span></div>
+</section>
 
+<!-- ================= CATÁLOGO ================= -->
+<section id="catalogo">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Catálogo interactivo</span>
+      <h2>Terrenos disponibles en Santa Catarina</h2>
+      <p>Precios referenciales de mercado (julio 2026). Filtra por ciudad, tipo y presupuesto — cada precio se muestra en reales y su equivalente en soles.</p>
+    </div>
+    <div class="filters">
+      <div class="f-group">
+        <label for="f-ciudad">Ciudad</label>
+        <select id="f-ciudad"><option value="all">Todas las ciudades</option></select>
+      </div>
+      <div class="f-group">
+        <label for="f-tipo">Tipo</label>
+        <select id="f-tipo">
+          <option value="all">Todos los tipos</option>
+          <option value="urbano">Lote urbano</option>
+          <option value="condominio">Condominio cerrado</option>
+          <option value="inversion">Área de inversión</option>
+        </select>
+      </div>
+      <div class="f-group f-range">
+        <label for="f-precio">Precio máx. — <span class="rv" id="f-precio-v"></span></label>
+        <input type="range" id="f-precio" min="250000" max="3400000" step="50000" value="3400000">
+      </div>
+      <div class="f-group">
+        <label for="f-orden">Ordenar por</label>
+        <select id="f-orden">
+          <option value="precio-asc">Precio: menor a mayor</option>
+          <option value="precio-desc">Precio: mayor a menor</option>
+          <option value="m2">Tamaño (m²)</option>
+          <option value="valor">Mayor valorización</option>
+        </select>
+      </div>
+      <div class="f-count"><b id="f-n">0</b> terrenos encontrados</div>
+    </div>
+    <div class="grid-lotes" id="grid-lotes"></div>
+    <div class="empty" id="empty" style="display:none">Ningún terreno coincide con esos filtros. Prueba subir el presupuesto o cambiar de ciudad.</div>
+    <p class="note-demo">◆ Catálogo demostrativo con valores referenciales del mercado catarinense (jul. 2026). Reemplázalo con tu inventario real: cada terreno es un objeto editable en el código.</p>
+  </div>
+</section>
+
+<!-- Modal detalle -->
+<div class="modal-ov" id="modal-ov" role="dialog" aria-modal="true">
+  <div class="modal" id="modal"></div>
+</div>
+<!-- ================= SIMULADOR ================= -->
+<section id="simulador">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Simulador de inversión</span>
+      <h2>De soles a metros cuadrados: proyecta tu inversión</h2>
+      <p>Convierte tu capital de S/ a R$, descuenta los costos reales de compra (ITBI, notaría, registro, cambio) y proyecta la valorización con escenarios basados en datos del mercado.</p>
+    </div>
+    <div class="sim">
+      <!-- Panel de entrada -->
+      <div class="panel">
+        <h3>Parámetros</h3>
+        <div class="fld">
+          <label>Punto de partida</label>
+          <div class="seg" id="modo-seg">
+            <button class="on" data-modo="presupuesto">Tengo un presupuesto</button>
+            <button data-modo="terreno">Elegí un terreno</button>
+          </div>
+        </div>
+        <div class="fld" id="fld-presupuesto">
+          <label for="in-pen">Presupuesto en soles <span class="hint">S/ 100.000 – 3.000.000</span></label>
+          <input type="number" id="in-pen" value="500000" min="50000" step="10000">
+          <input type="range" id="in-pen-r" min="100000" max="3000000" step="10000" value="500000" style="margin-top:8px" aria-label="Presupuesto en soles">
+        </div>
+        <div class="fld" id="fld-terreno" style="display:none">
+          <label for="in-lote">Terreno del catálogo</label>
+          <select id="in-lote"></select>
+        </div>
+        <div class="fld">
+          <label for="in-fx">Tipo de cambio S/ → R$ <span class="hint">editable</span></label>
+          <input type="number" id="in-fx" value="1.51" min="0.5" max="4" step="0.01">
+        </div>
+        <div class="fld">
+          <label for="in-anios">Horizonte de inversión <span class="hint" id="anios-v">8 años</span></label>
+          <input type="range" id="in-anios" min="1" max="15" step="1" value="8">
+        </div>
+        <div class="fld">
+          <label>Escenario de valorización anual</label>
+          <div class="scen" id="scen">
+            <button data-g="8"><span class="pct">8%</span>Conservador</button>
+            <button class="on" data-g="12"><span class="pct">12%</span>Moderado</button>
+            <button data-g="19"><span class="pct">19%</span>Histórico alto</button>
+          </div>
+          <p style="font-size:.72rem;color:var(--text-3);margin-top:8px">Referencias: Florianópolis +8,65% (2025) · Blumenau +12,96% (2024) · retorno efectivo Itapema/Itajaí/B. Camboriú 19–22% anual (2019–2024).</p>
+        </div>
+        <div class="fld">
+          <label>Forma de pago</label>
+          <div class="seg" id="pago-seg">
+            <button class="on" data-pago="contado">Al contado</button>
+            <button data-pago="cuotas">Financiación directa</button>
+          </div>
+        </div>
+        <div id="fin-flds" style="display:none">
+          <div class="fld">
+            <label for="in-entrada">Cuota inicial <span class="hint" id="entrada-v">30%</span></label>
+            <input type="range" id="in-entrada" min="20" max="60" step="5" value="30">
+          </div>
+          <div class="fld">
+            <label for="in-plazo">Plazo</label>
+            <select id="in-plazo">
+              <option value="12">12 cuotas mensuales</option>
+              <option value="24">24 cuotas mensuales</option>
+              <option value="36" selected>36 cuotas mensuales</option>
+              <option value="48">48 cuotas mensuales</option>
+              <option value="60">60 cuotas mensuales</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label for="in-interes">Interés anual del desarrollador <span class="hint">típico 8–12%</span></label>
+            <input type="number" id="in-interes" value="10" min="0" max="30" step="0.5">
+          </div>
+        </div>
+        <div class="fx-note">Ruta cambiaria de referencia: <b>S/ → USDT → R$</b> (1 USDT ≈ S/ 3,55 ≈ R$ 5,36). El tipo directo S/ 1 ≈ R$ 1,51 es el valor medio de mercado a jul. 2026 — ajústalo arriba al cerrar tu operación.</div>
+      </div>
+
+      <!-- Resultados -->
+      <div class="results">
+        <div class="hero-num">
+          <div class="k" id="hero-k">Valor proyectado del terreno</div>
+          <div class="v" id="hero-v">—</div>
+          <div class="sub" id="hero-sub">—</div>
+        </div>
+        <div class="alcance" id="alcance" style="display:none"></div>
+        <div class="tiles" id="tiles"></div>
+        <div class="chart-card">
+          <div class="chart-head">
+            <h4 id="chart-title">Proyección de valorización</h4>
+            <button class="tgl" id="tbl-tgl" aria-pressed="false">Ver tabla</button>
+          </div>
+          <div id="chart-wrap"><svg id="chart" role="img" aria-label="Proyección del valor del terreno por año"></svg></div>
+          <div id="tbl-wrap" style="display:none"></div>
+          <div class="tip" id="tip"></div>
+        </div>
+        <div class="desglose" id="desglose"></div>
+        <p class="disclaimer">Simulación referencial con fines informativos. No constituye asesoría financiera, legal ni tributaria, ni una oferta de inversión. La valorización pasada no garantiza resultados futuros; los tipos de cambio, impuestos y costos varían según municipio, cartório y operación.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROCESO ================= -->
+<section id="proceso">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Guía del proceso</span>
+      <h2>Cómo comprar un terreno en Brasil siendo peruano</h2>
+      <p>No necesitas visa ni residencia: con pasaporte vigente y un CPF puedes comprar propiedad urbana a tu nombre. Este es el camino completo, paso a paso.</p>
+    </div>
+    <div class="proceso-grid">
+      <div class="steps">
+        <div class="step">
+          <div class="s-num">1</div>
+          <div class="s-body">
+            <h3>Obtén tu CPF (Cadastro de Pessoa Física)</h3>
+            <div class="meta"><span class="gold">1–5 días</span><span>Gratuito o costo mínimo</span><span>Solo pasaporte</span></div>
+            <p>Es tu número de identificación tributaria en Brasil, <b>indispensable para comprar</b>. Se tramita ante la Receita Federal — también desde el consulado de Brasil en Lima o en línea, sin viajar.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="s-num">2</div>
+          <div class="s-body">
+            <h3>Elige el terreno y haz la verificación (due diligence)</h3>
+            <div class="meta"><span class="gold">1–2 semanas</span><span>Abogado local recomendado</span></div>
+            <p>Se solicita la <b>matrícula actualizada</b> del inmueble en el Registro de Imóveis y las <b>certidões negativas</b> (deudas, embargos, litigios) del terreno y del vendedor. También se confirma zonificación y potencial constructivo en la municipalidad.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="s-num">3</div>
+          <div class="s-body">
+            <h3>Reserva y contrato de compromiso</h3>
+            <div class="meta"><span class="gold">2–4 semanas</span><span>Señal típica: 10–20%</span></div>
+            <p>Se firma el <b>contrato de promessa de compra e venda</b> con el precio, plazos y penalidades. En lotes nuevos es común la <b>financiación directa del desarrollador</b>: cuota inicial + cuotas mensuales hasta en 60 meses.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="s-num">4</div>
+          <div class="s-body">
+            <h3>Envía el dinero por canal regulado</h3>
+            <div class="meta"><span class="gold">5–10 días útiles</span><span>Remesa registrada</span></div>
+            <p>El ingreso de fondos debe hacerse por <b>canales cambiarios regulados</b> y quedar registrado ante el Banco Central do Brasil (contrato de câmbio): eso documenta el origen de tu capital y te permite <b>repatriar la ganancia</b> al vender. KIPU acompaña la ruta S/ → USDT → R$ con trazabilidad completa.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="s-num">5</div>
+          <div class="s-body">
+            <h3>Escritura pública y pago del ITBI</h3>
+            <div class="meta"><span class="gold">1–2 semanas</span><span>ITBI: 2–4% del valor</span></div>
+            <p>Antes de escriturar se paga el <b>ITBI</b> (impuesto municipal de transferencia). Luego se firma la <b>escritura pública</b> en el Cartório de Notas — presencialmente o mediante poder.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="s-num">6</div>
+          <div class="s-body">
+            <h3>Registro del inmueble a tu nombre</h3>
+            <div class="meta"><span class="gold">10–20 días</span><span>Cartório de Registro de Imóveis</span></div>
+            <p>En Brasil, <b>solo es dueño quien registra</b>: la escritura se inscribe en la matrícula del inmueble y desde ese momento el terreno está legalmente a tu nombre, con efectos frente a terceros.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="s-num">7</div>
+          <div class="s-body">
+            <h3>Administra tu inversión</h3>
+            <div class="meta"><span>IPTU anual</span><span>Venta: 15% sobre la ganancia</span></div>
+            <p>Pagarás el <b>IPTU</b> (impuesto predial) cada año. Al vender, el no residente tributa <b>15% sobre la ganancia de capital</b>; con la remesa registrada del paso 4, puedes repatriar capital y utilidad a Perú por vía formal.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="side-card">
+          <h4>Documentos que necesitas</h4>
+          <ul>
+            <li>Pasaporte peruano vigente</li>
+            <li>CPF brasileño (paso 1)</li>
+            <li>Comprobante de origen de fondos (extractos, declaración de renta)</li>
+            <li>Documentos traducidos por traductor juramentado + apostilla de La Haya</li>
+            <li>Poder (procuração) apostillado, si compras a distancia</li>
+          </ul>
+        </div>
+        <div class="side-card">
+          <h4>Compra 100% a distancia</h4>
+          <p>Puedes completar toda la operación <b style="color:var(--text-1)">sin viajar a Brasil</b>: se otorga un poder ante notario peruano, se apostilla y un representante firma la escritura por ti en el cartório. Muchos inversionistas extranjeros compran así.</p>
+        </div>
+        <div class="side-card">
+          <h4>Costos de cierre estimados</h4>
+          <ul>
+            <li>ITBI municipal: 2–4% del valor</li>
+            <li>Escritura + registro: ≈ 1,5–2%</li>
+            <li>Asesoría legal: R$ 5.000–10.000</li>
+            <li>Cambio y remesa: ≈ 1%</li>
+          </ul>
+          <p style="margin-top:10px">Total típico: <span class="big">5–8%</span> <br>adicional al precio del terreno.</p>
+        </div>
+        <div class="side-card">
+          <h4>Restricciones a conocer</h4>
+          <ul>
+            <li><b style="color:var(--text-1)">Propiedad urbana:</b> sin restricciones para extranjeros — aplica a todo el catálogo costero.</li>
+            <li class="warn"><b style="color:var(--text-1)">Propiedad rural:</b> la Ley 5.709/71 limita la superficie (hasta 50 módulos; trámites ante INCRA).</li>
+            <li class="warn"><b style="color:var(--text-1)">Faixa de fronteira:</b> franja de 150 km junto a la frontera (oeste de SC) exige autorizaciones especiales. La costa no está en esa zona.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Preguntas frecuentes</span>
+      <h2>Lo que todo inversionista peruano pregunta</h2>
+    </div>
+    <div class="faq" id="faq-list">
+      <div class="q"><button class="qh">¿Necesito visa o residencia brasileña para comprar?<span class="plus">+</span></button><div class="qa"><p><b>No.</b> Cualquier extranjero puede comprar propiedad urbana en Brasil con pasaporte vigente y CPF. La residencia solo importa para temas migratorios, no para ser propietario.</p></div></div>
+      <div class="q"><button class="qh">¿Puedo comprar sin viajar a Brasil?<span class="plus">+</span></button><div class="qa"><p><b>Sí.</b> Con un poder (procuração) firmado ante notario en Perú y apostillado, un representante puede firmar la reserva, la escritura y el registro por ti. El CPF también puede tramitarse desde el consulado o en línea.</p></div></div>
+      <div class="q"><button class="qh">¿En qué moneda pago y cómo envío el dinero?<span class="plus">+</span></button><div class="qa"><p>El pago final es en <b>reales (R$)</b>. Desde Perú, el capital viaja por canales cambiarios regulados y queda registrado en el Banco Central do Brasil — clave para poder repatriar después. La ruta de referencia de KIPU es S/ → USDT → R$, con verificación de identidad y trazabilidad en cada tramo.</p></div></div>
+      <div class="q"><button class="qh">¿Qué impuestos y costos pago al comprar?<span class="plus">+</span></button><div class="qa"><p>Al comprar: <b>ITBI</b> (2–4% según municipio), escritura y registro (≈1,5–2%) y asesoría legal. En total, presupuesta <b>5–8% adicional</b> al precio. Cada año pagarás el IPTU municipal, y al vender, 15% sobre la ganancia de capital.</p></div></div>
+      <div class="q"><button class="qh">¿Es seguro? ¿Cómo evito fraudes?<span class="plus">+</span></button><div class="qa"><p>La seguridad viene del <b>sistema registral brasileño</b>: antes de pagar, se revisa la matrícula del inmueble (historial completo de dueños y gravámenes) y las certidões del vendedor. Regla de oro: nunca pagar sin due diligence, y solo es dueño quien <b>registra</b> la escritura.</p></div></div>
+      <div class="q"><button class="qh">¿Puedo financiar la compra?<span class="plus">+</span></button><div class="qa"><p>El crédito bancario brasileño es difícil para no residentes. Lo habitual en lotes es la <b>financiación directa del desarrollador</b>: cuota inicial de 20–40% y saldo hasta en 60 cuotas mensuales — el simulador de arriba la incluye.</p></div></div>
+      <div class="q"><button class="qh">¿Qué pasa cuando quiero vender y traer mi dinero a Perú?<span class="plus">+</span></button><div class="qa"><p>Vendes en reales, pagas el 15% sobre la ganancia y repatrías por el mismo canal regulado con el que ingresaste el capital (por eso importa registrar la remesa al comprar). El retorno puede convertirse a USDT o soles según tu preferencia.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA FINAL ================= -->
+<section style="padding-top:10px">
+  <div class="wrap">
+    <div class="cta-fin">
+      <div>
+        <h2>¿Listo para tu primer terreno en la costa catarinense?</h2>
+        <p>Agenda una asesoría: revisamos tu presupuesto, la ruta cambiaria desde soles y los terrenos que encajan con tu perfil.</p>
+      </div>
+      <a class="btn btn-gold" id="cta-wa" href="https://wa.me/51918616580?text=Hola%20KIPU%2C%20quiero%20invertir%20en%20terrenos%20de%20Santa%20Catarina" target="_blank" rel="noopener">Agendar asesoría por WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <div class="logo" style="margin-bottom:8px">KIPU <em>TERRENOS</em></div>
+        <p style="font-size:.85rem;color:var(--text-2);max-width:420px">División informativa de inversión inmobiliaria Perú → Brasil. Del efectivo al patrimonio — con la seguridad que tu trabajo merece.</p>
+      </div>
+      <nav class="links" style="display:flex;flex-direction:column;gap:8px">
+        <a href="#catalogo">Catálogo de terrenos</a>
+        <a href="#simulador">Simulador de inversión</a>
+        <a href="#proceso">Guía del proceso</a>
+        <a href="./">← Volver a KIPU (kippuu.com)</a>
+      </nav>
+    </div>
+    <p class="fine">Plataforma demostrativa. Los terrenos del catálogo son ejemplos con precios referenciales del mercado de Santa Catarina a julio de 2026 y deben reemplazarse por inventario real. Nada de lo aquí mostrado constituye asesoría financiera, legal o tributaria, ni oferta de valores. La atención se realiza por el canal oficial de WhatsApp de KIPU. Verifica siempre cada operación con un abogado inmobiliario habilitado en Brasil.</p>
+    <p class="src">Fuentes de mercado: FipeZAP / MySide (valorización 2024–2026) · Gazeta do Povo (precios m² 2026) · ZS Advogados (proceso legal para extranjeros) · Wise (tipo de cambio PEN–BRL, jul. 2026).</p>
+  </div>
+</footer>
 <script>
-/* ══════════════════════════════════════════════════════════════
-   ███  ZONA EDITABLE — PON AQUÍ TU INFORMACIÓN  ███
-
-   1) PERFIL   → nombre de la división, presentación y contacto.
-   2) PROYECTOS→ una entrada por carpeta = una PROPIEDAD.
-                 Cambia título, textos, etiquetas, año, enlace y
-                 posición (x/y en %).
-   ─ "variante" controla la miniatura generada:
-     carpeta · montanas · retrato · rojo · bosque · rostro
-   ─ Para usar TUS imágenes: pon URLs en "imagenes" (galería) y
-     en "portada" (miniatura + cabecera de la ventana).
-   [EDITABLE] Todo el contenido de abajo es PROVISIONAL: completar
-   con las propiedades reales de Bienes Raíces Santa Catarina
-   antes del anuncio oficial. Sin promesas de rentabilidad.
-   ══════════════════════════════════════════════════════════════ */
-
-const PERFIL = {
-  nombre : "Santa Catarina",
-  rol    : "Bienes Raíces · KIPU",
-  ciudad : "Lima, Perú",
-  email  : "contacto@kipu.com",
-  bio    : "La nueva división inmobiliaria de KIPU. Cada carpeta de este escritorio será una propiedad o proyecto, con su ficha, fotos y documentación. Estamos preparando el catálogo: este espacio se completará con las propiedades reales antes del anuncio oficial.",
-  redes  : {
-    instagram : "",   //  p. ej. "https://instagram.com/tuusuario"
-    x         : "",   //  p. ej. "https://x.com/tuusuario"
-    behance   : "",   //  p. ej. "https://behance.net/tuusuario"
-  },
-};
-
-const PROYECTOS = [
-  {
-    id:"prop01", etiqueta:"Propiedad 01",
-    variante:"carpeta", acento:"#C9A227",
-    x:11, y:16,  xm:18, ym:13,
-    categoria:"Departamento", anio:"2026",
-    descripcion:"[EDITABLE] Ficha de la propiedad: ubicación, metraje, distribución, estado y condiciones. Reemplaza este texto con los datos reales cuando el catálogo esté listo.",
-    tags:["Ubicación","Metraje","Estado"],
-    enlace:"", portada:"", imagenes:[],
-  },
-  {
-    id:"prop02", etiqueta:"Propiedad 02",
-    variante:"montanas", acento:"#7a8894",
-    x:70, y:13,  xm:72, ym:12,
-    categoria:"Terreno", anio:"2026",
-    descripcion:"[EDITABLE] Ficha de la propiedad: ubicación, metraje, linderos, uso de suelo y documentación. Completar con datos reales.",
-    tags:["Ubicación","Metraje","Documentos"],
-    enlace:"", portada:"", imagenes:[],
-  },
-  {
-    id:"prop03", etiqueta:"Propiedad 03",
-    variante:"retrato", acento:"#8b8b8b",
-    x:14, y:44,  xm:15, ym:34,
-    categoria:"Casa", anio:"2026",
-    descripcion:"[EDITABLE] Ficha de la propiedad: ubicación, áreas, ambientes, antigüedad y estado. Completar con datos reales.",
-    tags:["Ubicación","Áreas","Ambientes"],
-    enlace:"", portada:"", imagenes:[],
-  },
-  {
-    id:"prop04", etiqueta:"Propiedad 04",
-    variante:"rojo", acento:"#b3261e",
-    x:39, y:46,  xm:36, ym:52,
-    categoria:"Local comercial", anio:"2026",
-    descripcion:"[EDITABLE] Ficha de la propiedad: ubicación, frente, área, zonificación y condiciones. Completar con datos reales.",
-    tags:["Ubicación","Área","Zonificación"],
-    enlace:"", portada:"", imagenes:[],
-  },
-  {
-    id:"prop05", etiqueta:"Propiedad 05",
-    variante:"bosque", acento:"#2e4a36",
-    x:67, y:63,  xm:70, ym:66,
-    categoria:"Proyecto", anio:"2026",
-    descripcion:"[EDITABLE] Ficha del proyecto: etapa, ubicación, unidades y cronograma tentativo. Completar con datos reales, sin promesas de resultados.",
-    tags:["Etapa","Unidades","Cronograma"],
-    enlace:"", portada:"", imagenes:[],
-  },
-  {
-    id:"prop06", etiqueta:"Propiedad 06",
-    variante:"rostro", acento:"#a58d76",
-    x:84, y:52,  xm:82, ym:36,
-    categoria:"Oficina", anio:"2026",
-    descripcion:"[EDITABLE] Ficha de la propiedad: ubicación, piso, área, implementación y condiciones. Completar con datos reales.",
-    tags:["Ubicación","Área","Implementación"],
-    enlace:"", portada:"", imagenes:[],
-  },
+/* ============================================================
+   KIPU TERRENOS — datos demo (reemplazar con inventario real)
+   Precios referenciales del mercado catarinense, julio 2026
+   ============================================================ */
+const LOTES = [
+  {id:1, ciudad:'Itapema', barrio:'Meia Praia', tipo:'urbano', m2:450, precio:2900000, valPct:19, val:'Alta', dist:'A 350 m del mar', scene:'playa',
+   desc:'Lote plano en la zona de mayor valorización del país: Itapema tiene hoy el m² residencial más caro de Brasil (R$ 15.226). Área de verticalización con demanda constructiva permanente.',
+   extras:['m² más caro de Brasil','Zona de edificación vertical','Frente de 15 m','Servicios completos']},
+  {id:2, ciudad:'Balneário Camboriú', barrio:'Barra Norte', tipo:'urbano', m2:400, precio:3350000, valPct:19, val:'Alta', dist:'A 500 m de la playa', scene:'ciudad',
+   desc:'La “Dubái brasileña”: el skyline más alto de Latinoamérica y más de una década liderando precios. Lote con alto potencial constructivo cerca de la Avenida Brasil.',
+   extras:['Skyline icónico','Potencial constructivo alto','Infraestructura premium']},
+  {id:3, ciudad:'Porto Belo', barrio:'Perequê', tipo:'condominio', m2:600, precio:890000, valPct:15, val:'Alta', dist:'A 5 min del Outlet Premium', scene:'condominio',
+   desc:'Lote en condominio cerrado con portería, en el eje de expansión entre Porto Belo e Itapema. Zona impulsada por el Outlet Premium y nuevos desarrollos residenciales.',
+   extras:['Condominio con portería 24 h','Eje de expansión','Áreas verdes'], financiable:60},
+  {id:4, ciudad:'Penha', barrio:'Armação', tipo:'urbano', m2:384, precio:320000, valPct:12, val:'Media', dist:'A 10 min de Beto Carrero World', scene:'playa',
+   desc:'Ticket de entrada al litoral norte: lote urbano a minutos del parque temático más grande de Latinoamérica, motor de turismo y renta vacacional todo el año.',
+   extras:['Cerca de Beto Carrero','Turismo todo el año','Ideal renta vacacional'], financiable:48},
+  {id:5, ciudad:'Barra Velha', barrio:'Itajuba', tipo:'urbano', m2:360, precio:265000, valPct:12, val:'Media', dist:'A 900 m del mar', scene:'playa',
+   desc:'El lote más accesible del catálogo, en una ciudad-balneario en plena expansión sobre la BR-101. Financiación directa del desarrollador hasta en 60 cuotas.',
+   extras:['Menor ticket de entrada','Sobre eje BR-101','Ciudad en expansión'], financiable:60},
+  {id:6, ciudad:'Navegantes', barrio:'Meia Praia', tipo:'urbano', m2:420, precio:390000, valPct:13, val:'Media', dist:'A 15 min del aeropuerto NVT', scene:'playa',
+   desc:'Lote a minutos del aeropuerto internacional y del complejo portuario. Ciudad logística con playa: doble demanda, residencial y corporativa.',
+   extras:['Cerca del aeropuerto','Polo portuario-logístico','Playa amplia'], financiable:36},
+  {id:7, ciudad:'Itajaí', barrio:'Praia Brava (alto)', tipo:'urbano', m2:500, precio:1850000, valPct:19, val:'Alta', dist:'Vista al mar', scene:'colina',
+   desc:'Lote en altura con vista a Praia Brava, uno de los balnearios más exclusivos del sur. Itajaí registró 19,6% de retorno anual efectivo entre 2019 y 2024.',
+   extras:['Vista al mar','Balneario exclusivo','Retorno 19,6% anual (2019–24)']},
+  {id:8, ciudad:'Blumenau', barrio:'Itoupava Central', tipo:'urbano', m2:700, precio:480000, valPct:12, val:'Media', dist:'Polo industrial y tecnológico', scene:'valle',
+   desc:'Terreno amplio en la capital textil-tecnológica del estado, sede de la Oktoberfest y de la operación de KIPU en Brasil. Valorización de 12,96% en 2024.',
+   extras:['Sede de operación KIPU','Polo tecnológico','+12,96% en 2024'], financiable:48},
+  {id:9, ciudad:'Florianópolis', barrio:'Rio Vermelho', tipo:'condominio', m2:750, precio:690000, valPct:11, val:'Media', dist:'Norte de la isla', scene:'bosque',
+   desc:'Lote arbolado en condominio del norte de la isla, entre la laguna y las playas de Moçambique. Floripa es capital nacional de calidad de vida y tecnología.',
+   extras:['Entorno nativo','Cerca de playas del norte','Capital tecnológica'], financiable:36},
+  {id:10, ciudad:'Porto Belo', barrio:'Santa Luzia', tipo:'inversion', m2:7000, precio:3000000, valPct:15, val:'Alta', dist:'Área para desarrollo o loteo', scene:'valle',
+   desc:'Área de 7.000 m² para desarrollo: loteo, condominio o proyecto turístico, en el interior verde de Porto Belo con acceso a la península.',
+   extras:['Apta para loteo','Escala de desarrollo','Entorno natural']}
 ];
+const TIPO_LBL = {urbano:'Lote urbano', condominio:'Condominio cerrado', inversion:'Área de inversión'};
+const YEAR0 = 2026;
 
-/* ══════════════ FIN DE LA ZONA EDITABLE ══════════════
-   (De aquí hacia abajo no hace falta tocar nada)        */
+/* ---------- formato ---------- */
+const nf0 = new Intl.NumberFormat('es-PE',{maximumFractionDigits:0});
+const nf1 = new Intl.NumberFormat('es-PE',{maximumFractionDigits:1});
+const fmtBRL = v=>'R$ '+nf0.format(Math.round(v));
+const fmtPEN = v=>'S/ '+nf0.format(Math.round(v));
+const fmtBRLc = v=> v>=1e6 ? 'R$ '+nf1.format(v/1e6)+' M' : v>=1e3 ? 'R$ '+nf0.format(Math.round(v/1e3))+' mil' : 'R$ '+nf0.format(v);
+const fmtPct = v=>nf1.format(v)+'%';
+const esc = s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 
-"use strict";
-const $  = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-const esMovil    = () => matchMedia("(max-width:720px)").matches;
-const esTactil   = matchMedia("(hover:none), (pointer:coarse)").matches;
-const menosMovim = matchMedia("(prefers-reduced-motion:reduce)").matches;
-let contadorSvg = 0;
+/* ---------- escenas SVG (ilustraciones autocontenidas) ---------- */
+function sceneSVG(l, big){
+  const u = 'g'+l.id+(big?'b':''), w=400, h=big?175:210;
+  const sky = {playa:'#1A2B3F', ciudad:'#141B2E', condominio:'#18263A', colina:'#152238', valle:'#16233A', bosque:'#132030'}[l.scene]||'#16233A';
+  let mid='';
+  const sun = `<circle cx="${300+(l.id*13)%60}" cy="52" r="16" fill="url(#${u}s)"/><circle cx="${300+(l.id*13)%60}" cy="52" r="34" fill="rgba(229,184,78,.10)"/>`;
+  if(l.scene==='playa'){ mid = `
+    <rect x="0" y="92" width="400" height="46" fill="url(#${u}m)"/>
+    <path d="M0 92h400" stroke="rgba(229,184,78,.5)" stroke-width="1"/>
+    <path d="M20 106h58M96 114h44M300 104h64M210 118h40" stroke="rgba(255,255,255,.14)" stroke-width="2" stroke-linecap="round"/>
+    <path d="M0 138q120 -14 400 0v80H0z" fill="#20283A"/>
+    <path d="M0 148q140 -10 400 -2" stroke="rgba(229,184,78,.18)" stroke-width="1.5" fill="none"/>
+    <g stroke="#0D1420" stroke-width="4" stroke-linecap="round"><path d="M58 140v-26"/><path d="M338 146v-22"/></g>
+    <g stroke="#2FBF71" stroke-width="3" stroke-linecap="round" opacity=".75">
+      <path d="M58 114q-12 -8 -20 -4M58 114q2 -13 12 -15M58 114q13 -6 19 2M58 114q-4 -12 -14 -12"/>
+      <path d="M338 124q-11 -7 -18 -3M338 124q2 -11 11 -13M338 124q12 -5 17 2"/></g>`;
+  } else if(l.scene==='ciudad'){ mid = `
+    <g fill="#1B2438">
+      <rect x="36" y="52" width="30" height="86"/><rect x="76" y="30" width="36" height="108"/><rect x="122" y="64" width="26" height="74"/>
+      <rect x="158" y="42" width="34" height="96"/><rect x="242" y="56" width="30" height="82"/><rect x="282" y="72" width="24" height="66"/></g>
+    <g fill="rgba(229,184,78,.55)">
+      <rect x="82" y="40" width="5" height="5"/><rect x="94" y="40" width="5" height="5"/><rect x="82" y="56" width="5" height="5"/><rect x="100" y="72" width="5" height="5"/>
+      <rect x="164" y="52" width="5" height="5"/><rect x="176" y="66" width="5" height="5"/><rect x="164" y="84" width="5" height="5"/>
+      <rect x="44" y="64" width="4" height="4"/><rect x="54" y="80" width="4" height="4"/><rect x="248" y="66" width="4" height="4"/><rect x="260" y="84" width="4" height="4"/></g>
+    <rect x="0" y="138" width="400" height="80" fill="#20283A"/>
+    <path d="M0 138h400" stroke="rgba(229,184,78,.35)"/>`;
+  } else if(l.scene==='condominio'){ mid = `
+    <path d="M0 118q200 -22 400 0v100H0z" fill="#1D2637"/>
+    <g fill="#242F44" stroke="#0F1524" stroke-width="1.5">
+      <path d="M60 120l16 -12 16 12v18H60zM150 116l16 -12 16 12v20h-32zM250 120l16 -12 16 12v18h-32z"/></g>
+    <g fill="rgba(229,184,78,.6)"><rect x="72" y="126" width="7" height="7"/><rect x="162" y="124" width="7" height="7"/><rect x="262" y="126" width="7" height="7"/></g>
+    <g stroke="#2FBF71" stroke-width="3" stroke-linecap="round" opacity=".7">
+      <path d="M110 138v-14M110 126q-8 -7 -13 -4M110 126q8 -8 14 -5"/>
+      <path d="M212 140v-14M212 128q-8 -7 -13 -4M212 128q8 -8 14 -5"/>
+      <path d="M312 138v-12M312 128q-7 -6 -11 -3M312 128q7 -7 12 -4"/></g>
+    <path d="M20 156h360" stroke="rgba(229,184,78,.25)" stroke-width="1.5" stroke-dasharray="2 6"/>`;
+  } else if(l.scene==='colina'){ mid = `
+    <rect x="0" y="96" width="400" height="30" fill="url(#${u}m)"/>
+    <path d="M0 96h400" stroke="rgba(229,184,78,.45)"/>
+    <path d="M0 126C90 66 180 92 260 112s110 10 140 4v104H0z" fill="#1E2839"/>
+    <path d="M0 126C90 66 180 92 260 112" stroke="rgba(229,184,78,.2)" stroke-width="1.5" fill="none"/>
+    <g stroke="#2FBF71" stroke-width="2.6" stroke-linecap="round" opacity=".6"><path d="M96 96v-10M96 88q-6 -5 -10 -3M96 88q6 -6 10 -4"/><path d="M150 104v-9M150 97q-5 -5 -9 -3M150 97q6 -5 9 -3"/></g>`;
+  } else if(l.scene==='valle'){ mid = `
+    <path d="M0 122L70 58l64 64zM96 122l74 -74 86 74zM230 122l58 -50 72 50z" fill="#1B2536"/>
+    <path d="M70 58l16 16 -10 4 14 12M170 48l18 18 -12 4 16 14" stroke="rgba(229,184,78,.35)" stroke-width="1.5" fill="none"/>
+    <rect x="0" y="122" width="400" height="96" fill="#20293B"/>
+    <path d="M0 150q90 -14 190 0t210 -6" stroke="rgba(47,191,113,.35)" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+  } else { mid = `
+    <rect x="0" y="118" width="400" height="100" fill="#1A2434"/>
+    <g fill="#1F3A31">
+      <path d="M50 130l14 -34 14 34zM92 132l12 -28 12 28zM160 128l15 -36 15 36zM220 132l12 -26 12 26zM286 128l14 -32 14 32zM340 132l11 -24 11 24z"/></g>
+    <g fill="#254A3C" opacity=".8"><path d="M72 138l13 -30 13 30zM136 138l12 -26 12 26zM196 138l13 -30 13 30zM256 138l12 -26 12 26zM318 138l12 -26 12 26z"/></g>
+    <rect x="0" y="112" width="400" height="8" fill="rgba(255,255,255,.05)"/>`;
+  }
+  const parcel = `
+    <g transform="translate(0,${big?-14:0})">
+      <path d="M150 200 L250 200 L272 166 L172 166 Z" fill="rgba(229,184,78,.10)" stroke="#E5B84E" stroke-width="1.6" stroke-dasharray="7 5"/>
+      <g fill="#E5B84E"><circle cx="150" cy="200" r="3"/><circle cx="250" cy="200" r="3"/><circle cx="272" cy="166" r="3"/><circle cx="172" cy="166" r="3"/></g>
+      <text x="211" y="188" text-anchor="middle" font-size="11" font-weight="700" fill="#E5B84E" font-family="system-ui,sans-serif" letter-spacing="2">LOTE</text>
+    </g>`;
+  return `<svg viewBox="0 0 400 ${big?175:210}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="${u}k" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0D111C"/><stop offset="1" stop-color="${sky}"/></linearGradient>
+      <linearGradient id="${u}m" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1E4B55"/><stop offset="1" stop-color="#12293A"/></linearGradient>
+      <radialGradient id="${u}s"><stop offset="0" stop-color="#F0C868"/><stop offset="1" stop-color="#C98500"/></radialGradient>
+    </defs>
+    <rect width="400" height="${big?175:210}" fill="url(#${u}k)"/>
+    ${sun}${mid}${parcel}
+  </svg>`;
+}
 
-/* ---------- Miniaturas SVG generadas ---------- */
-function svgMiniatura(variante, acento){
-  const n = ++contadorSvg;
-  const abre = `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">`;
-  const cierra = `</svg>`;
-  switch(variante){
-    case "carpeta": return `
-      <svg viewBox="0 0 64 58" xmlns="http://www.w3.org/2000/svg">
-        <defs><linearGradient id="ca${n}" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="${acento}"/><stop offset="1" stop-color="${sombrear(acento,-28)}"/>
+/* ============================================================
+   CATÁLOGO
+   ============================================================ */
+const $ = id=>document.getElementById(id);
+const state = {ciudad:'all', tipo:'all', precioMax:3400000, orden:'precio-asc'};
+
+function cierreDe(precio){
+  const itbi=precio*0.03, escr=precio*0.0175, legal=8000;
+  const cambio=(precio+itbi+escr+legal)*0.01;
+  return {itbi, escr, legal, cambio, total: itbi+escr+legal+cambio};
+}
+const totalNecesario = l => l.precio + cierreDe(l.precio).total;
+
+function loteCard(l){
+  const pm2 = Math.round(l.precio/l.m2);
+  return `<article class="lote" data-id="${l.id}">
+    <div class="scene">${sceneSVG(l)}
+      <div class="badges">
+        <span class="badge gold">${TIPO_LBL[l.tipo]}</span>
+        <span class="badge green">▲ Valorización ${l.val.toLowerCase()}</span>
+        ${l.financiable?`<span class="badge">Hasta ${l.financiable} cuotas</span>`:''}
+      </div>
+    </div>
+    <div class="body">
+      <h3>${esc(l.barrio)} · ${esc(l.ciudad)}</h3>
+      <div class="loc"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.6 7-11a7 7 0 10-14 0c0 5.4 7 11 7 11z" stroke="#8A93A6" stroke-width="2"/><circle cx="12" cy="10" r="2.6" stroke="#8A93A6" stroke-width="2"/></svg> ${esc(l.dist)} — Santa Catarina, Brasil</div>
+      <div class="specs"><span><b>${nf0.format(l.m2)}</b> m²</span><span><b>${fmtBRL(pm2)}</b> /m²</span><span>▲ <b>~${l.valPct}%</b> anual ref.</span></div>
+      <div class="price-row">
+        <div><span class="p">${fmtBRL(l.precio)}</span><span class="pen">≈ ${fmtPEN(l.precio/sim.fx)}</span></div>
+        <button class="btn btn-ghost btn-sm ver-btn" data-id="${l.id}">Ver detalle</button>
+      </div>
+    </div>
+  </article>`;
+}
+
+function renderCatalogo(){
+  let ls = LOTES.filter(l=>
+    (state.ciudad==='all'||l.ciudad===state.ciudad) &&
+    (state.tipo==='all'||l.tipo===state.tipo) &&
+    l.precio<=state.precioMax);
+  const ord = state.orden;
+  ls.sort((a,b)=> ord==='precio-asc'?a.precio-b.precio : ord==='precio-desc'?b.precio-a.precio : ord==='m2'?b.m2-a.m2 : b.valPct-a.valPct);
+  $('grid-lotes').innerHTML = ls.map(loteCard).join('');
+  $('f-n').textContent = ls.length;
+  $('empty').style.display = ls.length?'none':'block';
+  document.querySelectorAll('.ver-btn').forEach(b=>b.addEventListener('click',()=>openModal(+b.dataset.id)));
+}
+
+function openModal(id){
+  const l = LOTES.find(x=>x.id===id), c = cierreDe(l.precio);
+  $('modal').innerHTML = `
+    <div class="scene">${sceneSVG(l,true)}<button class="m-close" id="m-close" aria-label="Cerrar">✕</button></div>
+    <div class="mbody">
+      <h3>${esc(l.barrio)} · ${esc(l.ciudad)}</h3>
+      <div class="loc">${esc(l.dist)} — ${TIPO_LBL[l.tipo]} · Santa Catarina, Brasil</div>
+      <p style="font-size:.92rem;color:var(--text-2)">${esc(l.desc)}</p>
+      <div class="kv">
+        <div><div class="k">Precio</div><div class="v gold">${fmtBRL(l.precio)}</div><div style="font-size:.74rem;color:var(--text-3)">≈ ${fmtPEN(l.precio/sim.fx)}</div></div>
+        <div><div class="k">Superficie</div><div class="v">${nf0.format(l.m2)} m²</div><div style="font-size:.74rem;color:var(--text-3)">${fmtBRL(Math.round(l.precio/l.m2))} por m²</div></div>
+        <div><div class="k">Valorización ref.</div><div class="v" style="color:var(--green)">▲ ~${l.valPct}% anual</div><div style="font-size:.74rem;color:var(--text-3)">potencial ${l.val.toLowerCase()}</div></div>
+      </div>
+      <div class="hl">${(l.extras||[]).map(e=>`<span>${esc(e)}</span>`).join('')}</div>
+      <div class="d-row"><span>Costos de cierre estimados (ITBI, escritura, registro, legal, cambio)</span><b>+ ${fmtBRL(c.total)}</b></div>
+      <div class="d-row total"><span>Desembolso total estimado</span><b>${fmtBRL(l.precio+c.total)} · ≈ ${fmtPEN((l.precio+c.total)/sim.fx)}</b></div>
+      ${l.financiable?`<p style="font-size:.8rem;color:var(--text-3);margin-top:8px">◆ Acepta financiación directa del desarrollador hasta en ${l.financiable} cuotas mensuales.</p>`:''}
+      <div class="m-actions">
+        <button class="btn btn-gold" id="m-sim">Simular esta inversión →</button>
+        <button class="btn btn-ghost" id="m-cerrar">Cerrar</button>
+      </div>
+    </div>`;
+  $('modal-ov').classList.add('open');
+  $('m-close').onclick = $('m-cerrar').onclick = closeModal;
+  $('m-sim').onclick = ()=>{ closeModal(); $('in-lote').value=String(l.id); setModo('terreno'); simular(); location.hash='#simulador'; };
+}
+function closeModal(){ $('modal-ov').classList.remove('open'); }
+$('modal-ov').addEventListener('click',e=>{ if(e.target===$('modal-ov')) closeModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+/* ============================================================
+   SIMULADOR
+   ============================================================ */
+const sim = {modo:'presupuesto', pen:500000, fx:1.51, anios:8, g:12, pago:'contado', entrada:30, plazo:36, interes:10, loteId:1, tabla:false};
+
+function setModo(m){
+  sim.modo = m;
+  document.querySelectorAll('#modo-seg button').forEach(b=>b.classList.toggle('on', b.dataset.modo===m));
+  $('fld-presupuesto').style.display = m==='presupuesto'?'block':'none';
+  $('fld-terreno').style.display = m==='terreno'?'block':'none';
+  if(m==='terreno'){
+    const l = LOTES.find(x=>x.id===+$('in-lote').value) || LOTES[0];
+    setScen(l.valPct<=9?8: l.valPct<=15?12:19);
+  }
+}
+function setScen(g){
+  sim.g = g;
+  document.querySelectorAll('#scen button').forEach(b=>b.classList.toggle('on', +b.dataset.g===g));
+}
+function setPago(p){
+  sim.pago = p;
+  document.querySelectorAll('#pago-seg button').forEach(b=>b.classList.toggle('on', b.dataset.pago===p));
+  $('fin-flds').style.display = p==='cuotas'?'block':'none';
+}
+
+function calcular(){
+  const fx = sim.fx;
+  let precio, lote=null, capBRL;
+  if(sim.modo==='terreno'){
+    lote = LOTES.find(x=>x.id===sim.loteId) || LOTES[0];
+    precio = lote.precio;
+    capBRL = precio + cierreDe(precio).total;
+  } else {
+    capBRL = sim.pen * fx;
+    precio = (capBRL - 8000*1.01) / (1.0475*1.01);   /* inversión total = presupuesto */
+    if(precio < 0) precio = 0;
+  }
+  const c = cierreDe(precio);
+  const inv = precio + c.total;                        /* desembolso total al contado */
+  const H = sim.anios, g = sim.g/100;
+  const serie = []; for(let t=0;t<=H;t++) serie.push(precio*Math.pow(1+g,t));
+  const vH = serie[H];
+  const imp = Math.max(0, vH-precio)*0.15;
+  const neto = vH - imp;
+  const ganNeta = neto - inv;
+  const roi = inv>0? ganNeta/inv : 0;
+  const tir = inv>0 && H>0? Math.pow(neto/inv, 1/H)-1 : 0;
+  let fin=null;
+  if(sim.pago==='cuotas'){
+    const e = sim.entrada/100, n = sim.plazo, i = sim.interes/1200;
+    const base = precio*(1-e);
+    const cuota = i>0? base*i/(1-Math.pow(1+i,-n)) : base/n;
+    fin = {inicial: precio*e, cuota, n, total: precio*e + cuota*n + c.total};
+  }
+  return {precio, lote, capBRL, c, inv, H, serie, vH, imp, neto, ganNeta, roi, tir, fin, fx};
+}
+
+function ganNetaEn(t, r){ /* ganancia neta acumulada si vendes en el año t */
+  const v = r.serie[t];
+  const neto = v - Math.max(0, v-r.precio)*0.15;
+  return neto - r.inv;
+}
+
+function simular(){
+  sim.pen = Math.max(0, +$('in-pen').value||0);
+  sim.fx = Math.min(4, Math.max(0.5, +$('in-fx').value||1.51));
+  sim.anios = +$('in-anios').value;
+  sim.entrada = +$('in-entrada').value;
+  sim.plazo = +$('in-plazo').value;
+  sim.interes = +$('in-interes').value||0;
+  sim.loteId = +$('in-lote').value || 1;
+  $('anios-v').textContent = sim.anios+(sim.anios===1?' año':' años');
+  $('entrada-v').textContent = sim.entrada+'%';
+
+  const r = calcular();
+  const yearH = YEAR0 + r.H;
+
+  /* --- héroe --- */
+  if(r.precio < 40000){
+    $('hero-k').textContent = 'Valor proyectado del terreno';
+    $('hero-v').textContent = '—';
+    $('hero-sub').innerHTML = 'Tu presupuesto aún no cubre un terreno del rango del catálogo tras costos de cierre. Prueba desde <b>S/ 100.000</b> aprox.';
+  } else {
+    $('hero-k').textContent = `Valor proyectado del terreno en ${yearH} (${r.H} ${r.H===1?'año':'años'})`;
+    $('hero-v').textContent = fmtBRL(r.vH);
+    const pctTot = r.precio>0? (r.vH/r.precio-1)*100 : 0;
+    $('hero-sub').innerHTML = `<span class="up">▲ +${fmtPct(pctTot)}</span> sobre el precio de compra · ganancia neta estimada <b style="color:var(--text-1)">${fmtBRL(r.ganNeta)}</b> (≈ ${fmtPEN(r.ganNeta/r.fx)}) tras el impuesto del 15% a la ganancia.`;
+  }
+
+  /* --- alcance (modo presupuesto) --- */
+  if(sim.modo==='presupuesto' && r.precio>=40000){
+    const alcanzables = LOTES.filter(l=>totalNecesario(l)<=r.capBRL).sort((a,b)=>b.precio-a.precio);
+    $('alcance').style.display='block';
+    $('alcance').innerHTML = `Con <b>${fmtPEN(sim.pen)}</b> (≈ ${fmtBRL(r.capBRL)}) alcanzas <b>${alcanzables.length} de ${LOTES.length}</b> terrenos del catálogo, con costos de cierre incluidos.` +
+      (alcanzables.length? `<div class="chips">${alcanzables.map(l=>`<button data-id="${l.id}">${esc(l.ciudad)} · ${nf0.format(l.m2)} m² — ${fmtBRLc(l.precio)}</button>`).join('')}</div>`:'');
+    document.querySelectorAll('#alcance .chips button').forEach(b=>b.addEventListener('click',()=>{ $('in-lote').value=b.dataset.id; setModo('terreno'); simular(); }));
+  } else { $('alcance').style.display='none'; }
+
+  /* --- tiles --- */
+  const tiles = [];
+  if(sim.modo==='terreno' && r.lote){
+    tiles.push({k:'Necesitas en total', v:fmtPEN(r.inv/r.fx), s:`≈ ${fmtBRL(r.inv)} con costos de cierre`, cls:'gold'});
+    tiles.push({k:'Precio del terreno', v:fmtBRL(r.precio), s:`${nf0.format(r.lote.m2)} m² · ${fmtBRL(Math.round(r.precio/r.lote.m2))}/m²`});
+  } else {
+    tiles.push({k:'Capital en reales', v:fmtBRL(r.capBRL), s:`de ${fmtPEN(sim.pen)} al cambio ${nf1.format(r.fx)}`, cls:'gold'});
+    tiles.push({k:'Terreno alcanzable', v:fmtBRL(r.precio), s:'invirtiendo todo el presupuesto'});
+  }
+  tiles.push({k:'Costos de cierre', v:fmtBRL(r.c.total), s:`≈ ${fmtPct(r.precio>0? r.c.total/r.precio*100:0)} del precio`});
+  tiles.push({k:`Ganancia neta (${yearH})`, v:(r.ganNeta>=0?'▲ +':'▼ ')+fmtBRL(Math.abs(r.ganNeta)), s:`≈ ${fmtPEN(Math.abs(r.ganNeta)/r.fx)} · tras impuesto 15%`, cls:r.ganNeta>=0?'green':''});
+  tiles.push({k:'Retorno total', v:(r.roi>=0?'▲ +':'▼ ')+fmtPct(Math.abs(r.roi*100)), s:`≈ ${fmtPct(r.tir*100)} anual compuesto`, cls:r.roi>=0?'green':''});
+  if(r.fin){
+    tiles.push({k:'Cuota mensual', v:fmtBRL(r.fin.cuota), s:`≈ ${fmtPEN(r.fin.cuota/r.fx)} · ${r.fin.n} cuotas`, cls:'gold'});
+  } else {
+    tiles.push({k:'Escenario aplicado', v:'▲ '+sim.g+'% anual', s: sim.modo==='terreno'&&r.lote? 'ajustado al potencial del terreno':'valorización compuesta'});
+  }
+  $('tiles').innerHTML = tiles.map(t=>`<div class="tile"><div class="k">${t.k}</div><div class="v ${t.cls||''}">${t.v}</div><div class="s">${t.s}</div></div>`).join('');
+
+  /* --- desglose --- */
+  let d = `<h4>Desglose del desembolso</h4>
+    <div class="d-row"><span>Precio del terreno</span><b>${fmtBRL(r.precio)}</b></div>
+    <div class="d-row"><span>ITBI municipal (3%)</span><b>${fmtBRL(r.c.itbi)}</b></div>
+    <div class="d-row"><span>Escritura + registro (1,75%)</span><b>${fmtBRL(r.c.escr)}</b></div>
+    <div class="d-row"><span>Asesoría legal</span><b>${fmtBRL(r.c.legal)}</b></div>
+    <div class="d-row"><span>Cambio y remesa (≈1%)</span><b>${fmtBRL(r.c.cambio)}</b></div>
+    <div class="d-row total"><span>Total al contado</span><b>${fmtBRL(r.inv)} · ≈ ${fmtPEN(r.inv/r.fx)}</b></div>`;
+  if(r.fin){
+    d += `<div class="d-row" style="margin-top:6px"><span>Cuota inicial (${sim.entrada}%) + cierre</span><b>${fmtBRL(r.fin.inicial + r.c.total)}</b></div>
+    <div class="d-row"><span>${r.fin.n} cuotas de ${fmtBRL(r.fin.cuota)} (interés ${nf1.format(sim.interes)}%)</span><b>${fmtBRL(r.fin.cuota*r.fin.n)}</b></div>
+    <div class="d-row total"><span>Total pagado con financiación</span><b>${fmtBRL(r.fin.total)} · ≈ ${fmtPEN(r.fin.total/r.fx)}</b></div>`;
+  }
+  $('desglose').innerHTML = d;
+
+  drawChart(r);
+  renderTabla(r);
+}
+
+/* ---------- gráfico SVG (serie única validada #C98500 sobre #141926) ---------- */
+let chartGeo = null;
+function niceStep(raw){
+  const p = Math.pow(10, Math.floor(Math.log10(raw||1)));
+  for(const m of [1,2,2.5,5,10]) if(raw <= m*p) return m*p;
+  return 10*p;
+}
+function drawChart(r){
+  const svg = $('chart');
+  const W=720, Hh=300, L=70, R=20, T=20, B=36;
+  const iw=W-L-R, ih=Hh-T-B;
+  svg.setAttribute('viewBox',`0 0 ${W} ${Hh}`);
+  if(r.precio<40000){ svg.innerHTML = `<text x="${W/2}" y="${Hh/2}" text-anchor="middle" fill="#8A93A6" font-size="14" font-family="system-ui,sans-serif">Aumenta el presupuesto para ver la proyección</text>`; chartGeo=null; return; }
+  const maxV = Math.max(...r.serie, r.inv)*1.06;
+  const step = niceStep(maxV/4);
+  const yMax = step*Math.ceil(maxV/step);
+  const x = t=> L + (r.H? t/r.H : 0)*iw;
+  const y = v=> T + ih - (v/yMax)*ih;
+  let g='';
+  for(let v=0; v<=yMax+1; v+=step){
+    g += `<line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="#232936" stroke-width="1"/>
+          <text x="${L-9}" y="${y(v)+4}" text-anchor="end" fill="#8A93A6" font-size="11" font-family="system-ui,sans-serif">${fmtBRLc(v)}</text>`;
+  }
+  const kx = r.H>8? 2:1;
+  for(let t=0;t<=r.H;t+=kx){
+    g += `<text x="${x(t)}" y="${Hh-12}" text-anchor="middle" fill="#8A93A6" font-size="11" font-family="system-ui,sans-serif">${t===0?'Hoy':YEAR0+t}</text>`;
+  }
+  const pts = r.serie.map((v,t)=>`${x(t)},${y(v)}`).join(' ');
+  const area = `M ${x(0)},${y(r.serie[0])} L ${pts.split(' ').join(' L ')} L ${x(r.H)},${T+ih} L ${x(0)},${T+ih} Z`;
+  const yInv = y(Math.min(r.inv,yMax));
+  g += `<defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="rgba(201,133,0,.30)"/><stop offset="1" stop-color="rgba(201,133,0,0)"/>
         </linearGradient></defs>
-        <path d="M6 13a4 4 0 0 1 4-4h12l5 5h27a4 4 0 0 1 4 4v6H6Z" fill="${sombrear(acento,-38)}"/>
-        <rect x="6" y="18" width="52" height="33" rx="4.5" fill="url(#ca${n})"/>
-        <rect x="6" y="18" width="52" height="5" rx="2.5" fill="rgba(255,255,255,.28)"/>
-      </svg>`;
-    case "montanas": return `${abre}
-      <defs><linearGradient id="mo${n}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#d3d3d3"/><stop offset="1" stop-color="#8a8a8a"/>
-      </linearGradient></defs>
-      <rect width="100" height="100" fill="url(#mo${n})"/>
-      <circle cx="71" cy="25" r="8" fill="#f2f2f2"/>
-      <path d="M0 76 28 40 44 62 60 34 82 64 100 50V100H0Z" fill="#575757"/>
-      <path d="M0 92 30 66 55 84 78 68 100 80V100H0Z" fill="#3a3a3a"/>${cierra}`;
-    case "retrato": return `${abre}
-      <defs><linearGradient id="re${n}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#bcbcbc"/><stop offset="1" stop-color="#878787"/>
-      </linearGradient></defs>
-      <rect width="100" height="100" fill="url(#re${n})"/>
-      <circle cx="50" cy="40" r="16" fill="#3d3d3d"/>
-      <path d="M17 100C21 70 36 61 50 61s29 9 33 39Z" fill="#3d3d3d"/>${cierra}`;
-    case "rojo": return `${abre}
-      <defs>
-        <linearGradient id="ro${n}" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#c9352a"/><stop offset="1" stop-color="#5f0d07"/>
-        </linearGradient>
-        <filter id="rb${n}" x="-120%" y="-120%" width="340%" height="340%"><feGaussianBlur stdDeviation="7"/></filter>
-      </defs>
-      <rect width="100" height="100" fill="url(#ro${n})"/>
-      <ellipse cx="36" cy="58" rx="30" ry="22" fill="#7e130b" filter="url(#rb${n})"/>
-      <ellipse cx="70" cy="28" rx="20" ry="13" fill="#e0584a" opacity=".75" filter="url(#rb${n})"/>${cierra}`;
-    case "bosque": return `${abre}
-      <defs><linearGradient id="bo${n}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#283b2e"/><stop offset="1" stop-color="#0c160f"/>
-      </linearGradient></defs>
-      <rect width="100" height="100" fill="url(#bo${n})"/>
-      <g fill="none" stroke-linecap="round">
-        <path d="M22 96C32 62 28 42 40 18" stroke="#5c7f63" stroke-width="4"/>
-        <path d="M52 98C56 68 62 52 74 30" stroke="#8fae8f" stroke-width="3.4"/>
-        <path d="M36 98C44 78 58 70 82 62" stroke="#46654d" stroke-width="4"/>
-        <path d="M12 98C16 80 14 66 8 52" stroke="#3c5a44" stroke-width="3"/>
-      </g>${cierra}`;
-    case "rostro": return `${abre}
-      <defs><linearGradient id="rf${n}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#847d74"/><stop offset="1" stop-color="#57524b"/>
-      </linearGradient></defs>
-      <rect width="100" height="100" fill="url(#rf${n})"/>
-      <path d="M14 100C18 76 34 68 50 68s32 8 36 32Z" fill="#2c2a27"/>
-      <circle cx="50" cy="45" r="16.5" fill="#c9b39c"/>
-      <path d="M32.5 45c-1.5-22 36.5-22 35 0l-2-9c-7-9-24-9-31 0Z" fill="#211f1d"/>${cierra}`;
-    default: return `${abre}<rect width="100" height="100" fill="#9a9a9a"/>${cierra}`;
-  }
-}
-function sombrear(hex, pct){
-  const v = hex.replace("#","");
-  const num = parseInt(v.length===3 ? v.split("").map(c=>c+c).join("") : v, 16);
-  const f = c => Math.max(0, Math.min(255, Math.round(c + (pct/100)*255)));
-  return `rgb(${f(num>>16)},${f((num>>8)&255)},${f(num&255)})`;
-}
-
-/* ---------- Render de iconos ---------- */
-const capaIconos = $("#iconos");
-function renderIconos(){
-  capaIconos.innerHTML = "";
-  PROYECTOS.forEach((p, i) => {
-    const el = document.createElement("div");
-    el.className = "icono oculto-inicial";
-    el.dataset.id = p.id;
-    posicionarIcono(el, p);
-    const esCarpeta = p.variante === "carpeta" && !p.portada;
-    const visual = p.portada
-      ? `<img src="${p.portada}" alt="">`
-      : svgMiniatura(p.variante, p.acento);
-    el.innerHTML = `
-      <div class="icono-inner">
-        <button type="button" aria-label="Abrir propiedad: ${p.etiqueta}">
-          <span class="mini ${esCarpeta ? "carpeta" : ""}">${visual}</span>
-          <span class="nombre">${p.etiqueta}</span>
-        </button>
-      </div>`;
-    // el click se escucha en el contenedor: setPointerCapture puede
-    // redirigir el evento fuera del botón interno
-    el.addEventListener("click", () => {
-      if (el.dataset.arrastrado === "1") { el.dataset.arrastrado = ""; return; }
-      abrirProyecto(p, el);
-    });
-    hacerArrastrable(el, p);
-    capaIconos.appendChild(el);
-    setTimeout(() => el.classList.add("aparecer"), 320 + i*130);
-    setTimeout(() => el.classList.remove("oculto-inicial","aparecer"), 2200 + i*130);
-  });
-}
-function posicionarIcono(el, p){
-  const x = esMovil() && p.xm != null ? p.xm : p.x;
-  const y = esMovil() && p.ym != null ? p.ym : p.y;
-  el.style.left = x + "%";
-  el.style.top  = y + "%";
-}
-
-/* ---------- Arrastre de iconos (estilo escritorio) ---------- */
-function hacerArrastrable(el, p){
-  let px=0, py=0, sx=0, sy=0, movio=false, id=null;
-  el.addEventListener("pointerdown", e => {
-    if (e.button && e.button !== 0) return;
-    id = e.pointerId;
-    el.setPointerCapture(id);
-    sx = e.clientX; sy = e.clientY;
-    const r = el.getBoundingClientRect();
-    px = r.left + r.width/2; py = r.top + r.height/2;
-    movio = false;
-  });
-  el.addEventListener("pointermove", e => {
-    if (id === null || e.pointerId !== id) return;
-    const dx = e.clientX - sx, dy = e.clientY - sy;
-    if (!movio && Math.hypot(dx,dy) < 7) return;
-    movio = true;
-    el.classList.add("arrastrando");
-    const X = Math.min(97, Math.max(3,  (px+dx) / innerWidth  * 100));
-    const Y = Math.min(88, Math.max(5,  (py+dy) / innerHeight * 100));
-    el.style.left = X + "%";
-    el.style.top  = Y + "%";
-    if (esMovil()) { p.xm = X; p.ym = Y; } else { p.x = X; p.y = Y; }
-  });
-  const soltar = e => {
-    if (id === null || (e.pointerId !== undefined && e.pointerId !== id)) return;
-    id = null;
-    el.classList.remove("arrastrando");
-    if (movio) el.dataset.arrastrado = "1";
+        <path d="${area}" fill="url(#ga)"/>
+        <line x1="${L}" y1="${T+ih}" x2="${W-R}" y2="${T+ih}" stroke="#2E3546" stroke-width="1.5"/>
+        <line x1="${L}" y1="${yInv}" x2="${W-R}" y2="${yInv}" stroke="#A8B0C2" stroke-width="1.5" stroke-dasharray="5 5" opacity=".8"/>
+        <text x="${L+6}" y="${yInv-7}" fill="#A8B0C2" font-size="11" font-family="system-ui,sans-serif">Inversión total ${fmtBRLc(r.inv)}</text>
+        <polyline points="${pts}" fill="none" stroke="#C98500" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="${x(r.H)}" cy="${y(r.vH)}" r="4.5" fill="#C98500" stroke="#141926" stroke-width="2"/>
+        <text x="${x(r.H)-8}" y="${y(r.vH)-12}" text-anchor="end" fill="#E5B84E" font-size="12.5" font-weight="700" font-family="system-ui,sans-serif">${fmtBRLc(r.vH)}</text>
+        <line id="cross" x1="0" y1="${T}" x2="0" y2="${T+ih}" stroke="#E5B84E" stroke-width="1" opacity="0" stroke-dasharray="3 3"/>
+        <circle id="dot" r="4.5" fill="#C98500" stroke="#141926" stroke-width="2" opacity="0"/>
+        <rect id="hover" x="${L}" y="${T}" width="${iw}" height="${ih}" fill="transparent"/>`;
+  svg.innerHTML = g;
+  chartGeo = {x,y,r,L,iw,T,ih};
+  const hv = $('hover'), tip=$('tip'), cross=$('cross'), dot=$('dot');
+  const move = ev=>{
+    const rect = svg.getBoundingClientRect();
+    const cx = ev.touches? ev.touches[0].clientX : ev.clientX;
+    const px = (cx-rect.left) * (W/rect.width);
+    let t = Math.round((px-L)/iw*r.H); t=Math.max(0,Math.min(r.H,t));
+    const vx=x(t), vy=y(r.serie[t]);
+    cross.setAttribute('x1',vx); cross.setAttribute('x2',vx); cross.setAttribute('opacity','.6');
+    dot.setAttribute('cx',vx); dot.setAttribute('cy',vy); dot.setAttribute('opacity','1');
+    const gn = ganNetaEn(t,r);
+    tip.style.display='block';
+    tip.innerHTML = `<div class="t-y">${t===0?'Hoy ('+YEAR0+')':'Año '+(YEAR0+t)+' · +'+t+' '+(t===1?'año':'años')}</div>
+      <div class="row"><span>Valor</span><b>${fmtBRL(r.serie[t])}</b></div>
+      <div class="row"><span>Si vendes, neto</span><b>${(gn>=0?'+':'−')+fmtBRL(Math.abs(gn))}</b></div>
+      <div class="row"><span>En soles</span><b>≈ ${fmtPEN(Math.abs(gn)/r.fx)}</b></div>`;
+    const card = svg.closest('.chart-card').getBoundingClientRect();
+    const sx = rect.left-card.left + vx*(rect.width/W);
+    let lx = sx+14; if(lx+185 > card.width) lx = sx-195;
+    tip.style.left = lx+'px';
+    tip.style.top = (rect.top-card.top + vy*(rect.height/Hh) - 20)+'px';
   };
-  el.addEventListener("pointerup", soltar);
-  el.addEventListener("pointercancel", soltar);
+  const leave = ()=>{ tip.style.display='none'; cross.setAttribute('opacity','0'); dot.setAttribute('opacity','0'); };
+  hv.addEventListener('mousemove',move); hv.addEventListener('touchmove',move,{passive:true});
+  hv.addEventListener('mouseleave',leave); hv.addEventListener('touchend',leave);
 }
 
-/* ---------- Ventanas ---------- */
-const capaVentanas = $("#capa-ventanas");
-let ventanaActual = null;
-
-function cerrarVentana(inmediato){
-  if (!ventanaActual) return;
-  const v = ventanaActual;
-  ventanaActual = null;
-  $$(".icono.activo").forEach(i => i.classList.remove("activo"));
-  if (inmediato) { v.remove(); return; }
-  v.classList.add("cerrando");
-  v.classList.remove("abierta");
-  setTimeout(() => v.remove(), 300);
-}
-
-function crearVentana(titulo, cuerpoHTML){
-  cerrarVentana(true);
-  const v = document.createElement("section");
-  v.className = "ventana";
-  v.setAttribute("role","dialog");
-  v.setAttribute("aria-label", titulo);
-  v.innerHTML = `
-    <header class="ventana-barra">
-      <span class="luces">
-        <button class="luz luz-roja" aria-label="Cerrar"></button>
-        <span class="luz luz-ambar"></span>
-        <span class="luz luz-verde"></span>
-      </span>
-      <span class="ventana-titulo">${titulo}</span>
-    </header>
-    ${cuerpoHTML}`;
-  capaVentanas.appendChild(v);
-  // posición inicial (el CSS móvil la reemplaza por hoja inferior)
-  const w = v.offsetWidth, h = v.offsetHeight;
-  const jx = (Math.random()-.5)*40, jy = (Math.random()-.5)*30;
-  v.style.left = Math.max(12, (innerWidth - w)/2 + jx) + "px";
-  v.style.top  = Math.max(54, (innerHeight - h)/2 - 24 + jy) + "px";
-  requestAnimationFrame(() => requestAnimationFrame(() => v.classList.add("abierta")));
-  v.querySelector(".luz-roja").addEventListener("click", () => cerrarVentana());
-  arrastrarVentana(v);
-  ventanaActual = v;
-  return v;
-}
-
-function arrastrarVentana(v){
-  const barra = v.querySelector(".ventana-barra");
-  let id=null, ox=0, oy=0;
-  barra.addEventListener("pointerdown", e => {
-    if (esMovil() || e.target.closest(".luz-roja")) return;
-    id = e.pointerId;
-    barra.setPointerCapture(id);
-    const r = v.getBoundingClientRect();
-    ox = e.clientX - r.left; oy = e.clientY - r.top;
-  });
-  barra.addEventListener("pointermove", e => {
-    if (id === null || e.pointerId !== id) return;
-    v.style.left = Math.min(innerWidth-80,  Math.max(-v.offsetWidth+120, e.clientX-ox)) + "px";
-    v.style.top  = Math.min(innerHeight-60, Math.max(8, e.clientY-oy)) + "px";
-    // leve inclinación según la velocidad horizontal
-    v.style.rotate = Math.max(-1.8, Math.min(1.8, e.movementX * .07)) + "deg";
-  });
-  const fin = () => { id = null; v.style.rotate = "0deg"; };
-  barra.addEventListener("pointerup", fin);
-  barra.addEventListener("pointercancel", fin);
-}
-
-function abrirProyecto(p, iconoEl){
-  const hero = p.portada
-    ? `<img src="${p.portada}" alt="">`
-    : svgMiniatura(p.variante === "carpeta" ? "montanas" : p.variante, p.acento);
-  const galeria = (p.imagenes && p.imagenes.length)
-    ? p.imagenes.slice(0,3).map(u => `<div class="cuadro"><img src="${u}" alt=""></div>`).join("")
-    : `<div class="cuadro vacio">tu imagen</div><div class="cuadro vacio">tu imagen</div>`;
-  const boton = p.enlace
-    ? `<a class="boton" href="${p.enlace}" target="_blank" rel="noopener">Ver propiedad <span aria-hidden="true">↗</span></a>`
-    : `<button class="boton" data-sin-enlace>Ver propiedad <span aria-hidden="true">↗</span></button>`;
-  const v = crearVentana(p.etiqueta, `
-    <div class="ventana-cuerpo">
-      <figure class="ventana-hero">${hero}</figure>
-      <div class="ventana-info">
-        <div class="chips">
-          <span class="chip acento" style="background:${p.acento}">${p.categoria}</span>
-          <span class="chip">${p.anio}</span>
-        </div>
-        <h2>${p.etiqueta}</h2>
-        <p class="desc">${p.descripcion}</p>
-        <ul class="tags">${p.tags.map(t => `<li>${t}</li>`).join("")}</ul>
-        <div class="galeria">${galeria}</div>
-        ${boton}
-      </div>
-    </div>`);
-  const sinEnlace = v.querySelector("[data-sin-enlace]");
-  if (sinEnlace) sinEnlace.addEventListener("click", () =>
-    mostrarToast("Añade la URL de esta propiedad en «enlace», dentro de la ZONA EDITABLE."));
-  if (iconoEl){
-    $$(".icono.activo").forEach(i => i.classList.remove("activo"));
-    iconoEl.classList.add("activo");
+function renderTabla(r){
+  if(r.precio<40000){ $('tbl-wrap').innerHTML=''; return; }
+  let rows='';
+  for(let t=0;t<=r.H;t++){
+    const gn = ganNetaEn(t,r);
+    rows += `<tr><td>${t===0?'Hoy ('+YEAR0+')':YEAR0+t}</td><td>${fmtBRL(r.serie[t])}</td><td style="color:${gn>=0?'var(--green)':'var(--red)'}">${(gn>=0?'+':'−')+fmtBRL(Math.abs(gn))}</td><td>${r.inv>0?(gn>=0?'+':'−')+fmtPct(Math.abs(gn/r.inv*100)):'—'}</td></tr>`;
   }
+  $('tbl-wrap').innerHTML = `<table class="proj"><thead><tr><th>Año</th><th>Valor estimado</th><th>Ganancia neta si vendes</th><th>Retorno</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-function abrirSobreMi(){
-  crearVentana("La división", `
-    <div class="ventana-cuerpo">
-      <div class="ventana-info" style="padding:30px 32px">
-        <div class="chips"><span class="chip">${PERFIL.rol}</span><span class="chip">${PERFIL.ciudad}</span></div>
-        <h2>${PERFIL.nombre}</h2>
-        <div class="texto-libre"><p>${PERFIL.bio}</p></div>
-        <div class="texto-libre" style="width:100%">
-          <div class="fila-dato"><span>Propiedades</span><span>${PROYECTOS.length} en este escritorio — haz clic en cualquier carpeta</span></div>
-          <div class="fila-dato"><span>Contacto</span><a href="mailto:${PERFIL.email}">${PERFIL.email}</a></div>
-        </div>
-      </div>
-    </div>`);
+/* ---------- eventos ---------- */
+function bind(){
+  /* filtros catálogo */
+  const ciudades = [...new Set(LOTES.map(l=>l.ciudad))].sort();
+  $('f-ciudad').innerHTML = '<option value="all">Todas las ciudades</option>' + ciudades.map(c=>`<option>${c}</option>`).join('');
+  $('f-ciudad').addEventListener('change',e=>{state.ciudad=e.target.value; renderCatalogo();});
+  $('f-tipo').addEventListener('change',e=>{state.tipo=e.target.value; renderCatalogo();});
+  $('f-orden').addEventListener('change',e=>{state.orden=e.target.value; renderCatalogo();});
+  const pr = $('f-precio'), prv=$('f-precio-v');
+  const updPrecio=()=>{ state.precioMax=+pr.value; prv.textContent = +pr.value>=3400000?'sin límite':fmtBRLc(+pr.value); renderCatalogo(); };
+  pr.addEventListener('input',updPrecio); updPrecio();
+
+  /* simulador */
+  $('in-lote').innerHTML = LOTES.map(l=>`<option value="${l.id}">${esc(l.ciudad)} — ${esc(l.barrio)} · ${nf0.format(l.m2)} m² · ${fmtBRLc(l.precio)}</option>`).join('');
+  document.querySelectorAll('#modo-seg button').forEach(b=>b.addEventListener('click',()=>{ setModo(b.dataset.modo); simular(); }));
+  document.querySelectorAll('#pago-seg button').forEach(b=>b.addEventListener('click',()=>{ setPago(b.dataset.pago); simular(); }));
+  document.querySelectorAll('#scen button').forEach(b=>b.addEventListener('click',()=>{ setScen(+b.dataset.g); simular(); }));
+  const pen=$('in-pen'), penR=$('in-pen-r');
+  pen.addEventListener('input',()=>{ penR.value=pen.value; simular(); });
+  penR.addEventListener('input',()=>{ pen.value=penR.value; simular(); });
+  ['in-fx','in-anios','in-entrada','in-plazo','in-interes'].forEach(id=>$(id).addEventListener('input',()=>{ simular(); if(id==='in-fx') renderCatalogo(); }));
+  $('in-lote').addEventListener('change',()=>{ setModo('terreno'); simular(); });
+  $('tbl-tgl').addEventListener('click',()=>{
+    sim.tabla=!sim.tabla;
+    $('tbl-wrap').style.display = sim.tabla?'block':'none';
+    $('chart-wrap').style.display = sim.tabla?'none':'block';
+    $('tbl-tgl').textContent = sim.tabla?'Ver gráfico':'Ver tabla';
+    $('tbl-tgl').setAttribute('aria-pressed', String(sim.tabla));
+  });
+
+  /* FAQ */
+  document.querySelectorAll('.q .qh').forEach(b=>b.addEventListener('click',()=>{
+    const q=b.parentElement, open=q.classList.contains('open');
+    document.querySelectorAll('.q.open').forEach(o=>{o.classList.remove('open'); o.querySelector('.qa').style.maxHeight='0';});
+    if(!open){ q.classList.add('open'); const a=q.querySelector('.qa'); a.style.maxHeight=a.scrollHeight+'px'; }
+  }));
 }
 
-function abrirContacto(){
-  const red = (nombre, url, ejemplo) => url
-    ? `<div class="fila-dato"><span>${nombre}</span><a href="${url}" target="_blank" rel="noopener">${url.replace(/^https?:\/\//,"")}</a></div>`
-    : `<div class="fila-dato"><span>${nombre}</span><span style="opacity:.5">añade tu enlace en la ZONA EDITABLE (${ejemplo})</span></div>`;
-  crearVentana("Contacto", `
-    <div class="ventana-cuerpo">
-      <div class="ventana-info" style="padding:30px 32px">
-        <h2 style="font-size:22px">Hablemos</h2>
-        <div class="texto-libre" style="width:100%">
-          <div class="fila-dato"><span>Correo</span><a href="mailto:${PERFIL.email}">${PERFIL.email}</a></div>
-          <div class="fila-dato"><span>Ubicación</span><span>${PERFIL.ciudad}</span></div>
-          ${red("Instagram", PERFIL.redes.instagram, "redes.instagram")}
-          ${red("X", PERFIL.redes.x, "redes.x")}
-          ${red("Behance", PERFIL.redes.behance, "redes.behance")}
-        </div>
-        <a class="boton" href="mailto:${PERFIL.email}">Escríbeme <span aria-hidden="true">✉</span></a>
-      </div>
-    </div>`);
-}
+bind();
+renderCatalogo();
+simular();
 
-function abrirAyuda(){
-  crearVentana("Cómo personalizar", `
-    <div class="ventana-cuerpo">
-      <div class="ventana-info" style="padding:28px 32px">
-        <h2 style="font-size:21px">Hazlo tuyo en 4 pasos</h2>
-        <div class="texto-libre">
-          <p><strong>1 · Tu información.</strong> Abre este archivo en un editor de texto y busca <strong>ZONA EDITABLE</strong> (al inicio del script). Ahí cambias el nombre, la presentación, el correo y el contenido de cada carpeta.</p>
-          <p><strong>2 · Tus propiedades.</strong> Cada entrada de <strong>PROYECTOS</strong> es una carpeta del escritorio: título, categoría, año, descripción, tags y enlace. Con <strong>x</strong> e <strong>y</strong> (en %) decides dónde flota. También puedes arrastrarlas con el ratón para probar posiciones.</p>
-          <p><strong>3 · Tus imágenes.</strong> Pon URLs en <strong>portada</strong> (miniatura y cabecera de la ventana) y en <strong>imagenes</strong> (galería). Mientras estén vacías se usan las miniaturas generadas.</p>
-          <p><strong>4 · Tu foto de fondo.</strong> Busca <strong>FOTO PROPIA</strong> en el HTML y pega la URL de una imagen en el src; sustituirá a la figura abstracta y se mostrará en blanco y negro.</p>
-          <p style="opacity:.6">Consejo: también puedes pedirle a Claude «pon mis propiedades en el escritorio» y lo edita por ti.</p>
-        </div>
-      </div>
-    </div>`);
-}
-
-/* ---------- Dock ---------- */
-const APPS_DOCK = [
-  { id:"kipu", nombre:"Volver a KIPU", accion: () => { location.href = "./"; }, svg:`
-    <svg viewBox="0 0 46 46"><defs><linearGradient id="dk0" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#E8C766"/><stop offset="1" stop-color="#C9A227"/></linearGradient></defs>
-      <rect width="46" height="46" rx="11" fill="#14161C"/>
-      <rect x="1" y="1" width="44" height="44" rx="10" fill="none" stroke="url(#dk0)" stroke-width="1.6"/>
-      <path d="M15 32V14M15 23l9-9M15 23l9 9" fill="none" stroke="url(#dk0)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M30 14v18" stroke="url(#dk0)" stroke-width="3" stroke-linecap="round"/></svg>` },
-  { sep:true },
-  { id:"sobre", nombre:"La división", accion: abrirSobreMi, svg:`
-    <svg viewBox="0 0 46 46"><defs><linearGradient id="dk1" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#4a4a4a"/><stop offset="1" stop-color="#1e1e1e"/></linearGradient></defs>
-      <rect width="46" height="46" rx="11" fill="url(#dk1)"/>
-      <circle cx="23" cy="18.5" r="6.5" fill="#f0f0f0"/>
-      <path d="M10.5 37c1.5-8 6.7-11.5 12.5-11.5S34 29 35.5 37Z" fill="#f0f0f0"/></svg>` },
-  { id:"contacto", nombre:"Contacto", accion: abrirContacto, svg:`
-    <svg viewBox="0 0 46 46"><defs><linearGradient id="dk2" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#5aa7e8"/><stop offset="1" stop-color="#2a6fc2"/></linearGradient></defs>
-      <rect width="46" height="46" rx="11" fill="url(#dk2)"/>
-      <rect x="9" y="14" width="28" height="19" rx="3.5" fill="#fff"/>
-      <path d="M10.5 16.5 23 26l12.5-9.5" fill="none" stroke="#2a6fc2" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
-  { sep:true },
-  { id:"instagram", nombre:"Instagram", red:"instagram", svg:`
-    <svg viewBox="0 0 46 46"><defs><linearGradient id="dk3" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0" stop-color="#f9ce34"/><stop offset=".45" stop-color="#ee2a7b"/><stop offset="1" stop-color="#6228d7"/></linearGradient></defs>
-      <rect width="46" height="46" rx="11" fill="url(#dk3)"/>
-      <rect x="12" y="12" width="22" height="22" rx="7" fill="none" stroke="#fff" stroke-width="2.6"/>
-      <circle cx="23" cy="23" r="5.4" fill="none" stroke="#fff" stroke-width="2.6"/>
-      <circle cx="30.4" cy="15.6" r="1.8" fill="#fff"/></svg>` },
-  { id:"x", nombre:"X", red:"x", svg:`
-    <svg viewBox="0 0 46 46"><rect width="46" height="46" rx="11" fill="#111"/>
-      <path transform="translate(11 11)" fill="#fff"
-        d="M13.8 10.2 21.3 1.5h-2.1l-6.4 7.3L7.7 1.5H2l7.9 11.4L2 22.5h2.1l7-8 5.5 8H22l-8.2-12.3z"/></svg>` },
-  { id:"behance", nombre:"Behance", red:"behance", svg:`
-    <svg viewBox="0 0 46 46"><rect width="46" height="46" rx="11" fill="#1769ff"/>
-      <text x="23" y="29.5" text-anchor="middle" font-family="Helvetica,Arial,sans-serif"
-        font-size="16.5" font-weight="700" fill="#fff">Bē</text></svg>` },
-];
-
-function renderDock(){
-  const dock = $("#dock");
-  APPS_DOCK.forEach(app => {
-    if (app.sep){
-      const s = document.createElement("span");
-      s.className = "dock-sep";
-      dock.appendChild(s);
-      return;
-    }
-    const b = document.createElement("button");
-    b.className = "dock-icono";
-    b.dataset.nombre = app.nombre;
-    b.setAttribute("aria-label", app.nombre);
-    b.innerHTML = app.svg;
-    b.addEventListener("click", () => {
-      if (app.accion) return app.accion();
-      const url = PERFIL.redes[app.red];
-      if (url) window.open(url, "_blank", "noopener");
-      else mostrarToast(`Añade tu enlace de ${app.nombre} en PERFIL.redes.${app.red} (ZONA EDITABLE).`);
-    });
-    dock.appendChild(b);
-  });
-  if (esTactil || menosMovim) return;
-  // efecto lupa estilo macOS
-  const iconos = $$(".dock-icono");
-  dock.addEventListener("mousemove", e => {
-    iconos.forEach(ic => {
-      const r = ic.getBoundingClientRect();
-      const d = Math.abs(e.clientX - (r.left + r.width/2));
-      const f = Math.max(0, 1 - d/110);
-      const esc = 1 + f*.34;
-      ic.style.transform = `translateY(${-f*11}px) scale(${esc})`;
-    });
-  });
-  dock.addEventListener("mouseleave", () =>
-    iconos.forEach(ic => ic.style.transform = ""));
-}
-
-/* ---------- Toast ---------- */
-let toastTimer = null;
-function mostrarToast(msg){
-  const t = $("#toast");
-  t.textContent = msg;
-  t.classList.add("visible");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove("visible"), 3200);
-}
-
-/* ---------- Motor de mouse: cursor, anillo, etiqueta, imán,
-              inclinación 3D, foco de luz y parallax con inercia ---------- */
-function iniciarMotorRaton(){
-  if (esTactil || menosMovim || !matchMedia("(hover:hover) and (pointer:fine)").matches) return;
-  document.documentElement.classList.add("cursor-oculto");
-  const cur   = $("#cursor");
-  const halo  = $("#cursor-halo");
-  const etiq  = $("#cursor-etiqueta");
-  const texto = etiq.querySelector("span");
-  const foco  = $("#foco");
-  const fondo = $("#fondo");
-  const lerp  = (a,b,t) => a + (b-a)*t;
-
-  let mx = innerWidth/2, my = innerHeight/2;         // objetivo (mouse real)
-  let cx = mx, cy = my;                              // cursor  (rápido)
-  let hx = mx, hy = my;                              // anillo  (retardo medio)
-  let fx = mx, fy = my;                              // foco    (retardo largo)
-  let px = 0,  py = 0;                               // parallax con inercia
-  let vel = 0, activo = false;
-  let focoW = foco.offsetWidth, focoH = foco.offsetHeight;
-  addEventListener("resize", () => { focoW = foco.offsetWidth; focoH = foco.offsetHeight; });
-
-  addEventListener("mousemove", e => {
-    mx = e.clientX; my = e.clientY;
-    if (!activo){ activo = true; document.body.classList.add("raton-activo"); }
-  });
-
-  // estados contextuales según lo que hay bajo el puntero
-  document.addEventListener("mouseover", e => {
-    const t      = e.target;
-    const icono  = t.closest?.(".icono");
-    const cerrar = t.closest?.(".luz-roja");
-    const inter  = t.closest?.("button, a, .dock-icono, .ventana-barra");
-    cur.classList.toggle("grande", !!inter && !icono);
-    halo.classList.toggle("anillo", !!(inter || icono));
-    if (cerrar)      { texto.textContent = "Cerrar"; etiq.classList.add("visible"); }
-    else if (icono)  { texto.textContent = "Abrir";  etiq.classList.add("visible"); }
-    else               etiq.classList.remove("visible");
-  });
-  addEventListener("mousedown", () => { cur.classList.add("presionado");  halo.classList.add("presionado"); });
-  addEventListener("mouseup",   () => { cur.classList.remove("presionado"); halo.classList.remove("presionado"); });
-  addEventListener("blur",      () => { cur.classList.remove("presionado"); halo.classList.remove("presionado"); });
-
-  // imán: los iconos y el botón de ayuda se acercan sutilmente al puntero
-  const imanes = [...$$(".icono button"), $("#ayuda")]
-    .filter(Boolean).map(el => ({ el, ox:0, oy:0 }));
-
-  // inclinación 3D de las miniaturas según la posición del puntero
-  capaIconos.addEventListener("pointermove", e => {
-    const b = e.target.closest?.(".icono button");
-    if (!b) return;
-    const r = b.getBoundingClientRect();
-    b.style.setProperty("--ry",  (((e.clientX - r.left) / r.width  - .5) * 16).toFixed(2) + "deg");
-    b.style.setProperty("--rx", -(((e.clientY - r.top)  / r.height - .5) * 14).toFixed(2) + "deg");
-  });
-  capaIconos.addEventListener("pointerout", e => {
-    const b = e.target.closest?.(".icono button");
-    if (b){ b.style.setProperty("--ry","0deg"); b.style.setProperty("--rx","0deg"); }
-  });
-
-  (function paso(){
-    const pcx = cx, pcy = cy;
-    cx = lerp(cx, mx, .45);  cy = lerp(cy, my, .45);
-    hx = lerp(hx, mx, .16);  hy = lerp(hy, my, .16);
-    fx = lerp(fx, mx, .07);  fy = lerp(fy, my, .07);
-    vel = lerp(vel, Math.hypot(cx-pcx, cy-pcy), .3);
-
-    cur.style.transform  = `translate3d(${cx-4}px, ${cy-3}px, 0)`;
-    const esc = 1 + Math.min(vel/48, .35);          // el anillo se estira con la velocidad
-    halo.style.transform = `translate3d(${hx}px, ${hy}px, 0) scale(${esc})`;
-    etiq.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
-    foco.style.transform = `translate3d(${fx-focoW/2}px, ${fy-focoH/2}px, 0)`;
-
-    // parallax con inercia
-    const nx = (mx/innerWidth - .5) * 2, ny = (my/innerHeight - .5) * 2;
-    px = lerp(px, nx, .06);  py = lerp(py, ny, .06);
-    fondo.style.transform      = `translate3d(${(px*-16).toFixed(2)}px, ${(py*-10).toFixed(2)}px, 0)`;
-    capaIconos.style.transform = `translate3d(${(px*10).toFixed(2)}px, ${(py*7).toFixed(2)}px, 0)`;
-
-    // imán
-    for (const m of imanes){
-      const r = m.el.getBoundingClientRect();
-      const ccx = r.left + r.width/2  - m.ox;
-      const ccy = r.top  + r.height/2 - m.oy;
-      const dx = mx - ccx, dy = my - ccy;
-      const d  = Math.hypot(dx, dy);
-      let tx = 0, ty = 0;
-      if (d < 120){ const f = (1 - d/120) * .3; tx = dx*f; ty = dy*f; }
-      m.ox = lerp(m.ox, tx, .16);
-      m.oy = lerp(m.oy, ty, .16);
-      m.el.style.translate = `${m.ox.toFixed(2)}px ${m.oy.toFixed(2)}px`;
-    }
-    requestAnimationFrame(paso);
-  })();
-}
-
-/* ---------- Sticker arrastrable ---------- */
-function iniciarSticker(){
-  const st = $("#sticker");
-  let id=null, ox=0, oy=0;
-  st.addEventListener("pointerdown", e => {
-    id = e.pointerId;
-    st.setPointerCapture(id);
-    const r = st.getBoundingClientRect();
-    ox = e.clientX - r.left - r.width/2;
-    oy = e.clientY - r.top  - r.height/2;
-  });
-  st.addEventListener("pointermove", e => {
-    if (id === null || e.pointerId !== id) return;
-    st.style.left = ((e.clientX - ox) / innerWidth  * 100) + "%";
-    st.style.top  = ((e.clientY - oy) / innerHeight * 100) + "%";
-  });
-  const fin = () => { id = null; };
-  st.addEventListener("pointerup", fin);
-  st.addEventListener("pointercancel", fin);
-}
-
-/* ---------- Reloj ---------- */
-function iniciarReloj(){
-  const r = $("#reloj");
-  const pinta = () => {
-    const d = new Date();
-    const fecha = d.toLocaleDateString("es-PE",{weekday:"short", day:"numeric", month:"short"});
-    const hora  = d.toLocaleTimeString("es-PE",{hour:"2-digit", minute:"2-digit", hour12:false});
-    r.textContent = `${fecha} · ${hora}`.replace(/\./g,"");
-  };
-  pinta();
-  setInterval(pinta, 15000);
-}
-
-/* ---------- Interacción global ---------- */
-document.addEventListener("keydown", e => { if (e.key === "Escape") cerrarVentana(); });
-document.addEventListener("pointerdown", e => {
-  if (!ventanaActual) return;
-  if (e.target.closest(".ventana, .icono, #dock, #ayuda, #sticker")) return;
-  cerrarVentana();
-});
-$("#ayuda").addEventListener("click", abrirAyuda);
-addEventListener("resize", () => {
-  $$(".icono").forEach(el => {
-    const p = PROYECTOS.find(x => x.id === el.dataset.id);
-    if (p) posicionarIcono(el, p);
-  });
-});
-
-/* ---------- Llegada por el portal (desde el orbe de KIPU) ---------- */
-function iniciarLlegada(){
+/* ---------- Llegada por el portal (desde el orbe de kippuu.com) ---------- */
+(function(){
   let viaja = false;
   try{
-    viaja = sessionStorage.getItem("kipu_warp") === "1";
-    sessionStorage.removeItem("kipu_warp");
+    viaja = sessionStorage.getItem('kipu_warp') === '1';
+    sessionStorage.removeItem('kipu_warp');
   }catch(e){ return; }
-  if (!viaja || menosMovim) return;
-  const velo = document.createElement("div");
-  velo.className = "warp-llegada";
-  velo.setAttribute("aria-hidden","true");
-  const cv = document.createElement("canvas");
+  if(!viaja || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const velo = document.createElement('div');
+  velo.className = 'warp-llegada';
+  velo.setAttribute('aria-hidden','true');
+  const cv = document.createElement('canvas');
   velo.appendChild(cv);
   document.body.appendChild(velo);
-  const ctx = cv.getContext("2d");
-  const DPR = Math.min(2, devicePixelRatio || 1);
-  const W = cv.width = Math.round(innerWidth * DPR);
-  const H = cv.height = Math.round(innerHeight * DPR);
-  const cx = W/2, cy = H/2;
-  const COLS = ["235,230,255","235,230,255","216,167,255","255,207,122","178,107,255"];
+  const ctx = cv.getContext('2d');
+  const DPR = Math.min(2, devicePixelRatio||1);
+  const W = cv.width = Math.round(innerWidth*DPR);
+  const H = cv.height = Math.round(innerHeight*DPR);
+  const cx0 = W/2, cy0 = H/2;
+  const COLS = ['235,230,255','235,230,255','216,167,255','229,184,78','178,107,255'];
   const est = [];
-  for (let i = 0; i < 220; i++){
-    est.push({ a: Math.random()*6.2832, d: 20 + Math.random()*(W*.5), v: .6 + Math.random(), col: COLS[i%5] });
-  }
+  for(let i=0;i<220;i++) est.push({a:Math.random()*6.2832, d:20+Math.random()*(W*.5), v:.6+Math.random(), col:COLS[i%5]});
   const t0 = performance.now(), DUR = 750; /* [EDITABLE] duración de la llegada en ms */
   requestAnimationFrame(function paso(t){
-    const p = Math.min(1, (t - t0) / DUR);
-    ctx.fillStyle = "rgba(5,3,19,.5)";
-    ctx.fillRect(0, 0, W, H);
-    const vel = 2 + Math.pow(1 - p, 2.2) * 70; /* desacelera: saliendo del warp */
+    const p = Math.min(1,(t-t0)/DUR);
+    ctx.fillStyle = 'rgba(5,3,19,.5)';
+    ctx.fillRect(0,0,W,H);
+    const vel = 2 + Math.pow(1-p,2.2)*70; /* desacelera: saliendo del warp */
     ctx.lineWidth = DPR;
-    for (const e of est){
-      const len = vel * e.v * DPR;
-      const x = cx + Math.cos(e.a)*e.d, y = cy + Math.sin(e.a)*e.d;
-      ctx.strokeStyle = "rgba(" + e.col + "," + (1 - p*.55).toFixed(2) + ")";
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(cx + Math.cos(e.a)*(e.d+len), cy + Math.sin(e.a)*(e.d+len));
+    for(const e of est){
+      const len = vel*e.v*DPR;
+      const px = cx0+Math.cos(e.a)*e.d, py = cy0+Math.sin(e.a)*e.d;
+      ctx.strokeStyle = 'rgba('+e.col+','+(1-p*.55).toFixed(2)+')';
+      ctx.beginPath(); ctx.moveTo(px,py);
+      ctx.lineTo(cx0+Math.cos(e.a)*(e.d+len), cy0+Math.sin(e.a)*(e.d+len));
       ctx.stroke();
-      e.d += vel * e.v;
-      if (e.d > Math.max(W,H)*.75) e.d = 10 + Math.random()*60;
+      e.d += vel*e.v;
+      if(e.d > Math.max(W,H)*.75) e.d = 10+Math.random()*60;
     }
-    if (p >= 1){
-      velo.classList.add("irse");
-      setTimeout(() => velo.remove(), 700);
-      return;
-    }
+    if(p>=1){ velo.classList.add('irse'); setTimeout(()=>velo.remove(), 700); return; }
     requestAnimationFrame(paso);
   });
-}
-
-/* ---------- Arranque ---------- */
-document.title = `${PERFIL.nombre} — Bienes Raíces KIPU`;
-$(".marca").innerHTML = `<a href="./" style="color:inherit;text-decoration:none">← ${PERFIL.nombre}</a><small>Bienes Raíces · KIPU</small>`;
-const fotoFondo = $("#foto-fondo");
-if (fotoFondo.getAttribute("src")) document.body.classList.add("con-foto");
-iniciarLlegada();
-renderIconos();
-renderDock();
-iniciarMotorRaton();
-iniciarSticker();
-iniciarReloj();
-
+})();
 </script>
 </body>
 </html>
