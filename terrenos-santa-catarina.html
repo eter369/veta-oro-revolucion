@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KIPU Bienes Raíces — Tu terreno en Santa Catarina, Brasil</title>
+<meta name="description" content="Compra tu terreno en Santa Catarina, Brasil, desde Perú: 100% online, en soles, dólares o USDT, con financiamiento directo hasta 36 meses.">
+<meta name="robots" content="noindex">
+<!-- [EDITABLE] Demo conceptual entregada por el propietario: lotes, precios,
+     tasas y la alianza "Landmark / Real Inmobiliaria" son de demostración.
+     Confirmar alianza real, inventario y validación legal (Perú + Brasil)
+     antes de publicar sin noindex. -->
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#0C0E13; --bg2:#0F131B;
+  --card:#141924; --card2:#171C26; --card3:#1B2130;
+  --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.14);
+  --ink:#F4F6FA; --ink2:#B7BfCD; --muted:#8D94A3;
+  --gold:#E8B24A; --gold-soft:#F3CE86; --gold-deep:#C98500; --gold-track:#413312;
+  --good:#0ca30c; --warn:#fab219; --sold:#2E3542;
+  --grid:#242B37; --axis:#3A4250;
+  --r:16px; --r-sm:10px;
+  --shadow:0 12px 40px rgba(0,0,0,.45);
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+body{
+  font-family:var(--sans); background:var(--bg); color:var(--ink);
+  line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+img,svg{display:block;max-width:100%}
+a{color:var(--gold);text-decoration:none}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+section{padding:72px 0;scroll-margin-top:70px}
+@media(max-width:760px){section{padding:52px 0}}
+
+/* ---------- header ---------- */
+.top{
+  position:sticky;top:0;z-index:50;
+  background:rgba(12,14,19,.82);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.top .wrap{display:flex;align-items:center;gap:18px;height:62px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.06em;font-size:17px}
+.brand small{display:block;font-size:10px;letter-spacing:.22em;color:var(--gold);font-weight:600;text-transform:uppercase}
+.brand .word{line-height:1.1}
+nav.main{display:flex;gap:4px;margin-left:auto}
+nav.main a{color:var(--ink2);font-size:13.5px;padding:8px 12px;border-radius:8px}
+nav.main a:hover{color:var(--ink);background:rgba(255,255,255,.05)}
+.tc-chip{
+  margin-left:8px;font-size:12px;color:var(--ink2);
+  border:1px solid var(--line2);border-radius:999px;padding:6px 12px;white-space:nowrap;
+}
+.tc-chip b{color:var(--gold-soft);font-weight:600}
+@media(max-width:900px){nav.main{display:none}}
+@media(max-width:520px){.tc-chip{display:none}}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(900px 420px at 78% -10%, rgba(232,178,74,.16), transparent 60%),
+    radial-gradient(700px 380px at 8% 8%, rgba(42,120,214,.10), transparent 60%),
+    linear-gradient(180deg,#10141d 0%,var(--bg) 78%);
+  border-bottom:1px solid var(--line);
+  padding:84px 0 64px;
+}
+.hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center}
+@media(max-width:920px){.hero .wrap{grid-template-columns:1fr}.hero{padding:56px 0 44px}}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.08em;
+  color:var(--gold-soft);border:1px solid rgba(232,178,74,.35);
+  background:rgba(232,178,74,.08);border-radius:999px;padding:7px 14px;margin-bottom:22px;
+  text-transform:uppercase;font-weight:600;
+}
+h1{font-size:clamp(2.1rem,4.6vw,3.4rem);line-height:1.08;letter-spacing:-.02em;font-weight:800}
+h1 em{font-style:normal;color:var(--gold);}
+.hero p.sub{color:var(--ink2);font-size:17px;max-width:34em;margin:18px 0 28px}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:9px;
+  background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#241a05;
+  font-weight:700;font-size:15px;border-radius:12px;padding:14px 22px;
+  box-shadow:0 6px 22px rgba(232,178,74,.28);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(232,178,74,.36)}
+.btn.ghost{
+  background:transparent;color:var(--ink);border:1px solid var(--line2);box-shadow:none;font-weight:600;
+}
+.btn.ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+.btn.small{padding:10px 16px;font-size:13.5px;border-radius:10px}
+.hero .chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:30px}
+.chip{
+  font-size:12.5px;color:var(--ink2);border:1px solid var(--line);
+  background:rgba(255,255,255,.03);border-radius:999px;padding:7px 13px;
+}
+.chip b{color:var(--ink);font-weight:600}
+/* hero route card */
+.route-card{
+  background:linear-gradient(180deg,var(--card3),var(--card));
+  border:1px solid var(--line2);border-radius:20px;padding:22px;box-shadow:var(--shadow);
+}
+.route-card h3{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:6px}
+.route-note{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--muted);margin-top:10px}
+.route-note b{color:var(--ink2);font-weight:600}
+.mini-facts{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--line);margin-top:16px;padding-top:16px;gap:10px}
+.mini-facts div{font-size:12px;color:var(--muted)}
+.mini-facts b{display:block;font-size:16.5px;color:var(--ink);font-weight:700;letter-spacing:-.01em}
+@media(max-width:400px){.mini-facts{grid-template-columns:1fr 1fr}}
+
+/* ---------- section headings ---------- */
+.sec-head{max-width:44em;margin-bottom:34px}
+.kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:10px}
+h2{font-size:clamp(1.5rem,3vw,2.15rem);letter-spacing:-.015em;line-height:1.15;font-weight:800}
+.sec-head p{color:var(--ink2);margin-top:12px;font-size:15.5px}
+
+/* ---------- lotes ---------- */
+#lotes{background:var(--bg2);border-block:1px solid var(--line)}
+.filters{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px;
+}
+.filters label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+.field select,.field input[type=number],.field input[type=text],.field input[type=tel]{
+  font:inherit;font-size:13.5px;color:var(--ink);
+  background:var(--card2);border:1px solid var(--line2);border-radius:10px;
+  padding:9px 12px;min-width:130px;
+}
+.field select:hover{border-color:var(--gold)}
+.filters .count{margin-left:auto;font-size:13px;color:var(--ink2)}
+.filters .count b{color:var(--gold-soft)}
+.link-btn{font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;align-self:end;padding:9px 4px}
+.link-btn:hover{color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin:6px 0 14px;font-size:12.5px;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+.sw.disp{background:var(--good)}
+.sw.res{background:var(--warn)}
+.sw.vend{background:var(--sold);border:1px solid var(--line2)}
+.map-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:20px;align-items:start}
+@media(max-width:880px){.map-grid{grid-template-columns:1fr}}
+.map-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;overflow:hidden}
+#plano{width:100%;height:auto;touch-action:manipulation}
+#plano .lot{cursor:pointer;transition:opacity .15s ease}
+#plano .lot rect{stroke:rgba(0,0,0,.35);stroke-width:1;rx:5}
+#plano .lot text{font:600 10.5px var(--sans);fill:#0b1208;pointer-events:none}
+#plano .lot.st-res text{fill:#231a02}
+#plano .lot.st-vend text{fill:var(--muted)}
+#plano .lot.st-vend{cursor:not-allowed}
+#plano .lot.st-res{cursor:default}
+#plano .lot:hover rect{filter:brightness(1.15)}
+#plano .lot.st-vend:hover rect{filter:none}
+#plano .lot.dim{opacity:.22;pointer-events:none}
+#plano .lot.sel rect{stroke:var(--gold);stroke-width:2.5;filter:brightness(1.12)}
+#plano .maplbl{font:600 10px var(--sans);fill:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+#plano .sea-lbl{font:700 11px var(--sans);fill:#7FB2D9;letter-spacing:.22em}
+/* ficha */
+.ficha{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;min-height:320px;position:sticky;top:78px}
+.ficha .empty{color:var(--muted);font-size:14px;text-align:center;padding:60px 12px}
+.ficha .empty svg{margin:0 auto 14px;opacity:.5}
+.ficha h3{font-size:22px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.status-pill{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:4px 10px;display:inline-flex;align-items:center;gap:5px}
+.status-pill.disp{background:rgba(12,163,12,.15);color:#5AD05A;border:1px solid rgba(12,163,12,.4)}
+.status-pill.res{background:rgba(250,178,25,.13);color:var(--warn);border:1px solid rgba(250,178,25,.4)}
+.status-pill.vend{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--line2)}
+.spec-rows{margin:16px 0;border-top:1px solid var(--line)}
+.spec-rows div{display:flex;justify-content:space-between;gap-8px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.spec-rows dt{color:var(--muted)}
+.spec-rows dd{color:var(--ink);font-weight:600}
+.price-big{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:4px}
+.price-big small{font-size:14px;color:var(--muted);font-weight:500}
+.price-alt{color:var(--ink2);font-size:14px;margin-bottom:14px}
+.ficha .cta-row{margin-top:16px}
+
+/* ---------- simulador ---------- */
+.sim-grid{display:grid;grid-template-columns:.92fr 1.08fr;gap:20px;align-items:start}
+@media(max-width:880px){.sim-grid{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px}
+.panel h3{font-size:15px;font-weight:700;margin-bottom:18px}
+.ctrl{margin-bottom:20px}
+.ctrl>label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:7px;font-weight:600;letter-spacing:.02em}
+.ctrl select,.ctrl input[type=number]{
+  width:100%;font:inherit;font-size:14.5px;color:var(--ink);
+  background:var(--card2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;
+}
+.seg{display:flex;background:var(--card2);border:1px solid var(--line2);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;padding:9px 6px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--gold);color:#241a05}
+.seg button:not([aria-pressed=true]):hover{color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--gold);height:28px}
+.range-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-top:2px}
+.range-row output{color:var(--gold-soft);font-weight:700;font-size:13.5px}
+.tea-note{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+.tc-note{font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
+/* resultados */
+.result-hero{text-align:left;padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.result-hero .lbl{font-size:13px;color:var(--muted);font-weight:600}
+.result-hero .big{font-size:clamp(38px,5vw,52px);font-weight:800;letter-spacing:-.03em;line-height:1.05;color:var(--ink)}
+.result-hero .big small{font-size:.45em;color:var(--muted);font-weight:600}
+.per-day{display:inline-block;margin-top:8px;font-size:12.5px;color:var(--gold-soft);background:rgba(232,178,74,.08);border:1px solid rgba(232,178,74,.3);border-radius:999px;padding:5px 12px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+@media(max-width:560px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.tile .lbl{font-size:11.5px;color:var(--muted);margin-bottom:3px}
+.tile .val{font-size:16.5px;font-weight:700;letter-spacing:-.01em}
+.meter-row{margin-bottom:20px}
+.meter-row .lbl{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.meter-row .lbl b{color:var(--ink2)}
+.meter{height:8px;border-radius:99px;background:var(--gold-track);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--gold-deep);border-radius:99px;transition:width .25s ease}
+/* chart */
+.chart-card{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:16px 16px 8px}
+.chart-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px}
+.chart-head h4{font-size:13px;font-weight:700;color:var(--ink2)}
+.chart-head button{font-size:12px;color:var(--gold);text-decoration:underline;text-underline-offset:3px}
+#chart{width:100%}
+#chart .bar{transition:filter .1s ease}
+#chart .hit:hover+.bar, #chart .hit:focus-visible+.bar{filter:brightness(1.25)}
+#chart text{font-family:var(--sans)}
+.tbl-wrap{max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:10px;margin:8px 0}
+table.crono{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+table.crono th{position:sticky;top:0;background:var(--card3);color:var(--muted);font-weight:600;text-align:right;padding:8px 12px;font-size:11.5px}
+table.crono th:first-child,table.crono td:first-child{text-align:left}
+table.crono td{padding:7px 12px;text-align:right;border-top:1px solid var(--line);color:var(--ink2)}
+table.crono td:last-child{color:var(--ink);font-weight:600}
+.sim-cta{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap}
+
+/* ---------- proceso (quipu) ---------- */
+#proceso{background:var(--bg2);border-block:1px solid var(--line)}
+.knots{display:flex;align-items:flex-start;gap:0;margin:34px 0 26px;overflow-x:auto;padding-bottom:6px}
+.knot{flex:1;min-width:96px;position:relative;text-align:center;padding-top:6px}
+.knot::before{
+  content:"";position:absolute;top:27px;left:-50%;width:100%;height:2px;
+  background:var(--axis);z-index:0;
+}
+.knot:first-child::before{display:none}
+.knot.done::before{background:var(--gold-deep)}
+.knot button{position:relative;z-index:1;display:inline-flex;flex-direction:column;align-items:center;gap:9px;padding:4px 8px;border-radius:10px}
+.knot .dot{
+  width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+  background:var(--card3);border:2px solid var(--axis);color:var(--muted);
+  font-weight:800;font-size:15px;transition:all .2s ease;
+}
+.knot.done .dot{background:var(--gold);border-color:var(--gold);color:#241a05}
+.knot.current .dot{border-color:var(--gold);color:var(--gold-soft);box-shadow:0 0 0 5px rgba(232,178,74,.14)}
+.knot .k-lbl{font-size:11.5px;color:var(--muted);font-weight:600;max-width:110px;line-height:1.3}
+.knot.current .k-lbl,.knot.done .k-lbl{color:var(--ink2)}
+.step-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px;max-width:820px}
+.step-card h3{font-size:20px;font-weight:800;margin-bottom:8px;letter-spacing:-.01em}
+.step-card h3 span{color:var(--gold);margin-right:8px}
+.step-card p{color:var(--ink2);font-size:14.5px;max-width:56em}
+.step-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+@media(max-width:640px){.step-meta{grid-template-columns:1fr}}
+.step-meta div{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--ink2)}
+.step-meta b{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.step-nav{display:flex;gap:10px;margin-top:20px}
+.cpf-box{
+  margin-top:26px;border:1px solid rgba(232,178,74,.35);background:rgba(232,178,74,.06);
+  border-radius:var(--r);padding:18px 20px;font-size:13.5px;color:var(--ink2);max-width:820px;
+}
+.cpf-box b{color:var(--gold-soft)}
+
+/* ---------- pagos ---------- */
+.pay-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:840px){.pay-grid{grid-template-columns:1fr}}
+.pay-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px;position:relative}
+.pay-card.hot{border-color:rgba(232,178,74,.5);background:linear-gradient(180deg,rgba(232,178,74,.07),var(--card) 55%)}
+.pay-card .ic{width:42px;height:42px;border-radius:11px;background:var(--card3);display:grid;place-items:center;margin-bottom:14px;border:1px solid var(--line2)}
+.pay-card h3{font-size:16.5px;font-weight:800;margin-bottom:8px}
+.pay-card ul{list-style:none;margin-top:10px}
+.pay-card li{font-size:13.5px;color:var(--ink2);padding:6px 0 6px 22px;position:relative}
+.pay-card li::before{content:"✓";position:absolute;left:0;color:var(--gold);font-weight:700}
+.tag{position:absolute;top:14px;right:14px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#241a05;background:var(--gold);border-radius:99px;padding:4px 9px}
+.compliance{font-size:12px;color:var(--muted);margin-top:18px;max-width:60em}
+
+/* ---------- por qué SC ---------- */
+#porque .tiles4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:880px){#porque .tiles4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){#porque .tiles4{grid-template-columns:1fr}}
+.t4{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.t4 b{display:block;font-size:26px;font-weight:800;letter-spacing:-.02em;color:var(--gold-soft);margin-bottom:4px}
+.t4 span{font-size:13px;color:var(--ink2)}
+.ref-note{font-size:11.5px;color:var(--muted);margin-top:14px}
+
+/* ---------- faq ---------- */
+#faq details{border:1px solid var(--line);border-radius:12px;background:var(--card);margin-bottom:10px;overflow:hidden}
+#faq summary{
+  cursor:pointer;list-style:none;padding:17px 20px;font-weight:600;font-size:14.5px;
+  display:flex;justify-content:space-between;align-items:center;gap:14px;
+}
+#faq summary::-webkit-details-marker{display:none}
+#faq summary::after{content:"+";color:var(--gold);font-size:20px;font-weight:400;flex-shrink:0}
+#faq details[open] summary::after{content:"–"}
+#faq details p{padding:0 20px 18px;color:var(--ink2);font-size:14px;max-width:62em}
+#faq details p b{color:var(--ink)}
+
+/* ---------- cta final / footer ---------- */
+.final-card{
+  background:
+    radial-gradient(600px 300px at 85% 0%, rgba(232,178,74,.18), transparent 60%),
+    linear-gradient(180deg,var(--card3),var(--card));
+  border:1px solid var(--line2);border-radius:24px;padding:52px 40px;text-align:center;box-shadow:var(--shadow);
+}
+@media(max-width:640px){.final-card{padding:36px 22px}}
+.final-card h2{max-width:20em;margin:0 auto 12px}
+.final-card p{color:var(--ink2);max-width:38em;margin:0 auto 26px;font-size:15px}
+.final-card .cta-row{justify-content:center}
+footer{border-top:1px solid var(--line);padding:34px 0 46px;margin-top:72px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:flex-start}
+footer .fine{font-size:11.5px;color:var(--muted);max-width:56em;line-height:1.6}
+
+/* ---------- floating & overlays ---------- */
+.wa-float{
+  position:fixed;right:18px;bottom:18px;z-index:60;width:54px;height:54px;border-radius:50%;
+  background:#22c55e;display:grid;place-items:center;box-shadow:0 8px 24px rgba(34,197,94,.4);
+  transition:transform .15s ease;
+}
+.wa-float:hover{transform:scale(1.06)}
+#tooltip{
+  position:fixed;z-index:70;pointer-events:none;display:none;
+  background:#0b0d12;border:1px solid var(--line2);border-radius:10px;
+  padding:9px 12px;font-size:12px;color:var(--ink2);box-shadow:var(--shadow);max-width:230px;
+}
+#tooltip .v{font-size:14.5px;font-weight:700;color:var(--ink)}
+#toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+  background:#101613;border:1px solid rgba(12,163,12,.5);color:#8FE28F;
+  border-radius:12px;padding:12px 20px;font-size:13.5px;z-index:80;opacity:0;
+  transition:all .25s ease;pointer-events:none;box-shadow:var(--shadow);max-width:92vw;text-align:center;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal-back{
+  position:fixed;inset:0;background:rgba(5,6,9,.72);backdrop-filter:blur(4px);
+  z-index:90;display:none;align-items:flex-end;justify-content:center;padding:16px;
+}
+@media(min-width:640px){.modal-back{align-items:center}}
+.modal-back.open{display:flex}
+.modal{
+  background:var(--card3);border:1px solid var(--line2);border-radius:20px;
+  width:100%;max-width:440px;padding:26px;box-shadow:var(--shadow);
+  max-height:88vh;overflow:auto;
+}
+.modal h3{font-size:19px;font-weight:800;margin-bottom:4px}
+.modal .sub{font-size:13px;color:var(--muted);margin-bottom:18px}
+.modal .ctrl input{width:100%;font:inherit;font-size:14.5px;color:var(--ink);background:var(--card2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px}
+.modal .x{position:absolute;margin-left:auto;float:right;color:var(--muted);font-size:22px;line-height:1;padding:4px 8px}
+.modal .x:hover{color:var(--ink)}
+.resumen{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:13px;color:var(--ink2);margin-bottom:16px}
+.resumen b{color:var(--ink)}
+.ok-view{text-align:center;padding:18px 4px}
+.ok-view .big-ok{width:64px;height:64px;border-radius:50%;background:rgba(12,163,12,.15);border:2px solid var(--good);display:grid;place-items:center;margin:0 auto 16px;font-size:28px;color:#5AD05A}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+        <path d="M15 2v9" stroke="#E8B24A" stroke-width="2.6" stroke-linecap="round"/>
+        <circle cx="15" cy="15" r="4.6" fill="#E8B24A"/>
+        <path d="M15 19.6V28M9.5 21.5 5 26M20.5 21.5 25 26" stroke="#E8B24A" stroke-width="2.6" stroke-linecap="round"/>
+      </svg>
+      <div class="word">KIPU<small>Bienes Raíces</small></div>
+    </div>
+    <nav class="main" aria-label="Secciones">
+      <a href="santa-catarina.html">← Escritorio</a>
+      <a href="#lotes">Lotes</a>
+      <a href="#simulador">Simulador</a>
+      <a href="#proceso">Cómo comprar</a>
+      <a href="#pagos">Pagos</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <span class="tc-chip">TC ref. <b>S/ 3.425</b> · sujeto a SUNAT</span>
+    <a class="btn small" href="#lotes" style="margin-left:6px">Ver lotes</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="inicio">
+  <div class="wrap">
+    <div>
+      <span class="badge">KIPU × Landmark · respaldo Real Inmobiliaria</span>
+      <h1>Que tu inversión<br><em>cruce fronteras</em>.</h1>
+      <p class="sub">Compra tu terreno en <b>Santa Catarina, Brasil</b> desde Perú: elige tu lote en el plano, simula tu cuota y resérvalo 100% online — pagando en soles, dólares o USDT.</p>
+      <div class="cta-row">
+        <a class="btn" href="#lotes">Explorar lotes disponibles</a>
+        <a class="btn ghost" href="#simulador">Simular mi cuota</a>
+      </div>
+      <div class="chips">
+        <span class="chip">Lotes desde <b>100 m²</b></span>
+        <span class="chip">Desde <b>US$ 31,900</b> ó <b>S/ 109,246</b></span>
+        <span class="chip">Financiamiento directo hasta <b>36 meses</b></span>
+        <span class="chip">Paga en <b>S/ · US$ · USDT</b></span>
+      </div>
+    </div>
+
+    <div class="route-card" aria-label="Ruta de inversión Lima a Santa Catarina">
+      <h3>Tu ruta de inversión</h3>
+      <svg viewBox="0 0 380 200" role="img" aria-label="Mapa: de Lima, Perú a Santa Catarina, Brasil">
+        <defs>
+          <linearGradient id="arcg" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#E8B24A" stop-opacity=".25"/>
+            <stop offset="1" stop-color="#E8B24A"/>
+          </linearGradient>
+        </defs>
+        <path d="M30 168 C 120 30, 260 30, 350 78" fill="none" stroke="url(#arcg)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 7"/>
+        <circle cx="30" cy="168" r="7" fill="#0C0E13" stroke="#8D94A3" stroke-width="2"/>
+        <circle cx="350" cy="78" r="8" fill="#E8B24A"/>
+        <circle cx="350" cy="78" r="14" fill="none" stroke="#E8B24A" stroke-opacity=".35" stroke-width="2"/>
+        <path d="M196 56 l 18 6 -18 6 4 -6 z" fill="#E8B24A"/>
+        <text x="30" y="190" font-size="11.5" fill="#B7BFCD" font-weight="600" text-anchor="start" font-family="system-ui">Lima 🇵🇪</text>
+        <text x="350" y="108" font-size="11.5" fill="#F3CE86" font-weight="700" text-anchor="end" font-family="system-ui">Santa Catarina 🇧🇷</text>
+      </svg>
+      <div class="route-note"><span>Vuelo directo LIM → FLN</span><b>≈ 4 h 40 min</b></div>
+      <div class="mini-facts">
+        <div><b id="factDisp">—</b>lotes disponibles hoy</div>
+        <div><b>36</b>meses para pagar</div>
+        <div><b>72 h</b>de reserva gratis</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LOTES ============ -->
+<section id="lotes">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Paso 1 · Elige</div>
+      <h2>Elige tu lote en el plano, como quien elige asiento de avión</h2>
+      <p>Plano referencial del proyecto Landmark · Santa Catarina. Toca cualquier lote <b>disponible</b> para ver su ficha, precio en dólares y soles, y simular tu financiamiento.</p>
+    </div>
+
+    <div class="filters" role="group" aria-label="Filtros de lotes">
+      <div class="field">
+        <label for="fEstado">Estado</label>
+        <select id="fEstado">
+          <option value="all">Todos</option>
+          <option value="disp" selected>Solo disponibles</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fArea">Tamaño mínimo</label>
+        <select id="fArea">
+          <option value="0" selected>Desde 100 m²</option>
+          <option value="140">Desde 140 m²</option>
+          <option value="180">Desde 180 m²</option>
+          <option value="250">Desde 250 m²</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fPrecio">Precio máximo</label>
+        <select id="fPrecio">
+          <option value="0" selected>Sin límite</option>
+          <option value="45000">Hasta US$ 45,000</option>
+          <option value="65000">Hasta US$ 65,000</option>
+          <option value="90000">Hasta US$ 90,000</option>
+        </select>
+      </div>
+      <button class="link-btn" id="fReset">Limpiar</button>
+      <span class="count" id="lotCount"></span>
+    </div>
+
+    <div class="legend">
+      <span><i class="sw disp"></i> Disponible</span>
+      <span><i class="sw res"></i> Reservado ◔</span>
+      <span><i class="sw vend"></i> Vendido ✕</span>
+      <span style="color:var(--muted)">· Manzana A: frente al mar</span>
+    </div>
+
+    <div class="map-grid">
+      <div class="map-card">
+        <svg id="plano" viewBox="0 0 720 470" role="group" aria-label="Plano interactivo de lotes del proyecto"></svg>
+      </div>
+      <aside class="ficha" id="ficha" aria-live="polite">
+        <div class="empty">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#8D94A3" stroke-width="1.5"><path d="M12 21s-7-5.1-7-11a7 7 0 0 1 14 0c0 5.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+          Selecciona un lote disponible en el plano<br>para ver su ficha completa.
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SIMULADOR ============ -->
+<section id="simulador">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Paso 2 · Simula</div>
+      <h2>Simula tu cuota en 10 segundos</h2>
+      <p>Mueve la cuota inicial, elige el plazo y mira tu cronograma al instante — en soles o en dólares.</p>
+    </div>
+
+    <div class="sim-grid">
+      <div class="panel">
+        <h3>Arma tu plan</h3>
+        <div class="ctrl">
+          <label for="simLot">Lote</label>
+          <select id="simLot"></select>
+        </div>
+        <div class="ctrl">
+          <label for="simPrice">Precio del terreno (US$)</label>
+          <input type="number" id="simPrice" min="10000" step="100" value="31900">
+        </div>
+        <div class="ctrl">
+          <label id="lblMoneda">Quiero ver mis cuotas en</label>
+          <div class="seg" role="group" aria-labelledby="lblMoneda">
+            <button id="curPEN" aria-pressed="true">Soles S/</button>
+            <button id="curUSD" aria-pressed="false">Dólares US$</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <label for="simDown">Cuota inicial</label>
+          <input type="range" id="simDown" min="10" max="50" step="5" value="20">
+          <div class="range-row"><span>10%</span><output id="downOut" for="simDown">20%</output><span>50%</span></div>
+        </div>
+        <div class="ctrl">
+          <label id="lblPlazo">Plazo</label>
+          <div class="seg" role="group" aria-labelledby="lblPlazo">
+            <button data-m="12" aria-pressed="false">12 meses</button>
+            <button data-m="24" aria-pressed="false">24 meses</button>
+            <button data-m="36" aria-pressed="true">36 meses</button>
+          </div>
+          <p class="tea-note" id="teaNote"></p>
+        </div>
+        <p class="tc-note">TC referencial S/ 3.425 por US$ — sujeto a SUNAT. Tasas de demostración editables por el equipo comercial.</p>
+      </div>
+
+      <div class="panel">
+        <div class="result-hero" aria-live="polite">
+          <div class="lbl">Tu cuota mensual estimada</div>
+          <div class="big" id="cuotaBig">—</div>
+          <span class="per-day" id="perDay"></span>
+        </div>
+        <div class="tiles">
+          <div class="tile"><div class="lbl">Cuota inicial</div><div class="val" id="tInicial">—</div></div>
+          <div class="tile"><div class="lbl">Monto financiado</div><div class="val" id="tFin">—</div></div>
+          <div class="tile"><div class="lbl">Total a pagar</div><div class="val" id="tTotal">—</div></div>
+          <div class="tile"><div class="lbl">Interés total</div><div class="val" id="tInt">—</div></div>
+        </div>
+        <div class="meter-row">
+          <div class="lbl"><span>Pagas hoy (inicial)</span><b id="meterLbl">20%</b></div>
+          <div class="meter"><i id="meterFill" style="width:20%"></i></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-head">
+            <h4>Saldo pendiente mes a mes</h4>
+            <button id="tblToggle" aria-expanded="false">Ver cronograma</button>
+          </div>
+          <div id="chartWrap"><svg id="chart" role="img" aria-label="Gráfico de barras del saldo pendiente por mes"></svg></div>
+          <div class="tbl-wrap hidden" id="tblWrap" tabindex="0">
+            <table class="crono" id="cronoTbl">
+              <thead><tr><th scope="col">Mes</th><th scope="col">Cuota</th><th scope="col">Interés</th><th scope="col">Capital</th><th scope="col">Saldo</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="sim-cta">
+          <button class="btn" id="btnReservaSim">Reservar con esta simulación</button>
+          <a class="btn ghost" id="btnWaSim" target="_blank" rel="noopener">Enviar simulación por WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROCESO / QUIPU ============ -->
+<section id="proceso">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Paso 3 · Compra guiada</div>
+      <h2>Tu quipu de compra: 6 nudos, cero estrés</h2>
+      <p>Como en un quipu, cada nudo es un registro que queda amarrado: avanza paso a paso y mira siempre dónde estás. Toca cada nudo para ver el detalle.</p>
+    </div>
+    <div class="knots" id="knots" role="tablist" aria-label="Pasos del proceso de compra"></div>
+    <div class="step-card" id="stepCard" role="tabpanel"></div>
+    <div class="cpf-box">
+      <b>¿Qué es el CPF y por qué importa?</b> Es el número tributario brasileño (como el RUC/DNI tributario) y es <b>obligatorio</b> para comprar un inmueble en Brasil. La buena noticia: se tramita gratis, 100% en línea y sin viajar — y nuestro equipo lo hace contigo en el nudo 3.
+    </div>
+  </div>
+</section>
+
+<!-- ============ PAGOS ============ -->
+<section id="pagos">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Diferencial KIPU</div>
+      <h2>Paga como el peruano paga</h2>
+      <p>Sin enviar dinero “a ciegas” al extranjero: KIPU liquida tus pagos con trazabilidad completa y tipo de cambio bloqueado.</p>
+    </div>
+    <div class="pay-grid">
+      <div class="pay-card">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8B24A" stroke-width="1.8"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/></svg></div>
+        <h3>Soles (S/)</h3>
+        <p style="font-size:13.5px;color:var(--muted)">Desde tu banco o billetera de siempre.</p>
+        <ul>
+          <li>Yape, Plin y transferencia BCP / Interbank / BBVA</li>
+          <li>Débito automático de cuotas</li>
+          <li>Constancia de cada pago en tu panel</li>
+        </ul>
+      </div>
+      <div class="pay-card">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8B24A" stroke-width="1.8"><circle cx="12" cy="12" r="9.5"/><path d="M12 6.5v11M9.2 15.2c.6 1 1.6 1.6 2.8 1.6 1.7 0 3-1 3-2.4 0-3.2-5.6-1.7-5.6-4.6 0-1.3 1.2-2.3 2.6-2.3 1.1 0 2 .5 2.6 1.4"/></svg></div>
+        <h3>Dólares (US$)</h3>
+        <p style="font-size:13.5px;color:var(--muted)">Para quienes ya ahorran en verde.</p>
+        <ul>
+          <li>Transferencia desde tu cuenta en US$</li>
+          <li>Tarjeta de crédito para la reserva</li>
+          <li>TC S/↔US$ referencial SUNAT, siempre visible</li>
+        </ul>
+      </div>
+      <div class="pay-card hot">
+        <span class="tag">Único de KIPU</span>
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8B24A" stroke-width="1.8"><path d="M12 2.5 21 7v10l-9 4.5L3 17V7l9-4.5z"/><path d="M12 7v10M7.5 9.2l9 5.6M16.5 9.2l-9 5.6"/></svg></div>
+        <h3>USDT / BTC</h3>
+        <p style="font-size:13.5px;color:var(--muted)">Vía la mesa OTC de KIPU.</p>
+        <ul>
+          <li>Precio bloqueado por 15 minutos al confirmar</li>
+          <li>Comprobante on-chain (hash) de cada operación</li>
+          <li>Liquidación directa en Brasil, sin bancos intermediarios</li>
+        </ul>
+      </div>
+    </div>
+    <p class="compliance">KIPU opera bajo estándares PLAFT y es sujeto obligado ante la UIF-Perú. Toda operación pasa por verificación de identidad (KYC) y validación de origen de fondos.</p>
+  </div>
+</section>
+
+<!-- ============ POR QUÉ SC ============ -->
+<section id="porque">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">La tesis</div>
+      <h2>¿Por qué Santa Catarina?</h2>
+      <p>El estado del sur de Brasil donde el metro cuadrado no deja de moverse: playas, seguridad y un boom tecnológico alrededor de Florianópolis.</p>
+    </div>
+    <div class="tiles4">
+      <div class="t4"><b>10–14%</b><span>valorización anual referencial de terrenos en zonas costeras</span></div>
+      <div class="t4"><b>Top 3</b><span>de Brasil en IDH y seguridad entre los 26 estados</span></div>
+      <div class="t4"><b>+10 M</b><span>de turistas al año buscando dónde quedarse</span></div>
+      <div class="t4"><b>“Floripa”</b><span>hub tech: la “isla del silicio” brasileña atrae talento y alquileres</span></div>
+    </div>
+    <p class="ref-note">Cifras referenciales de mercado para fines de demostración — reemplazar por fuentes verificadas (IBGE, FipeZap, Santur) antes de publicar.</p>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Sin letra chica</div>
+      <h2>Preguntas que todo peruano hace primero</h2>
+    </div>
+    <details open>
+      <summary>¿Un peruano puede comprar un terreno en Brasil, legalmente y a su nombre?</summary>
+      <p><b>Sí.</b> Brasil permite a extranjeros comprar inmuebles urbanos con propiedad plena (título a tu nombre, heredable y revendible). Solo necesitas tu pasaporte o DNI vigente y un <b>CPF</b> — el número tributario brasileño que tramitamos contigo, gratis y sin viajar.</p>
+    </details>
+    <details>
+      <summary>¿Puedo pagar todo en soles, sin complicarme con bancos del extranjero?</summary>
+      <p>Sí. Pagas en S/ por Yape, Plin o transferencia; KIPU se encarga de la conversión y liquidación en Brasil con tipo de cambio visible y bloqueado al confirmar. También aceptamos US$ y USDT/BTC vía nuestra mesa OTC.</p>
+    </details>
+    <details>
+      <summary>¿Qué costos extra existen además del precio del lote?</summary>
+      <p>Como referencia: el impuesto de transferencia municipal (<b>ITBI</b>, usualmente 2–3% en Santa Catarina), los derechos de escritura y registro en el cartório, y el mantenimiento anual del predio (IPTU). Antes de firmar te entregamos el desglose exacto por escrito — sin sorpresas.</p>
+    </details>
+    <details>
+      <summary>¿Qué recibo al final? ¿Y si quiero revender o construir?</summary>
+      <p>Recibes tu <b>escritura pública inscrita</b> en el registro de inmuebles (matrícula), apostillada para su validez internacional. Desde ese momento puedes construir según el reglamento del proyecto, alquilar o revender — incluso a otro inversionista de la comunidad KIPU.</p>
+    </details>
+    <details>
+      <summary>¿Qué pasa si un mes no puedo pagar mi cuota?</summary>
+      <p>El financiamiento es directo con el desarrollador: existen períodos de gracia y reprogramación según contrato. Nuestro equipo te contacta antes del vencimiento por WhatsApp para encontrar la mejor salida; todo queda documentado en tu panel.</p>
+    </details>
+    <details>
+      <summary>¿Pagar con USDT es legal y seguro?</summary>
+      <p>KIPU opera como sujeto obligado bajo normativa PLAFT/UIF en Perú: verificamos tu identidad, el origen de tus fondos y te entregamos comprobante on-chain y contrato formal por cada operación. La compra del inmueble en Brasil siempre se perfecciona en moneda local vía canales regulados.</p>
+    </details>
+    <p class="ref-note" style="margin-top:14px">Esta información es referencial y no constituye asesoría legal ni tributaria; cada operación incluye revisión con abogados en Perú y Brasil.</p>
+  </div>
+</section>
+
+<!-- ============ CTA FINAL ============ -->
+<section id="contacto">
+  <div class="wrap">
+    <div class="final-card">
+      <div class="kicker">¿Hablamos?</div>
+      <h2>Tu pedacito de Brasil puede empezar hoy con una reserva de 72 horas</h2>
+      <p>Agenda una videollamada con un asesor KIPU o escríbenos por WhatsApp: te mostramos los lotes en vivo, resolvemos tus dudas legales y armamos tu plan de pago a medida.</p>
+      <div class="cta-row">
+        <a class="btn" id="waMain" target="_blank" rel="noopener">Hablar por WhatsApp</a>
+        <a class="btn ghost" href="#lotes">Volver al plano de lotes</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+        <path d="M15 2v9" stroke="#E8B24A" stroke-width="2.6" stroke-linecap="round"/>
+        <circle cx="15" cy="15" r="4.6" fill="#E8B24A"/>
+        <path d="M15 19.6V28M9.5 21.5 5 26M20.5 21.5 25 26" stroke="#E8B24A" stroke-width="2.6" stroke-linecap="round"/>
+      </svg>
+      <div class="word">KIPU<small>Bienes Raíces</small></div>
+    </div>
+    <p class="fine">Demo conceptual para kippuu.com — KIPU Bienes Raíces × Landmark by Real Inmobiliaria. Los lotes, precios, tasas y cifras mostrados son de demostración y no constituyen oferta pública, recomendación de inversión ni asesoría legal, financiera o tributaria. Tipo de cambio referencial sujeto a SUNAT. KIPU opera bajo estándares PLAFT, sujeto obligado ante la UIF-Perú.</p>
+  </div>
+</footer>
+
+<a class="wa-float" id="waFloat" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a9.9 9.9 0 0 0-8.5 15.1L2 22l5-1.4A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.4 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.9.9-1.2 2.1-.6 3.5.9 2 2.4 3.7 4.3 4.8 1.6.9 2.9 1.2 3.9 1 .7-.1 1.5-.6 1.7-1.3.2-.6.2-1.2.1-1.3 0-.1-.2-.2-.6-.3z"/></svg>
+</a>
+
+<div id="tooltip" role="tooltip"></div>
+<div id="toast"></div>
+
+<div class="modal-back" id="modalBack">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="x" id="modalX" aria-label="Cerrar">×</button>
+    <div id="modalForm">
+      <h3 id="modalTitle">Reserva tu lote por 72 horas</h3>
+      <p class="sub">Sin costo y sin compromiso: congelamos el precio mientras decides.</p>
+      <div class="resumen" id="modalResumen"></div>
+      <form id="reservaForm">
+        <div class="ctrl">
+          <label for="rNombre">Nombre y apellido</label>
+          <input id="rNombre" type="text" required autocomplete="name" placeholder="Ej. Eter Pérez">
+        </div>
+        <div class="ctrl">
+          <label for="rWa">WhatsApp</label>
+          <input id="rWa" type="tel" required autocomplete="tel" placeholder="+51 999 999 999">
+        </div>
+        <div class="ctrl">
+          <label for="rPago">¿Cómo prefieres pagar la reserva? (US$ 500)</label>
+          <select id="rPago">
+            <option>Yape / Plin (S/ 1,713)</option>
+            <option>Transferencia en soles (S/ 1,713)</option>
+            <option>Tarjeta en US$ (US$ 500)</option>
+            <option>USDT vía KIPU OTC (500 USDT)</option>
+          </select>
+        </div>
+        <button class="btn" style="width:100%;justify-content:center" type="submit">Confirmar reserva</button>
+        <p class="tc-note" style="margin-top:12px">Demo: no se procesa ningún pago real. La reserva se descuenta del precio del lote.</p>
+      </form>
+    </div>
+    <div id="modalOk" class="ok-view hidden">
+      <div class="big-ok">✓</div>
+      <h3 id="okTitle">¡Lote reservado!</h3>
+      <p class="sub" id="okMsg" style="margin-top:6px"></p>
+      <button class="btn" id="okClose" style="margin-top:10px">Seguir explorando</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ================= KIPU Bienes Raíces — demo interactiva =================
+   Datos 100% de demostración. TC referencial 3.42464 (S/ por US$).       */
+
+const TC = 3.42464;
+const WA_NUM = '51918616580'; // canal oficial de KIPU
+
+/* ---------- utilidades ---------- */
+const $ = (s, c = document) => c.querySelector(s);
+const $$ = (s, c = document) => [...c.querySelectorAll(s)];
+const SVGNS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs = {}) => {
+  const n = document.createElementNS(SVGNS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  return n;
+};
+const nfUS = new Intl.NumberFormat('en-US');
+const nfPE = new Intl.NumberFormat('es-PE');
+const usd = v => 'US$ ' + nfUS.format(Math.round(v));
+const pen = v => 'S/ ' + nfPE.format(Math.round(v));
+const inCur = (vUSD, cur) => cur === 'PEN' ? pen(vUSD * TC) : usd(vUSD);
+const compact = (vUSD, cur) => {
+  const v = cur === 'PEN' ? vUSD * TC : vUSD;
+  const p = cur === 'PEN' ? 'S/ ' : 'US$ ';
+  if (v >= 1e6) return p + (v / 1e6).toFixed(2) + ' M';
+  if (v >= 1e3) return p + Math.round(v / 1e3) + ' K';
+  return p + Math.round(v);
+};
+
+/* ---------- datos demo de lotes ---------- */
+const MZ = {
+  A: { ppm2: 399, fondo: 20, dist: '≈ 150 m', tagline: 'frente al mar' },
+  B: { ppm2: 349, fondo: 14, dist: '≈ 450 m', tagline: 'zona central' },
+  C: { ppm2: 319, fondo: 12.5, dist: '≈ 800 m', tagline: 'zona parque' },
+};
+const CFG = [
+  { m: 'A', sizes: [300, 280, 260, 250, 240, 230, 220, 210, 200, 190], st: 'vdrdvddrdv' },
+  { m: 'B', sizes: [200, 190, 180, 170, 160, 160, 150, 150, 140, 140, 180, 170], st: 'drddvdrddvdd' },
+  { m: 'C', sizes: [100, 100, 110, 100, 120, 110, 100, 130, 120, 100, 140, 110, 100, 120], st: 'ddvddrdddvdddr' },
+];
+const LOTS = [];
+CFG.forEach(cfg => cfg.sizes.forEach((area, i) => {
+  const mz = MZ[cfg.m];
+  LOTS.push({
+    id: `${cfg.m}-${i + 1}`, mz: cfg.m, area,
+    price: area * mz.ppm2,
+    status: cfg.st[i],            // d = disponible, r = reservado, v = vendido
+    frente: +(area / mz.fondo).toFixed(1),
+    fondo: mz.fondo, dist: mz.dist,
+  });
+}));
+const lotById = id => LOTS.find(l => l.id === id);
+const STATUS_TXT = { d: 'Disponible', r: 'Reservado', v: 'Vendido' };
+
+/* ---------- estado global ---------- */
+const state = {
+  filters: { estado: 'all', minM2: 0, maxUSD: 0 },
+  selected: null,
+  cur: 'PEN',
+  price: 31900, lotSim: '', downPct: 20, months: 36,
+  step: 0,
+};
+const TEA = { 12: 0, 24: 0.069, 36: 0.089 };
+
+/* ================= MAPA ================= */
+const plano = $('#plano');
+const ROWS = [
+  { m: 'A', y: 104, h: 68, lbl: 'MANZANA A · FRENTE AL MAR' },
+  { m: 'B', y: 216, h: 68, lbl: 'MANZANA B · ZONA CENTRAL' },
+  { m: 'C', y: 328, h: 68, lbl: 'MANZANA C · ZONA PARQUE' },
+];
+function renderMap() {
+  plano.innerHTML = `
+    <defs>
+      <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#17405E"/><stop offset="1" stop-color="#0E1A26"/>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="0" width="720" height="64" fill="url(#sea)"/>
+    <path d="M0 52 Q 45 44 90 52 T 180 52 T 270 52 T 360 52 T 450 52 T 540 52 T 630 52 T 720 52" fill="none" stroke="#7FB2D9" stroke-opacity=".5" stroke-width="1.5"/>
+    <path d="M0 40 Q 45 32 90 40 T 180 40 T 270 40 T 360 40 T 450 40 T 540 40 T 630 40 T 720 40" fill="none" stroke="#7FB2D9" stroke-opacity=".25" stroke-width="1.5"/>
+    <text class="sea-lbl" x="360" y="30" text-anchor="middle">OCÉANO ATLÁNTICO</text>
+    <rect x="0" y="64" width="720" height="10" fill="#C9B37E" opacity=".28"/>
+    <rect x="24" y="186" width="672" height="16" rx="4" fill="#10141B" stroke="rgba(255,255,255,.07)"/>
+    <text class="maplbl" x="360" y="197.5" text-anchor="middle">AV. BEIRA-MAR</text>
+    <rect x="24" y="298" width="672" height="16" rx="4" fill="#10141B" stroke="rgba(255,255,255,.07)"/>
+    <text class="maplbl" x="360" y="309.5" text-anchor="middle">CALLE LOS IPÊS</text>
+    <rect x="24" y="414" width="672" height="42" rx="8" fill="#12231A" stroke="rgba(90,208,90,.18)"/>
+    <text class="maplbl" x="360" y="439" text-anchor="middle" fill="#6FB27F">ÁREA VERDE · CLUB HOUSE · ACCESO PRINCIPAL</text>`;
+  ROWS.forEach(row => {
+    const lots = LOTS.filter(l => l.mz === row.m);
+    const gap = 6, x0 = 24, W = 672;
+    const w = (W - gap * (lots.length - 1)) / lots.length;
+    const lbl = el('text', { x: x0, y: row.y - 8, class: 'maplbl' });
+    lbl.textContent = row.lbl;
+    plano.appendChild(lbl);
+    lots.forEach((lot, i) => {
+      const g = el('g', { class: 'lot', 'data-id': lot.id, tabindex: lot.status === 'v' ? -1 : 0, role: 'button' });
+      g.setAttribute('aria-label', `Lote ${lot.id}, ${lot.area} metros cuadrados, ${STATUS_TXT[lot.status]}, ${usd(lot.price)}`);
+      const x = x0 + i * (w + gap);
+      const fill = lot.status === 'd' ? '#0ca30c' : lot.status === 'r' ? '#fab219' : '#2E3542';
+      g.appendChild(el('rect', { x, y: row.y, width: w, height: row.h, rx: 5, fill }));
+      const t = el('text', { x: x + w / 2, y: row.y + row.h / 2 + 1, 'text-anchor': 'middle' });
+      t.textContent = lot.id;
+      g.appendChild(t);
+      const t2 = el('text', { x: x + w / 2, y: row.y + row.h / 2 + 14, 'text-anchor': 'middle', 'font-size': '8.5', opacity: '.8' });
+      t2.textContent = lot.area + ' m²';
+      g.appendChild(t2);
+      if (lot.status !== 'd') {
+        const mark = el('text', { x: x + w - 6, y: row.y + 12, 'text-anchor': 'end', 'font-size': '9' });
+        mark.textContent = lot.status === 'r' ? '◔' : '✕';
+        g.appendChild(mark);
+      }
+      g.classList.add('st-' + (lot.status === 'd' ? 'disp' : lot.status === 'r' ? 'res' : 'vend'));
+      if (lot.status !== 'v') {
+        g.addEventListener('click', () => selectLot(lot.id));
+        g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectLot(lot.id); } });
+      }
+      plano.appendChild(g);
+    });
+  });
+  applyFilters(false);
+  if (state.selected) highlightSel();
+}
+function matches(lot) {
+  const f = state.filters;
+  if (f.estado === 'disp' && lot.status !== 'd') return false;
+  if (lot.area < f.minM2) return false;
+  if (f.maxUSD && lot.price > f.maxUSD) return false;
+  return true;
+}
+function applyFilters(scroll = true) {
+  $$('#plano .lot').forEach(g => {
+    const lot = lotById(g.dataset.id);
+    g.classList.toggle('dim', !matches(lot));
+  });
+  const n = LOTS.filter(l => matches(l) && l.status === 'd').length;
+  const c = $('#lotCount');
+  c.textContent = '';
+  const b = document.createElement('b'); b.textContent = n;
+  c.append(b, ` de ${LOTS.filter(l => l.status === 'd').length} disponibles cumplen tus filtros`);
+}
+function highlightSel() {
+  $$('#plano .lot').forEach(g => g.classList.toggle('sel', g.dataset.id === state.selected));
+}
+
+/* ---------- ficha ---------- */
+function selectLot(id) {
+  state.selected = id;
+  highlightSel();
+  const lot = lotById(id);
+  const f = $('#ficha');
+  const stCls = lot.status === 'd' ? 'disp' : lot.status === 'r' ? 'res' : 'vend';
+  f.innerHTML = `
+    <h3>Lote ${lot.id} <span class="status-pill ${stCls}">${STATUS_TXT[lot.status]}</span></h3>
+    <p style="font-size:13px;color:var(--muted);margin-top:4px">Manzana ${lot.mz} · ${MZ[lot.mz].tagline}</p>
+    <dl class="spec-rows">
+      <div><dt>Área</dt><dd>${lot.area} m²</dd></div>
+      <div><dt>Frente × fondo</dt><dd>${lot.frente} m × ${lot.fondo} m</dd></div>
+      <div><dt>Distancia al mar</dt><dd>${lot.dist}</dd></div>
+      <div><dt>Precio por m²</dt><dd>${usd(MZ[lot.mz].ppm2)}</dd></div>
+    </dl>
+    <div class="price-big">${usd(lot.price)} <small>al contado</small></div>
+    <div class="price-alt">≈ ${pen(lot.price * TC)} · o desde <b>${inCur(cuotaFor(lot.price), 'PEN')}/mes</b> con 20% inicial a 36 meses</div>
+    <div class="cta-row">
+      ${lot.status === 'd'
+        ? `<button class="btn small" id="fReservar">Reservar 72 h</button>
+           <button class="btn ghost small" id="fSimular">Simular financiamiento</button>`
+        : `<a class="btn ghost small" target="_blank" rel="noopener" href="https://wa.me/${WA_NUM}?text=${encodeURIComponent('Hola KIPU, me interesa un lote similar al ' + lot.id + ' en Santa Catarina 🙌')}">Avísame si se libera</a>`}
+    </div>`;
+  if (lot.status === 'd') {
+    $('#fReservar').addEventListener('click', () => openReserva(lot.id, false));
+    $('#fSimular').addEventListener('click', () => {
+      state.lotSim = lot.id; state.price = lot.price;
+      $('#simLot').value = lot.id; $('#simPrice').value = lot.price;
+      compute();
+      $('#simulador').scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+}
+function cuotaFor(price) { // 20% inicial, 36 meses — para la ficha
+  const fin = price * .8, tea = TEA[36], i = Math.pow(1 + tea, 1 / 12) - 1;
+  return fin * i / (1 - Math.pow(1 + i, -36));
+}
+
+/* ================= SIMULADOR ================= */
+function fillLotSelect() {
+  const sel = $('#simLot');
+  sel.innerHTML = '<option value="">— Monto libre (edita el precio) —</option>';
+  LOTS.filter(l => l.status === 'd').forEach(l => {
+    const o = document.createElement('option');
+    o.value = l.id;
+    o.textContent = `Lote ${l.id} · ${l.area} m² · ${usd(l.price)}`;
+    sel.appendChild(o);
+  });
+  sel.value = state.lotSim;
+}
+function schedule() {
+  const price = state.price;
+  const down = price * state.downPct / 100;
+  const fin = price - down;
+  const n = state.months;
+  const tea = TEA[n];
+  const i = tea === 0 ? 0 : Math.pow(1 + tea, 1 / 12) - 1;
+  const cuota = i === 0 ? fin / n : fin * i / (1 - Math.pow(1 + i, -n));
+  const rows = [];
+  let saldo = fin;
+  for (let k = 1; k <= n; k++) {
+    const int = saldo * i;
+    const cap = cuota - int;
+    saldo = Math.max(0, saldo - cap);
+    rows.push({ k, cuota, int, cap, saldo });
+  }
+  return { price, down, fin, n, cuota, rows, total: down + cuota * n };
+}
+function compute() {
+  const s = schedule();
+  const c = state.cur;
+  $('#cuotaBig').innerHTML = '';
+  $('#cuotaBig').append(inCur(s.cuota, c), Object.assign(document.createElement('small'), { textContent: ' /mes' }));
+  $('#perDay').textContent = `Equivale a ≈ ${inCur(s.cuota / 30, c)} al día`;
+  $('#tInicial').textContent = inCur(s.down, c);
+  $('#tFin').textContent = inCur(s.fin, c);
+  $('#tTotal').textContent = inCur(s.total, c);
+  $('#tInt').textContent = inCur(s.total - s.price, c);
+  $('#meterLbl').textContent = state.downPct + '%';
+  $('#meterFill').style.width = state.downPct + '%';
+  $('#downOut').textContent = state.downPct + '%';
+  $('#teaNote').textContent = state.months === 12
+    ? 'A 12 meses: 0% de interés — precio al contado en 12 partes (demo).'
+    : `A ${state.months} meses aplica TEA ${(TEA[state.months] * 100).toFixed(1)}% de financiamiento directo (demo).`;
+  drawChart(s);
+  fillTable(s);
+  $('#btnWaSim').href = `https://wa.me/${WA_NUM}?text=` + encodeURIComponent(
+    `Hola KIPU 👋 Simulé mi terreno en Santa Catarina: precio ${usd(s.price)}, inicial ${state.downPct}%, ${s.n} meses → cuota aprox ${inCur(s.cuota, c)}/mes. ¿Agendamos una llamada?`);
+}
+/* ---------- gráfico de barras: saldo pendiente ---------- */
+const tooltip = $('#tooltip');
+function showTip(html, x, y) {
+  tooltip.innerHTML = html;
+  tooltip.style.display = 'block';
+  const r = tooltip.getBoundingClientRect();
+  tooltip.style.left = Math.min(window.innerWidth - r.width - 10, Math.max(8, x - r.width / 2)) + 'px';
+  tooltip.style.top = Math.max(8, y - r.height - 14) + 'px';
+}
+const hideTip = () => tooltip.style.display = 'none';
+function niceMax(v) {
+  const raw = v / 4;
+  const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * pow).find(s => s >= raw);
+  return { max: Math.ceil(v / step) * step, step };
+}
+function drawChart(s) {
+  const svg = $('#chart');
+  const wrap = $('#chartWrap');
+  const W = Math.max(300, wrap.clientWidth - 2);
+  const padT = 16, padB = 26, padL = 52, padR = 10, plotH = 180;
+  const H = padT + plotH + padB;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W); svg.setAttribute('height', H);
+  svg.innerHTML = '';
+  const c = state.cur, toC = v => c === 'PEN' ? v * TC : v;
+  const { max, step } = niceMax(toC(s.fin) || 1);
+  const y = v => padT + plotH - (toC(v) / max) * plotH;
+  // gridlines + ticks Y
+  for (let t = 0; t <= max + 1; t += step) {
+    const yy = padT + plotH - (t / max) * plotH;
+    if (t > 0) svg.appendChild(el('line', { x1: padL, x2: W - padR, y1: yy, y2: yy, stroke: '#242B37', 'stroke-width': 1 }));
+    const lb = el('text', { x: padL - 8, y: yy + 3.5, 'text-anchor': 'end', 'font-size': 10.5, fill: '#8D94A3', style: 'font-variant-numeric:tabular-nums' });
+    lb.textContent = t >= 1000 ? (t / 1000) + 'K' : t;
+    svg.appendChild(lb);
+  }
+  // baseline
+  svg.appendChild(el('line', { x1: padL, x2: W - padR, y1: padT + plotH, y2: padT + plotH, stroke: '#3A4250', 'stroke-width': 1 }));
+  const n = s.rows.length;
+  const slot = (W - padL - padR) / n;
+  const barW = Math.min(24, Math.max(3, slot - 2));
+  s.rows.forEach((r, idx) => {
+    const bx = padL + idx * slot + (slot - barW) / 2;
+    const by = y(r.saldo), bh = padT + plotH - by;
+    const g = el('g', {});
+    const hit = el('rect', { class: 'hit', x: padL + idx * slot, y: padT, width: slot, height: plotH, fill: 'transparent', tabindex: 0, role: 'img' });
+    hit.setAttribute('aria-label', `Mes ${r.k}: saldo ${inCur(r.saldo, c)}, cuota ${inCur(r.cuota, c)}`);
+    let bar;
+    if (bh > 1) {
+      const rr = Math.min(3, barW / 2);
+      bar = el('path', { class: 'bar', fill: '#C98500', 'pointer-events': 'none', d: `M ${bx} ${padT + plotH} L ${bx} ${by + rr} Q ${bx} ${by} ${bx + rr} ${by} L ${bx + barW - rr} ${by} Q ${bx + barW} ${by} ${bx + barW} ${by + rr} L ${bx + barW} ${padT + plotH} Z` });
+    } else {
+      bar = el('rect', { class: 'bar', fill: '#C98500', 'pointer-events': 'none', x: bx, y: padT + plotH - 1.5, width: barW, height: 1.5 });
+    }
+    const tip = e => {
+      const p = e.touches ? e.touches[0] : e;
+      const box = hit.getBoundingClientRect();
+      showTip(`<div class="v">${inCur(r.saldo, c)}</div>saldo tras el mes ${r.k} · cuota ${inCur(r.cuota, c)}`,
+        p.clientX ?? box.x + box.width / 2, box.top);
+    };
+    hit.addEventListener('pointermove', tip);
+    hit.addEventListener('pointerleave', hideTip);
+    hit.addEventListener('focus', () => {
+      const box = hit.getBoundingClientRect();
+      showTip(`<div class="v">${inCur(r.saldo, c)}</div>saldo tras el mes ${r.k} · cuota ${inCur(r.cuota, c)}`, box.x + box.width / 2, box.top);
+    });
+    hit.addEventListener('blur', hideTip);
+    g.append(hit, bar);
+    svg.appendChild(g);
+    // etiquetas X selectivas
+    if (r.k === 1 || r.k % 6 === 0) {
+      const xl = el('text', { x: padL + idx * slot + slot / 2, y: padT + plotH + 16, 'text-anchor': 'middle', 'font-size': 10.5, fill: '#8D94A3' });
+      xl.textContent = r.k;
+      svg.appendChild(xl);
+    }
+  });
+  // etiqueta directa: primera barra
+  const first = s.rows[0];
+  const fl = el('text', { x: padL + slot / 2 + 4, y: y(first.saldo) - 6, 'font-size': 10.5, fill: '#B7BFCD', 'font-weight': 600 });
+  fl.textContent = compact(first.saldo, c);
+  svg.appendChild(fl);
+  const xt = el('text', { x: W - padR, y: H - 4, 'text-anchor': 'end', 'font-size': 10, fill: '#5E6675' });
+  xt.textContent = 'mes';
+  svg.appendChild(xt);
+  svg.setAttribute('aria-label', `Saldo pendiente por mes: inicia en ${inCur(first.saldo, c)} y llega a 0 en el mes ${s.n}.`);
+}
+function fillTable(s) {
+  const tb = $('#cronoTbl tbody');
+  tb.innerHTML = '';
+  const c = state.cur;
+  s.rows.forEach(r => {
+    const tr = document.createElement('tr');
+    [r.k, inCur(r.cuota, c), inCur(r.int, c), inCur(r.cap, c), inCur(r.saldo, c)].forEach(v => {
+      const td = document.createElement('td');
+      td.textContent = v;
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+}
+
+/* ---------- controles del simulador ---------- */
+$('#simLot').addEventListener('change', e => {
+  state.lotSim = e.target.value;
+  if (state.lotSim) { state.price = lotById(state.lotSim).price; $('#simPrice').value = state.price; }
+  compute();
+});
+$('#simPrice').addEventListener('input', e => {
+  const v = +e.target.value;
+  if (v >= 10000) { state.price = v; state.lotSim = ''; $('#simLot').value = ''; compute(); }
+});
+$('#curPEN').addEventListener('click', () => setCur('PEN'));
+$('#curUSD').addEventListener('click', () => setCur('USD'));
+function setCur(c) {
+  state.cur = c;
+  $('#curPEN').setAttribute('aria-pressed', c === 'PEN');
+  $('#curUSD').setAttribute('aria-pressed', c === 'USD');
+  compute();
+}
+$('#simDown').addEventListener('input', e => { state.downPct = +e.target.value; compute(); });
+$$('#simulador .seg [data-m]').forEach(b => b.addEventListener('click', () => {
+  state.months = +b.dataset.m;
+  $$('#simulador .seg [data-m]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  compute();
+}));
+$('#tblToggle').addEventListener('click', () => {
+  const nowHidden = $('#tblWrap').classList.toggle('hidden'); // true → tabla oculta
+  const showingTable = !nowHidden;
+  $('#chartWrap').classList.toggle('hidden', showingTable);
+  $('#tblToggle').textContent = showingTable ? 'Ver gráfico' : 'Ver cronograma';
+  $('#tblToggle').setAttribute('aria-expanded', showingTable);
+  if (!showingTable) compute(); // re-dibuja el gráfico al volver
+});
+$('#btnReservaSim').addEventListener('click', () => openReserva(state.lotSim || null, true));
+let rsz;
+window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => compute(), 150); });
+
+/* ================= QUIPU / PROCESO ================= */
+const STEPS = [
+  { t: 'Elige tu lote', d: 'Explora el plano interactivo, compara precios por manzana y pide un tour virtual 360° o una videollamada con dron en vivo desde el proyecto.', need: 'Solo tu curiosidad', time: 'Hoy mismo', who: 'Asesor KIPU en vivo' },
+  { t: 'Resérvalo online', d: 'Con US$ 500 (≈ S/ 1,713) congelas el precio por 72 horas, 100% descontables del valor del lote. Paga con Yape, tarjeta o USDT con tipo de cambio bloqueado 15 minutos.', need: 'US$ 500 de reserva', time: '5 minutos', who: 'Pasarela segura + OTC KIPU' },
+  { t: 'Verifica tu identidad', d: 'KYC exprés con tu DNI o pasaporte + selfie. Aquí mismo tramitamos gratis tu CPF brasileño — el requisito clave para comprar en Brasil — sin que viajes ni hagas colas.', need: 'DNI o pasaporte vigente', time: '24 – 48 horas', who: 'Equipo legal KIPU' },
+  { t: 'Firma tu contrato', d: 'Contrato bilingüe español–portugués, revisado por abogados de Perú y Brasil, con firma electrónica válida en ambos países. Te lo explicamos cláusula por cláusula.', need: 'Leerlo con calma', time: '24 horas', who: 'Notaría digital + abogados' },
+  { t: 'Paga a tu ritmo', d: 'Cuota inicial + hasta 36 cuotas mensuales en S/, US$ o USDT. Débito automático, recordatorios por WhatsApp y tu saldo siempre visible en el panel.', need: 'Tu plan del simulador', time: '12 – 36 meses', who: 'KIPU Pagos' },
+  { t: 'Recibe tu escritura', d: 'Escritura pública inscrita en el registro de inmuebles (matrícula) del cartório, apostillada y enviada a tu casa. El terreno queda 100% a tu nombre: heredable, construible y revendible.', need: 'Haber completado tus pagos', time: '30 – 45 días', who: 'Cartório + Real Inmobiliaria' },
+];
+function renderKnots() {
+  const k = $('#knots');
+  k.innerHTML = '';
+  STEPS.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'knot' + (i < state.step ? ' done' : i === state.step ? ' current' : '');
+    const b = document.createElement('button');
+    b.setAttribute('role', 'tab');
+    b.setAttribute('aria-selected', i === state.step);
+    b.addEventListener('click', () => { state.step = i; renderKnots(); });
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    dot.textContent = i < state.step ? '✓' : i + 1;
+    const lbl = document.createElement('span');
+    lbl.className = 'k-lbl';
+    lbl.textContent = s.t;
+    b.append(dot, lbl);
+    d.appendChild(b);
+    k.appendChild(d);
+  });
+  const s = STEPS[state.step];
+  $('#stepCard').innerHTML = `
+    <h3><span>Nudo ${state.step + 1}</span>${s.t}</h3>
+    <p>${s.d}</p>
+    <div class="step-meta">
+      <div><b>Necesitas</b>${s.need}</div>
+      <div><b>Tiempo estimado</b>${s.time}</div>
+      <div><b>Te acompaña</b>${s.who}</div>
+    </div>
+    <div class="step-nav">
+      ${state.step > 0 ? '<button class="btn ghost small" id="stPrev">← Anterior</button>' : ''}
+      ${state.step < STEPS.length - 1
+        ? '<button class="btn small" id="stNext">Siguiente nudo →</button>'
+        : `<a class="btn small" target="_blank" rel="noopener" href="https://wa.me/${WA_NUM}?text=${encodeURIComponent('Hola KIPU, quiero empezar mi compra en Santa Catarina 🚀')}">Empezar mi quipu</a>`}
+    </div>`;
+  const p = $('#stPrev'), nx = $('#stNext');
+  if (p) p.addEventListener('click', () => { state.step--; renderKnots(); });
+  if (nx) nx.addEventListener('click', () => { state.step++; renderKnots(); });
+}
+
+/* ================= RESERVA (demo) ================= */
+const back = $('#modalBack');
+let modalCtx = { lotId: null, sim: false };
+function openReserva(lotId, withSim) {
+  modalCtx = { lotId, sim: withSim };
+  $('#modalForm').classList.remove('hidden');
+  $('#modalOk').classList.add('hidden');
+  const res = $('#modalResumen');
+  const s = schedule();
+  let html = '';
+  if (lotId) {
+    const l = lotById(lotId);
+    html += `<b>Lote ${l.id}</b> · ${l.area} m² · Manzana ${l.mz} (${MZ[l.mz].tagline})<br>${usd(l.price)} ≈ ${pen(l.price * TC)}`;
+  } else {
+    html += `<b>Monto personalizado</b>: ${usd(state.price)} ≈ ${pen(state.price * TC)}`;
+  }
+  if (withSim) html += `<br>Plan simulado: inicial ${state.downPct}% + ${s.n} cuotas de <b>${inCur(s.cuota, state.cur)}</b>`;
+  res.innerHTML = html;
+  back.classList.add('open');
+  $('#rNombre').focus();
+}
+function closeModal() { back.classList.remove('open'); }
+$('#modalX').addEventListener('click', closeModal);
+back.addEventListener('click', e => { if (e.target === back) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+$('#reservaForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const nombre = $('#rNombre').value.trim() || 'inversionista';
+  const wa = $('#rWa').value.trim();
+  if (modalCtx.lotId) {
+    const l = lotById(modalCtx.lotId);
+    if (l && l.status === 'd') l.status = 'r';
+    renderMap(); fillLotSelect(); updateFactDisp();
+    if (state.selected === l.id) selectLot(l.id);
+  }
+  $('#modalForm').classList.add('hidden');
+  $('#modalOk').classList.remove('hidden');
+  $('#okTitle').textContent = modalCtx.lotId ? `¡Lote ${modalCtx.lotId} reservado!` : '¡Solicitud registrada!';
+  $('#okMsg').textContent = `${nombre}, congelamos tu precio por 72 horas. Te escribiremos al ${wa || 'WhatsApp indicado'} para coordinar el pago de la reserva. (Demo: no se cobró nada).`;
+  toast('✓ Reserva demo registrada — así de simple sería en producción');
+});
+$('#okClose').addEventListener('click', closeModal);
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3800);
+}
+
+/* ================= filtros / init ================= */
+$('#fEstado').addEventListener('change', e => { state.filters.estado = e.target.value; applyFilters(); });
+$('#fArea').addEventListener('change', e => { state.filters.minM2 = +e.target.value; applyFilters(); });
+$('#fPrecio').addEventListener('change', e => { state.filters.maxUSD = +e.target.value; applyFilters(); });
+$('#fReset').addEventListener('click', () => {
+  state.filters = { estado: 'all', minM2: 0, maxUSD: 0 };
+  $('#fEstado').value = 'all'; $('#fArea').value = '0'; $('#fPrecio').value = '0';
+  applyFilters();
+});
+function updateFactDisp() { $('#factDisp').textContent = LOTS.filter(l => l.status === 'd').length; }
+const waHref = `https://wa.me/${WA_NUM}?text=` + encodeURIComponent('Hola KIPU 👋 Quiero saber más sobre los terrenos en Santa Catarina, Brasil.');
+$('#waMain').href = waHref;
+$('#waFloat').href = waHref;
+
+$('#fEstado').value = 'all';
+renderMap();
+fillLotSelect();
+updateFactDisp();
+setCur('PEN');
+renderKnots();
+</script>
+</body>
+</html>
