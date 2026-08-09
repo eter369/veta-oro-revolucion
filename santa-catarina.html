@@ -562,12 +562,13 @@ const PROYECTOS = [
     enlace:"", portada:"", imagenes:[],
   },
   {
-    id:"prop05", etiqueta:"Propiedad 05",
-    variante:"bosque", acento:"#2e4a36",
+    id:"sweep", etiqueta:"SOL Lunar Oracle",
+    variante:"oraculo", acento:"#a78bfa",
     x:67, y:63,  xm:70, ym:66,
-    categoria:"Proyecto", anio:"2026",
-    descripcion:"[EDITABLE] Ficha del proyecto: etapa, ubicación, unidades y cronograma tentativo. Completar con datos reales, sin promesas de resultados.",
-    tags:["Etapa","Unidades","Cronograma"],
+    categoria:"Sweep Intelligence · Tesla 369", anio:"2026",
+    enlacePagina:"sweep/", /* dashboard React compilado (en vivo, datos de Binance) */
+    descripcion:"Panel de análisis probabilístico de SOL/USDT: sweeps institucionales, señal Tesla 369, reloj lunar y gestión de riesgo en vivo.",
+    tags:["SOL/USDT","9 indicadores"],
     enlace:"", portada:"", imagenes:[],
   },
   {
@@ -607,6 +608,26 @@ function svgMiniatura(variante, acento){
         <rect x="6" y="18" width="52" height="33" rx="4.5" fill="url(#ca${n})"/>
         <rect x="6" y="18" width="52" height="5" rx="2.5" fill="rgba(255,255,255,.28)"/>
       </svg>`;
+    case "oraculo": return `${abre}
+      <defs>
+        <linearGradient id="or${n}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#12081f"/><stop offset="1" stop-color="#070812"/>
+        </linearGradient>
+        <radialGradient id="orl${n}" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stop-color="#f5efe0"/><stop offset="1" stop-color="#f5efe0" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="100" height="100" fill="url(#or${n})"/>
+      <ellipse cx="50" cy="42" rx="34" ry="30" fill="none" stroke="rgba(139,92,246,.14)" stroke-width="1"/>
+      <circle cx="66" cy="26" r="11" fill="url(#orl${n})" opacity=".55"/>
+      <circle cx="66" cy="26" r="8" fill="#e9e2cf"/><circle cx="62.5" cy="24" r="8" fill="#12081f"/>
+      <g stroke-linecap="round" stroke-width="4.5">
+        <path d="M14 78 V64" stroke="#34d399"/><path d="M24 78 V52" stroke="#34d399"/>
+        <path d="M34 82 V60" stroke="#fb7185"/><path d="M44 74 V48" stroke="#34d399"/>
+        <path d="M54 84 V66" stroke="#fb7185"/><path d="M64 72 V44" stroke="#34d399"/>
+        <path d="M74 80 V58" stroke="#a78bfa"/><path d="M84 70 V40" stroke="#a78bfa"/>
+      </g>
+      <path d="M10 70 22 58 32 66 42 50 52 64 62 42 74 56 88 36" fill="none" stroke="#c4b5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>${cierra}`;
     case "nucleo": return `${abre}
       <defs>
         <radialGradient id="nc${n}" cx=".42" cy=".38" r=".65">
