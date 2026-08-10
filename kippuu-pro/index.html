@@ -8,16 +8,19 @@
 <meta name="description" content="KIPU Pro: escritorio inmersivo del catálogo de terrenos en Santa Catarina, Brasil. Fichas, precios en BRL y USD con tipo de cambio en vivo. Demostración.">
 <meta property="og:title" content="KIPU Pro — Santa Catarina OS">
 <meta property="og:description" content="Escritorio inmersivo del catálogo de terrenos de Santa Catarina.">
-<meta property="og:image" content="assets/wallpaper.jpg">
+<meta property="og:image" content="../assets/fondo-santa-catarina.jpg">
 <meta property="og:type" content="website">
 <!-- ============================================================
      KIPU PRO — Santa Catarina OS
-     Versión "pro" del escritorio: ventanas arrastrables, fichas de
-     terreno y tipo de cambio USD/BRL en vivo (open.er-api.com).
-     [EDITABLE] El inventario de 3 terrenos es DEMOSTRACIÓN: hay que
-     sustituirlo por lotes reales con su documentación antes de
-     quitar el noindex. Ninguna cifra de esta página puede
-     presentarse como rentabilidad prometida.
+     El catálogo de Santa Catarina como escritorio: ventanas
+     arrastrables, ficha por terreno, simulador, guía legal y FAQ,
+     con tipo de cambio USD/BRL en vivo (open.er-api.com).
+     Sustituye a la antigua terrenos.html, cuyo contenido se portó a
+     catalogo.js / simulador.js / guia.js.
+     [EDITABLE] Los 10 lotes provienen del catálogo anterior y siguen
+     pendientes de verificación documental lote a lote antes de quitar
+     el noindex. Ninguna cifra de esta página puede presentarse como
+     rentabilidad prometida.
      ============================================================ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,7 +47,8 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 /* ---------- Fondo cinematográfico ---------- */
 #wallpaper{
   position:fixed;inset:-4%;z-index:0;
-  background:url('assets/wallpaper.jpg') center/cover no-repeat;
+  /* fondo compartido con el escritorio de la división: una sola imagen para las dos */
+  background:url('../assets/fondo-santa-catarina.jpg') center/cover no-repeat;
   animation:kenburns 40s ease-in-out infinite alternate;
 }
 @keyframes kenburns{from{transform:scale(1) translate(0,0)}to{transform:scale(1.09) translate(-1.2%,1.5%)}}
@@ -405,7 +409,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 </nav>
   <!-- Franja legal siempre visible: esta página muestra terrenos, no productos financieros -->
   <div id="legal">
-    DEMOSTRACIÓN · Inventario de ejemplo, pendiente de sustituir por lotes reales con su documentación.
+    DEMOSTRACIÓN · Los 10 terrenos son de referencia: cada uno requiere verificación documental (matrícula y certidões) antes de reservarse.
     KIPU no garantiza revalorización ni rentabilidad de ningún terreno · PROFIX CENTRAL BANK S.A.C. · RUC 20614585146
   </div>
 </div>
@@ -416,6 +420,13 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
   <b>Bienvenido a Santa Catarina OS.</b><br>
   Haz clic en cualquier ícono del escritorio para abrir su ventana. Arrastra las ventanas desde la barra superior y minimízalas al dock.
 </div>
+<!-- Contenido real del catálogo, portado de la antigua terrenos.html.
+     Son scripts planos (sin build): cuelgan sus datos y plantillas de window.KP
+     y por eso deben cargar ANTES del motor del sistema. -->
+<script src="catalogo.js"></script>
+<script src="simulador.js"></script>
+<script src="guia.js"></script>
+
 <script>
 /* ============================================================
    SANTA CATARINA OS — Motor de la aplicación
@@ -428,37 +439,16 @@ const CONFIG = {
 };
 
 /* ---------- Datos del catálogo ----------
-   [EDITABLE · DEMOSTRACIÓN] Estos tres lotes son un ejemplo de ficha, NO
-   inventario a la venta. Sustituir por terrenos reales con su matrícula,
-   medidas y documentación antes de publicar la página sin noindex.
-   Las descripciones evitan a propósito cualquier promesa de rentabilidad,
-   plusvalía o revalorización: describen el terreno, no un resultado. */
-const PROPS = [
-  {
-    id:'sc05', ref:'SC-05', name:'Valle Itajaí', loc:'Blumenau · Santa Catarina',
-    img:'assets/terreno-valle.jpg', m2:1250, precioM2:550,
-    lat:-26.9194, lon:-49.0661,
-    badges:['Documentación por verificar','Registro inmobiliario','Apto extranjeros'],
-    specs:{Frente:'28 m',Topografía:'Plana',Servicios:'Agua · Luz · Fibra',Zonificación:'Residencial'},
-    desc:'Terreno plano en el Valle Itajaí, a minutos del centro de Blumenau. Zona residencial consolidada, de herencia alemana, con servicios completos y acceso asfaltado. Apto para vivienda unifamiliar o proyecto de baja densidad según su zonificación.'
-  },
-  {
-    id:'sc06', ref:'SC-06', name:'Costa Esmeralda', loc:'Balneário Camboriú · SC',
-    img:'assets/terreno-costa.jpg', m2:480, precioM2:3000,
-    lat:-26.9906, lon:-48.6356,
-    badges:['Documentación por verificar','Apto extranjeros','Zona urbana consolidada'],
-    specs:{Frente:'16 m',Topografía:'Plana',Servicios:'Todos',Zonificación:'Mixto'},
-    desc:'Lote a pocas cuadras del mar en Balneário Camboriú, una de las ciudades con el mercado inmobiliario más activo del sur de Brasil. Zonificación mixta: admite vivienda y uso comercial en planta baja, sujeto al plan director municipal vigente.'
-  },
-  {
-    id:'sc07', ref:'SC-07', name:'Mirador del Atlántico', loc:'Itapema · Santa Catarina',
-    img:'assets/terreno-colina.jpg', m2:900, precioM2:1300,
-    lat:-27.0903, lon:-48.6114,
-    badges:['Documentación por verificar','Vista al mar','Apto extranjeros'],
-    specs:{Frente:'30 m',Topografía:'Suave pendiente',Servicios:'Agua · Luz',Zonificación:'Residencial alto'},
-    desc:'Colina con vista al Atlántico en Itapema, entre Balneário Camboriú y Florianópolis. Pendiente suave que permite construcción en terrazas. Requiere estudio de suelos y proyecto de contención: pídenos el detalle técnico antes de decidir.'
-  }
-];
+   Los 10 terrenos viven ahora en catalogo.js (KP.LOTES), portados de la
+   antigua página terrenos.html. Aquí solo queda el puente con las tres
+   fotografías que traía el sistema: los lotes que tienen foto propia la
+   usan, y los otros siete se dibujan con la escena generada de KP.sceneSVG. */
+const FOTOS = {
+  2: 'assets/terreno-costa.jpg',   // Balneário Camboriú — la foto de costa
+  7: 'assets/terreno-colina.jpg',  // Itajaí, Praia Brava alto — la foto de colina
+  8: 'assets/terreno-valle.jpg',   // Blumenau — la foto de valle
+};
+
 
 /* ---------- Estado global ---------- */
 let fxRate = CONFIG.fxFallback;
@@ -495,8 +485,15 @@ setInterval(tick, 1000); tick();
 
 /* ---------- Íconos del escritorio ---------- */
 const ICONS = [
-  { id:'catalogo', label:'Catálogo', sub:'3 terrenos', svg:'<svg viewBox="0 0 24 24" fill="none" stroke="#e3b85c" stroke-width="1.6"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>' },
-  ...PROPS.map(p => ({ id:p.id, label:p.name, sub:p.ref, img:p.img })),
+  { id:'catalogo', label:'Catálogo', sub:`${(window.KP?.LOTES||[]).length} terrenos`, svg:'<svg viewBox="0 0 24 24" fill="none" stroke="#e3b85c" stroke-width="1.6"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>' },
+  /* Tres lotes destacados con fotografía real, como acceso directo desde el escritorio */
+  ...Object.keys(FOTOS).map(id => {
+    const l = (window.KP?.LOTES || []).find(x => String(x.id) === String(id));
+    return l ? { id:`lote:${l.id}`, label:l.ciudad, sub:l.barrio, img:FOTOS[id] } : null;
+  }).filter(Boolean),
+  { id:'simulador', label:'Simulador', sub:'De soles a m²', svg:'<svg viewBox="0 0 24 24" fill="none" stroke="#e3b85c" stroke-width="1.6"><rect x="4" y="2.5" width="16" height="19" rx="3"/><path d="M8 7h8" stroke-width="2"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01"/><path d="M15.5 16v2.5" stroke-width="2" stroke-linecap="round"/></svg>' },
+  { id:'proceso', label:'Guía legal', sub:'7 pasos', svg:'<svg viewBox="0 0 24 24" fill="none" stroke="#e3b85c" stroke-width="1.6"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4" stroke-linecap="round"/></svg>' },
+  { id:'faq', label:'Preguntas', sub:'Frecuentes', svg:'<svg viewBox="0 0 24 24" fill="none" stroke="#e3b85c" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.3a2.9 2.9 0 1 1 3.6 3.4c-.6.2-.9.7-.9 1.3v.4" stroke-linecap="round"/><path d="M12 17.4h.01" stroke-width="2.2" stroke-linecap="round"/></svg>' },
   { id:'aurum', label:'AURUM', sub:'Criterio de selección', svg:'<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" fill="#e3b85c"/><circle cx="12" cy="12" r="5" fill="url(#g1)" opacity=".6"/><ellipse cx="12" cy="12" rx="10" ry="3.2" stroke="#f6dc9a" stroke-width="1" opacity=".8"/><circle cx="19" cy="7" r="1.2" fill="#f6dc9a"/><defs><radialGradient id="g1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e3b85c"/></radialGradient></defs></svg>' },
   { id:'smartmoney', label:'Smart Money', sub:'Datos del mercado', svg:'<svg viewBox="0 0 24 24" fill="none" stroke="#3ddc97" stroke-width="1.7"><path d="M3 20h18"/><path d="M4 16l4-6 4 3 5-8 3 4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="5" r="1.4" fill="#3ddc97" stroke="none"/></svg>' },
 ];
@@ -513,68 +510,6 @@ function buildDesktop(){
 }
 
 /* ---------- Plantillas de ventana ---------- */
-function tplCatalogo(){
-  return `<div class="pad">
-    <div class="sec-head">
-      <h2>Catálogo de <em>terrenos</em></h2>
-      <p>Santa Catarina · Documentación verificada · Precios en BRL y USD</p>
-    </div>
-    <div class="grid">
-      ${PROPS.map(p => `
-        <article class="card" data-open="${p.id}">
-          <div class="ph"><img src="${p.img}" alt="${p.name}">
-            <span class="ref">${p.ref}</span><span class="m2">${p.m2.toLocaleString()} m²</span>
-          </div>
-          <div class="info">
-            <h3>${p.name}</h3>
-            <div class="loc">◈ ${p.loc}</div>
-            <div class="price"><b>${fmtBRL(p.m2*p.precioM2)}</b><span class="usd-lbl" data-brl="${p.m2*p.precioM2}"></span></div>
-            <div class="cta-row">
-              <button class="btn btn-gold" data-open="${p.id}">Ver ficha</button>
-              <a class="btn btn-wa" target="_blank" rel="noopener" href="${waLink(`Hola KIPU, me interesa el terreno ${p.name} (${p.ref}) en ${p.loc}. ¿Me envían más información?`)}">WhatsApp</a>
-            </div>
-          </div>
-        </article>`).join('')}
-    </div>
-  </div>`;
-}
-
-function tplProp(p){
-  const total = p.m2 * p.precioM2;
-  return `
-  <div class="hero"><img src="${p.img}" alt="${p.name}">
-    <div class="h-txt"><div class="ref">Ref. ${p.ref} · ${p.loc}</div><h2>${p.name}</h2></div>
-  </div>
-  <div class="badges">
-    ${p.badges.map(b => `<span class="badge">✓ ${b}</span>`).join('')}
-    <span class="badge gold">◆ Selección KIPU</span>
-  </div>
-  <div class="specs">
-    <div class="spec"><div class="k">Área</div><div class="v">${p.m2.toLocaleString()} m²</div></div>
-    <div class="spec"><div class="k">Frente</div><div class="v">${p.specs.Frente}</div></div>
-    <div class="spec"><div class="k">Topografía</div><div class="v">${p.specs.Topografía}</div></div>
-    <div class="spec"><div class="k">Servicios</div><div class="v">${p.specs.Servicios}</div></div>
-    <div class="spec"><div class="k">Zonificación</div><div class="v">${p.specs.Zonificación}</div></div>
-  </div>
-  <div class="pricebox">
-    <div>
-      <div class="p-brl">${fmtBRL(total)}</div>
-      <div class="p-usd">≈ <b class="usd-lbl" data-brl="${total}"></b> al tipo de cambio de hoy</div>
-    </div>
-    <div class="per-m2">Precio por m²<b>${fmtBRL(p.precioM2)}</b></div>
-  </div>
-  <p class="desc">${p.desc}</p>
-  <div class="mapbox">
-    <iframe loading="lazy" title="Mapa ${p.name}"
-      src="https://www.openstreetmap.org/export/embed.html?bbox=${p.lon-0.03}%2C${p.lat-0.02}%2C${p.lon+0.03}%2C${p.lat+0.02}&layer=mapnik&marker=${p.lat}%2C${p.lon}"></iframe>
-    <span class="tag">◈ ${p.loc}</span>
-  </div>
-  <div class="actions">
-    <a class="btn btn-wa" target="_blank" rel="noopener" href="${waLink(`Hola KIPU, quiero agendar una visita al terreno ${p.name} (${p.ref}) en ${p.loc}.`)}">◉ Agendar visita por WhatsApp</a>
-    <a class="btn btn-ghost" href="mailto:contacto@kippuu.com?subject=${encodeURIComponent('Consulta terreno '+p.ref+' — '+p.name)}">Solicitar dossier PDF</a>
-  </div>`;
-}
-
 function tplAurum(){
   return `<div class="pad">
     <div class="a-logo">
@@ -640,14 +575,27 @@ function tplSmartMoney(){
 
 /* ---------- Gestor de ventanas ---------- */
 const WIN_DEFS = {
-  catalogo:  { title:'Catálogo de terrenos', tag:'KIPU', tpl:tplCatalogo },
+  catalogo:  { title:'Catálogo de terrenos', tag:'KIPU',      tpl:() => KP.tpl.catalogo(),  init:r => KP.init.catalogo?.(r) },
+  simulador: { title:'Simulador de inversión', tag:'S/ → R$', tpl:() => KP.tpl.simulador(), init:r => KP.init.simulador?.(r) },
+  proceso:   { title:'Cómo comprar en Brasil', tag:'Guía',    tpl:() => KP.tpl.proceso(),   init:r => KP.init.proceso?.(r) },
+  faq:       { title:'Preguntas frecuentes', tag:'FAQ',       tpl:() => KP.tpl.faq(),       init:r => KP.init.faq?.(r) },
   aurum:     { title:'AURUM', tag:'Criterio', tpl:tplAurum, cls:'aurum' },
   smartmoney:{ title:'Smart Money', tag:'Ejemplo', tpl:tplSmartMoney },
-  ...Object.fromEntries(PROPS.map(p => [p.id, { title:p.name, tag:p.ref, tpl:() => tplProp(p) }]))
 };
 
+/* Las fichas de terreno no son ventanas fijas: se resuelven al vuelo desde el
+   id "lote:N", para no declarar diez entradas idénticas en WIN_DEFS. */
+function defDe(id){
+  if(String(id).startsWith('lote:')){
+    const l = (KP.LOTES || []).find(x => String(x.id) === String(id).slice(5));
+    if(!l) return null;
+    return { title:l.ciudad, tag:l.barrio, tpl:() => KP.tpl.lote(l.id) };
+  }
+  return WIN_DEFS[id];
+}
+
 function openWindow(id){
-  const def = WIN_DEFS[id]; if(!def) return;
+  const def = defDe(id); if(!def) return;
   let w = wins[id];
   if(!w){
     w = document.createElement('section');
@@ -677,9 +625,19 @@ function openWindow(id){
     w.querySelector('.t-max').addEventListener('click',  e => { e.stopPropagation(); toggleMax(w); });
     makeDraggable(w, w.querySelector('.wtitlebar'));
 
-    // abrir fichas desde tarjetas internas
-    w.querySelectorAll('[data-open]').forEach(el =>
-      el.addEventListener('click', e => { e.stopPropagation(); openWindow(el.dataset.open); }));
+    // Abrir fichas desde cualquier elemento con data-open, presente o futuro:
+    // se delega en la ventana porque el catálogo repinta su rejilla al filtrar
+    // y los botones nuevos no tendrían listener propio.
+    w.addEventListener('click', e => {
+      const el = e.target.closest('[data-open]');
+      if(!el || !w.contains(el)) return;
+      e.stopPropagation();
+      openWindow(el.dataset.open);
+    });
+
+    // Inicializador del módulo (filtros del catálogo, controles del simulador,
+    // acordeón del FAQ): recibe la ventana ya montada en el DOM.
+    try { def.init?.(w); } catch(err){ console.error('init de la ventana', id, err); }
 
     // gráfico Smart Money al primer render
     if(id === 'smartmoney') requestAnimationFrame(drawChart);
@@ -827,6 +785,20 @@ function drawChart(){
     requestAnimationFrame(loop);
   })(0);
 })();
+
+/* ---------- Puente con las fotografías ----------
+   El catálogo dibuja cada lote con una escena SVG generada. Los tres lotes que
+   sí tienen fotografía real la usan en su lugar: se envuelve KP.sceneSVG en vez
+   de tocar catalogo.js, así el módulo de datos no sabe nada de las imágenes. */
+if (window.KP && typeof KP.sceneSVG === 'function') {
+  const escenaOriginal = KP.sceneSVG;
+  KP.sceneSVG = function (lote, grande) {
+    const foto = FOTOS[lote?.id];
+    return foto
+      ? `<img src="${foto}" alt="Terreno en ${lote.ciudad}, ${lote.barrio}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">`
+      : escenaOriginal(lote, grande);
+  };
+}
 
 /* ---------- Arranque e inicio ---------- */
 buildDesktop();

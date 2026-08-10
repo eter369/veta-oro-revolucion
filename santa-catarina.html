@@ -64,11 +64,28 @@
   #foto-fondo{
     display:none;
     position:absolute;inset:0;width:100%;height:100%;
-    object-fit:cover;object-position:center 20%;
-    filter:grayscale(1) contrast(1.04) brightness(.96);
+    object-fit:cover;object-position:center 30%;
+    /* La foto conserva su color (antes iba en blanco y negro, pensado para un
+       retrato): solo se baja el brillo y se sube algo el contraste para que las
+       etiquetas blancas de los iconos se lean encima sin competir con el cielo. */
+    filter:saturate(1.04) contrast(1.05) brightness(.78);
+    /* deriva lenta, como el escritorio de KIPU Pro */
+    animation:derivaFondo 48s ease-in-out infinite alternate;
+  }
+  @keyframes derivaFondo{
+    from{transform:scale(1.02) translate(0,0)}
+    to{transform:scale(1.09) translate(-1.1%,1.3%)}
   }
   body.con-foto #foto-fondo{display:block}
   body.con-foto .figura{display:none}
+  /* Con foto, la viñeta se refuerza: sin esto los iconos de la fila superior
+     quedaban sobre el cielo claro y perdían legibilidad. */
+  body.con-foto #escena::after{
+    background:
+      radial-gradient(ellipse 130% 95% at 50% 45%,transparent 40%,rgba(6,8,12,.42) 100%),
+      linear-gradient(180deg,rgba(6,8,12,.52) 0%,rgba(6,8,12,.10) 20%,transparent 46%,rgba(6,8,12,.30) 78%,rgba(6,8,12,.62) 100%);
+  }
+  @media (prefers-reduced-motion:reduce){ #foto-fondo{animation:none} }
 
   /* viñeta */
   #escena::after{
@@ -80,7 +97,9 @@
 
   /* sticker sonriente */
   #sticker{
-    position:absolute;left:57%;top:63%;
+    /* se corrió a la izquierda: en su sitio anterior pisaba la etiqueta de
+       "Lunar Oracle 369"; aquí cae sobre el agua, zona limpia del fondo */
+    position:absolute;left:41%;top:74%;
     width:54px;height:54px;border:none;background:transparent;
     transform:rotate(14deg);
     opacity:.85;cursor:grab;touch-action:none;
@@ -452,9 +471,13 @@
         </g>
       </svg>
 
-      <!-- FOTO PROPIA (opcional): pega la URL de tu imagen aquí, en src="".
-           Ejemplo:  <img id="foto-fondo" src="mi-retrato.jpg" alt="">      -->
-      <img id="foto-fondo" src="" alt="">
+      <!-- FONDO DEL ESCRITORIO
+           La costa de Santa Catarina (Balneário Camboriú al atardecer), el mismo
+           fondo que usa KIPU Pro: la división entera comparte una sola imagen.
+           Para cambiarlo, sustituye el src por otra foto y listo — el sistema
+           oculta solo la figura generada y aplica el tratamiento de color. -->
+      <img id="foto-fondo" src="assets/fondo-santa-catarina.jpg"
+           alt="" aria-hidden="true" fetchpriority="high">
 
       <!-- Sticker sonriente (se puede arrastrar) -->
       <button id="sticker" aria-label="Sticker">
@@ -536,8 +559,8 @@ const PROYECTOS = [
     variante:"mapa", acento:"#C9A227",
     x:11, y:16,  xm:18, ym:13,
     categoria:"Terrenos · Santa Catarina", anio:"2026",
-    enlacePagina:"terrenos.html", /* esta carpeta ABRE la página completa de la división */
-    descripcion:"Catálogo de terrenos en Santa Catarina, Brasil: simulador de soles a reales y guía legal completa para comprar desde Perú.",
+    enlacePagina:"kippuu-pro/", /* el catálogo completo, ahora como escritorio con ventanas */
+    descripcion:"Catálogo de 10 terrenos en Santa Catarina, Brasil, en ventanas: ficha de cada lote con costos de cierre, simulador de soles a reales, guía legal para comprar desde Perú y preguntas frecuentes.",
     tags:["Catálogo","Simulador","Guía legal"],
     enlace:"", portada:"", imagenes:[],
   },
@@ -579,16 +602,6 @@ const PROYECTOS = [
     enlacePagina:"mirofish/", /* app React compilada: precios reales, operativa simulada */
     descripcion:"Terminal MIROFISH × Tesla 369: gráfico de TradingView y precios reales de Binance, con motor probabilístico, red de relaciones entre BTC · ETH · SOL y bitácora de paper trading. La operativa y el P&L son simulación, no dinero real.",
     tags:["Paper trading","TradingView"],
-    enlace:"", portada:"", imagenes:[],
-  },
-  {
-    id:"kippuupro", etiqueta:"KIPU Pro",
-    variante:"ventana", acento:"#e3b85c",
-    x:46, y:20,  xm:50, ym:26,
-    categoria:"Santa Catarina OS · Catálogo", anio:"2026",
-    enlacePagina:"kippuu-pro/", /* escritorio inmersivo con ventanas y fichas de terreno */
-    descripcion:"El catálogo como sistema operativo: ventanas arrastrables con la ficha de cada terreno, mapa, precio en reales y su equivalente en dólares al tipo de cambio del día. Inventario de demostración.",
-    tags:["Fichas","BRL · USD"],
     enlace:"", portada:"", imagenes:[],
   },
   {
