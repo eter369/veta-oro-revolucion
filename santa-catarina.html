@@ -562,6 +562,10 @@
   <nav id="dock" aria-label="Dock"></nav>
 
   <button id="ayuda" aria-label="Cómo personalizar">?</button>
+
+  <!-- App "Notas Rápidas": vive dentro de este escritorio, en una ventana.
+       Script plano, sin build; usa crearVentana() del motor de abajo. -->
+  <script src="notas.js"></script>
   <div id="toast" role="status"></div>
 
   <!-- grano de película -->
@@ -662,6 +666,17 @@ const PROYECTOS = [
     enlacePagina:"mirofish/", /* app React compilada: precios reales, operativa simulada */
     descripcion:"Terminal MIROFISH × Tesla 369: gráfico de TradingView y precios reales de Binance, con motor probabilístico, red de relaciones entre BTC · ETH · SOL y bitácora de paper trading. La operativa y el P&L son simulación, no dinero real.",
     tags:["Paper trading","TradingView"],
+    enlace:"", portada:"", imagenes:[],
+  },
+  {
+    id:"notas", etiqueta:"Notas Rápidas",
+    variante:"notas", acento:"#E8C766",
+    x:44, y:76,  xm:66, ym:80,
+    categoria:"App del escritorio", anio:"2026",
+    /* No navega: abre una ventana dentro del propio escritorio (notas.js) */
+    accion: () => window.KipuNotas && window.KipuNotas.abrir(),
+    descripcion:"Bloc de notas del escritorio: se guardan solas mientras escribes y siguen aquí al volver.",
+    tags:["Notas","Local"],
     enlace:"", portada:"", imagenes:[],
   },
   {
@@ -784,6 +799,32 @@ function svgMiniatura(variante, acento){
       <rect x="18.5" y="45" width="51" height="26" rx="3" fill="url(#vnm${n})" opacity=".9"/>
       <path d="M18.5 63 L31 53 L41 61 L52 49 L69.5 64 v7 h-51 Z" fill="#1d3a2c" opacity=".85"/>
       <circle cx="60" cy="51" r="4" fill="#FFF1C9" opacity=".9"/>${cierra}`;
+    case "notas": return `${abre}
+      <defs>
+        <linearGradient id="nt${n}" x1="0" y1="0" x2=".4" y2="1">
+          <stop offset="0" stop-color="#20242e"/><stop offset="1" stop-color="#0c0e14"/>
+        </linearGradient>
+        <linearGradient id="ntp${n}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#FBF3DC"/><stop offset="1" stop-color="#E9DCB4"/>
+        </linearGradient>
+        <linearGradient id="ntl${n}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#F3CE86"/><stop offset="1" stop-color="#A87F1E"/>
+        </linearGradient>
+      </defs>
+      <rect width="100" height="100" fill="url(#nt${n})"/>
+      <!-- hoja de nota con la esquina doblada -->
+      <path d="M24 18h38l16 16v48a4 4 0 0 1-4 4H24a4 4 0 0 1-4-4V22a4 4 0 0 1 4-4Z" fill="url(#ntp${n})"/>
+      <path d="M62 18l16 16H66a4 4 0 0 1-4-4Z" fill="#C9B57F"/>
+      <!-- renglones escritos -->
+      <g stroke="#8C7B4E" stroke-width="3" stroke-linecap="round" opacity=".55">
+        <path d="M30 46h30"/><path d="M30 56h34"/><path d="M30 66h22"/>
+      </g>
+      <!-- lápiz dorado en diagonal -->
+      <g transform="rotate(38 62 66)">
+        <rect x="58" y="42" width="9" height="34" rx="2" fill="url(#ntl${n})"/>
+        <path d="M58 76h9l-4.5 9Z" fill="#5C4A16"/>
+        <rect x="58" y="42" width="9" height="5" rx="1.6" fill="#F7E6BC"/>
+      </g>${cierra}`;
     case "tesla": return `${abre}
       <defs>
         <radialGradient id="ts${n}" cx=".5" cy=".4" r=".78">
@@ -943,6 +984,9 @@ function renderIconos(){
     // redirigir el evento fuera del botón interno
     el.addEventListener("click", () => {
       if (el.dataset.arrastrado === "1") { el.dataset.arrastrado = ""; return; }
+      /* Una carpeta puede: ejecutar una acción (app que vive dentro del
+         escritorio, como Notas), navegar a una página, o abrir su ficha. */
+      if (p.accion) { p.accion(); return; }
       if (p.enlacePagina) {
         if (/^https?:/.test(p.enlacePagina)) window.open(p.enlacePagina, "_blank", "noopener");
         else location.href = p.enlacePagina;
