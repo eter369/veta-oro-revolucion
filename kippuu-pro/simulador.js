@@ -34,18 +34,7 @@
      ================================================================ */
   var IMP_GANANCIA = 0.15;   // no residente: 15% sobre la ganancia de capital al vender
   var PRECIO_MIN   = 40000;  // por debajo de esto no hay lote razonable: se avisa en vez de inventar
-  var FX_RESPALDO  = 1.51;   // S/ 1 ≈ R$ 1,51 — solo si no hay cotización en vivo
-  /* El tipo de cambio ya no es una constante escrita a mano: el shell trae
-     USD/BRL y USD/PEN de open.er-api.com y publica el cruce en KP.fx.penToBrl.
-     Se sigue permitiendo editarlo a mano, porque la casa de cambio real
-     siempre da un número algo distinto al interbancario. */
-  function fxVivo(){
-    var c = KP.fx && KP.fx.penToBrl;
-    return (typeof c === 'number' && isFinite(c) && c > 0.2 && c < 4)
-      ? Math.round(c * 100) / 100
-      : FX_RESPALDO;
-  }
-  var FX_DEF       = FX_RESPALDO;   // se reemplaza por fxVivo() al construir la ventana
+  var FX_DEF       = 1.51;   // S/ 1 ≈ R$ 1,51 — valor medio de mercado citado en la página antigua
   var ANIOS_DEF    = 8;
   var PEN_DEF      = 500000;
 
@@ -387,8 +376,8 @@
 
       <div class="kp-sim-fld">
         <label class="kp-sim-lbl" for="${id}-fx">Tipo de cambio S/ → R$
-          <span class="kp-sim-hint">${(KP.fx && KP.fx.live) ? 'en vivo · editable' : 'referencia · editable'}</span></label>
-        <input class="kp-sim-in" type="number" id="${id}-fx" value="${fxVivo()}" min="0.5" max="4" step="0.01" inputmode="decimal">
+          <span class="kp-sim-hint">editable</span></label>
+        <input class="kp-sim-in" type="number" id="${id}-fx" value="${FX_DEF}" min="0.5" max="4" step="0.01" inputmode="decimal">
       </div>
 
       <div class="kp-sim-fld">
@@ -445,13 +434,10 @@
         <p class="kp-sim-nota" data-out="finnota"></p>
       </div>
 
-      <p class="kp-sim-fx">Ruta cambiaria de referencia: <b>S/ → USDT → R$</b>
-        (hoy 1 USD ≈ ${(KP.fx ? KP.fx.pen : 3.55).toFixed(2)} soles ≈ ${(KP.fx ? KP.fx.brl : 5.36).toFixed(2)} reales).
-        El cruce directo de arriba, <b>S/ 1 ≈ R$ ${fxVivo().toFixed(2)}</b>, sale de dividir esas dos
-        cotizaciones${(KP.fx && KP.fx.live) ? ' tomadas en vivo al abrir la página' : ' (valores de referencia: no hubo conexión con el proveedor)'}.
-        Es el tipo <b>interbancario</b>: la casa de cambio y la plataforma cripto se quedan con un
-        margen, así que <b>ajústalo con el número real del día en que cierres</b>. El equivalente en
-        dólares que aparece a la derecha usa la misma cotización USD/BRL de la barra superior.</p>
+      <p class="kp-sim-fx">Ruta cambiaria de referencia: <b>S/ → USDT → R$</b> (1 USDT ≈ S/ 3,55 ≈ R$ 5,36).
+        El tipo directo S/ 1 ≈ R$ 1,51 era el valor medio de mercado citado por Wise en jul. 2026:
+        <b>ajústalo arriba con la cotización del día en que cierres</b>. El equivalente en dólares que
+        aparece a la derecha usa la cotización USD/BRL en vivo de la barra superior.</p>
     </div>
 
     <!-- ============ RESULTADOS ============ -->
@@ -714,7 +700,7 @@
 
     /* ---- estado ---- */
     var st = {
-      uid: id, modo: 'presupuesto', pen: PEN_DEF, fx: fxVivo(), anios: ANIOS_DEF,
+      uid: id, modo: 'presupuesto', pen: PEN_DEF, fx: FX_DEF, anios: ANIOS_DEF,
       preset: 'intermedio', g: presetsDe(medianaValPct()).intermedio,
       pago: 'contado', entrada: 30, plazo: 36, interes: 10,
       loteId: L[0].id, tabla: false
@@ -733,7 +719,7 @@
 
     function leer() {
       st.pen     = num('#' + id + '-pen', PEN_DEF, 0);
-      st.fx      = num('#' + id + '-fx', fxVivo(), 0.5, 4);
+      st.fx      = num('#' + id + '-fx', FX_DEF, 0.5, 4);
       st.anios   = num('#' + id + '-anios', ANIOS_DEF, 1, 15);
       st.entrada = num('#' + id + '-entrada', 30, 20, 60);
       st.plazo   = num('#' + id + '-plazo', 36, 12, 60);
