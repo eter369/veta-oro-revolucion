@@ -96,8 +96,14 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 #topbar .crumb span{opacity:.55;font-weight:400;letter-spacing:.12em}
 #topbar .crumb:hover span{opacity:1;color:var(--gold-hi)}
 #topbar .right{display:flex;align-items:center;gap:18px;font-size:11.5px;letter-spacing:.1em;color:var(--txt-dim)}
-#fx{display:flex;align-items:center;gap:7px;color:var(--txt)}
+#fx{display:flex;align-items:center;gap:11px;color:var(--txt)}
+#fx .par{display:inline-flex;align-items:center;white-space:nowrap}
+/* el cruce va separado por una barrita: es un dato derivado, no una cotización */
+#fx .par.cruce{padding-left:11px;border-left:1px solid rgba(255,255,255,.16)}
 #fx .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+/* sin conexión con el proveedor: el punto deja de ser verde y de latir */
+#fx.fx-estimado .dot{background:var(--gold);box-shadow:0 0 8px var(--gold);animation:none}
+#fx.fx-estimado b{color:var(--txt-dim)}
 @keyframes pulse{50%{opacity:.35}}
 #fx b{color:var(--gold-hi);font-weight:600}
 #clock{color:var(--txt);font-variant-numeric:tabular-nums}
@@ -344,8 +350,18 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 @media (max-width:760px){
   #desktop{grid-template-columns:repeat(3,1fr);padding:20px 16px;gap:6px;overflow-y:auto}
   .window{width:100vw;height:calc(100vh - 46px);max-height:none;top:46px!important;left:0!important;border-radius:0}
-  #topbar .right #fx span.lbl-fx{display:none}
+  /* En móvil no caben tres cotizaciones con etiqueta: se deja el cruce
+     S/→R$, que es el único que un comprador peruano usa para decidir. */
+  #topbar{padding:0 14px}
+  #topbar .right{gap:10px;font-size:10.5px}
+  #fx{gap:7px}
+  #fx .par:not(.cruce){display:none}
+  #fx .par.cruce{padding-left:0;border-left:none}
   .ditem{width:44px;height:44px}
+}
+@media (max-width:1040px) and (min-width:761px){
+  /* espacio intermedio: se ocultan las etiquetas, no los números */
+  #topbar .right #fx span.lbl-fx{font-size:9.5px;letter-spacing:.04em}
 }
 </style>
 </head>
@@ -368,7 +384,14 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
     <a class="crumb" href="../santa-catarina.html" title="Volver al escritorio de la división">← ESCRITORIO <span>KIPU Pro · Santa Catarina</span></a>
   </div>
   <div class="right">
-    <div id="fx"><span class="dot"></span><span class="lbl-fx">USD/BRL</span>&nbsp;<b id="fxRate">—</b></div>
+    <!-- Tipos de cambio en vivo: el real (moneda del terreno), el sol (moneda
+         del comprador) y el cruce entre ambos, que es el que se usa al pagar. -->
+    <div id="fx">
+      <span class="dot"></span>
+      <span class="par"><span class="lbl-fx">USD/BRL</span>&nbsp;<b id="fxRate">—</b></span>
+      <span class="par"><span class="lbl-fx">USD/SOL</span>&nbsp;<b id="penRate">—</b></span>
+      <span class="par cruce"><span class="lbl-fx">S/→R$</span>&nbsp;<b id="crossRate">—</b></span>
+    </div>
     <div id="clock">—</div>
   </div>
 </header>
@@ -436,6 +459,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 const CONFIG = {
   whatsapp: '51918616580',             // WhatsApp real de KIPU (Perú)
   fxFallback: 5.45,                    // USD/BRL de respaldo si la API falla
+  penFallback: 3.55,                   // USD/PEN de respaldo si la API falla
 };
 
 /* ---------- Datos del catálogo ----------
@@ -451,7 +475,13 @@ const FOTOS = {
 
 
 /* ---------- Estado global ---------- */
-let fxRate = CONFIG.fxFallback;
+let fxRate = CONFIG.fxFallback;      // reales por dólar
+let penRate = CONFIG.penFallback;    // soles por dólar
+/* Cambio compartido con los módulos (el simulador lee de aquí en vez de
+   traer un tipo de cambio escrito a mano). penToBrl = cuántos reales
+   compra un sol: es el cruce que le importa a un comprador peruano. */
+window.KP = window.KP || {};
+KP.fx = { brl: fxRate, pen: penRate, penToBrl: fxRate / penRate, live: false };
 let zTop = 60;
 const wins = {};      // id -> elemento ventana
 const minimized = new Set();
@@ -464,13 +494,34 @@ const waLink = txt => `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponen
 
 /* ---------- Cotización USD/BRL en vivo ---------- */
 async function loadFX(){
+  let vivo = false;
   try{
+    // Una sola petición trae TODAS las monedas contra el dólar: de ahí salen
+    // el real (precio de los terrenos) y el sol (la moneda del comprador).
     const r = await fetch('https://open.er-api.com/v6/latest/USD');
     const j = await r.json();
-    if(j && j.rates && j.rates.BRL){ fxRate = j.rates.BRL; }
-  }catch(e){ /* se usa el respaldo */ }
+    if(j && j.rates && j.rates.BRL){ fxRate = j.rates.BRL; vivo = true; }
+    if(j && j.rates && j.rates.PEN){ penRate = j.rates.PEN; }
+  }catch(e){ /* se usan los respaldos */ }
+
+  KP.fx = { brl: fxRate, pen: penRate, penToBrl: fxRate / penRate, live: vivo };
+
   $('#fxRate').textContent = fxRate.toFixed(2);
+  $('#penRate').textContent = penRate.toFixed(2);
+  // El cruce S/ → R$ es el número que de verdad usa un peruano al comprar:
+  // no lo publica ninguna API directamente, sale de dividir los dos.
+  $('#crossRate').textContent = KP.fx.penToBrl.toFixed(2);
+  // Si la API falló, se dice: mejor un dato rotulado como estimado que un
+  // número inventado con pinta de estar en vivo.
+  const chip = $('#fx');
+  chip.classList.toggle('fx-estimado', !vivo);
+  chip.title = vivo
+    ? 'Tipos de cambio en vivo (open.er-api.com), actualizados al abrir la página'
+    : 'Sin conexión con el proveedor de tipo de cambio: se muestran valores de referencia';
+
   renderPrices(); // actualiza todos los precios USD visibles
+  // El simulador, si está abierto, adopta el cambio real
+  document.dispatchEvent(new CustomEvent('kp:fx', { detail: KP.fx }));
 }
 
 /* ---------- Reloj ---------- */
