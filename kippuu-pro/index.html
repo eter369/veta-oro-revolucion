@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KIPU Pro — Santa Catarina OS · Bienes Raíces</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="KIPU Pro: escritorio inmersivo del catálogo de terrenos en Santa Catarina, Brasil. Fichas, precios en BRL y USD con tipo de cambio en vivo. Demostración.">
+<meta property="og:title" content="KIPU Pro — Santa Catarina OS">
+<meta property="og:description" content="Escritorio inmersivo del catálogo de terrenos de Santa Catarina.">
+<meta property="og:image" content="assets/wallpaper.jpg">
+<meta property="og:type" content="website">
+<!-- ============================================================
+     KIPU PRO — Santa Catarina OS
+     Versión "pro" del escritorio: ventanas arrastrables, fichas de
+     terreno y tipo de cambio USD/BRL en vivo (open.er-api.com).
+     [EDITABLE] El inventario de 3 terrenos es DEMOSTRACIÓN: hay que
+     sustituirlo por lotes reales con su documentación antes de
+     quitar el noindex. Ninguna cifra de esta página puede
+     presentarse como rentabilidad prometida.
+     ============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SANTA CATARINA OS — KIPU Bienes Raíces
+   Sistema de escritorio inmersivo con ventanas funcionales
+   ============================================================ */
+:root{
+  --gold:#e3b85c; --gold-hi:#f6dc9a; --gold-dim:rgba(227,184,92,.35);
+  --ink:#0b0d10; --glass:rgba(16,18,22,.62); --glass-hi:rgba(30,33,40,.72);
+  --line:rgba(255,255,255,.09); --txt:#eef1f4; --txt-dim:rgba(238,241,244,.55);
+  --green:#3ddc97; --radius:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Inter',system-ui,sans-serif;color:var(--txt);
+  background:var(--ink); user-select:none;
+}
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
+
+/* ---------- Fondo cinematográfico ---------- */
+#wallpaper{
+  position:fixed;inset:-4%;z-index:0;
+  background:url('assets/wallpaper.jpg') center/cover no-repeat;
+  animation:kenburns 40s ease-in-out infinite alternate;
+}
+@keyframes kenburns{from{transform:scale(1) translate(0,0)}to{transform:scale(1.09) translate(-1.2%,1.5%)}}
+#vignette{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(5,6,8,.55) 0%,rgba(5,6,8,.05) 22%,rgba(5,6,8,.08) 60%,rgba(5,6,8,.62) 100%),
+    radial-gradient(120% 90% at 50% 110%,rgba(5,6,8,.5),transparent 60%);
+}
+#particles{position:fixed;inset:0;z-index:2;pointer-events:none}
+
+/* ---------- Pantalla de arranque ---------- */
+#boot{
+  position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:18px;background:var(--ink);
+  transition:opacity .9s ease,visibility .9s;
+}
+#boot.done{opacity:0;visibility:hidden}
+#boot .logo{
+  font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,5vw,52px);
+  letter-spacing:.42em;font-weight:600;padding-left:.42em;
+  background:linear-gradient(100deg,#8a8f98 20%,var(--gold-hi) 45%,#fff 50%,var(--gold-hi) 55%,#8a8f98 80%);
+  background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:shimmer 2.4s linear infinite;
+}
+@keyframes shimmer{to{background-position:-220% 0}}
+#boot .sub{font-size:12px;letter-spacing:.34em;color:var(--txt-dim);text-transform:uppercase;padding-left:.34em}
+#boot .bar{width:180px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+#boot .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold-hi));animation:load 1.6s ease forwards}
+@keyframes load{to{width:100%}}
+
+/* ---------- Barra superior ---------- */
+#topbar{
+  position:fixed;top:0;left:0;right:0;z-index:50;height:46px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 22px;
+  background:linear-gradient(180deg,rgba(8,9,12,.55),rgba(8,9,12,.18) 70%,transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+#topbar .left{display:flex;align-items:center;gap:14px;font-size:12.5px;letter-spacing:.08em}
+#topbar .crumb{
+  font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:.22em;
+  color:#fff;text-decoration:none;display:flex;align-items:center;gap:9px;font-size:12px;
+}
+#topbar .crumb span{opacity:.55;font-weight:400;letter-spacing:.12em}
+#topbar .crumb:hover span{opacity:1;color:var(--gold-hi)}
+#topbar .right{display:flex;align-items:center;gap:18px;font-size:11.5px;letter-spacing:.1em;color:var(--txt-dim)}
+#fx{display:flex;align-items:center;gap:7px;color:var(--txt)}
+#fx .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.35}}
+#fx b{color:var(--gold-hi);font-weight:600}
+#clock{color:var(--txt);font-variant-numeric:tabular-nums}
+
+/* ---------- Escritorio ---------- */
+#desktop{
+  position:fixed;inset:46px 0 90px 0;z-index:10;padding:34px 40px;
+  display:grid;grid-template-columns:repeat(auto-fill,104px);grid-auto-rows:118px;
+  gap:8px 18px;align-content:start;justify-content:space-between;
+}
+.icon{
+  display:flex;flex-direction:column;align-items:center;gap:9px;
+  padding:10px 4px;border-radius:14px;transition:background .25s,transform .25s;
+}
+.icon:hover{background:rgba(255,255,255,.07);transform:translateY(-3px)}
+.icon:active{transform:scale(.96)}
+.icon .thumb{
+  width:62px;height:62px;border-radius:16px;position:relative;overflow:hidden;
+  background:var(--glass-hi);border:1px solid var(--line);
+  box-shadow:0 10px 26px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.14);
+  display:flex;align-items:center;justify-content:center;
+  transition:box-shadow .3s,border-color .3s;
+}
+.icon:hover .thumb{border-color:var(--gold-dim);box-shadow:0 14px 34px rgba(0,0,0,.55),0 0 0 1px var(--gold-dim),inset 0 1px 0 rgba(255,255,255,.2)}
+.icon .thumb img{width:100%;height:100%;object-fit:cover}
+.icon .thumb svg{width:30px;height:30px}
+.icon .lbl{
+  font-size:11px;font-weight:500;letter-spacing:.04em;text-align:center;line-height:1.25;
+  color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.8);max-width:100px;
+}
+.icon .lbl small{display:block;font-size:9px;color:var(--gold-hi);letter-spacing:.14em;text-transform:uppercase;margin-top:2px}
+
+/* ---------- Ventanas ---------- */
+.window{
+  position:fixed;z-index:60;width:min(860px,94vw);max-height:calc(100vh - 130px);
+  background:var(--glass);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);
+  box-shadow:0 40px 90px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);
+  display:flex;flex-direction:column;overflow:hidden;
+  opacity:0;transform:scale(.94) translateY(14px);pointer-events:none;
+  transition:opacity .28s ease,transform .28s cubic-bezier(.2,.9,.25,1.1);
+}
+.window.open{opacity:1;transform:none;pointer-events:auto}
+.window.closing{opacity:0;transform:scale(.94) translateY(10px);pointer-events:none}
+.window.focused{border-color:rgba(227,184,92,.32);box-shadow:0 46px 110px rgba(0,0,0,.7),0 0 0 1px rgba(227,184,92,.14),inset 0 1px 0 rgba(255,255,255,.14)}
+.wtitlebar{
+  display:flex;align-items:center;gap:12px;padding:12px 16px;flex:0 0 auto;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),transparent);
+  border-bottom:1px solid var(--line);cursor:grab;
+}
+.wtitlebar:active{cursor:grabbing}
+.traffic{display:flex;gap:8px}
+.traffic button{
+  width:12px;height:12px;border-radius:50%;position:relative;
+  transition:transform .15s,filter .15s;filter:saturate(.6);
+}
+.traffic button:hover{transform:scale(1.18);filter:saturate(1.3)}
+.t-close{background:#ff5f57}.t-min{background:#febc2e}.t-max{background:#28c840}
+.wtitle{
+  font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--txt);flex:1;text-align:center;transform:translateX(-26px);
+}
+.wtitle small{color:var(--gold-hi);letter-spacing:.2em;margin-left:8px;font-size:10px}
+.wbody{overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:rgba(227,184,92,.4) transparent}
+.wbody::-webkit-scrollbar{width:8px}
+.wbody::-webkit-scrollbar-thumb{background:rgba(227,184,92,.3);border-radius:8px}
+</style>
+<style>
+/* ---------- Contenido: Catálogo ---------- */
+.pad{padding:26px 28px 30px}
+.sec-head{margin-bottom:20px}
+.sec-head h2{
+  font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,30px);font-weight:600;
+  color:#fff;letter-spacing:.01em;
+}
+.sec-head h2 em{color:var(--gold-hi);font-style:italic}
+.sec-head p{font-size:12.5px;color:var(--txt-dim);margin-top:6px;letter-spacing:.05em}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+.card{
+  background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;transition:transform .3s,border-color .3s,box-shadow .3s;cursor:pointer;
+}
+.card:hover{transform:translateY(-5px);border-color:var(--gold-dim);box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.card .ph{height:130px;position:relative;overflow:hidden}
+.card .ph img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
+.card:hover .ph img{transform:scale(1.08)}
+.card .ph .ref{
+  position:absolute;top:10px;left:10px;font-size:9.5px;letter-spacing:.16em;
+  background:rgba(8,9,12,.65);backdrop-filter:blur(6px);padding:4px 9px;border-radius:20px;
+  color:var(--gold-hi);border:1px solid rgba(227,184,92,.3);
+}
+.card .ph .m2{
+  position:absolute;bottom:10px;right:10px;font-size:10px;font-weight:600;
+  background:rgba(8,9,12,.65);backdrop-filter:blur(6px);padding:4px 9px;border-radius:20px;
+}
+.card .info{padding:14px 15px 15px}
+.card h3{font-size:14.5px;font-weight:600;letter-spacing:.02em}
+.card .loc{font-size:11px;color:var(--txt-dim);margin-top:3px;display:flex;align-items:center;gap:5px}
+.card .price{margin-top:11px;display:flex;align-items:baseline;justify-content:space-between}
+.card .price b{font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--gold-hi);font-weight:600}
+.card .price span{font-size:10.5px;color:var(--txt-dim)}
+.card .cta-row{margin-top:12px;display:flex;gap:8px}
+.btn{
+  flex:1;text-align:center;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  padding:9px 10px;border-radius:9px;transition:all .25s;text-decoration:none;display:inline-block;
+}
+.btn-gold{background:linear-gradient(120deg,var(--gold),var(--gold-hi));color:#191204;box-shadow:0 4px 16px rgba(227,184,92,.28)}
+.btn-gold:hover{box-shadow:0 6px 22px rgba(227,184,92,.45);transform:translateY(-1px)}
+.btn-ghost{border:1px solid rgba(255,255,255,.18);color:var(--txt)}
+.btn-ghost:hover{border-color:var(--gold-dim);color:var(--gold-hi)}
+.btn-wa{background:#1fce6d;color:#04160c;box-shadow:0 4px 16px rgba(31,206,109,.3)}
+.btn-wa:hover{box-shadow:0 6px 24px rgba(31,206,109,.5);transform:translateY(-1px)}
+
+/* ---------- Contenido: Ficha de propiedad ---------- */
+.hero{position:relative;height:min(300px,34vh);overflow:hidden}
+.hero img{width:100%;height:100%;object-fit:cover}
+.hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(11,13,16,.9))}
+.hero .h-txt{position:absolute;bottom:16px;left:24px;right:24px;z-index:2}
+.hero .h-txt .ref{font-size:10px;letter-spacing:.22em;color:var(--gold-hi);text-transform:uppercase}
+.hero .h-txt h2{font-family:'Playfair Display',serif;font-size:clamp(22px,3.4vw,32px);font-weight:600;margin-top:4px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;padding:16px 24px 0}
+.badge{
+  font-size:10.5px;letter-spacing:.06em;padding:6px 12px;border-radius:20px;
+  background:rgba(61,220,151,.1);color:var(--green);border:1px solid rgba(61,220,151,.28);
+  display:flex;align-items:center;gap:6px;
+}
+.badge.gold{background:rgba(227,184,92,.1);color:var(--gold-hi);border-color:rgba(227,184,92,.3)}
+.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--line);margin:18px 24px 0;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.spec{background:rgba(14,16,20,.7);padding:13px 14px}
+.spec .k{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--txt-dim)}
+.spec .v{font-family:'Space Grotesk',sans-serif;font-size:15.5px;font-weight:600;margin-top:4px}
+.pricebox{
+  margin:18px 24px 0;padding:18px 20px;border-radius:12px;
+  background:linear-gradient(120deg,rgba(227,184,92,.12),rgba(227,184,92,.04));
+  border:1px solid rgba(227,184,92,.28);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+}
+.pricebox .p-brl{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:600;color:var(--gold-hi)}
+.pricebox .p-usd{font-size:12px;color:var(--txt-dim);margin-top:3px}
+.pricebox .p-usd b{color:var(--txt)}
+.pricebox .per-m2{text-align:right;font-size:11px;color:var(--txt-dim);line-height:1.6}
+.pricebox .per-m2 b{display:block;font-size:14px;color:var(--txt);font-family:'Space Grotesk',sans-serif}
+.desc{padding:18px 24px 0;font-size:13px;line-height:1.75;color:rgba(238,241,244,.82);font-weight:300}
+.mapbox{margin:18px 24px 0;border-radius:12px;overflow:hidden;border:1px solid var(--line);height:190px;position:relative}
+.mapbox iframe{width:100%;height:100%;border:0;filter:grayscale(.7) invert(.92) contrast(.9) hue-rotate(180deg)}
+.mapbox .tag{
+  position:absolute;bottom:10px;left:10px;z-index:2;font-size:10px;letter-spacing:.12em;
+  background:rgba(8,9,12,.75);padding:5px 11px;border-radius:20px;border:1px solid var(--line);
+}
+.actions{display:flex;gap:10px;padding:20px 24px 26px;flex-wrap:wrap}
+.actions .btn{flex:1;min-width:150px;padding:13px;font-size:11.5px;display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* ---------- AURUM ---------- */
+.aurum{background:radial-gradient(120% 140% at 50% -20%,rgba(227,184,92,.16),transparent 55%)}
+.aurum .pad{text-align:center;padding-top:36px}
+.aurum .a-logo{
+  width:74px;height:74px;margin:0 auto 18px;border-radius:22px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(140deg,#241a08,#0d0a04);border:1px solid rgba(227,184,92,.45);
+  box-shadow:0 0 44px rgba(227,184,92,.28),inset 0 1px 0 rgba(246,220,154,.3);
+}
+.aurum h2{font-family:'Playfair Display',serif;font-size:30px;font-weight:600;color:var(--gold-hi);letter-spacing:.14em}
+.aurum .tagline{font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--txt-dim);margin-top:8px}
+.pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-top:28px;text-align:left}
+.pillar{padding:18px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.pillar .n{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold);font-style:italic}
+.pillar h4{font-size:13px;font-weight:600;margin:8px 0 6px;letter-spacing:.04em}
+.pillar p{font-size:11.5px;line-height:1.65;color:var(--txt-dim);font-weight:300}
+
+/* ---------- Smart Money ---------- */
+.sm-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.sm-stat{padding:15px;border-radius:12px;background:rgba(255,255,255,.045);border:1px solid var(--line)}
+.sm-stat .k{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--txt-dim)}
+.sm-stat .v{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:600;color:var(--green);margin-top:5px}
+.sm-stat .v.gold{color:var(--gold-hi)}
+.sm-stat .s{font-size:10px;color:var(--txt-dim);margin-top:3px}
+#chart{width:100%;height:220px;border-radius:12px;background:rgba(8,9,12,.5);border:1px solid var(--line)}
+/* aviso de datos ilustrativos y pie legal del panel de mercado */
+.sm-aviso{
+  margin-bottom:16px;padding:11px 14px;border-radius:11px;font-size:11.5px;line-height:1.65;
+  color:rgba(238,241,244,.82);background:rgba(227,184,92,.09);border:1px solid rgba(227,184,92,.3);
+}
+.sm-aviso b{color:var(--gold-hi);font-weight:600}
+.sm-pie{margin-top:14px;font-size:10.5px;line-height:1.7;color:var(--txt-dim)}
+/* Pie del sistema: dock + franja legal apilados en una sola columna fija.
+   Al estar en flujo dentro del mismo contenedor NUNCA se solapan, sea cual
+   sea el ancho de pantalla ni cuántas líneas ocupe el aviso legal. */
+#bottombar{
+  position:fixed;left:0;right:0;bottom:0;z-index:80;pointer-events:none;
+  display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:10px;
+}
+/* Franja legal permanente: se ve SIEMPRE, también en móvil. */
+#legal{
+  width:100%;pointer-events:none;
+  padding:5px 16px 6px;text-align:center;font-size:9.5px;line-height:1.55;letter-spacing:.03em;
+  color:rgba(238,241,244,.62);text-shadow:0 1px 5px rgba(0,0,0,.95);
+  background:linear-gradient(180deg,transparent,rgba(5,6,8,.78) 55%);
+}
+@media(max-width:720px){#legal{font-size:8.5px;padding:5px 10px 6px}}
+.legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:12px;font-size:10.5px;color:var(--txt-dim);letter-spacing:.06em}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+
+/* ---------- Dock ---------- */
+#dock{
+  pointer-events:auto;
+  display:flex;align-items:flex-end;gap:6px;padding:9px 12px;border-radius:22px;
+  background:rgba(20,22,27,.55);backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);
+  border:1px solid rgba(255,255,255,.12);box-shadow:0 22px 50px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12);
+}
+.ditem{
+  width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  background:var(--glass-hi);border:1px solid var(--line);position:relative;
+  transition:transform .22s cubic-bezier(.3,1.4,.5,1),border-color .25s;text-decoration:none;
+  transform-origin:bottom center;
+}
+.ditem:hover{transform:translateY(-12px) scale(1.22);border-color:var(--gold-dim);z-index:2}
+.ditem svg{width:24px;height:24px}
+.ditem .tip{
+  position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%) scale(.8);opacity:0;
+  font-size:10.5px;letter-spacing:.08em;white-space:nowrap;padding:6px 12px;border-radius:8px;
+  background:rgba(8,9,12,.85);border:1px solid var(--line);transition:all .2s;pointer-events:none;
+}
+.ditem:hover .tip{opacity:1;transform:translateX(-50%) scale(1)}
+.ditem .dot-open{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--gold-hi);opacity:0;transition:opacity .3s}
+.ditem.active .dot-open{opacity:1}
+
+/* ---------- Botón ayuda / toast ---------- */
+#help{
+  /* por encima del pie (dock + franja legal), para no taparlos en móvil */
+  position:fixed;bottom:126px;right:18px;z-index:81;width:38px;height:38px;border-radius:50%;
+  background:rgba(20,22,27,.6);backdrop-filter:blur(14px);border:1px solid var(--line);
+  font-size:15px;color:var(--txt-dim);transition:all .25s;
+}
+#help:hover{color:var(--gold-hi);border-color:var(--gold-dim);transform:scale(1.1)}
+#toast{
+  position:fixed;bottom:76px;right:20px;z-index:90;max-width:280px;padding:16px 18px;border-radius:14px;
+  background:rgba(12,14,18,.85);backdrop-filter:blur(20px);border:1px solid rgba(227,184,92,.25);
+  font-size:12px;line-height:1.7;color:var(--txt);box-shadow:0 20px 50px rgba(0,0,0,.5);
+  opacity:0;transform:translateY(10px);pointer-events:none;transition:all .35s ease;
+}
+#toast.show{opacity:1;transform:none;pointer-events:auto}
+#toast b{color:var(--gold-hi)}
+#toast .close-t{position:absolute;top:8px;right:10px;font-size:14px;color:var(--txt-dim)}
+
+/* ---------- Responsive ---------- */
+@media (max-width:760px){
+  #desktop{grid-template-columns:repeat(3,1fr);padding:20px 16px;gap:6px;overflow-y:auto}
+  .window{width:100vw;height:calc(100vh - 46px);max-height:none;top:46px!important;left:0!important;border-radius:0}
+  #topbar .right #fx span.lbl-fx{display:none}
+  .ditem{width:44px;height:44px}
+}
+</style>
+</head>
+<body>
+<!-- Fondo -->
+<div id="wallpaper"></div>
+<div id="vignette"></div>
+<canvas id="particles"></canvas>
+
+<!-- Arranque -->
+<div id="boot">
+  <div class="logo">SANTA CATARINA</div>
+  <div class="sub">Bienes Raíces · KIPU</div>
+  <div class="bar"><i></i></div>
+</div>
+
+<!-- Barra superior -->
+<header id="topbar">
+  <div class="left">
+    <a class="crumb" href="../santa-catarina.html" title="Volver al escritorio de la división">← ESCRITORIO <span>KIPU Pro · Santa Catarina</span></a>
+  </div>
+  <div class="right">
+    <div id="fx"><span class="dot"></span><span class="lbl-fx">USD/BRL</span>&nbsp;<b id="fxRate">—</b></div>
+    <div id="clock">—</div>
+  </div>
+</header>
+
+<!-- Escritorio (los íconos se generan desde JS) -->
+<main id="desktop"></main>
+
+<!-- Ventanas (se generan desde JS) -->
+<div id="windows"></div>
+
+<!-- Pie: dock + franja legal (apilados, nunca se solapan) -->
+<div id="bottombar">
+<nav id="dock">
+  <a class="ditem" href="https://kippuu.com/" data-tip="KIPU — Inicio">
+    <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" fill="#151312" stroke="#e3b85c" stroke-width="1.2"/><text x="12" y="16.5" text-anchor="middle" font-family="Space Grotesk" font-weight="600" font-size="11" fill="#f6dc9a">K</text></svg>
+    <span class="tip">KIPU — Inicio</span><span class="dot-open"></span>
+  </a>
+  <button class="ditem" id="dock-catalogo" data-tip="Catálogo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#e3b85c" stroke-width="1.6"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
+    <span class="tip">Catálogo de terrenos</span><span class="dot-open"></span>
+  </button>
+  <a class="ditem" id="dock-wa" href="#" target="_blank" rel="noopener" data-tip="WhatsApp">
+    <svg viewBox="0 0 24 24" fill="#1fce6d"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm5.4 14.1c-.2.7-1.3 1.3-1.9 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-2.9-1.3-4.8-4.2-4.9-4.4-.1-.2-1.2-1.6-1.2-3s.7-2.1 1-2.4c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.4l.9 2.1c.1.2.1.4 0 .6l-.4.6-.5.5c-.2.2-.3.4-.1.7.2.3.8 1.3 1.7 2.1 1.2 1.1 2.2 1.4 2.5 1.5.3.1.5.1.7-.1l1-1.2c.2-.3.4-.2.7-.1l2 .9c.3.2.5.3.6.4 0 .1 0 .6-.2 1Z"/></svg>
+    <span class="tip">WhatsApp directo</span><span class="dot-open"></span>
+  </a>
+  <a class="ditem" href="mailto:contacto@kippuu.com" data-tip="Email">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#7db4ff" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 8 9 6 9-6"/></svg>
+    <span class="tip">contacto@kippuu.com</span><span class="dot-open"></span>
+  </a>
+  <a class="ditem" href="https://instagram.com/kippuu" target="_blank" rel="noopener" data-tip="Instagram">
+    <svg viewBox="0 0 24 24" fill="none" stroke="url(#igg)" stroke-width="1.8"><defs><linearGradient id="igg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#feda75"/><stop offset=".5" stop-color="#d62976"/><stop offset="1" stop-color="#962fbf"/></linearGradient></defs><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="url(#igg)" stroke="none"/></svg>
+    <span class="tip">@kippuu</span><span class="dot-open"></span>
+  </a>
+  <a class="ditem" href="https://x.com/kippuu" target="_blank" rel="noopener" data-tip="X">
+    <svg viewBox="0 0 24 24" fill="#e8eaed"><path d="M17.7 3H21l-7.3 8.3L22 21h-6.8l-5.3-6.3L3.8 21H.5l7.8-8.9L1 3h7l4.8 5.7L17.7 3Zm-1.2 16h1.9L6.6 4.9H4.6L16.5 19Z"/></svg>
+    <span class="tip">X / Twitter</span><span class="dot-open"></span>
+  </a>
+</nav>
+  <!-- Franja legal siempre visible: esta página muestra terrenos, no productos financieros -->
+  <div id="legal">
+    DEMOSTRACIÓN · Inventario de ejemplo, pendiente de sustituir por lotes reales con su documentación.
+    KIPU no garantiza revalorización ni rentabilidad de ningún terreno · PROFIX CENTRAL BANK S.A.C. · RUC 20614585146
+  </div>
+</div>
+
+<button id="help" title="Ayuda">?</button>
+<div id="toast">
+  <button class="close-t" id="toastClose">×</button>
+  <b>Bienvenido a Santa Catarina OS.</b><br>
+  Haz clic en cualquier ícono del escritorio para abrir su ventana. Arrastra las ventanas desde la barra superior y minimízalas al dock.
+</div>
+<script>
+/* ============================================================
+   SANTA CATARINA OS — Motor de la aplicación
+   ============================================================ */
+
+/* ---------- CONFIGURACIÓN (editar aquí) ---------- */
+const CONFIG = {
+  whatsapp: '51918616580',             // WhatsApp real de KIPU (Perú)
+  fxFallback: 5.45,                    // USD/BRL de respaldo si la API falla
+};
+
+/* ---------- Datos del catálogo ----------
+   [EDITABLE · DEMOSTRACIÓN] Estos tres lotes son un ejemplo de ficha, NO
+   inventario a la venta. Sustituir por terrenos reales con su matrícula,
+   medidas y documentación antes de publicar la página sin noindex.
+   Las descripciones evitan a propósito cualquier promesa de rentabilidad,
+   plusvalía o revalorización: describen el terreno, no un resultado. */
+const PROPS = [
+  {
+    id:'sc05', ref:'SC-05', name:'Valle Itajaí', loc:'Blumenau · Santa Catarina',
+    img:'assets/terreno-valle.jpg', m2:1250, precioM2:550,
+    lat:-26.9194, lon:-49.0661,
+    badges:['Documentación por verificar','Registro inmobiliario','Apto extranjeros'],
+    specs:{Frente:'28 m',Topografía:'Plana',Servicios:'Agua · Luz · Fibra',Zonificación:'Residencial'},
+    desc:'Terreno plano en el Valle Itajaí, a minutos del centro de Blumenau. Zona residencial consolidada, de herencia alemana, con servicios completos y acceso asfaltado. Apto para vivienda unifamiliar o proyecto de baja densidad según su zonificación.'
+  },
+  {
+    id:'sc06', ref:'SC-06', name:'Costa Esmeralda', loc:'Balneário Camboriú · SC',
+    img:'assets/terreno-costa.jpg', m2:480, precioM2:3000,
+    lat:-26.9906, lon:-48.6356,
+    badges:['Documentación por verificar','Apto extranjeros','Zona urbana consolidada'],
+    specs:{Frente:'16 m',Topografía:'Plana',Servicios:'Todos',Zonificación:'Mixto'},
+    desc:'Lote a pocas cuadras del mar en Balneário Camboriú, una de las ciudades con el mercado inmobiliario más activo del sur de Brasil. Zonificación mixta: admite vivienda y uso comercial en planta baja, sujeto al plan director municipal vigente.'
+  },
+  {
+    id:'sc07', ref:'SC-07', name:'Mirador del Atlántico', loc:'Itapema · Santa Catarina',
+    img:'assets/terreno-colina.jpg', m2:900, precioM2:1300,
+    lat:-27.0903, lon:-48.6114,
+    badges:['Documentación por verificar','Vista al mar','Apto extranjeros'],
+    specs:{Frente:'30 m',Topografía:'Suave pendiente',Servicios:'Agua · Luz',Zonificación:'Residencial alto'},
+    desc:'Colina con vista al Atlántico en Itapema, entre Balneário Camboriú y Florianópolis. Pendiente suave que permite construcción en terrazas. Requiere estudio de suelos y proyecto de contención: pídenos el detalle técnico antes de decidir.'
+  }
+];
+
+/* ---------- Estado global ---------- */
+let fxRate = CONFIG.fxFallback;
+let zTop = 60;
+const wins = {};      // id -> elemento ventana
+const minimized = new Set();
+
+/* ---------- Utilidades ---------- */
+const $ = s => document.querySelector(s);
+const fmtBRL = n => 'R$ ' + n.toLocaleString('pt-BR');
+const fmtUSD = n => 'US$ ' + Math.round(n).toLocaleString('en-US');
+const waLink = txt => `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(txt)}`;
+
+/* ---------- Cotización USD/BRL en vivo ---------- */
+async function loadFX(){
+  try{
+    const r = await fetch('https://open.er-api.com/v6/latest/USD');
+    const j = await r.json();
+    if(j && j.rates && j.rates.BRL){ fxRate = j.rates.BRL; }
+  }catch(e){ /* se usa el respaldo */ }
+  $('#fxRate').textContent = fxRate.toFixed(2);
+  renderPrices(); // actualiza todos los precios USD visibles
+}
+
+/* ---------- Reloj ---------- */
+function tick(){
+  const d = new Date();
+  const dias = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+  const meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+  const hh = String(d.getHours()).padStart(2,'0'), mm = String(d.getMinutes()).padStart(2,'0');
+  $('#clock').textContent = `${dias[d.getDay()]}, ${d.getDate()} ${meses[d.getMonth()]} · ${hh}:${mm}`;
+}
+setInterval(tick, 1000); tick();
+
+/* ---------- Íconos del escritorio ---------- */
+const ICONS = [
+  { id:'catalogo', label:'Catálogo', sub:'3 terrenos', svg:'<svg viewBox="0 0 24 24" fill="none" stroke="#e3b85c" stroke-width="1.6"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>' },
+  ...PROPS.map(p => ({ id:p.id, label:p.name, sub:p.ref, img:p.img })),
+  { id:'aurum', label:'AURUM', sub:'Criterio de selección', svg:'<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" fill="#e3b85c"/><circle cx="12" cy="12" r="5" fill="url(#g1)" opacity=".6"/><ellipse cx="12" cy="12" rx="10" ry="3.2" stroke="#f6dc9a" stroke-width="1" opacity=".8"/><circle cx="19" cy="7" r="1.2" fill="#f6dc9a"/><defs><radialGradient id="g1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e3b85c"/></radialGradient></defs></svg>' },
+  { id:'smartmoney', label:'Smart Money', sub:'Datos del mercado', svg:'<svg viewBox="0 0 24 24" fill="none" stroke="#3ddc97" stroke-width="1.7"><path d="M3 20h18"/><path d="M4 16l4-6 4 3 5-8 3 4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="5" r="1.4" fill="#3ddc97" stroke="none"/></svg>' },
+];
+
+function buildDesktop(){
+  const desk = $('#desktop');
+  desk.innerHTML = ICONS.map(ic => `
+    <button class="icon" data-open="${ic.id}">
+      <span class="thumb">${ic.img ? `<img src="${ic.img}" alt="${ic.label}">` : ic.svg}</span>
+      <span class="lbl">${ic.label}<small>${ic.sub}</small></span>
+    </button>`).join('');
+  desk.querySelectorAll('.icon').forEach(el =>
+    el.addEventListener('click', () => openWindow(el.dataset.open)));
+}
+
+/* ---------- Plantillas de ventana ---------- */
+function tplCatalogo(){
+  return `<div class="pad">
+    <div class="sec-head">
+      <h2>Catálogo de <em>terrenos</em></h2>
+      <p>Santa Catarina · Documentación verificada · Precios en BRL y USD</p>
+    </div>
+    <div class="grid">
+      ${PROPS.map(p => `
+        <article class="card" data-open="${p.id}">
+          <div class="ph"><img src="${p.img}" alt="${p.name}">
+            <span class="ref">${p.ref}</span><span class="m2">${p.m2.toLocaleString()} m²</span>
+          </div>
+          <div class="info">
+            <h3>${p.name}</h3>
+            <div class="loc">◈ ${p.loc}</div>
+            <div class="price"><b>${fmtBRL(p.m2*p.precioM2)}</b><span class="usd-lbl" data-brl="${p.m2*p.precioM2}"></span></div>
+            <div class="cta-row">
+              <button class="btn btn-gold" data-open="${p.id}">Ver ficha</button>
+              <a class="btn btn-wa" target="_blank" rel="noopener" href="${waLink(`Hola KIPU, me interesa el terreno ${p.name} (${p.ref}) en ${p.loc}. ¿Me envían más información?`)}">WhatsApp</a>
+            </div>
+          </div>
+        </article>`).join('')}
+    </div>
+  </div>`;
+}
+
+function tplProp(p){
+  const total = p.m2 * p.precioM2;
+  return `
+  <div class="hero"><img src="${p.img}" alt="${p.name}">
+    <div class="h-txt"><div class="ref">Ref. ${p.ref} · ${p.loc}</div><h2>${p.name}</h2></div>
+  </div>
+  <div class="badges">
+    ${p.badges.map(b => `<span class="badge">✓ ${b}</span>`).join('')}
+    <span class="badge gold">◆ Selección KIPU</span>
+  </div>
+  <div class="specs">
+    <div class="spec"><div class="k">Área</div><div class="v">${p.m2.toLocaleString()} m²</div></div>
+    <div class="spec"><div class="k">Frente</div><div class="v">${p.specs.Frente}</div></div>
+    <div class="spec"><div class="k">Topografía</div><div class="v">${p.specs.Topografía}</div></div>
+    <div class="spec"><div class="k">Servicios</div><div class="v">${p.specs.Servicios}</div></div>
+    <div class="spec"><div class="k">Zonificación</div><div class="v">${p.specs.Zonificación}</div></div>
+  </div>
+  <div class="pricebox">
+    <div>
+      <div class="p-brl">${fmtBRL(total)}</div>
+      <div class="p-usd">≈ <b class="usd-lbl" data-brl="${total}"></b> al tipo de cambio de hoy</div>
+    </div>
+    <div class="per-m2">Precio por m²<b>${fmtBRL(p.precioM2)}</b></div>
+  </div>
+  <p class="desc">${p.desc}</p>
+  <div class="mapbox">
+    <iframe loading="lazy" title="Mapa ${p.name}"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=${p.lon-0.03}%2C${p.lat-0.02}%2C${p.lon+0.03}%2C${p.lat+0.02}&layer=mapnik&marker=${p.lat}%2C${p.lon}"></iframe>
+    <span class="tag">◈ ${p.loc}</span>
+  </div>
+  <div class="actions">
+    <a class="btn btn-wa" target="_blank" rel="noopener" href="${waLink(`Hola KIPU, quiero agendar una visita al terreno ${p.name} (${p.ref}) en ${p.loc}.`)}">◉ Agendar visita por WhatsApp</a>
+    <a class="btn btn-ghost" href="mailto:contacto@kippuu.com?subject=${encodeURIComponent('Consulta terreno '+p.ref+' — '+p.name)}">Solicitar dossier PDF</a>
+  </div>`;
+}
+
+function tplAurum(){
+  return `<div class="pad">
+    <div class="a-logo">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" fill="#e3b85c"/><ellipse cx="12" cy="12" rx="10" ry="3.2" stroke="#f6dc9a" stroke-width="1"/><circle cx="19" cy="7" r="1.2" fill="#f6dc9a"/></svg>
+    </div>
+    <h2>AURUM</h2>
+    <div class="tagline">Tesis de inversión · Santa Catarina</div>
+    <p style="margin-top:18px;font-size:13px;line-height:1.8;color:rgba(238,241,244,.8);font-weight:300;max-width:520px;margin-left:auto;margin-right:auto">
+      AURUM es el criterio con el que KIPU elige qué terreno entra al catálogo y cuál se descarta.
+      No es una promesa de resultado: es una lista de requisitos que un lote debe cumplir antes de
+      que lo mostremos. Si un terreno no los cumple, no aparece aquí.
+    </p>
+    <div class="pillars">
+      <div class="pillar"><div class="n">I</div><h4>Papeles antes que discurso</h4><p>Matrícula al día, sin gravámenes ni litigios, con registro inmobiliario verificable por el comprador. Sin documentación limpia no hay ficha.</p></div>
+      <div class="pillar"><div class="n">II</div><h4>Compra legal desde el extranjero</h4><p>Terrenos urbanos en los que un no residente puede comprar cumpliendo el marco brasileño, con CPF y el proceso declarado ante el Banco Central.</p></div>
+      <div class="pillar"><div class="n">III</div><h4>Precio comparable y verificable</h4><p>Precio por m² contrastado con operaciones cercanas de la misma zonificación, para que puedas juzgar el número con datos, no con adjetivos.</p></div>
+    </div>
+    <p style="margin-top:20px;font-size:11px;line-height:1.7;color:rgba(238,241,244,.45);max-width:520px;margin-left:auto;margin-right:auto">
+      Ningún terreno garantiza revalorización. El mercado inmobiliario puede subir o bajar, y la
+      inversión inmobiliaria es ilíquida: vender puede tomar meses. Consulta siempre con un
+      abogado en Brasil antes de comprometer capital.
+    </p>
+    <div style="margin-top:26px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <a class="btn btn-gold" style="padding:13px 34px;display:inline-flex" target="_blank" rel="noopener"
+         href="${waLink('Hola KIPU, quiero conocer el criterio AURUM y los terrenos disponibles.')}">Conversar con un asesor</a>
+      <a class="btn btn-ghost" style="padding:13px 26px;display:inline-flex" href="../aurum.html">Ver el holding AURUM ↗</a>
+    </div>
+  </div>`;
+}
+
+function tplSmartMoney(){
+  return `<div class="pad">
+    <div class="sec-head">
+      <h2>Smart <em>Money</em></h2>
+      <p>Cómo se compara el precio por m² entre la costa y el valle · ejemplo ilustrativo</p>
+    </div>
+    <div class="sm-aviso">
+      ⚠ <b>Datos de ejemplo, no un índice de mercado.</b> Las curvas de abajo ilustran cómo se leería
+      este panel; todavía no provienen de una fuente publicada. Hasta que se conecten a un registro
+      verificable (FipeZAP, Secovi-SC o el registro inmobiliario), no deben usarse para decidir nada.
+    </div>
+    <div class="sm-stats">
+      <div class="sm-stat"><div class="k">Precio m² · costa</div><div class="v gold">R$ 3.000</div><div class="s">Ficha SC-06 de este catálogo</div></div>
+      <div class="sm-stat"><div class="k">Precio m² · valle</div><div class="v gold">R$ 550</div><div class="s">Ficha SC-05 de este catálogo</div></div>
+      <div class="sm-stat"><div class="k">Diferencia</div><div class="v">5,5×</div><div class="s">Lo que cuesta el metro en la costa frente al valle</div></div>
+    </div>
+    <canvas id="chart"></canvas>
+    <div class="legend">
+      <span><i style="background:#3ddc97"></i>Costa (Balneário · Itapema)</span>
+      <span><i style="background:#e3b85c"></i>Valle (Blumenau · Itajaí)</span>
+      <span style="opacity:.55">· serie ilustrativa</span>
+    </div>
+    <p class="sm-pie">
+      Rendimientos pasados, reales o ilustrativos, no anticipan rendimientos futuros. KIPU no
+      garantiza revalorización de ningún terreno.
+    </p>
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+      <a class="btn btn-ghost" href="../oraculo.html">Lunar Oracle 369 ↗</a>
+      <a class="btn btn-ghost" href="../mirofish/">Terminal MIROFISH ↗</a>
+    </div>
+  </div>`;
+}
+
+/* ---------- Gestor de ventanas ---------- */
+const WIN_DEFS = {
+  catalogo:  { title:'Catálogo de terrenos', tag:'KIPU', tpl:tplCatalogo },
+  aurum:     { title:'AURUM', tag:'Criterio', tpl:tplAurum, cls:'aurum' },
+  smartmoney:{ title:'Smart Money', tag:'Ejemplo', tpl:tplSmartMoney },
+  ...Object.fromEntries(PROPS.map(p => [p.id, { title:p.name, tag:p.ref, tpl:() => tplProp(p) }]))
+};
+
+function openWindow(id){
+  const def = WIN_DEFS[id]; if(!def) return;
+  let w = wins[id];
+  if(!w){
+    w = document.createElement('section');
+    w.className = 'window' + (def.cls ? ' '+def.cls : '');
+    w.innerHTML = `
+      <div class="wtitlebar">
+        <div class="traffic">
+          <button class="t-close" title="Cerrar"></button>
+          <button class="t-min" title="Minimizar"></button>
+          <button class="t-max" title="Maximizar"></button>
+        </div>
+        <div class="wtitle">${def.title}<small>${def.tag}</small></div>
+      </div>
+      <div class="wbody">${def.tpl()}</div>`;
+    $('#windows').appendChild(w);
+    wins[id] = w;
+
+    // posición inicial escalonada
+    const n = Object.keys(wins).length;
+    const vw = Math.min(860, innerWidth*.94);
+    w.style.left = Math.max(12,(innerWidth-vw)/2 + (n%5)*26 - 52) + 'px';
+    w.style.top  = (70 + (n%5)*22) + 'px';
+
+    // eventos de la barra de título
+    w.querySelector('.t-close').addEventListener('click', e => { e.stopPropagation(); closeWindow(id); });
+    w.querySelector('.t-min').addEventListener('click',  e => { e.stopPropagation(); minimizeWindow(id); });
+    w.querySelector('.t-max').addEventListener('click',  e => { e.stopPropagation(); toggleMax(w); });
+    makeDraggable(w, w.querySelector('.wtitlebar'));
+
+    // abrir fichas desde tarjetas internas
+    w.querySelectorAll('[data-open]').forEach(el =>
+      el.addEventListener('click', e => { e.stopPropagation(); openWindow(el.dataset.open); }));
+
+    // gráfico Smart Money al primer render
+    if(id === 'smartmoney') requestAnimationFrame(drawChart);
+  }
+  minimized.delete(id);
+  w.classList.remove('closing');
+  w.classList.add('open');
+  focusWindow(w);
+  renderPrices();
+  updateDockDots();
+}
+
+function closeWindow(id){
+  const w = wins[id]; if(!w) return;
+  w.classList.add('closing'); w.classList.remove('open');
+  setTimeout(() => { w.remove(); delete wins[id]; updateDockDots(); }, 280);
+}
+
+function minimizeWindow(id){
+  const w = wins[id]; if(!w) return;
+  w.classList.remove('open'); minimized.add(id); updateDockDots();
+}
+
+function toggleMax(w){
+  if(w.dataset.max){
+    w.style.left = w.dataset.l; w.style.top = w.dataset.t;
+    w.style.width = w.dataset.w; w.style.height = w.dataset.h;
+    delete w.dataset.max;
+  }else{
+    Object.assign(w.dataset, { max:1, l:w.style.left, t:w.style.top, w:w.style.width||'', h:w.style.height||'' });
+    w.style.left = '2vw'; w.style.top = '54px';
+    w.style.width = '96vw'; w.style.height = 'calc(100vh - 140px)';
+  }
+}
+
+function focusWindow(w){
+  document.querySelectorAll('.window').forEach(x => x.classList.remove('focused'));
+  w.classList.add('focused'); w.style.zIndex = ++zTop;
+}
+
+function makeDraggable(w, handle){
+  let sx, sy, ox, oy, drag = false;
+  handle.addEventListener('pointerdown', e => {
+    if(e.target.closest('.traffic')) return;
+    drag = true; focusWindow(w);
+    sx = e.clientX; sy = e.clientY;
+    const r = w.getBoundingClientRect(); ox = r.left; oy = r.top;
+    handle.setPointerCapture(e.pointerId);
+  });
+  handle.addEventListener('pointermove', e => {
+    if(!drag) return;
+    w.style.left = Math.min(innerWidth-120, Math.max(-w.offsetWidth+140, ox + e.clientX - sx)) + 'px';
+    w.style.top  = Math.min(innerHeight-80, Math.max(50, oy + e.clientY - sy)) + 'px';
+  });
+  handle.addEventListener('pointerup', () => drag = false);
+}
+
+/* ---------- Precios USD (se recalculan con el FX en vivo) ---------- */
+function renderPrices(){
+  document.querySelectorAll('.usd-lbl').forEach(el => {
+    el.textContent = fmtUSD(parseFloat(el.dataset.brl) / fxRate);
+  });
+}
+
+/* ---------- Dock ---------- */
+function updateDockDots(){
+  const open = Object.keys(wins).some(id => !minimized.has(id)) || minimized.size > 0;
+  $('#dock-catalogo').classList.toggle('active', open);
+}
+$('#dock-catalogo').addEventListener('click', () => {
+  // reabre la última minimizada o abre el catálogo
+  const lastMin = [...minimized].pop();
+  if(lastMin){ openWindow(lastMin); } else { openWindow('catalogo'); }
+});
+$('#dock-wa').href = waLink('Hola KIPU, vengo de la página de Santa Catarina y quiero información sobre los terrenos.');
+
+/* ---------- Gráfico Smart Money (canvas) ---------- */
+function drawChart(){
+  const c = $('#chart'); if(!c) return;
+  const dpr = devicePixelRatio || 1;
+  const W = c.clientWidth, H = 220;
+  c.width = W*dpr; c.height = H*dpr;
+  const ctx = c.getContext('2d'); ctx.scale(dpr,dpr);
+  /* [EDITABLE · ILUSTRATIVO] Serie de ejemplo para mostrar la forma del panel.
+     NO es un índice publicado. Al conectar una fuente real (FipeZAP, Secovi-SC),
+     sustituir estos arrays y quitar el aviso .sm-aviso de la plantilla. */
+  const years = ['2019','2020','2021','2022','2023','2024','2025'];
+  const costa = [100,108,124,146,172,198,226];
+  const valle = [100,104,115,130,148,166,182];
+  const padL=34, padR=14, padT=16, padB=26, pw=W-padL-padR, ph=H-padT-padB;
+  const max = 260;
+  const X = i => padL + pw*i/(years.length-1);
+  const Y = v => padT + ph*(1 - v/max);
+  // rejilla
+  ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.fillStyle='rgba(238,241,244,.4)';
+  ctx.font='9px Inter'; ctx.textAlign='right';
+  for(let v=50; v<=max; v+=50){
+    ctx.beginPath(); ctx.moveTo(padL,Y(v)); ctx.lineTo(W-padR,Y(v)); ctx.stroke();
+    ctx.fillText(v, padL-7, Y(v)+3);
+  }
+  ctx.textAlign='center';
+  years.forEach((y,i)=> ctx.fillText(y, X(i), H-9));
+  // series
+  function line(data, color, glow){
+    ctx.beginPath();
+    data.forEach((v,i)=> i? ctx.lineTo(X(i),Y(v)) : ctx.moveTo(X(i),Y(v)));
+    ctx.strokeStyle=color; ctx.lineWidth=2.2; ctx.lineJoin='round';
+    ctx.shadowColor=glow; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
+    // área bajo la curva
+    ctx.lineTo(X(data.length-1), Y(0)); ctx.lineTo(X(0), Y(0)); ctx.closePath();
+    const g = ctx.createLinearGradient(0,padT,0,H-padB);
+    g.addColorStop(0, color.replace(')',',.18)').replace('rgb','rgba'));
+    g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=g; ctx.fill();
+  }
+  line(valle,'rgb(227,184,92)','rgba(227,184,92,.5)');
+  line(costa,'rgb(61,220,151)','rgba(61,220,151,.5)');
+  // punto final destacado (último año de la serie, sea cual sea su longitud)
+  ctx.fillStyle='#3ddc97';
+  ctx.beginPath(); ctx.arc(X(costa.length-1), Y(costa[costa.length-1]), 4, 0, 7); ctx.fill();
+}
+
+/* ---------- Partículas doradas ---------- */
+(function(){
+  const cv = $('#particles'), ctx = cv.getContext('2d');
+  let W,H,P=[];
+  function resize(){ W=cv.width=innerWidth; H=cv.height=innerHeight; }
+  resize(); addEventListener('resize', resize);
+  for(let i=0;i<70;i++) P.push({
+    x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+    r:Math.random()*1.6+.4, s:Math.random()*.35+.08,
+    a:Math.random()*.5+.15, ph:Math.random()*6.28
+  });
+  (function loop(t){
+    ctx.clearRect(0,0,W,H);
+    P.forEach(p=>{
+      p.y -= p.s; p.x += Math.sin(t/2600 + p.ph)*.18;
+      if(p.y < -6){ p.y = H+6; p.x = Math.random()*W; }
+      const tw = p.a * (0.6 + 0.4*Math.sin(t/900 + p.ph));
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7);
+      ctx.fillStyle = `rgba(246,220,154,${tw})`;
+      ctx.shadowColor='rgba(227,184,92,.8)'; ctx.shadowBlur=6;
+      ctx.fill(); ctx.shadowBlur=0;
+    });
+    requestAnimationFrame(loop);
+  })(0);
+})();
+
+/* ---------- Arranque e inicio ---------- */
+buildDesktop();
+loadFX();
+addEventListener('resize', () => { const c=$('#chart'); if(c) drawChart(); });
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    $('#boot').classList.add('done');
+    setTimeout(() => { $('#toast').classList.add('show'); }, 900);
+    setTimeout(() => { $('#toast').classList.remove('show'); }, 9500);
+  }, 1700);
+});
+$('#help').addEventListener('click', () => $('#toast').classList.toggle('show'));
+$('#toastClose').addEventListener('click', () => $('#toast').classList.remove('show'));
+
+/* Atajos de teclado: Esc cierra la ventana activa */
+addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    const top = Object.entries(wins).filter(([id,w]) => w.classList.contains('open')).pop();
+    if(top) minimizeWindow(top[0]);
+  }
+});
+</script>
+</body>
+</html>
