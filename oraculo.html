@@ -96,7 +96,9 @@ main.cambiando{animation:cambioActivo .45s ease}
 .panel{background:var(--panel);border:1px solid var(--borde);border-radius:16px;padding:14px 16px}
 .panel h2{font-family:var(--num);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--tinta2);margin-bottom:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .panel h2 .mini{margin-left:auto;font-size:9px;font-weight:400;letter-spacing:.06em;color:var(--tinta3);text-transform:none}
-.fila-2{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+/* El panel del medidor solo contiene un SVG de 230 px: fijándolo en 300 px
+   en vez de darle 1fr, el gráfico recupera ~164 px de ancho a 1440. */
+.fila-2{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px}
 .fila-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 @media(max-width:1100px){.fila-2,.fila-3{grid-template-columns:1fr}}
 .cargando{text-align:center;padding:70px 0;color:var(--tinta3);font-family:var(--num);animation:vivoPulso 1.4s ease-in-out infinite}
@@ -114,7 +116,10 @@ main.cambiando{animation:cambioActivo .45s ease}
 .filtro .fl b{display:block;font-family:var(--num);font-size:11.5px;color:var(--tinta);font-weight:600;letter-spacing:.04em}
 
 /* ---------- gráfico de velas ---------- */
-#lienzoVelas{width:100%;display:block;cursor:crosshair}
+/* la altura la fija el JS según el ancho; se reserva aquí para que la página
+   no dé un salto de layout entre el primer pintado y el segundo */
+#lienzoVelas{width:100%;display:block;cursor:crosshair;height:460px}
+@media(max-width:700px){#lienzoVelas{height:360px}}
 .leyenda-chart{display:flex;flex-wrap:wrap;gap:12px;font-family:var(--num);font-size:9.5px;color:var(--tinta3);margin-bottom:6px}
 .leyenda-chart i{font-style:normal}
 #tipVela{position:fixed;z-index:50;display:none;pointer-events:none;background:#0b0d18;border:1px solid var(--borde2);border-radius:10px;padding:8px 11px;font-family:var(--num);font-size:10.5px;line-height:1.6;color:var(--tinta2);box-shadow:0 12px 30px rgba(0,0,0,.5)}
@@ -284,11 +289,13 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
       <section class="panel">
         <h2><span id="tituloChart">…</span> · 1H · Mapa de Sweeps <span class="mini">⬆ barrido de mínimos con volumen alto — posible acumulación</span></h2>
         <div class="leyenda-chart">
-          <span><i style="color:#60a5fa">━</i> EMA20</span><span><i style="color:#34d399">━</i> EMA50</span>
-          <span><i style="color:#f472b6">━</i> EMA200</span><span><i style="color:#facc15">┄</i> VWAP</span>
+          <span><i style="color:#93c5fd">━</i> EMA20</span><span><i style="color:#3b82f6">━</i> EMA50</span>
+          <span><i style="color:#f472b6">━</i> EMA200</span><span><i style="color:#e2e8f0">┄</i> VWAP</span>
           <span><i style="color:#a5b4fc">┄</i> liquidez</span>
+          <span><i style="color:#facc15">▮</i> volumen climático (≥1.5× la media de 20)</span>
+          <span style="opacity:.6">▮ la última barra es la vela en curso</span>
         </div>
-        <canvas id="lienzoVelas" height="440" role="img" aria-label="Gráfico de velas de 1 hora con medias móviles, VWAP, niveles de liquidez y marcas de sweep"></canvas>
+        <canvas id="lienzoVelas" role="img" aria-label="Gráfico de velas de 1 hora con medias móviles, VWAP, niveles de liquidez, marcas de sweep e histograma de volumen"></canvas>
         <p class="resumen-canvas" id="resumenVelas"></p>
       </section>
       <section class="panel">
@@ -758,8 +765,6 @@ async function cargar(primeraVez) {
 
     calcularFiltros(v1h, lun, fgV);
     revisarAlertas(sym);           /* el símbolo llega de la carga que lo produjo */
-    calcularHistorial(v1h);        /* ~70 ms: se recalcula en cada refresco para que el
-                                      último punto coincida con el medidor */
 
     estado.hayDatos = true;
     estado.ultimoOk = new Date();
@@ -770,6 +775,18 @@ async function cargar(primeraVez) {
     $('puntoVivo').style.background = 'var(--verde)';
     $('horaAct').textContent = estado.ultimoOk.toLocaleTimeString('es-PE');
     pintarTodo();
+
+    /* El historial son 168 pasadas del motor sobre prefijos crecientes: es
+       O(n²) y bloqueaba el hilo hasta 200 ms CADA MINUTO, justo cuando se
+       repinta el gráfico. Se difiere a cuando el navegador está ocioso, con
+       la misma guarda de carrera que el resto de la carga. */
+    const trabajoPesado = () => {
+      if (sym !== estado.sym) return;
+      calcularHistorial(v1h);
+      pintarHistorial();
+    };
+    if (window.requestIdleCallback) requestIdleCallback(trabajoPesado, { timeout: 2000 });
+    else setTimeout(trabajoPesado, 60);
   } catch (e) {
     if (sym !== estado.sym) return;          /* falló una carga obsoleta: se ignora */
     $('cargando').style.display = 'none';
@@ -905,7 +922,9 @@ function calcularHistorial(v1h) {
 /* ══════════ PINTADO ══════════ */
 function pintarTodo() {
   pintarTabs(); pintarSemaforo(); pintarChart(); pintarGauge(); pintarMTF();
-  pintarIndicadores(); pintarLiquidez(); pintarLunar(); pintarHistorial();
+  /* pintarHistorial NO va aquí: depende de calcularHistorial, que se difiere
+     a requestIdleCallback para no bloquear el repintado del gráfico */
+  pintarIndicadores(); pintarLiquidez(); pintarLunar();
   pintarDiario(); pintarAlertas();
   $('chipFG').textContent = estado.fg ? `F&G ${estado.fg.v} · ${estado.fg.txt}` : 'F&G —';
   $('tituloChart').textContent = `${ACTIVOS[estado.sym].corto}/USDT`;
@@ -950,91 +969,251 @@ function pintarSemaforo() {
       <span class="fl"><b>${f.n}</b>${f.d} — <b style="display:inline;font-size:inherit">${f.ok ? 'en verde' : 'BLOQUEA'}</b></span></div>`).join('');
 }
 
-/* ---------- gráfico de velas (canvas propio, sin librerías) ---------- */
+/* ---------- gráfico de velas (canvas propio, sin librerías) ----------
+   Paleta del lienzo. El verde queda EXCLUSIVO de las velas alcistas: antes
+   la EMA50 usaba el mismo #34d399 y se disolvía dentro de cada cuerpo verde.
+   Las medias pasan a una familia azul donde el grosor codifica el periodo,
+   y el ámbar queda reservado al volumen climático.                       */
+const C_ALZA = '#34d399', C_BAJA = '#fb7185';
+const C_EJE = '#7d86ae';        /* antes #5d6488: 3,3:1, insuficiente */
+const C_REJILLA = '#1b2138';
+const C_LIQ = '#a5b4fc';        /* índigo, el mismo que anuncia la leyenda */
+/* la EMA20 va en azul claro y no en casi-blanco: el VWAP es gris claro y a
+   simple vista se confundían */
+const EMAS = [[20, '#93c5fd', 1], [50, '#3b82f6', 1.5], [200, '#f472b6', 2]];
+
+/* Un solo sitio decide cuántos decimales lleva un precio, a partir del paso
+   de la rejilla: BTC no se formatea como SOL. Antes la regla estaba copiada
+   en cuatro puntos del lienzo y en el tooltip, y no coincidían. */
+function decDe(precio) {
+  const p = Math.abs(precio);
+  return p >= 10000 ? 0 : p >= 1000 ? 1 : p >= 1 ? 2 : p >= 0.01 ? 4 : 6;
+}
+function fmtP(v, dec) {
+  return v.toLocaleString('es-PE', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+/* Fija TODO el estado de texto de una vez. Antes el ctx.font que ponían los
+   sweeps se filtraba y la caja del precio se dibujaba a 9 px o a 10 px
+   según hubiera barridos en la ventana: el número principal del panel
+   cambiaba de tamaño según el mercado. */
+function estiloTexto(ctx, o) {
+  ctx.font = `${o.peso ? o.peso + ' ' : ''}${o.px}px "Space Grotesk",ui-monospace,monospace`;
+  ctx.fillStyle = o.color;
+  ctx.textAlign = o.align || 'left';
+  ctx.textBaseline = o.base || 'middle';
+}
+
 const geoChart = { pts: null };
 function pintarChart() {
   const cv = $('lienzoVelas'), ctx = cv.getContext('2d');
   const DPR = Math.min(2, devicePixelRatio || 1);
-  const cssW = cv.clientWidth || 800, cssH = innerWidth < 700 ? 300 : 440;
-  cv.width = cssW * DPR; cv.height = cssH * DPR;
+  const rect = cv.getBoundingClientRect();
+  const cssW = Math.max(220, Math.round(rect.width) || 800);
+  /* Alto derivado del ancho: un gráfico ancho y bajo aplasta las velas.
+     El suelo de 460 mantiene el área de precio por encima de ~330 px
+     incluso con el panel de volumen restado. */
+  const cssH = innerWidth < 700 ? 360 : clamp(Math.round(cssW * 0.60), 460, 560);
+  /* Bitmap en píxeles ENTEROS: con anchos fraccionarios la escala real
+     quedaba en ~1,9987 y la deriva se acumulaba hacia la derecha, justo
+     donde va el texto del eje. */
+  cv.width = Math.round(cssW * DPR);
+  cv.height = Math.round(cssH * DPR);
   cv.style.height = cssH + 'px';
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   ctx.clearRect(0, 0, cssW, cssH);
-  const V = estado.velas1h.slice(-120);
+
+  /* --- Encuadre. En móvil NO se encoge el mismo gráfico: se reencuadra.
+     120 velas en 241 px dan un paso de 2 px con cuerpo de 2 px, o sea una
+     mancha sólida. Con 48 velas (dos días) el cuerpo sube a ~3,3 px. --- */
+  const movil = cssW < 420;
+  const padL = 8, padR = movil ? 48 : 62, padT = 10, padB = 22;
+  const iw = cssW - padL - padR;
+  const N = movil ? 48 : clamp(Math.round(iw / 7), 40, 120);
+  const full = estado.velas1h;
+  const V = full.slice(-N);
   if (!V.length) return;
-  const padL = 8, padR = 62, padT = 10, padB = 22;
-  const iw = cssW - padL - padR, ih = cssH - padT - padB;
+  const base = Math.max(0, full.length - V.length);   /* nunca negativo */
+  const nLiq = movil ? 1 : 2;
+
+  /* --- Reparto vertical: precio arriba, volumen abajo --- */
+  const ihTotal = cssH - padT - padB;
+  const volH = Math.round(ihTotal * (movil ? 0.18 : 0.22));
+  const gapV = 16;
+  const ih = ihTotal - volH - gapV;                   /* área de precio */
+  const volBase = padT + ih + gapV + volH;            /* línea cero del histograma */
+
   let mn = Math.min(...V.map(c => c.low)), mx = Math.max(...V.map(c => c.high));
   const rango = (mx - mn) || 1; mn -= rango*0.04; mx += rango*0.04;
+  const dec = decDe(V[V.length - 1].close);
   const X = i => padL + (i + 0.5) * (iw / V.length);
   const Y = p => padT + ih - ((p - mn) / (mx - mn)) * ih;
-  /* rejilla + eje de precio */
-  ctx.font = '10px "Space Grotesk",monospace'; ctx.fillStyle = '#5d6488'; ctx.strokeStyle = '#1b2138'; ctx.lineWidth = 1;
+  const snap = x => Math.round(x * DPR) / DPR;        /* cuerpos de vela iguales */
+  const snapY = y => Math.round(y) + 0.5;             /* rejilla de 1 px nítida */
+
+  /* --- Rejilla y eje de precio --- */
+  estiloTexto(ctx, { px: 10, color: C_EJE });
+  ctx.strokeStyle = C_REJILLA; ctx.lineWidth = 1;
   for (let g = 0; g <= 4; g++) {
-    const p = mn + (mx - mn) * g / 4, y = Y(p);
+    const p = mn + (mx - mn) * g / 4, y = snapY(Y(p));
     ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(cssW - padR, y); ctx.stroke();
-    ctx.fillText(p >= 1000 ? p.toFixed(0) : p.toFixed(2), cssW - padR + 6, y + 3);
+    ctx.fillText(fmtP(p, dec), cssW - padR + 6, Y(p));
   }
-  /* eje temporal (cada 24 velas = 1 día) */
-  for (let i = V.length - 1; i >= 0; i -= 24) {
-    const d = new Date(V[i].time * 1000);
-    ctx.fillText(`${d.getDate()}/${d.getMonth()+1}`, X(i) - 12, cssH - 8);
-  }
-  /* niveles de liquidez (los 2 más cercanos por lado) */
-  const { hs, ls } = nivelesLiquidez(V, 5);
-  const px = V[V.length-1].close;
-  const arriba = [...new Set(hs.filter(h => h > px))].sort((a,b) => a-b).slice(0, 2);
-  const abajo = [...new Set(ls.filter(l => l < px))].sort((a,b) => b-a).slice(0, 2);
-  ctx.setLineDash([4, 4]);
-  [...arriba, ...abajo].forEach(nv => {
-    ctx.strokeStyle = 'rgba(103,232,249,.5)'; ctx.beginPath(); ctx.moveTo(padL, Y(nv)); ctx.lineTo(cssW - padR, Y(nv)); ctx.stroke();
-    ctx.fillStyle = '#67e8f9'; ctx.fillText('LIQ ' + (nv >= 1000 ? nv.toFixed(0) : nv.toFixed(2)), cssW - padR - 74, Y(nv) - 3);
+
+  /* --- Eje temporal: una marca por día, no cada 24 velas --- */
+  estiloTexto(ctx, { px: 10, color: C_EJE, align: 'center' });
+  let ultimaMarca = -999, diaPrev = null;
+  V.forEach((c, i) => {
+    const d = new Date(c.time * 1000), dia = d.getDate();
+    if (diaPrev !== null && dia !== diaPrev && X(i) - ultimaMarca > 40) {
+      ctx.fillText(`${dia}/${d.getMonth() + 1}`, X(i), cssH - 10);
+      ultimaMarca = X(i);
+    }
+    diaPrev = dia;
   });
-  /* VWAP */
-  const vw = vwapSerie(estado.velas1h, 24).slice(-120);
-  ctx.strokeStyle = 'rgba(250,204,21,.7)'; ctx.beginPath();
-  vw.forEach((v, i) => i ? ctx.lineTo(X(i), Y(v)) : ctx.moveTo(X(0), Y(v))); ctx.stroke();
+
+  const px = V[V.length - 1].close;
+
+  /* --- Capas de línea, recortadas al área de precio.
+     Sin este clip una EMA200 fuera de rango se pintaba sobre las fechas. --- */
+  ctx.save();
+  ctx.beginPath(); ctx.rect(padL, padT, iw, ih); ctx.clip();
+
+  /* niveles de liquidez */
+  const { hs, ls } = nivelesLiquidez(V, 5);
+  const arriba = [...new Set(hs.filter(h => h > px))].sort((a,b) => a-b).slice(0, nLiq);
+  const abajo  = [...new Set(ls.filter(l => l < px))].sort((a,b) => b-a).slice(0, nLiq);
+  const niveles = [...arriba, ...abajo];
+  ctx.setLineDash([4, 4]);
+  ctx.strokeStyle = 'rgba(165,180,252,.5)';
+  ctx.beginPath();
+  niveles.forEach(nv => { const y = snapY(Y(nv)); ctx.moveTo(padL, y); ctx.lineTo(cssW - padR, y); });
+  ctx.stroke();
+
+  /* VWAP — en gris claro: el ámbar pasa a significar volumen climático */
+  if (!movil) {
+    const vw = vwapSerie(full.slice(-(V.length + 24)), 24).slice(-V.length);
+    ctx.strokeStyle = 'rgba(226,232,240,.8)'; ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    vw.forEach((v, i) => i ? ctx.lineTo(X(i), Y(v)) : ctx.moveTo(X(0), Y(v)));
+    ctx.stroke();
+  }
   ctx.setLineDash([]);
-  /* EMAs sobre el histórico completo (recortadas a la vista) */
-  const closesAll = estado.velas1h.map(c => c.close);
-  [[20,'#60a5fa'],[50,'#34d399'],[200,'#f472b6']].forEach(([p, col]) => {
-    const serie = ema(closesAll, p).slice(-120);
-    ctx.strokeStyle = col; ctx.lineWidth = 1.4; ctx.beginPath();
+
+  /* EMAs: familia azul, el grosor codifica el periodo */
+  const closesAll = full.map(c => c.close);
+  (movil ? EMAS.filter(e => e[0] !== 50) : EMAS).forEach(([p, col, gr]) => {
+    const serie = ema(closesAll, p).slice(-V.length);
+    ctx.strokeStyle = col; ctx.lineWidth = gr; ctx.beginPath();
     serie.forEach((v, i) => i ? ctx.lineTo(X(i), Y(v)) : ctx.moveTo(X(0), Y(v)));
     ctx.stroke();
   });
-  /* velas */
-  const cw = Math.max(2, iw / V.length * 0.62);
-  V.forEach((c, i) => {
-    const alcista = c.close >= c.open;
-    ctx.strokeStyle = ctx.fillStyle = alcista ? '#34d399' : '#fb7185';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(X(i), Y(c.high)); ctx.lineTo(X(i), Y(c.low)); ctx.stroke();
-    const y1 = Y(Math.max(c.open, c.close)), y2 = Y(Math.min(c.open, c.close));
-    ctx.fillRect(X(i) - cw/2, y1, cw, Math.max(1, y2 - y1));
+
+  /* --- Velas, agrupadas por color: ~4 llamadas de dibujo en vez de ~270 --- */
+  const cw = Math.max(2, (iw / V.length) * 0.62);
+  [[true, C_ALZA], [false, C_BAJA]].forEach(([alza, col]) => {
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1;
+    ctx.beginPath();
+    V.forEach((c, i) => {
+      if ((c.close >= c.open) !== alza) return;
+      const x = snapY(X(i));
+      ctx.moveTo(x, Y(c.high)); ctx.lineTo(x, Y(c.low));
+    });
+    ctx.stroke();
+    ctx.beginPath();
+    V.forEach((c, i) => {
+      if ((c.close >= c.open) !== alza) return;
+      const y1 = Y(Math.max(c.open, c.close)), y2 = Y(Math.min(c.open, c.close));
+      ctx.rect(snap(X(i) - cw/2), y1, cw, Math.max(1, y2 - y1));
+    });
+    ctx.fill();
   });
-  /* sweeps sobre la ventana visible */
-  const base = estado.velas1h.length - 120;
-  detectarSweeps(estado.velas1h, 20, 1.5).filter(e => e.i >= base).forEach(e => {
-    const i = e.i - base, c = estado.velas1h[e.i];
-    ctx.font = 'bold 9px "Space Grotesk",monospace';
-    if (e.tipo === 'bull') { ctx.fillStyle = '#34d399'; ctx.fillText('⬆' + e.vr.toFixed(1) + '×', X(i) - 10, Y(c.low) + 14); }
-    else { ctx.fillStyle = '#fb7185'; ctx.fillText('⬇' + e.vr.toFixed(1) + '×', X(i) - 10, Y(c.high) - 6); }
+  ctx.restore();
+
+  /* --- Histograma de volumen ---------------------------------------
+     El panel enseñaba la conclusión ("⬇2.3×") y escondía la prueba. Aquí
+     se ve el volumen y su media, así que el 1,5× se comprueba en vez de
+     creerse. La media se calcula sobre las 20 velas PREVIAS excluyéndose
+     a sí misma, igual que detectarSweeps, para que las barras ámbar
+     coincidan con las marcas de barrido.                              */
+  const mediaPrev = i => {
+    const gi = base + i; let s = 0, n = 0;
+    for (let j = Math.max(0, gi - 20); j < gi; j++) { s += full[j].volume; n++; }
+    return n ? s / n : 0;
+  };
+  const medias = V.map((_, i) => mediaPrev(i));
+  const climax = V.map((c, i) => medias[i] > 0 && c.volume >= 1.5 * medias[i]);
+  /* percentil 95 y no el máximo: una sola vela climática aplasta el resto */
+  const ordenados = V.map(c => c.volume).sort((a, b) => a - b);
+  const maxV = ordenados[Math.min(ordenados.length - 1, Math.floor(ordenados.length * 0.95))] || 1;
+  const YV = v => volBase - Math.min(1, v / maxV) * volH;
+
+  const grupos = [
+    { test: (c, i) => climax[i], color: 'rgba(250,204,21,.55)' },
+    { test: (c, i) => !climax[i] && c.close >= c.open, color: 'rgba(52,211,153,.30)' },
+    { test: (c, i) => !climax[i] && c.close <  c.open, color: 'rgba(251,113,133,.30)' },
+  ];
+  grupos.forEach(g => {
+    ctx.fillStyle = g.color;
+    ctx.beginPath();
+    V.forEach((c, i) => {
+      if (!g.test(c, i)) return;
+      if (i === V.length - 1) return;            /* la vela en curso va aparte */
+      const y = YV(c.volume);
+      ctx.rect(snap(X(i) - cw/2), y, cw, Math.max(1, volBase - y));
+    });
+    ctx.fill();
   });
-  /* línea de precio actual */
-  ctx.strokeStyle = '#a78bfa'; ctx.setLineDash([2, 3]);
-  ctx.beginPath(); ctx.moveTo(padL, Y(px)); ctx.lineTo(cssW - padR, Y(px)); ctx.stroke();
+  /* La última barra es la vela EN CURSO: su volumen aún es parcial y sin
+     esta salvedad el histograma parecería desplomarse siempre al final. */
+  const ult = V[V.length - 1], yU = YV(ult.volume);
+  ctx.fillStyle = climax[V.length - 1] ? 'rgba(250,204,21,.30)'
+                : ult.close >= ult.open ? 'rgba(52,211,153,.16)' : 'rgba(251,113,133,.16)';
+  ctx.fillRect(snap(X(V.length - 1) - cw/2), yU, cw, Math.max(1, volBase - yU));
+
+  /* media de volumen: sin ella "climático" es una afirmación, no un dato */
+  ctx.strokeStyle = 'rgba(125,134,174,.55)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  medias.forEach((m, i) => i ? ctx.lineTo(X(i), YV(m)) : ctx.moveTo(X(0), YV(m)));
+  ctx.stroke(); ctx.setLineDash([]);
+
+  /* --- Marcas de sweep --- */
+  const sweeps = detectarSweeps(full, 20, 1.5).filter(e => e.i >= base);
+  estiloTexto(ctx, { px: 9, peso: 'bold', color: C_ALZA, align: 'center' });
+  sweeps.forEach(e => {
+    const i = e.i - base, c = full[e.i];
+    ctx.fillStyle = e.tipo === 'bull' ? C_ALZA : C_BAJA;
+    const etq = (e.tipo === 'bull' ? '▲' : '▼') + e.vr.toFixed(1) + '×';
+    const x = clamp(X(i), padL + 18, cssW - padR - 18);
+    ctx.fillText(etq, x, e.tipo === 'bull' ? Y(c.low) + 12 : Y(c.high) - 12);
+  });
+
+  /* --- Etiquetas del eje: liquidez y precio actual --- */
+  estiloTexto(ctx, { px: 9.5, color: C_LIQ, align: 'left' });
+  niveles.forEach(nv => {
+    ctx.fillStyle = nv > px ? '#fecdd3' : '#a7f3d0';
+    ctx.fillText(fmtP(nv, dec), cssW - padR + 6, Y(nv));
+  });
+  /* precio actual: pastilla violeta con texto oscuro (7:1 de contraste) */
+  ctx.strokeStyle = '#a78bfa'; ctx.setLineDash([2, 3]); ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(padL, snapY(Y(px))); ctx.lineTo(cssW - padR, snapY(Y(px))); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle = '#0b0e1c'; ctx.fillRect(cssW - padR + 2, Y(px) - 9, padR - 4, 15);
-  ctx.fillStyle = '#c4b5fd'; ctx.fillText(px >= 1000 ? px.toFixed(0) : px.toFixed(2), cssW - padR + 6, Y(px) + 3);
-  geoChart.pts = { V, X, Y, padL, padR, cssW, cssH };
-  /* resumen en texto del gráfico (lectura sin ratón y sin vista) */
-  const sw = detectarSweeps(estado.velas1h, 20, 1.5).filter(e => e.i >= base);
-  const alc = sw.filter(e => e.tipo === 'bull').length, baj = sw.length - alc;
+  ctx.fillStyle = '#a78bfa';
+  ctx.fillRect(cssW - padR + 2, Y(px) - 8, padR - 6, 16);
+  estiloTexto(ctx, { px: 10, peso: 'bold', color: '#0b0e1c', align: 'left' });
+  ctx.fillText(fmtP(px, dec), cssW - padR + 6, Y(px));
+
+  geoChart.pts = { V, X, Y, padL, padR, cssW, cssH, dec };
+
+  /* --- Resumen en texto (lectura sin ratón y sin vista) --- */
+  const alc = sweeps.filter(e => e.tipo === 'bull').length, baj = sweeps.length - alc;
+  const nClimax = climax.filter(Boolean).length;
+  const volMedio = medias.length ? medias[medias.length - 1] : 0;
   $('resumenVelas').textContent =
-    `${ACTIVOS[estado.sym].corto}/USDT en velas de 1 hora: últimas ${V.length} velas entre ${mn.toFixed(2)} y ${mx.toFixed(2)}, ` +
-    `precio actual ${px.toFixed(2)}. En la ventana visible hay ${alc} barrido${alc === 1 ? '' : 's'} de mínimos y ${baj} de máximos con volumen alto ` +
-    `(posible acumulación o distribución: es una inferencia del modelo, no una orden observada).`;
+    `${ACTIVOS[estado.sym].corto}/USDT en velas de 1 hora: últimas ${V.length} velas entre ${fmtP(mn, dec)} y ${fmtP(mx, dec)}, ` +
+    `precio actual ${fmtP(px, dec)}. En la ventana visible hay ${alc} barrido${alc === 1 ? '' : 's'} de mínimos y ${baj} de máximos con volumen alto ` +
+    `(posible acumulación o distribución: es una inferencia del modelo, no una orden observada). ` +
+    `El histograma marca ${nClimax} vela${nClimax === 1 ? '' : 's'} con volumen climático, es decir al menos 1,5 veces la media de las 20 anteriores ` +
+    `(media actual ${Math.round(volMedio).toLocaleString('es-PE')}). La última barra corresponde a la vela en curso y su volumen todavía es parcial.`;
 }
 /* tooltip del gráfico */
 $('lienzoVelas').addEventListener('mousemove', e => {
@@ -1043,8 +1222,9 @@ $('lienzoVelas').addEventListener('mousemove', e => {
   const i = clamp(Math.floor((e.clientX - r.left - g.padL) / ((g.cssW - g.padL - g.padR) / g.V.length)), 0, g.V.length - 1);
   const c = g.V[i], t = $('tipVela');
   const d = new Date(c.time * 1000);
+  const dec = g.dec ?? 2;   /* mismos decimales que el eje: BTC no se lee como SOL */
   t.innerHTML = `<b>${d.getDate()}/${d.getMonth()+1} ${String(d.getHours()).padStart(2,'0')}:00</b><br>
-    O ${c.open.toFixed(2)} · H ${c.high.toFixed(2)}<br>L ${c.low.toFixed(2)} · C <b>${c.close.toFixed(2)}</b><br>Vol ${(c.volume/1000).toFixed(1)}K`;
+    O ${fmtP(c.open, dec)} · H ${fmtP(c.high, dec)}<br>L ${fmtP(c.low, dec)} · C <b>${fmtP(c.close, dec)}</b><br>Vol ${(c.volume/1000).toFixed(1)}K`;
   t.style.display = 'block';
   t.style.left = Math.min(innerWidth - 150, e.clientX + 14) + 'px';
   t.style.top = (e.clientY - 20) + 'px';
@@ -1391,6 +1571,13 @@ $('btnSonido').addEventListener('click', () => {
   document.addEventListener('visibilitychange', () => { if (!document.hidden && !RM) arrancar(); });
   addEventListener('resize', () => { medir(); if (!RM) arrancar(); });
 })();
+
+/* Space Grotesk llega por Google Fonts: el primer pintado del lienzo cae en
+   el monoespaciado de respaldo, más ancho, y descuadra el eje. Se repinta
+   una vez cuando la fuente real está lista. */
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => { if (estado.velas1h.length) pintarChart(); });
+}
 
 /* ---------- arranque ---------- */
 cargar(true);
