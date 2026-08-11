@@ -289,7 +289,7 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
       <section class="panel">
         <h2><span id="tituloChart">…</span> · 1H · Mapa de Sweeps <span class="mini">⬆ barrido de mínimos con volumen alto — posible acumulación</span></h2>
         <div class="leyenda-chart">
-          <span><i style="color:#93c5fd">━</i> EMA20</span><span><i style="color:#3b82f6">━</i> EMA50</span>
+          <span><i style="color:#38bdf8">━</i> EMA20</span><span><i style="color:#22c55e">━</i> EMA50</span>
           <span><i style="color:#f472b6">━</i> EMA200</span><span><i style="color:#e2e8f0">┄</i> VWAP</span>
           <span><i style="color:#a5b4fc">┄</i> liquidez</span>
           <span><i style="color:#facc15">▮</i> volumen climático (≥1.5× la media de 20)</span>
@@ -978,9 +978,11 @@ const C_ALZA = '#34d399', C_BAJA = '#fb7185';
 const C_EJE = '#7d86ae';        /* antes #5d6488: 3,3:1, insuficiente */
 const C_REJILLA = '#1b2138';
 const C_LIQ = '#a5b4fc';        /* índigo, el mismo que anuncia la leyenda */
-/* la EMA20 va en azul claro y no en casi-blanco: el VWAP es gris claro y a
-   simple vista se confundían */
-const EMAS = [[20, '#93c5fd', 1], [50, '#3b82f6', 1.5], [200, '#f472b6', 2]];
+/* EMA20 azul cielo, EMA50 verde, EMA200 rosa. Se le da a la EMA50 un verde
+   más puro (#22c55e) que el teal de las velas alcistas (#34d399) para que la
+   línea no se confunda con los cuerpos; al ser una curva continua y más
+   gruesa se distingue bien. */
+const EMAS = [[20, '#38bdf8', 1], [50, '#22c55e', 1.6], [200, '#f472b6', 2]];
 
 /* Un solo sitio decide cuántos decimales lleva un precio, a partir del paso
    de la rejilla: BTC no se formatea como SOL. Antes la regla estaba copiada
