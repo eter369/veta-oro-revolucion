@@ -32,11 +32,18 @@
   html,body{height:100%;overflow:hidden}
   body{
     font-family:var(--fuente);
+    /* Gradiente gris de la figura generada. NO se pinta cuando hay foto:
+       tardaba lo que tardase la imagen en descargarse y ese gris claro
+       era el "destello blanco" al entrar por el orbe. */
     background:linear-gradient(180deg,var(--gris-fondo-1) 0%,#828282 55%,var(--gris-fondo-2) 100%);
     color:var(--etiqueta);
     user-select:none;
     -webkit-user-select:none;
   }
+  /* Con foto de fondo, el body arranca en el mismo negro del velo de llegada
+     y se queda ahí hasta que la imagen esté lista: la transición del warp
+     entra en oscuro y sigue en oscuro. */
+  body.con-foto{background:#050313}
   html.cursor-oculto,
   html.cursor-oculto *{cursor:none !important}
 
@@ -557,7 +564,10 @@
   }
 </style>
 </head>
-<body>
+<!-- con-foto va en el HTML, no lo pone el JS: si esperara a que corra el
+     script, el gradiente gris claro asomaría durante esa primera pintura.
+     El JS lo sigue añadiendo por si alguien vacía el src de #foto-fondo. -->
+<body class="con-foto">
 
   <div id="escena">
     <div id="fondo">
