@@ -111,7 +111,8 @@
   /* sticker sonriente */
   #sticker{
     /* se corrió a la izquierda: en su sitio anterior pisaba la etiqueta de
-       "Lunar Oracle 369"; aquí cae sobre el agua, zona limpia del fondo */
+       "Lunar Oracle 369"; aquí cae sobre el agua, zona limpia del fondo.
+       En móvil baja más, porque la rejilla de dos columnas ocupa esa franja. */
     position:absolute;left:41%;top:74%;
     width:54px;height:54px;border:none;background:transparent;
     transform:rotate(14deg);
@@ -542,7 +543,8 @@
     #cambio .par-brl::before{content:'BRL'}
     #cambio .par-sol::before{content:'SOL'}
     #cambio b{font-size:10.5px}
-    #sticker{width:44px;height:44px;left:24%;top:62%}
+    /* hueco libre entre la columna izquierda y la derecha de la rejilla móvil */
+    #sticker{width:44px;height:44px;left:47%;top:24%}
     .ventana{
       left:50% !important;top:auto !important;bottom:86px;
       transform:translateX(-50%) scale(.94) translateY(12px);
@@ -707,7 +709,7 @@ const PROYECTOS = [
   {
     id:"terrenos", etiqueta:"Santa Catarina",
     variante:"mapa", acento:"#C9A227",
-    x:11, y:16,  xm:18, ym:13,
+    x:11, y:16,  xm:20, ym:13,
     categoria:"Terrenos · Santa Catarina", anio:"2026",
     enlacePagina:"kippuu-pro/", /* el catálogo completo, ahora como escritorio con ventanas */
     descripcion:"Catálogo de 10 terrenos en Santa Catarina, Brasil, en ventanas: ficha de cada lote con costos de cierre, simulador de soles a reales, guía legal para comprar desde Perú y preguntas frecuentes.",
@@ -727,7 +729,7 @@ const PROYECTOS = [
   {
     id:"vortex", etiqueta:"Smart Money",
     variante:"orbe", acento:"#37e6ff",
-    x:39, y:46,  xm:36, ym:52,
+    x:39, y:46,  xm:22, ym:36,
     categoria:"Oráculo · Análisis", anio:"2026",
     enlacePagina:"https://www.vortex369.app/", /* externo: se abre en pestaña nueva */
     descripcion:"El oráculo probabilístico de la casa: análisis de BTC · ETH · SOL. No predice. Sintoniza.",
@@ -737,7 +739,7 @@ const PROYECTOS = [
   {
     id:"sweep", etiqueta:"Lunar Oracle 369",
     variante:"oraculo", acento:"#a78bfa",
-    x:67, y:63,  xm:70, ym:66,
+    x:67, y:63,  xm:22, ym:58,
     categoria:"Terminal Multi-Activo · Tesla 369", anio:"2026",
     enlacePagina:"oraculo.html", /* terminal multi-activo autocontenido (en vivo, Binance spot+futures) */
     descripcion:"Terminal multi-activo BTC · ETH · SOL: señal Tesla 369, sweeps institucionales, filtros de no-operación, reloj lunar, diario de trading y alertas en vivo.",
@@ -747,7 +749,7 @@ const PROYECTOS = [
   {
     id:"prop06", etiqueta:"MIROFISH",
     variante:"pez", acento:"#e0dbc8",
-    x:84, y:52,  xm:82, ym:36,
+    x:84, y:52,  xm:72, ym:42,
     categoria:"Terminal de simulación · Tesla 369", anio:"2026",
     enlacePagina:"mirofish/", /* app React compilada: precios reales, operativa simulada */
     descripcion:"Terminal MIROFISH × Tesla 369: gráfico de TradingView y precios reales de Binance, con motor probabilístico, red de relaciones entre BTC · ETH · SOL y bitácora de paper trading. La operativa y el P&L son simulación, no dinero real.",
@@ -765,6 +767,16 @@ const PROYECTOS = [
     enlacePagina:"https://tesla369.app/", /* externo: se abre en pestaña nueva */
     descripcion:"La app del método Tesla 3·6·9 aplicado al análisis de mercado: el motor que late detrás de toda la división.",
     tags:["3 · 6 · 9","Método"],
+    enlace:"", portada:"", imagenes:[],
+  },
+  {
+    id:"biblioteca", etiqueta:"Biblioteca",
+    variante:"biblioteca", acento:"#E8C766",
+    x:47, y:70,  xm:72, ym:62,
+    categoria:"Archivo · Gnosis y hermetismo", anio:"2026",
+    enlacePagina:"biblioteca.html",
+    descripcion:"Archivo de trabajo sobre gnosticismo clásico y hermetismo: fuentes primarias, heresiología, tradiciones y estudios, con un método que separa lo que el texto dice de lo que la tradición interpreta.",
+    tags:["Gnosis","Hermetismo"],
     enlace:"", portada:"", imagenes:[],
   },
 ];
@@ -855,6 +867,35 @@ function svgMiniatura(variante, acento){
         <path d="M6 0C2.7 0 0 2.7 0 6c0 4.2 6 11 6 11s6-6.8 6-11c0-3.3-2.7-6-6-6z" fill="#fff"/>
         <circle cx="6" cy="6" r="2.4" fill="#0d1220"/>
       </g>${cierra}`;
+    case "biblioteca": return `${abre}
+      <defs>
+        <linearGradient id="bi${n}" x1="0" y1="0" x2=".35" y2="1">
+          <stop offset="0" stop-color="#1b1526"/><stop offset="1" stop-color="#0a070f"/>
+        </linearGradient>
+        <linearGradient id="bio${n}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#F3CE86"/><stop offset="1" stop-color="#A87F1E"/>
+        </linearGradient>
+        <radialGradient id="bir${n}" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stop-color="#FFF3D2"/><stop offset="1" stop-color="#E8C766" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="100" height="100" fill="url(#bi${n})"/>
+      <!-- la ogdóada: ocho radios saliendo del centro, el esquema del pleroma -->
+      <g stroke="rgba(243,206,134,.28)" stroke-width="1">
+        <path d="M50 50 L50 12M50 50 L77 23M50 50 L88 50M50 50 L77 77M50 50 L50 88M50 50 L23 77M50 50 L12 50M50 50 L23 23"/>
+      </g>
+      <circle cx="50" cy="50" r="30" fill="none" stroke="rgba(243,206,134,.35)" stroke-width="1.2"/>
+      <circle cx="50" cy="50" r="21" fill="none" stroke="rgba(243,206,134,.2)" stroke-width="1"/>
+      <!-- códice abierto: dos páginas y el lomo -->
+      <path d="M50 40 C42 34, 30 33, 24 35 v26 c6-2 18-1 26 5Z" fill="#EDE3C8"/>
+      <path d="M50 40 C58 34, 70 33, 76 35 v26 c-6-2-18-1-26 5Z" fill="#DCCFAE"/>
+      <path d="M50 40 v31" stroke="#8C7B4E" stroke-width="1.6"/>
+      <g stroke="#9A8858" stroke-width="1.5" stroke-linecap="round" opacity=".65">
+        <path d="M29 42h15M29 47h15M29 52h12"/><path d="M56 42h15M56 47h15M56 52h12"/>
+      </g>
+      <!-- la chispa: el punto de luz sobre el códice -->
+      <circle cx="50" cy="30" r="9" fill="url(#bir${n})"/>
+      <circle cx="50" cy="30" r="3.2" fill="url(#bio${n})"/>${cierra}`;
     case "ventana": return `${abre}
       <defs>
         <linearGradient id="vn${n}" x1="0" y1="0" x2=".3" y2="1">

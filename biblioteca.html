@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0a070f">
+<meta name="color-scheme" content="dark">
+<style>html{background:#0a070f}</style>
+<title>Biblioteca — Gnosis y hermetismo · KIPU</title>
+<!-- ============================================================
+     BIBLIOTECA GNÓSTICO-HERMÉTICA — página de presentación
+     PRESENTA el archivo; no lo reproduce. El archivo vive fuera de
+     este repositorio (Escritorio/gnosis), en Markdown plano, porque
+     este repo se despliega íntegro a un sitio público y el material
+     personal no debe publicarse por defecto.
+     Todo el contenido de esta página está destilado de los archivos
+     reales: README.md, TAXONOMIA.md, CONVENCIONES.md, CRONOLOGIA.md
+     y MAPA.md. No se ha añadido ninguna afirmación que no esté allí.
+     ============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --tinta:#0a070f; --tinta-2:#120d1a; --panel:#15101f;
+  --oro:#E8C766; --oro-alto:#F7E6BC; --oro-bajo:#A87F1E;
+  --texto:#E7E2D6; --texto-2:rgba(231,226,214,.62); --texto-3:rgba(231,226,214,.38);
+  --linea:rgba(232,199,102,.18); --linea-2:rgba(255,255,255,.07);
+  --serif:'EB Garamond',Georgia,serif; --sans:'Inter',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:var(--tinta); color:var(--texto);
+  font-family:var(--sans); font-weight:300; line-height:1.7;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+a{color:var(--oro); text-decoration:none}
+a:hover{color:var(--oro-alto)}
+:focus-visible{outline:2px solid var(--oro); outline-offset:3px; border-radius:3px}
+
+/* ---------- barra ---------- */
+.barra{
+  position:sticky; top:0; z-index:50; display:flex; align-items:center;
+  justify-content:space-between; gap:16px; padding:12px 22px;
+  background:rgba(10,7,15,.86); backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--linea-2);
+}
+.barra a.volver{
+  font-size:11px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--texto-2); border:1px solid var(--linea); border-radius:99px;
+  padding:6px 14px; white-space:nowrap;
+}
+.barra a.volver:hover{color:var(--oro); border-color:var(--oro)}
+.barra .sello{font-family:var(--serif); font-size:13px; letter-spacing:.26em; color:var(--texto-3); text-transform:uppercase}
+
+/* ---------- portada ---------- */
+.portada{
+  position:relative; padding:76px 22px 60px; text-align:center; overflow:hidden;
+  border-bottom:1px solid var(--linea-2);
+}
+.portada::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(60% 55% at 50% 0%, rgba(232,199,102,.10), transparent 70%);
+}
+.portada .interior{position:relative; max-width:760px; margin:0 auto}
+.ogdoada{width:88px; height:88px; margin:0 auto 26px; display:block; opacity:.9}
+h1{
+  font-family:var(--serif); font-weight:500; font-size:clamp(30px,6vw,50px);
+  line-height:1.15; letter-spacing:.01em; color:var(--oro-alto);
+}
+.portada .bajada{
+  margin-top:16px; font-size:clamp(15px,2.4vw,17px); color:var(--texto-2);
+  max-width:56ch; margin-left:auto; margin-right:auto;
+}
+/* etiqueta y cifra van en elementos propios: como texto suelto dentro de un
+   inline-flex, el "·" separador formaba caja aparte y caía solo a la segunda
+   línea. Sin él, la pastilla se parte limpia cuando no cabe en una. */
+.estado-chip{
+  display:inline-flex; align-items:baseline; flex-wrap:wrap;
+  justify-content:center; gap:4px 14px; margin-top:26px;
+  font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  border:1px solid var(--linea); border-radius:99px; padding:8px 18px;
+  color:var(--texto-2); background:rgba(232,199,102,.05);
+}
+.estado-chip i{font-style:normal; white-space:nowrap; color:var(--oro-bajo)}
+.estado-chip b{color:var(--oro); font-weight:600}
+
+/* ---------- estructura general ---------- */
+main{max-width:880px; margin:0 auto; padding:0 22px 80px}
+section{padding:54px 0; border-bottom:1px solid var(--linea-2)}
+section:last-of-type{border-bottom:none}
+.num{
+  font-family:var(--serif); font-size:12px; letter-spacing:.3em;
+  color:var(--oro-bajo); text-transform:uppercase; display:block; margin-bottom:10px;
+}
+h2{
+  font-family:var(--serif); font-weight:500; font-size:clamp(23px,4vw,31px);
+  line-height:1.25; color:var(--oro-alto); margin-bottom:14px;
+}
+h3{
+  font-family:var(--serif); font-weight:600; font-size:18px;
+  color:var(--texto); margin:30px 0 8px;
+}
+p{margin-bottom:15px; color:var(--texto-2)}
+p strong,li strong{color:var(--texto); font-weight:500}
+.entradilla{font-size:16.5px; color:var(--texto); margin-bottom:22px}
+
+/* ---------- cita destacada ---------- */
+blockquote{
+  margin:26px 0; padding:16px 22px; border-left:2px solid var(--oro-bajo);
+  background:rgba(232,199,102,.045); border-radius:0 8px 8px 0;
+  font-family:var(--serif); font-size:17.5px; font-style:italic; color:var(--texto);
+}
+
+/* ---------- las tres capas ---------- */
+.capas{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:24px 0}
+@media(max-width:720px){.capas{grid-template-columns:1fr}}
+.capa{
+  padding:16px 17px; border-radius:11px; background:var(--panel);
+  border:1px solid var(--linea-2); border-top:2px solid;
+}
+.capa.t{border-top-color:#7ec8a9}
+.capa.i{border-top-color:var(--oro)}
+.capa.e{border-top-color:#b48ad6}
+.capa .et{
+  font-family:ui-monospace,monospace; font-size:10.5px; letter-spacing:.13em;
+  font-weight:600; display:block; margin-bottom:7px;
+}
+.capa.t .et{color:#7ec8a9} .capa.i .et{color:var(--oro)} .capa.e .et{color:#b48ad6}
+.capa p{font-size:13.5px; margin:0; line-height:1.6}
+
+/* ---------- árbol de carpetas ---------- */
+.arbol{
+  font-family:ui-monospace,SFMono-Regular,monospace; font-size:12.5px; line-height:1.85;
+  background:var(--tinta-2); border:1px solid var(--linea-2); border-radius:11px;
+  padding:18px 20px; margin:22px 0; overflow-x:auto; color:var(--texto-2);
+}
+.arbol .c{color:var(--oro)}
+.arbol .g{color:var(--texto-3)}
+
+/* ---------- tablas ---------- */
+.tabla-scroll{overflow-x:auto; margin:20px 0}
+table{width:100%; border-collapse:collapse; font-size:14px; min-width:480px}
+th{
+  text-align:left; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--oro-bajo); font-weight:600; padding:9px 12px;
+  border-bottom:1px solid var(--linea);
+}
+td{padding:10px 12px; border-bottom:1px solid var(--linea-2); color:var(--texto-2); vertical-align:top}
+td:first-child{color:var(--texto); font-weight:500; white-space:nowrap}
+
+/* ---------- fichas de tradición ---------- */
+.tradiciones{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:22px 0}
+@media(max-width:720px){.tradiciones{grid-template-columns:1fr}}
+.trad{
+  padding:15px 17px; border-radius:11px; background:var(--panel);
+  border:1px solid var(--linea-2);
+}
+.trad h4{
+  font-family:var(--serif); font-size:16.5px; font-weight:600;
+  color:var(--oro-alto); margin-bottom:5px;
+}
+.trad p{font-size:13.5px; margin:0; line-height:1.6}
+
+/* ---------- esquema cosmológico ---------- */
+.aviso{
+  margin:22px 0; padding:15px 18px; border-radius:11px;
+  background:rgba(180,138,214,.09); border:1px solid rgba(180,138,214,.32);
+  font-size:14px; color:var(--texto);
+}
+.aviso b{color:#d9bff0}
+.escalera{margin:24px 0; display:flex; flex-direction:column; gap:0}
+.peldano{
+  display:grid; grid-template-columns:118px 1fr; gap:16px; align-items:start;
+  padding:11px 0; border-bottom:1px dashed var(--linea-2);
+}
+@media(max-width:600px){.peldano{grid-template-columns:1fr; gap:2px}}
+.peldano:last-child{border-bottom:none}
+.peldano .p-n{
+  font-family:var(--serif); font-size:15px; color:var(--oro); font-weight:600;
+}
+.peldano .p-d{font-size:13.5px; color:var(--texto-2); line-height:1.6}
+
+/* ---------- lista de discutidos ---------- */
+ul.limpia{list-style:none; margin:16px 0}
+ul.limpia li{
+  position:relative; padding-left:22px; margin-bottom:11px;
+  font-size:14.5px; color:var(--texto-2); line-height:1.65;
+}
+ul.limpia li::before{
+  content:"◈"; position:absolute; left:0; top:0; color:var(--oro-bajo); font-size:11px;
+}
+.marca{
+  display:inline-block; font-family:ui-monospace,monospace; font-size:10px;
+  letter-spacing:.08em; text-transform:uppercase; padding:2px 7px; border-radius:5px;
+  margin-right:7px; vertical-align:1px;
+}
+.m-cons{background:rgba(126,200,169,.15); color:#7ec8a9; border:1px solid rgba(126,200,169,.3)}
+.m-disc{background:rgba(232,199,102,.13); color:var(--oro); border:1px solid rgba(232,199,102,.3)}
+.m-trad{background:rgba(180,138,214,.13); color:#b48ad6; border:1px solid rgba(180,138,214,.3)}
+.m-verif{background:rgba(255,255,255,.06); color:var(--texto-3); border:1px solid var(--linea-2)}
+
+/* ---------- pie ---------- */
+footer{
+  border-top:1px solid var(--linea-2); padding:34px 22px 46px;
+  text-align:center; font-size:12.5px; color:var(--texto-3); line-height:1.8;
+}
+footer .ruta{font-family:ui-monospace,monospace; color:var(--texto-2)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="barra">
+  <a class="volver" href="santa-catarina">← Escritorio</a>
+  <span class="sello">Archivo</span>
+</div>
+
+<header class="portada">
+  <div class="interior">
+    <svg class="ogdoada" viewBox="0 0 100 100" aria-hidden="true">
+      <g stroke="rgba(232,199,102,.35)" stroke-width="1">
+        <path d="M50 50 L50 10M50 50 L78 22M50 50 L90 50M50 50 L78 78M50 50 L50 90M50 50 L22 78M50 50 L10 50M50 50 L22 22"/>
+      </g>
+      <circle cx="50" cy="50" r="32" fill="none" stroke="rgba(232,199,102,.45)" stroke-width="1.2"/>
+      <circle cx="50" cy="50" r="21" fill="none" stroke="rgba(232,199,102,.25)" stroke-width="1"/>
+      <circle cx="50" cy="50" r="6" fill="#E8C766"/>
+      <circle cx="50" cy="50" r="12" fill="none" stroke="rgba(247,230,188,.5)" stroke-width="1"/>
+    </svg>
+    <h1>Gnosis y hermetismo</h1>
+    <p class="bajada">
+      Un archivo de trabajo sobre el gnosticismo de los primeros siglos y la tradición
+      hermética que se le entrelaza. Su valor no crece con el número de ficheros, sino
+      con la densidad de sus conexiones internas.
+    </p>
+    <span class="estado-chip"><i>Estado actual</i><b>34 carpetas, 20 archivos, 0 materiales ingeridos</b></span>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 01 · QUÉ ES ============ -->
+<section>
+  <span class="num">01 · Qué es</span>
+  <h2>Una biblioteca de trabajo, no un proyecto</h2>
+  <p class="entradilla">
+    Carpetas y archivos de texto plano donde se depositan, ordenan y anotan materiales
+    del gnosticismo de los siglos <span style="white-space:nowrap">I–IV</span> y de la
+    tradición hermética. Su lógica es la del archivo, no la del proyecto: no tiene fecha
+    de entrega ni estado «terminado».
+  </p>
+
+  <h3>Lo que no es</h3>
+  <p>
+    <strong>No es una web</strong> ni una app: no hay build, ni servidor, ni base de datos,
+    ni plugin del que dependa. Se lee con cualquier editor de texto.
+    <strong>No es un montón de PDFs sueltos</strong>: un PDF sin procesar no está archivado,
+    está pendiente, porque lo que se archiva es la <em>lectura</em> del material —resumen,
+    metadatos, términos extraídos, conexiones—, no el fichero binario.
+    Y <strong>no es un devocionario</strong> ni un manual de práctica.
+  </p>
+
+  <h3>Los dos ejes, y su cruce</h3>
+  <p>
+    <strong>Gnosticismo clásico:</strong> los textos coptos de Nag Hammadi, las escuelas
+    setiana, valentiniana y basilidiana, el marcionismo, los mandeos —la única de estas
+    corrientes con continuidad comunitaria hasta hoy— y el maniqueísmo. Junto a ellos, los
+    testimonios heresiológicos: fuentes hostiles, pero durante siglos las únicas
+    disponibles, y aún hoy imprescindibles para reconstruir sistemas que no han llegado
+    por vía directa.
+  </p>
+  <p>
+    <strong>Hermetismo y esoterismo:</strong> el Corpus Hermeticum griego y el Asclepio
+    latino, la Tabla de Esmeralda, la alquimia, la cábala, el neoplatonismo, la teosofía
+    moderna. Y también la historia de recepción de todo ello.
+  </p>
+  <p>
+    No se tocan de vez en cuando: se cruzan constantemente. Comparten vocabulario técnico,
+    el problema del ascenso del alma a través de las esferas, el medio cultural del Egipto
+    grecorromano y, sobre todo, su historia moderna —buena parte de lo que hoy llamamos
+    «gnosticismo» y «hermetismo» se reconstruyó a la vez, con las mismas herramientas y a
+    menudo con las mismas confusiones. Que se crucen no significa que sean lo mismo:
+    sostener la distinción sin negar el contacto es tarea permanente de la biblioteca.
+  </p>
+
+  <div class="aviso">
+    <b>Una disputa que consta desde la portada.</b> La categoría misma de «gnosticismo»
+    está discutida en los estudios actuales: hay una línea consolidada que sostiene que es
+    una construcción moderna, heredera de la polémica heresiológica, que agrupa fenómenos
+    demasiado heterogéneos para un mismo nombre. Aquí el término se usa por comodidad
+    operativa y porque la bibliografía lo usa, no porque se dé el debate por resuelto.
+  </div>
+</section>
+
+<!-- ============ 02 · EL MÉTODO ============ -->
+<section>
+  <span class="num">02 · El método</span>
+  <h2>Tres capas, o por qué esto no es una carpeta de PDFs</h2>
+  <p class="entradilla">
+    La biblioteca no se distingue por lo que guarda, sino por cómo obliga a escribirlo.
+    Cada párrafo declara de antemano su estatuto. En un campo donde abundan las citas
+    apócrifas y las atribuciones cómodas, esa disciplina es lo único que separa un archivo
+    de un rumor ordenado.
+  </p>
+
+  <div class="capas">
+    <div class="capa t">
+      <span class="et">[TEXTO]</span>
+      <p>Lo que el documento dice. Descripción de lo que está escrito, sin conclusiones.</p>
+    </div>
+    <div class="capa i">
+      <span class="et">[TRADICIÓN]</span>
+      <p>Lo que la tradición o los estudiosos han interpretado. Lectura ajena, atribuida.</p>
+    </div>
+    <div class="capa e">
+      <span class="et">[ESPECULACIÓN]</span>
+      <p>Hipótesis propia, sin probar. Nada asciende de aquí sin evidencia documentada.</p>
+    </div>
+  </div>
+
+  <p>
+    Los marcadores van <strong>en línea, uno por párrafo</strong>, y no como encabezados de
+    sección. La razón es concreta: el riesgo real no es escribir un bloque interpretativo
+    creyéndolo descriptivo, sino la frase que empieza describiendo y termina interpretando
+    a mitad de camino. Marcando párrafo a párrafo, ese deslizamiento no tiene dónde
+    esconderse — y además los marcadores se pueden buscar con cualquier buscador de texto.
+  </p>
+
+  <h3>Las reglas duras</h3>
+  <ul class="limpia">
+    <li>Sin la cita exacta delante se escribe <strong>«cita por verificar»</strong>. Nunca se
+      reconstruye de memoria un versículo, un logion o la numeración de un tratado.</li>
+    <li>Sin la referencia comprobada se escribe <strong>«referencia por verificar»</strong>,
+      jamás una página o un volumen inventados.</li>
+    <li>Las atribuciones discutidas se redactan como tales: <strong>«atribuido a Hermes
+      Trismegisto»</strong> no es lo mismo que «de Hermes Trismegisto».</li>
+    <li>Cuando una traducción es polémica, se señala y se da el término copto o griego.</li>
+    <li>Las dataciones van <strong>en rango</strong>, con los extremos y quién defiende cada
+      uno. Nunca una fecha cerrada donde el consenso da un intervalo.</li>
+    <li>Lo moderno con apariencia de antiguo se marca <code>apocrifa-moderna</code>: sin
+      juicio de valor, pero sin ambigüedad.</li>
+    <li>Si dos fuentes se contradicen, <strong>no se armonizan</strong>. El conflicto se
+      registra en los archivos de ambas.</li>
+  </ul>
+</section>
+
+<!-- ============ 03 · ESTRUCTURA ============ -->
+<section>
+  <span class="num">03 · Estructura</span>
+  <h2>La numeración mide distancia a la fuente</h2>
+  <p class="entradilla">
+    Las carpetas van de <code>00</code> a <code>99</code>. El número no indica importancia:
+    indica distancia respecto al texto. Cuanto más bajo, más cerca de la fuente; cuanto más
+    alto, más cerca de la elaboración propia.
+  </p>
+
+  <div class="arbol">
+<span class="c">00-indice/</span>            <span class="g">índice maestro · taxonomía · glosario · cronología · mapa</span>
+<span class="c">01-fuentes-primarias/</span> <span class="g">nag-hammadi · corpus-hermeticum · otros-coptos-y-griegos · heresiologia</span>
+<span class="c">02-tradiciones/</span>      <span class="g">once corrientes, de los setianos a la recepción moderna</span>
+<span class="c">03-estudios/</span>         <span class="g">ediciones-y-traducciones · articulos · libros</span>
+<span class="c">04-notas/</span>            <span class="g">literarias · permanentes · fugaces</span>
+<span class="c">05-temas/</span>            <span class="g">una síntesis por concepto mayor</span>
+<span class="c">06-publicacion/</span>      <span class="g">borradores · publicado · activos</span>
+<span class="c">07-inbox/</span>            <span class="g">todo lo nuevo cae aquí antes de clasificarse</span>
+<span class="c">99-meta/</span>             <span class="g">plantillas · convenciones · registro de ingestas</span>
+  </div>
+
+  <h3>Por qué cada separación existe</h3>
+  <p>
+    <strong>La heresiología va en fuentes primarias.</strong> Ireneo o Epifanio son fuentes
+    antiguas de primera mano <em>para nosotros</em>, aunque sean testimonio hostil y de
+    segunda mano respecto de las doctrinas que describen. Tratarlos como estudios modernos
+    sería un error de categoría; tratarlos como descripción neutral, un error de método.
+  </p>
+  <p>
+    <strong>Los textos y las escuelas van aparte</strong> porque un texto no es una escuela.
+    La adscripción de un tratado concreto a una corriente concreta es casi siempre una
+    hipótesis moderna, a veces frágil y a veces disputada. Con las carpetas separadas, el
+    texto se archiva mientras su adscripción sigue en discusión, y cambiar de hipótesis no
+    obliga a mover nada.
+  </p>
+  <p>
+    <strong>Los estudios van aparte</strong> porque un estudio sobre los valentinianos no es
+    una fuente valentiniana, por bueno que sea. Y <strong>los temas son otra capa</strong>:
+    una síntesis de segundo orden que reúne y confronta lo que varias fuentes dicen sobre un
+    mismo concepto, incluidos sus desacuerdos. Es el nivel donde la biblioteca deja de
+    acumular y empieza a pensar.
+  </p>
+  <p>
+    <strong>El inbox puede estar lleno.</strong> Que tenga elementos no es un fallo: es la
+    prueba de que el sistema recibe material. Que lleve meses sin vaciarse, eso sí es una
+    señal.
+  </p>
+</section>
+
+<!-- ============ 04 · TRADICIONES ============ -->
+<section>
+  <span class="num">04 · Tradiciones</span>
+  <h2>Once corrientes, no una masa llamada «gnosticismo»</h2>
+  <p class="entradilla">
+    La biblioteca no tiene carpeta llamada «gnosticismo»: tiene once tradiciones concretas,
+    cada una con su perfil y sus fronteras discutidas.
+  </p>
+
+  <div class="tradiciones">
+    <div class="trad"><h4>Setianos</h4><p>Densa impronta bíblica y poca o ninguna cristología. El trasfondo judío es más sólido aquí que en ninguna otra corriente.</p></div>
+    <div class="trad"><h4>Valentinianos</h4><p>Se mueven en ambiente cristiano. Se dividieron en ramas oriental e itálica.</p></div>
+    <div class="trad"><h4>Basilidianos</h4><p>Los dos resúmenes heresiológicos conservados describen sistemas difícilmente compatibles: sólo puede archivarse «Basílides según Ireneo» y «Basílides según Hipólito».</p></div>
+    <div class="trad"><h4>Marcionismo</h4><p>Opone el dios extraño y bueno del evangelio al dios justo del Antiguo Testamento, pero sin pleroma de eones ni caída de la sabiduría. Su motor es exegético, no mitológico.</p></div>
+    <div class="trad"><h4>Mandeos</h4><p>Otro vocabulario y otra historia. La única de estas comunidades que ha sobrevivido de forma continuada hasta hoy.</p></div>
+    <div class="trad"><h4>Maniqueísmo</h4><p>Dos principios coeternos, luz y tiniebla: no hay error de un eón caído, sino agresión de un principio contra otro. Y es una religión con canon, iglesia y jerarquía, no una escuela de maestros.</p></div>
+    <div class="trad"><h4>Hermetismo</h4><p>En general <em>no</em> es anticósmico: en buena parte de los tratados el cosmos es bello y el ascenso es camino de conocimiento, no fuga de una cárcel.</p></div>
+    <div class="trad"><h4>Alquimia</h4><p>Comparte con ambos ejes el ambiente intelectual del Egipto romano. De la grecoegipcia pasa a la árabe y de ahí a la latina.</p></div>
+    <div class="trad"><h4>Cábala</h4><p>Su relación con el gnosticismo antiguo es tesis discutida: el problema es de mecanismo, no se ha documentado canal de transmisión entre los siglos IV y XII.</p></div>
+    <div class="trad"><h4>Neoplatonismo</h4><p>Vecindad y polémica, no descendencia. Comparten léxico y problemas platónicos, y discrepan justamente por eso.</p></div>
+    <div class="trad"><h4>Recepción moderna</h4><p>Lo que los siglos XIX–XXI hicieron con este material. Parte legítima del objeto de estudio, siempre que no se confunda con su origen.</p></div>
+  </div>
+
+  <h3>Cinco grados de fiabilidad</h3>
+  <p>
+    No miden la calidad de un texto, sino su relación con las fuentes. Una obra de
+    divulgación excelente sigue siendo divulgación.
+  </p>
+  <div class="tabla-scroll">
+    <table>
+      <thead><tr><th>Valor</th><th>Qué significa</th></tr></thead>
+      <tbody>
+        <tr><td>primaria</td><td>El texto mismo del corpus, en edición o traducción.</td></tr>
+        <tr><td>secundaria</td><td>Estudio académico sobre el material.</td></tr>
+        <tr><td>divulgacion</td><td>Difusión no especializada. Puede ser buena y seguir siendo divulgación.</td></tr>
+        <tr><td>especulativa</td><td>Interpretación sin respaldo documental establecido.</td></tr>
+        <tr><td>apocrifa-moderna</td><td>Obra moderna que se presenta como transmisión antigua. Se marca sin juicio de valor, pero sin ambigüedad.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 05 · LAS TRES FECHAS ============ -->
+<section>
+  <span class="num">05 · Cronología</span>
+  <h2>Un texto casi nunca tiene una sola fecha</h2>
+  <p class="entradilla">
+    Distinguir cuándo se escribió un texto, cuándo se copió el ejemplar que hoy tenemos y
+    cuándo se tradujo es la disciplina básica de este campo. Confundirlas es el error más
+    frecuente y más costoso.
+  </p>
+
+  <div class="tabla-scroll">
+    <table>
+      <thead><tr><th>Fecha</th><th>Qué mide</th></tr></thead>
+      <tbody>
+        <tr><td>Composición</td><td>Cuándo se escribió la obra. Casi siempre hipótesis.</td></tr>
+        <tr><td>Manuscrito</td><td>Cuándo se copió el ejemplar conservado.</td></tr>
+        <tr><td>Traducción</td><td>Cuándo se vertió a la lengua en que ha llegado. Puede ser siglos posterior.</td></tr>
+        <tr><td>Edición</td><td>Cuándo se descubrió o publicó. No dice nada sobre su antigüedad.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <blockquote>
+    Decir que un tratado de Nag Hammadi «es del siglo IV» es confundir el papiro con la
+    obra. Decir que «es del siglo II» es afirmar como cierto lo que en muchos casos es una
+    hipótesis.
+  </blockquote>
+
+  <p>
+    Los códices coptos se sitúan de forma bastante estable hacia mediados del
+    <span style="white-space:nowrap">s. IV</span>, mientras que los textos que contienen se
+    componen, según cada caso, entre los <span style="white-space:nowrap">ss. II y IV</span>.
+    Los trece códices reúnen tratados de tradiciones dispares y <strong>no forman una
+    «biblioteca gnóstica» homogénea</strong>: la fecha de copia es común, las de composición
+    no lo son.
+  </p>
+
+  <h3>Cada entrada lleva su grado de certeza</h3>
+  <p>
+    <span class="marca m-cons">consenso</span> acuerdo amplio, discrepancias marginales.<br>
+    <span class="marca m-disc">discutido</span> posiciones enfrentadas y vigentes; se dan ambas.<br>
+    <span class="marca m-trad">tradicional</span> heredado de la propia tradición, no establecido críticamente: se registra porque circula, no porque se suscriba.<br>
+    <span class="marca m-verif">por verificar</span> no puede confirmarse sin el material delante.
+  </p>
+
+  <h3>1614, el punto de inflexión</h3>
+  <p>
+    Isaac Casaubon demuestra, con argumentos de lengua y de contenido, que los tratados del
+    Corpus Hermeticum no pueden ser de una antigüedad egipcia anterior a Moisés, como
+    sostenía la lectura renacentista, sino de época imperial romana. Hoy se sitúan
+    aproximadamente entre los <span style="white-space:nowrap">ss. I y III d.C.</span>
+  </p>
+  <blockquote>
+    El hermetismo renacentista es históricamente real e influyente, pero su autoconciencia
+    cronológica era falsa. Ambos datos son verdaderos a la vez y hay que registrar los dos.
+  </blockquote>
+  <p>
+    Conviene además no confundir dos cronologías distintas: la de composición y la de
+    <strong>descubrimiento y edición</strong>. Entre el hallazgo de un corpus y su
+    disponibilidad efectiva pasan de veinte a sesenta años, y en ese intervalo circulan
+    versiones parciales y traducciones apresuradas. Los códices Brucianus y Askewianus
+    pusieron material gnóstico copto al alcance de Europa mucho antes de 1945, y los
+    relatos populares suelen olvidarlo.
+  </p>
+</section>
+
+<!-- ============ 06 · EL ESQUEMA ============ -->
+<section>
+  <span class="num">06 · El esquema</span>
+  <h2>Un promedio que no existe en ninguna fuente</h2>
+
+  <div class="aviso">
+    <b>Advertencia, antes del esquema y no después.</b> Lo que sigue es un esquema
+    <em>compuesto</em>, montado con fines de orientación: <b>ninguna escuela concreta
+    sostiene exactamente esto</b>. Se construyó tomando rasgos recurrentes de varias
+    corrientes y alineándolos en una secuencia. Las diferencias reales están precisamente
+    en los detalles que el esquema aplana. Úsese como índice de conceptos, nunca como
+    resumen doctrinal.
+  </div>
+
+  <div class="escalera">
+    <div class="peldano"><span class="p-n">Lo inefable</span><span class="p-d">Principio primero, incognoscible, sin nombre.</span></div>
+    <div class="peldano"><span class="p-n">Pleroma</span><span class="p-d">Plenitud de los eones, emanados por pares o series.</span></div>
+    <div class="peldano"><span class="p-n">El error</span><span class="p-d">Deseo, audacia o ignorancia de un eón último.</span></div>
+    <div class="peldano"><span class="p-n">Producto defectuoso</span><span class="p-d">Aborto, sombra, materia informe.</span></div>
+    <div class="peldano"><span class="p-n">Demiurgo</span><span class="p-d">Artesano del mundo; se cree único dios.</span></div>
+    <div class="peldano"><span class="p-n">Arcontes</span><span class="p-d">Potencias planetarias, guardianes de las esferas.</span></div>
+    <div class="peldano"><span class="p-n">Heimarmene</span><span class="p-d">Destino astral, ley, sujeción.</span></div>
+    <div class="peldano"><span class="p-n">El cosmos</span><span class="p-d">Región de la mezcla: mundo material, esferas, cuerpo fabricado por los arcontes.</span></div>
+    <div class="peldano"><span class="p-n">La chispa</span><span class="p-d">Pneuma o simiente de lo alto, atrapada en el cuerpo.</span></div>
+    <div class="peldano"><span class="p-n">La llamada</span><span class="p-d">Revelador o redentor que desciende atravesando las esferas.</span></div>
+    <div class="peldano"><span class="p-n">Gnosis</span><span class="p-d">Reconocimiento de la propia procedencia.</span></div>
+    <div class="peldano"><span class="p-n">El ascenso</span><span class="p-d">Paso por las esferas, contraseñas, despojo.</span></div>
+    <div class="peldano"><span class="p-n">Retorno</span><span class="p-d">Restauración y reintegración de lo disperso.</span></div>
+  </div>
+
+  <h3>Lo que el esquema aplana</h3>
+  <p>
+    Cinco contrapuntos que impiden leerlo como doctrina real: <strong>Marción</strong> no
+    despliega pleroma ni caída de la sabiduría. El <strong>maniqueísmo</strong> parte de dos
+    principios coeternos, no de un error. Los <strong>mandeos</strong> usan otro vocabulario
+    y otra historia. El <strong>hermetismo</strong> en general no es anticósmico.
+    Y de <strong>Basílides</strong> sólo tenemos versiones incompatibles entre sí.
+  </p>
+  <p>
+    Hay además una cuestión de forma: varios de estos textos son himnos, plegarias, diálogos
+    de revelación o instrucciones prácticas, no tratados sistemáticos.
+    <em>El sistema, muchas veces, lo pusieron los heresiólogos primero y los manuales
+    modernos después.</em>
+  </p>
+</section>
+
+<!-- ============ 07 · LO DISCUTIDO ============ -->
+<section>
+  <span class="num">07 · Lo discutido</span>
+  <h2>Ocho filiaciones que el mapa dibuja con línea punteada</h2>
+  <p class="entradilla">
+    El mapa de influencias distingue cuatro tipos de trazo, y la distinción es el contenido,
+    no el adorno: un diagrama de flechas iguales mentiría. Estas ocho relaciones se han
+    afirmado, no probado — y cada una arrastra su disputa a cualquier material que llegue
+    por ella.
+  </p>
+
+  <ul class="limpia">
+    <li><span class="marca m-disc">discutido</span><strong>Origen judío del gnosticismo.</strong> Ganó terreno tras Nag Hammadi, pero no es unánime y es más sólido para el setianismo que para el valentinianismo.</li>
+    <li><span class="marca m-disc">discutido</span><strong>Gnosticismo como herejía cristiana.</strong></li>
+    <li><span class="marca m-disc">abandonada</span><strong>Mito iranio del redentor.</strong> Se sostenía sobre fuentes más tardías que aquello que pretendía explicar. Se conserva como pieza de historiografía, no como explicación vigente.</li>
+    <li><span class="marca m-disc">discutido</span><strong>Mandeos y maniqueísmo temprano.</strong></li>
+    <li><span class="marca m-disc">discutido</span><strong>Préstamos mutuos entre setianos y hermetismo filosófico.</strong></li>
+    <li><span class="marca m-disc">muy discutido</span><strong>Continuidad hacia los dualismos medievales.</strong> Buena parte de la evidencia cátara procede de fuentes inquisitoriales que tenían interés activo en identificar a los acusados con herejías antiguas ya condenadas.</li>
+    <li><span class="marca m-disc">discutido</span><strong>Transmisión maniquea por Asia Menor y los Balcanes.</strong></li>
+    <li><span class="marca m-disc">discutido</span><strong>Restos gnósticos en la cábala temprana.</strong> El problema es de mecanismo: no hay canal documentado entre los siglos IV y XII, y las semejanzas pueden explicarse por un fondo común que reaparece de forma independiente.</li>
+  </ul>
+
+  <h3>Jung: interpretación, no reconstrucción</h3>
+  <p>
+    La obra junguiana sobre alquimia y textos gnósticos es una interpretación psicológica
+    del siglo XX. Leerla como si describiera lo que los alquimistas o los gnósticos creían
+    es un error de género, frecuente en la divulgación. Su influencia sobre el interés
+    moderno por estos materiales es innegable y está bien documentada; su valor como
+    historia es otra discusión.
+  </p>
+
+  <div class="capa e" style="margin-top:26px">
+    <span class="et">[ESPECULACIÓN]</span>
+    <p>
+      La biblioteca anota como sospecha propia, sin base probatoria y para poder refutarla
+      más adelante, que buena parte de las «continuidades» del mapa podrían ser reapariciones
+      independientes de un repertorio limitado de soluciones a un mismo problema —cómo
+      explicar un mundo defectuoso desde un principio perfecto— más que transmisiones reales.
+      Si el material futuro documenta canales concretos, la nota se corrige o se borra.
+    </p>
+  </div>
+</section>
+
+<!-- ============ 08 · CÓMO CRECE ============ -->
+<section>
+  <span class="num">08 · Cómo crece</span>
+  <h2>El recorrido de un material</h2>
+  <p class="entradilla">
+    Todo lo nuevo cae en <code>07-inbox/</code>, sin excepción. A partir de ahí, cada
+    material recorre el mismo camino antes de considerarse archivado.
+  </p>
+
+  <div class="escalera">
+    <div class="peldano"><span class="p-n">Leer</span><span class="p-d">Entero, antes de opinar.</span></div>
+    <div class="peldano"><span class="p-n">Fichar</span><span class="p-d">Rellenar los metadatos. Campo indeterminable → <code>desconocido</code>, nunca inventado.</span></div>
+    <div class="peldano"><span class="p-n">Resumir</span><span class="p-d">De cinco a diez líneas: qué es, de qué habla, por qué importa en el corpus.</span></div>
+    <div class="peldano"><span class="p-n">Extraer</span><span class="p-d">Los términos técnicos nuevos van al glosario con la fuente exacta donde aparecen.</span></div>
+    <div class="peldano"><span class="p-n">Colocar</span><span class="p-d">En su carpeta. Si hay duda entre dos, se elige una y se explica el criterio.</span></div>
+    <div class="peldano"><span class="p-n">Conectar</span><span class="p-d">Tres conexiones concretas con material ya archivado, anotadas en <em>ambos</em> lados.</span></div>
+    <div class="peldano"><span class="p-n">Registrar</span><span class="p-d">Índice maestro y bitácora de ingestas, con fecha.</span></div>
+  </div>
+
+  <h3>Los cuatro estados</h3>
+  <div class="tabla-scroll">
+    <table>
+      <thead><tr><th>Estado</th><th>Qué lleva encima</th></tr></thead>
+      <tbody>
+        <tr><td>crudo</td><td>Está, pero nadie lo ha leído del todo.</td></tr>
+        <tr><td>procesado</td><td>Metadatos y resumen hechos; colocado en su sitio.</td></tr>
+        <tr><td>anotado</td><td>Términos extraídos, conexiones tendidas, lectura por capas.</td></tr>
+        <tr><td>sintetizado</td><td>Su contenido ya alimenta una nota temática.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    El estado mide cuánto trabajo lleva encima un archivo, no su importancia. Y puede
+    <strong>retroceder</strong>: si se detecta un error, el archivo vuelve a un estado
+    anterior hasta resolverlo.
+  </p>
+</section>
+
+</main>
+
+<footer>
+  El archivo vive fuera de este sitio, en Markdown plano:
+  <span class="ruta">Escritorio/gnosis/</span><br>
+  Esta página lo presenta; no lo reproduce. Contenido destilado de
+  <span class="ruta">README.md</span>, <span class="ruta">TAXONOMIA.md</span>,
+  <span class="ruta">CONVENCIONES.md</span>, <span class="ruta">CRONOLOGIA.md</span> y
+  <span class="ruta">MAPA.md</span>.<br><br>
+  Ninguna entrada procede todavía de una edición consultada. No se ha datado ningún tratado
+  individual de Nag Hammadi ni del Corpus Hermeticum: es intencionado.
+</footer>
+
+</body>
+</html>
