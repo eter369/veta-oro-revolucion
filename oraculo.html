@@ -136,7 +136,7 @@ main.cambiando{animation:cambioActivo .45s ease}
 /* fallo de las velas de UN intervalo: ámbar, no rojo — el resto del terminal sigue vivo */
 .error-chart{display:flex;flex-wrap:wrap;align-items:center;gap:10px;border:1px solid rgba(250,204,21,.5);background:rgba(250,204,21,.08);color:#fde68a;border-radius:10px;padding:9px 12px;font-size:11.5px;margin-bottom:8px}
 .error-chart .btn-ref{margin-left:auto;color:#fde68a;border-color:rgba(250,204,21,.6)}
-/* a 375 px los nueve chips caben en una fila si el chip pierde el tracking y parte del relleno */
+/* a 375 px los seis chips caben en una fila si el chip pierde el tracking y parte del relleno */
 @media(max-width:700px){.tf-chip{font-size:10px;letter-spacing:0;padding:3px 5px}.tf-chips{gap:3px}.tf-estado{margin-left:0}}
 #tipVela{position:fixed;z-index:50;display:none;pointer-events:none;background:#0b0d18;border:1px solid var(--borde2);border-radius:10px;padding:8px 11px;font-family:var(--num);font-size:10.5px;line-height:1.6;color:var(--tinta2);box-shadow:0 12px 30px rgba(0,0,0,.5)}
 #tipVela b{color:var(--tinta)}
@@ -473,10 +473,7 @@ const INTERVALOS = {
   '15m': { etq:'15m', nombre:'15 minutos', lb:12, w:4, lim:200, refresh:30000,  vwapWin:96 },
   '30m': { etq:'30m', nombre:'30 minutos', lb:12, w:4, lim:200, refresh:30000,  vwapWin:48 },
   '1h':  { etq:'1H',  nombre:'1 hora',     lb:20, w:5, lim:200, refresh:60000,  vwapWin:24 },
-  '2h':  { etq:'2H',  nombre:'2 horas',    lb:20, w:5, lim:200, refresh:60000,  vwapWin:12 },
   '4h':  { etq:'4H',  nombre:'4 horas',    lb:30, w:6, lim:180, refresh:300000, vwapWin:6 },
-  '6h':  { etq:'6H',  nombre:'6 horas',    lb:30, w:6, lim:180, refresh:300000, vwapWin:4 },
-  '12h': { etq:'12H', nombre:'12 horas',   lb:40, w:7, lim:150, refresh:900000, vwapWin:2 },
   '1d':  { etq:'1D',  nombre:'1 día',      lb:40, w:7, lim:150, refresh:900000, vwapWin:0 },
   '1w':  { etq:'1W',  nombre:'1 semana',   lb:40, w:7, lim:150, refresh:900000, vwapWin:0 },
 };
