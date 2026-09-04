@@ -282,7 +282,7 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
     <nav class="tabs" id="tabs" role="tablist" aria-label="Selector de activo"></nav>
     <div class="top-der">
       <span class="chip-fg" id="chipFG">F&G …</span>
-      <span><span class="punto-vivo" id="puntoVivo"></span> <span id="estadoVivo">CARGANDO</span> · <span id="horaAct">…</span></span>
+      <span id="cajaVivo"><span class="punto-vivo" id="puntoVivo"></span> <span id="estadoVivo">CARGANDO</span> · <span id="horaAct">…</span></span>
       <button class="btn-son" id="btnSonido" aria-pressed="true" title="Sonido de alertas">🔔</button>
     </div>
   </div>
@@ -439,7 +439,7 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
 </main>
 
 <footer>
-  Datos en vivo: Binance API pública (spot + futures) y Alternative.me Fear &amp; Greed · Cálculo lunar astronómico local · Auto-refresh según el intervalo del gráfico (30 s a 15 min)<br>
+  Datos en vivo: WebSocket público de Binance (precio y vela en curso, cada segundo) sobre su API REST (spot + futures) y Alternative.me Fear &amp; Greed · Cálculo lunar astronómico local · Reconciliación completa según el intervalo del gráfico (30 s a 15 min)<br>
   Herramienta educativa de análisis probabilístico. No es asesoría financiera — la ejecución y el riesgo son tuyos.
 </footer>
 
@@ -486,6 +486,16 @@ const CALENTAMIENTO_EMA = 300;
 const refrescoDe = tf => INTERVALOS[tf].refresh;
 const textoRefresco = tf => { const ms = refrescoDe(tf); return ms <= 60000 ? `${ms / 1000} s` : `${ms / 60000} min`; };
 const UMBRALES = [0.40, 0.60, 0.80];   /* [EDITABLE] SWING / LONG-SHORT / MAX */
+/* Banda muerta al SALIR de una zona. La señal se calcula sobre la vela EN
+   CURSO y ahora se reevalúa cada segundo: sin margen, un valor parado en
+   0.600 entraría y saldría de zona sin parar, con su alerta y su pitido cada
+   vez. Entrar mantiene el umbral exacto, para no desmentir la etiqueta del
+   medidor, que sigue clasificando en 0.40 / 0.60 / 0.80; una vez dentro,
+   hay que caer 0.02 por debajo para que se anuncie la salida.               */
+const HISTERESIS = 0.02;               /* [EDITABLE] */
+/* Marcos que alimentan la matriz y las alertas. El gráfico puede estar en
+   15m o 30m; la señal siempre se lee en estos cuatro. */
+const TF_SEÑAL = ['1h', '4h', '1d', '1w'];
 
 const $ = id => document.getElementById(id);
 /* Almacenamiento local a prueba de fallos. Si el navegador lo bloquea (datos del
@@ -794,6 +804,8 @@ async function futuros(sym) {
 /* ══════════ ESTADO GLOBAL ══════════ */
 const estado = {
   sym: LS.get('lo369_sym') || 'SOLUSDT',
+  velasSeñal: {},          /* series de TF_SEÑAL, vivas: el WebSocket las va tocando */
+  restOk: false,           /* última reconciliación REST correcta */
   /* intervalo del gráfico; si lo guardado no existe en INTERVALOS, 1H */
   tf: INTERVALOS[LS.get('lo369_tf')] ? LS.get('lo369_tf') : '1h',
   velas1h: [], velas1hDe: null, tickers: {}, fg: null, fut: null,
@@ -840,31 +852,21 @@ async function cargar(primeraVez) {
       else if (vTF) adoptarVelasTF(vTF, sym, tf);
     }
 
-    const lun = faseLunar();
-    const fgV = fg ? fg.v : null;
-    estado.señal = señalTesla(v1h, lun, fgV, fut);
-    const s4 = señalTesla(v4h, lun, fgV, fut).score;
-    const s1 = señalTesla(v1d, lun, fgV, fut).score;
-    const sw = señalTesla(v1w, lun, fgV, fut).score;
-    estado.tfs = [
-      { id:'1h',    l:'1H — Táctico', s:estado.señal.score, w:0.15 },
-      { id:'4h',    l:'4H — Timing',  s:s4,                 w:0.25 },
-      { id:'1d',    l:'1D — Swing',   s:s1,                 w:0.35 },
-      { id:'1w',    l:'1W — Macro',   s:sw,                 w:0.15 },
-      { id:'lunar', l:'Lunar — Ciclo', s:señalLunar(lun),   w:0.10 },
-    ];
-    estado.mtf = multiTimeframe(estado.tfs);
-
-    calcularFiltros(v1h, lun, fgV);
+    /* Las cuatro series quedan en estado: a partir de aquí el WebSocket las
+       mantiene vivas, y el REST solo vuelve a reconciliarlas. */
+    estado.velasSeñal = { '1h': v1h, '4h': v4h, '1d': v1d, '1w': v1w };
+    /* si ya hay un tick más reciente que estas velas, se aplica antes de
+       calcular: si no, cada reconciliación daría un salto atrás visible */
+    aplicarPrecioVivo(sym);
+    calcularSeñales();
     revisarAlertas(sym);           /* el símbolo llega de la carga que lo produjo */
 
     estado.hayDatos = true;
+    estado.restOk = true;
     estado.ultimoOk = new Date();
     $('cargando').style.display = 'none';
     $('errorDatos').style.display = 'none';
     $('tablero').style.display = 'flex';
-    $('estadoVivo').textContent = 'EN VIVO';
-    $('puntoVivo').style.background = 'var(--verde)';
     $('horaAct').textContent = estado.ultimoOk.toLocaleTimeString('es-PE');
     pintarTodo();
 
@@ -881,9 +883,9 @@ async function cargar(primeraVez) {
     else setTimeout(trabajoPesado, 60);
   } catch (e) {
     if (sym !== estado.sym) return;          /* falló una carga obsoleta: se ignora */
+    estado.restOk = false;
     $('cargando').style.display = 'none';
-    $('estadoVivo').textContent = estado.hayDatos ? 'SIN CONEXIÓN' : 'SIN DATOS';
-    $('puntoVivo').style.background = 'var(--rojo)';
+    pintarEstadoVivo();
     const err = $('errorDatos');
     err.style.display = 'block';
     /* si ya había un tablero pintado NO se borra: se marca claramente como
@@ -933,6 +935,7 @@ function cambiarTF(tf) {
   pintarSelectorTF(); pintarTituloChart(); pintarHace();
   if (estado.mtf) pintarMTF();                  /* resalta la tarjeta del intervalo */
   programarRefresco();                          /* nueva cadencia, cuenta desde ahora */
+  conectarVivo();                               /* el stream sigue al intervalo */
   cargarVelasTF(estado.sym, tf);
 }
 function programarRefresco() {
@@ -980,6 +983,13 @@ function pintarTituloChart() {
 function pintarHace() {
   const el = $('haceAct'), t = estado.ultimoOkTF;
   const cad = `cada ${textoRefresco(estado.tf)}`;
+  /* con el stream abierto la vela en curso se mueve sola: contar segundos
+     desde la última petición REST sería engañoso */
+  if (vivo.abierto && !estado.errorTF && estado.velasTF.length) {
+    el.textContent = `en tiempo real · reconciliación ${cad}`;
+    el.classList.remove('viejo');
+    return;
+  }
   if (!t) { el.textContent = `sin datos aún · ${cad}`; el.classList.remove('viejo'); return; }
   const s = Math.max(0, Math.round((Date.now() - t.getTime()) / 1000));
   const hace = s < 60 ? `${s} s` : s < 3600 ? `${Math.floor(s / 60)} min` : `${Math.floor(s / 3600)} h ${Math.floor(s % 3600 / 60)} min`;
@@ -1000,9 +1010,31 @@ setInterval(pintarHace, 1000);
   });
 })();
 
+/* Señal, matriz y filtros a partir de las series que ya están en memoria.
+   La usan la reconciliación REST y cada tick del WebSocket, así que los pesos
+   y el orden de los marcos viven en un único sitio. */
+function calcularSeñales() {
+  const S = estado.velasSeñal;
+  if (!S['1h'] || !S['1h'].length) return false;
+  const lun = faseLunar();
+  const fgV = estado.fg ? estado.fg.v : null;
+  estado.señal = señalTesla(S['1h'], lun, fgV, estado.fut);
+  estado.tfs = [
+    { id:'1h',    l:'1H — Táctico',  s: estado.señal.score,                              w:0.15 },
+    { id:'4h',    l:'4H — Timing',   s: señalTesla(S['4h'], lun, fgV, estado.fut).score, w:0.25 },
+    { id:'1d',    l:'1D — Swing',    s: señalTesla(S['1d'], lun, fgV, estado.fut).score, w:0.35 },
+    { id:'1w',    l:'1W — Macro',    s: señalTesla(S['1w'], lun, fgV, estado.fut).score, w:0.15 },
+    { id:'lunar', l:'Lunar — Ciclo', s: señalLunar(lun),                                 w:0.10 },
+  ];
+  estado.mtf = multiTimeframe(estado.tfs);
+  calcularFiltros(S['1h'], lun, fgV);
+  return true;
+}
+
 /* ---------- 3 · filtros de no-operación ---------- */
 function calcularFiltros(v1h, lun, fgV) {
   const s = estado.señal;
+  estado.velas1h = v1h;                       /* el mapa de liquidez lee de aquí */
   /* la última vela 1H está EN CURSO (volumen parcial): el filtro usa la última CERRADA,
      y la compara contra el promedio de las 20 ANTERIORES (sin incluirse a sí misma,
      que subía el listón real del 70% al 68,9%) */
@@ -1020,7 +1052,13 @@ function calcularFiltros(v1h, lun, fgV) {
 }
 
 /* ---------- 2 · protocolo de alertas ---------- */
-function zonaDe(s) { const a = Math.abs(s); const z = a >= 0.80 ? 3 : a >= 0.60 ? 2 : a >= 0.40 ? 1 : 0; return z * (s >= 0 ? 1 : -1); }
+function zonaDe(s, prev = 0) {
+  const a = Math.abs(s), nivelPrev = Math.abs(prev || 0);
+  /* ya dentro del nivel, el umbral cede; para entrar se respeta intacto */
+  const u = UMBRALES.map((x, i) => nivelPrev >= i + 1 ? x - HISTERESIS : x);
+  const z = a >= u[2] ? 3 : a >= u[1] ? 2 : a >= u[0] ? 1 : 0;
+  return z * (s >= 0 ? 1 : -1);
+}
 const NOMBRE_ZONA = { 1:'SWING LONG', 2:'LONG', 3:'MAX LONG', '-1':'SWING SHORT', '-2':'SHORT', '-3':'MAX SHORT' };
 /* La señal se evalúa en los cuatro marcos que ya calcula la matriz. La zona
    previa se recuerda por activo Y por intervalo: un cruce en 4H no es un
@@ -1029,7 +1067,7 @@ const TF_ALERTA = ['1h', '4h', '1d', '1w'];
 function revisarAlertas(sym) {
   estado.tfs.filter(t => TF_ALERTA.includes(t.id)).forEach(t => {
     const s = t.s, clave = `${sym}:${t.id}`;
-    const z = zonaDe(s), prev = estado.zonaPrev[clave];
+    const prev = estado.zonaPrev[clave], z = zonaDe(s, prev);
     estado.zonaPrev[clave] = z;
     if (prev === undefined) return;                     /* primera lectura: no hay cruce */
     if (z === prev) return;                             /* sigue en la misma zona */
@@ -1126,9 +1164,172 @@ function calcularHistorial(v1h) {
     winRate: total ? (wins/total*100) : null, zonas, n: serie.length };
 }
 
+/* ══════════ TIEMPO REAL — WebSocket público de Binance ══════════
+   Sondear el REST cada segundo no era una opción: son siete peticiones por
+   pasada, Alternative.me no admite esa frecuencia y Binance acaba devolviendo
+   429 y luego 418. El vivo llega por dos streams públicos, sin clave:
+     · <sym>@ticker    cada 1000 ms — precio y variación 24 h de los tres activos
+     · <sym>@kline_X   cada 2000 ms — la vela en curso del activo seleccionado
+   El ticker es el que marca el segundo: mueve el cierre de la vela en curso y
+   con él la señal, el medidor, la matriz y las alertas. El kline aporta el
+   volumen real y el cambio de vela. El REST se queda como reconciliación
+   periódica y como única vía para Fear & Greed y futuros, que no tienen
+   stream.                                                                  */
+const WS_URL = 'wss://stream.binance.com:9443/stream?streams=';
+const TOPE_VELAS = 900;                /* una serie viva no crece sin límite */
+const vivo = { ws:null, abierto:false, intentos:0, temporizador:null, ultimoMensaje:0 };
+
+function streamsDe(sym, tf) {
+  const s = sym.toLowerCase();
+  /* el intervalo del gráfico puede ser 15m o 30m, que no están en TF_SEÑAL */
+  const klines = [...new Set([...TF_SEÑAL, tf])].map(i => `${s}@kline_${i}`);
+  return [...SIMBOLOS.map(x => x.toLowerCase() + '@ticker'), ...klines];
+}
+function cerrarVivo() {
+  clearTimeout(vivo.temporizador);
+  if (vivo.ws) {
+    const w = vivo.ws; vivo.ws = null;
+    w.onclose = null; w.onmessage = null; w.onerror = null; w.onopen = null;
+    try { w.close(); } catch {}
+  }
+  vivo.abierto = false;
+}
+function programarReconexion() {
+  clearTimeout(vivo.temporizador);
+  /* espera creciente: 1, 2, 4… hasta 30 s. Reintentar en bucle contra un
+     endpoint caído solo gasta batería. */
+  const espera = Math.min(30000, 1000 * Math.pow(2, vivo.intentos++));
+  vivo.temporizador = setTimeout(conectarVivo, espera);
+}
+function conectarVivo() {
+  cerrarVivo();
+  const sym = estado.sym, tf = estado.tf;
+  let ws;
+  try { ws = new WebSocket(WS_URL + streamsDe(sym, tf).join('/')); }
+  catch { programarReconexion(); return; }     /* WebSocket bloqueado: queda el REST */
+  vivo.ws = ws;
+  ws.onopen = () => {
+    if (vivo.ws !== ws) return;                /* llegó tarde: ya hay otra conexión */
+    vivo.abierto = true; vivo.intentos = 0; vivo.ultimoMensaje = Date.now();
+    pintarEstadoVivo(); pintarHace();
+  };
+  ws.onmessage = ev => {
+    if (vivo.ws !== ws) return;
+    let d; try { d = JSON.parse(ev.data); } catch { return; }
+    const m = d && d.data; if (!m) return;
+    vivo.ultimoMensaje = Date.now();
+    if (m.e === '24hrTicker') recibirTicker(m);
+    else if (m.e === 'kline') recibirKline(m);
+  };
+  ws.onerror = () => {};                       /* el close que viene detrás reconecta */
+  ws.onclose = () => {
+    if (vivo.ws !== ws) return;
+    vivo.abierto = false; vivo.ws = null;
+    pintarEstadoVivo(); pintarHace();
+    programarReconexion();
+  };
+}
+/* Series que el tick debe tocar. Con el gráfico en 1H, velasTF y
+   velasSeñal['1h'] son EL MISMO array: el Set evita aplicar el precio dos
+   veces sobre la misma vela. */
+function seriesVivas() {
+  const s = new Set();
+  Object.values(estado.velasSeñal).forEach(a => { if (a && a.length) s.add(a); });
+  if (estado.velasTF && estado.velasTF.length) s.add(estado.velasTF);
+  return [...s];
+}
+/* El precio del ticker se refleja en la vela EN CURSO: cierre siempre, y
+   máximo o mínimo si el tick los desborda. Es lo que hace que la señal se
+   mueva cada segundo sin volver a pedir velas. */
+function aplicarPrecioVivo(sym) {
+  if (sym !== estado.sym) return false;
+  const t = estado.tickers[sym];
+  const p = t && t.precio;
+  if (!isFinite(p) || p <= 0) return false;
+  let tocado = false;
+  seriesVivas().forEach(arr => {
+    const c = arr[arr.length - 1];
+    if (!c) return;
+    c.close = p;
+    if (p > c.high) c.high = p;
+    if (p < c.low) c.low = p;
+    tocado = true;
+  });
+  return tocado;
+}
+function recibirTicker(m) {
+  const sym = m.s;
+  if (!ACTIVOS[sym]) return;
+  estado.tickers[sym] = { precio:+m.c, chg:+m.P, alto:+m.h, bajo:+m.l, vol:+m.v };
+  pintarPreciosTabs();
+  if (sym === estado.sym && aplicarPrecioVivo(sym)) pedirRepintadoVivo();
+}
+function fundirVela(arr, v) {
+  if (!arr || !arr.length) return false;
+  const u = arr[arr.length - 1];
+  if (v.time === u.time) { arr[arr.length - 1] = v; return true; }
+  /* vela nueva: entra al final y la serie mantiene su tope */
+  if (v.time > u.time) { arr.push(v); if (arr.length > TOPE_VELAS) arr.shift(); return true; }
+  return false;                                /* mensaje atrasado: se descarta */
+}
+function recibirKline(m) {
+  if (m.s !== estado.sym) return;
+  const k = m.k, tf = k.i;
+  const v = { time: Math.floor(k.t / 1000), open:+k.o, high:+k.h, low:+k.l, close:+k.c, volume:+k.v };
+  const objetivo = new Set();
+  if (estado.velasSeñal[tf]) objetivo.add(estado.velasSeñal[tf]);
+  if (tf === estado.tf && estado.velasTF && estado.velasTF.length) objetivo.add(estado.velasTF);
+  let tocado = false;
+  objetivo.forEach(arr => { if (fundirVela(arr, v)) tocado = true; });
+  if (tocado) pedirRepintadoVivo();
+}
+/* Un recálculo como mucho cada 400 ms. El ticker llega una vez por segundo,
+   pero tres activos y varios klines pueden caer en la misma décima. */
+let vivoPendiente = false, vivoUltimo = 0;
+function pedirRepintadoVivo() {
+  if (vivoPendiente || !estado.hayDatos) return;
+  vivoPendiente = true;
+  const espera = Math.max(0, 400 - (performance.now() - vivoUltimo));
+  setTimeout(() => {
+    vivoPendiente = false; vivoUltimo = performance.now();
+    recalcularVivo();
+  }, espera);
+}
+function recalcularVivo() {
+  if (!estado.hayDatos || !calcularSeñales()) return;
+  revisarAlertas(estado.sym);
+  /* pintarTabs NO: rehace el HTML y con él los botones, y perdería el foco
+     del teclado cada segundo. Solo se reescriben los precios. */
+  pintarPreciosTabs(); pintarSemaforo(); pintarChart(); pintarGauge();
+  pintarMTF(); pintarIndicadores(); pintarLiquidez();
+  /* calcularHistorial queda fuera a propósito: son 168 pasadas del motor,
+     O(n²), y solo tiene sentido en la reconciliación. */
+  if (vivo.abierto) $('horaAct').textContent = new Date(vivo.ultimoMensaje).toLocaleTimeString('es-PE');
+}
+function pintarEstadoVivo() {
+  const p = $('puntoVivo'), e = $('estadoVivo'), caja = $('cajaVivo');
+  if (!estado.restOk) {
+    e.textContent = estado.hayDatos ? 'SIN CONEXIÓN' : 'SIN DATOS';
+    p.style.background = 'var(--rojo)';
+    caja.title = 'La API REST de Binance no responde';
+    return;
+  }
+  e.textContent = vivo.abierto ? 'TIEMPO REAL' : 'EN VIVO';
+  p.style.background = vivo.abierto ? 'var(--verde)' : 'var(--ambar)';
+  caja.title = vivo.abierto
+    ? 'Precio y vela en curso por WebSocket de Binance, cada segundo'
+    : `Sin stream en tiempo real (WebSocket caído o bloqueado): el terminal se actualiza cada ${textoRefresco(estado.tf)}`;
+}
+/* Vigía: en redes móviles el socket puede quedarse mudo sin disparar close
+   al cambiar de celda. El ticker llega cada segundo, así que 20 s de silencio
+   solo significan que esta conexión ya no sirve. */
+setInterval(() => {
+  if (vivo.abierto && Date.now() - vivo.ultimoMensaje > 20000) { vivo.intentos = 0; conectarVivo(); }
+}, 5000);
+
 /* ══════════ PINTADO ══════════ */
 function pintarTodo() {
-  pintarTabs(); pintarSemaforo();
+  pintarTabs(); pintarSemaforo(); pintarEstadoVivo();
   pintarSelectorTF(); pintarTituloChart(); pintarErrorTF(); pintarHace();
   pintarChart(); pintarGauge(); pintarMTF();
   /* pintarHistorial NO va aquí: depende de calcularHistorial, que se difiere
@@ -1158,6 +1359,16 @@ function pintarTabs() {
   }).join('');
   $('tabs').querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => cambiarActivo(b.dataset.sym)));
 }
+/* Solo el precio y la variación. pintarTabs rehace los botones enteros y no
+   puede correr cada segundo: destruiría el foco y los listeners. */
+function pintarPreciosTabs() {
+  document.querySelectorAll('#tabs .tab').forEach(b => {
+    const t = estado.tickers[b.dataset.sym];
+    const tp = b.querySelector('.tp');
+    if (!t || !tp) return;
+    tp.innerHTML = `${fmt$(t.precio)}<span class="chg ${t.chg >= 0 ? 'sube' : 'baja'}">${t.chg >= 0 ? '▲' : '▼'}${Math.abs(t.chg).toFixed(1)}%</span>`;
+  });
+}
 function cambiarActivo(sym) {
   if (sym === estado.sym) return;
   estado.sym = sym;
@@ -1165,9 +1376,12 @@ function cambiarActivo(sym) {
   const m = $('principal');
   m.classList.remove('cambiando'); void m.offsetWidth; m.classList.add('cambiando');
   $('cargando').style.display = 'block'; $('tablero').style.display = 'none';
-  estado.velasTF = [];                       /* las del activo anterior no valen */
+  /* las series del activo anterior no valen, y sobre todo NO deben recibir
+     los ticks del nuevo: se vacían antes de reconectar el stream */
+  estado.velasTF = []; estado.velasSeñal = {};
   cargar(true);
   programarRefresco();
+  conectarVivo();
 }
 
 function pintarSemaforo() {
@@ -1834,6 +2048,7 @@ if (document.fonts && document.fonts.ready) {
 /* ---------- arranque ---------- */
 cargar(true);
 programarRefresco();
+conectarVivo();
 /* el resize se agrupa: arrastrar el borde de la ventana disparaba un repintado
    completo (velas + historial) en cada píxel */
 let tempResize = null;
