@@ -77,7 +77,7 @@ header.top{position:sticky;top:0;z-index:30;background:rgba(7,8,18,.86);backdrop
    Vive DENTRO del header pegajoso: así nunca queda tapado por él, sea cual sea
    la altura que tome la cabecera al plegarse en móvil. */
 #bannerAlerta{display:none;margin:0 auto;max-width:1440px;padding:0 16px 10px}
-#bannerAlerta.on{display:block}
+#bannerAlerta.on{display:flex;flex-direction:column;gap:8px}
 #bannerAlerta .caja{display:flex;flex-wrap:wrap;align-items:center;gap:12px;border-radius:12px;padding:12px 16px;
   font-family:var(--num);font-size:13px;letter-spacing:.04em;animation:alertaLatido 1.2s ease-in-out infinite;border:1px solid}
 #bannerAlerta .caja.long{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.6);color:#a7f3d0}
@@ -122,6 +122,22 @@ main.cambiando{animation:cambioActivo .45s ease}
 @media(max-width:700px){#lienzoVelas{height:360px}}
 .leyenda-chart{display:flex;flex-wrap:wrap;gap:12px;font-family:var(--num);font-size:9.5px;color:var(--tinta3);margin-bottom:6px}
 .leyenda-chart i{font-style:normal}
+/* selector de intervalo: chips índigo, el mismo color que la liquidez */
+.barra-tf{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-bottom:8px}
+.tf-chips{display:flex;flex-wrap:wrap;gap:4px}
+.tf-chip{font-family:var(--num);font-size:10.5px;letter-spacing:.04em;color:var(--tinta3);border:1px solid var(--borde2);border-radius:8px;padding:4px 9px;transition:color .15s,border-color .15s,background .15s}
+.tf-chip:hover{color:var(--tinta);border-color:var(--liq)}
+.tf-chip.on{color:#e0e7ff;border-color:var(--liq);background:rgba(99,102,241,.2);box-shadow:0 0 10px rgba(165,180,252,.25)}
+.tf-estado{margin-left:auto;display:flex;align-items:center;gap:8px;font-family:var(--num);font-size:10px;color:var(--tinta3)}
+.tf-estado .viejo{color:var(--ambar)}
+.btn-ref{font-family:var(--num);font-size:10.5px;color:var(--tinta2);border:1px solid var(--borde2);border-radius:8px;padding:4px 10px;white-space:nowrap}
+.btn-ref:hover{color:var(--liq);border-color:var(--liq)}
+.btn-ref[aria-busy="true"]{opacity:.6;cursor:progress}
+/* fallo de las velas de UN intervalo: ámbar, no rojo — el resto del terminal sigue vivo */
+.error-chart{display:flex;flex-wrap:wrap;align-items:center;gap:10px;border:1px solid rgba(250,204,21,.5);background:rgba(250,204,21,.08);color:#fde68a;border-radius:10px;padding:9px 12px;font-size:11.5px;margin-bottom:8px}
+.error-chart .btn-ref{margin-left:auto;color:#fde68a;border-color:rgba(250,204,21,.6)}
+/* a 375 px los nueve chips caben en una fila si el chip pierde el tracking y parte del relleno */
+@media(max-width:700px){.tf-chip{font-size:10px;letter-spacing:0;padding:3px 5px}.tf-chips{gap:3px}.tf-estado{margin-left:0}}
 #tipVela{position:fixed;z-index:50;display:none;pointer-events:none;background:#0b0d18;border:1px solid var(--borde2);border-radius:10px;padding:8px 11px;font-family:var(--num);font-size:10.5px;line-height:1.6;color:var(--tinta2);box-shadow:0 12px 30px rgba(0,0,0,.5)}
 #tipVela b{color:var(--tinta)}
 
@@ -140,14 +156,21 @@ main.cambiando{animation:cambioActivo .45s ease}
 .gauge-pie{margin-top:10px;padding-top:10px;border-top:1px solid var(--borde);font-family:var(--num);font-size:10.5px;color:var(--tinta3);display:flex;justify-content:space-between;width:100%}
 
 /* ---------- multi-timeframe ---------- */
-.mtf-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-@media(max-width:900px){.mtf-grid{grid-template-columns:repeat(2,1fr)}}
+.mtf-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+@media(max-width:1100px){.mtf-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.mtf-grid{grid-template-columns:repeat(2,1fr)}}
 .mtf{background:var(--panel2);border-radius:12px;padding:10px 12px}
 .mtf .l{font-size:10px;color:var(--tinta3)}
 .mtf .v{font-family:var(--num);font-size:17px;font-weight:700}
 .mtf .barra{height:4px;background:#252b47;border-radius:99px;margin-top:6px;overflow:hidden;display:flex}
 .mtf .barra i{height:100%;border-radius:99px}
 .mtf.final{background:rgba(109,40,217,.25);border:1px solid rgba(139,92,246,.4)}
+/* tarjeta del intervalo que está en el gráfico: borde por sombra interior, sin mover el layout */
+.mtf.activa{box-shadow:inset 0 0 0 1px var(--liq),0 0 12px rgba(165,180,252,.25)}
+.mtf .eng{display:block;font-style:normal;font-size:9px;color:var(--liq);letter-spacing:.08em;margin-top:2px}
+.mtf .dir{font-size:12px}
+.aviso-div{display:flex;gap:10px;align-items:flex-start;margin-top:10px;border:1px solid rgba(250,204,21,.5);background:rgba(250,204,21,.08);color:#fde68a;border-radius:10px;padding:9px 12px;font-size:11.5px;line-height:1.45}
+.aviso-div b{color:#fef3c7;font-weight:600}
 .chip-alineado{font-family:var(--num);font-size:10.5px;padding:4px 10px;border-radius:8px}
 .chip-alineado.si{background:rgba(52,211,153,.15);color:#a7f3d0}
 .chip-alineado.no{background:rgba(251,113,133,.15);color:#fecdd3}
@@ -233,6 +256,8 @@ table.trades .cerrar:hover{color:var(--rojo);border-color:var(--rojo)}
 #tablaAlertas th{text-align:left;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta3);padding:6px 8px;border-bottom:1px solid var(--borde2)}
 #tablaAlertas td{padding:5px 8px;border-bottom:1px solid rgba(35,42,68,.6);color:var(--tinta2)}
 .sin-datos{color:var(--tinta3);font-size:12px;padding:8px 0}
+.filtro-tf{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:8px;font-family:var(--num);font-size:10px;color:var(--tinta3)}
+.filtro-tf span{margin-right:4px}
 
 footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(--tinta3);padding:6px 16px 30px;line-height:1.7;max-width:900px;margin:0 auto}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -287,15 +312,17 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
     <!-- ============ CHART + GAUGE ============ -->
     <div class="fila-2">
       <section class="panel">
-        <h2><span id="tituloChart">…</span> · 1H · Mapa de Sweeps <span class="mini">⬆ barrido de mínimos con volumen alto — posible acumulación</span></h2>
-        <div class="leyenda-chart">
-          <span><i style="color:#38bdf8">━</i> EMA20</span><span><i style="color:#22c55e">━</i> EMA50</span>
-          <span><i style="color:#f472b6">━</i> EMA200</span><span><i style="color:#e2e8f0">┄</i> VWAP</span>
-          <span><i style="color:#a5b4fc">┄</i> liquidez</span>
-          <span><i style="color:#facc15">▮</i> volumen climático (≥1.5× la media de 20)</span>
-          <span style="opacity:.6">▮ la última barra es la vela en curso</span>
+        <h2><span id="tituloChart">…</span> <span class="mini">⬆ barrido de mínimos con volumen alto — posible acumulación</span></h2>
+        <div class="barra-tf">
+          <div class="tf-chips" id="selectorTF" role="tablist" aria-label="Intervalo del gráfico"></div>
+          <div class="tf-estado">
+            <span id="haceAct" aria-live="polite">…</span>
+            <button class="btn-ref" id="btnRefrescar" type="button" title="Recargar los datos ahora">↻ Actualizar</button>
+          </div>
         </div>
-        <canvas id="lienzoVelas" role="img" aria-label="Gráfico de velas de 1 hora con medias móviles, VWAP, niveles de liquidez, marcas de sweep e histograma de volumen"></canvas>
+        <div class="leyenda-chart" id="leyendaChart"></div>
+        <div class="error-chart" id="errorTF" style="display:none" role="status"></div>
+        <canvas id="lienzoVelas" role="img" aria-label="Gráfico de velas con medias móviles, niveles de liquidez, marcas de sweep e histograma de volumen"></canvas>
         <p class="resumen-canvas" id="resumenVelas"></p>
       </section>
       <section class="panel">
@@ -319,6 +346,7 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
     <section class="panel">
       <h2>Confianza Multi-Timeframe <span class="chip-alineado" id="chipMTF" style="margin-left:auto">…</span></h2>
       <div class="mtf-grid" id="mtfGrid"></div>
+      <div class="aviso-div" id="avisoDiv" style="display:none" role="status"></div>
     </section>
 
     <!-- ============ INDICADORES / LIQUIDEZ / LUNAR ============ -->
@@ -392,9 +420,17 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
 
     <!-- ============ 2 · HISTORIAL DE ALERTAS ============ -->
     <section class="panel">
-      <h2>Historial de Alertas Tesla 369 <span class="mini">umbrales: SWING ±0.40 · LONG/SHORT ±0.60 · MAX ±0.80</span></h2>
+      <h2>Historial de Alertas Tesla 369 <span class="mini">umbrales: SWING ±0.40 · LONG/SHORT ±0.60 · MAX ±0.80 · evaluados en 1H, 4H, 1D y 1W</span></h2>
+      <div class="filtro-tf" id="filtroAlertas" role="group" aria-label="Filtrar alertas por timeframe">
+        <span>Timeframe:</span>
+        <button class="tf-chip on" type="button" data-f="todos" aria-pressed="true">Todos</button>
+        <button class="tf-chip" type="button" data-f="1h" aria-pressed="false">1H</button>
+        <button class="tf-chip" type="button" data-f="4h" aria-pressed="false">4H</button>
+        <button class="tf-chip" type="button" data-f="1d" aria-pressed="false">1D</button>
+        <button class="tf-chip" type="button" data-f="1w" aria-pressed="false">1W</button>
+      </div>
       <div class="tabla-scroll" style="margin-top:0" tabindex="0" role="region" aria-label="Historial de alertas (desplazable)"><table id="tablaAlertas">
-        <thead><tr><th scope="col">Fecha</th><th scope="col">Activo</th><th scope="col">Alerta</th><th scope="col">Señal</th><th scope="col">Precio</th></tr></thead>
+        <thead><tr><th scope="col">Fecha</th><th scope="col">Activo</th><th scope="col">TF</th><th scope="col">Alerta</th><th scope="col">Señal</th><th scope="col">Precio</th></tr></thead>
         <tbody id="cuerpoAlertas"></tbody></table></div>
       <div class="sin-datos" id="sinAlertas">Aún no se ha disparado ninguna alerta en este navegador.</div>
     </section>
@@ -403,7 +439,7 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
 </main>
 
 <footer>
-  Datos en vivo: Binance API pública (spot + futures) y Alternative.me Fear &amp; Greed · Cálculo lunar astronómico local · Auto-refresh 60 s<br>
+  Datos en vivo: Binance API pública (spot + futures) y Alternative.me Fear &amp; Greed · Cálculo lunar astronómico local · Auto-refresh según el intervalo del gráfico (30 s a 15 min)<br>
   Herramienta educativa de análisis probabilístico. No es asesoría financiera — la ejecución y el riesgo son tuyos.
 </footer>
 
@@ -424,7 +460,34 @@ const ACTIVOS = {
   SOLUSDT: { corto:'SOL', stopATR:2.5, tgtMin:5,  tgtMax:18, asigMax:15 },
 };
 const SIMBOLOS = Object.keys(ACTIVOS);
-const REFRESH_MS = 60000;              /* [EDITABLE] auto-refresh */
+/* ---------- [EDITABLE] intervalos del gráfico ----------
+   Cada intervalo lleva sus propios parámetros: el barrido y la liquidez
+   escalan con el marco temporal (un sweep de 12 velas de 15 min no es lo
+   mismo que uno de 40 velas diarias) y el refresco también, porque
+   recargar velas semanales cada minuto es tráfico sin información.
+   - lb: lookback de detectarSweeps · w: ventana de nivelesLiquidez
+   - lim: velas de análisis · refresh: cadencia del auto-refresh
+   - vwapWin: velas que forman un día. El VWAP es intradía: en 1D y 1W
+     vale 0, no se dibuja y la leyenda lo anuncia.                       */
+const INTERVALOS = {
+  '15m': { etq:'15m', nombre:'15 minutos', lb:12, w:4, lim:200, refresh:30000,  vwapWin:96 },
+  '30m': { etq:'30m', nombre:'30 minutos', lb:12, w:4, lim:200, refresh:30000,  vwapWin:48 },
+  '1h':  { etq:'1H',  nombre:'1 hora',     lb:20, w:5, lim:200, refresh:60000,  vwapWin:24 },
+  '2h':  { etq:'2H',  nombre:'2 horas',    lb:20, w:5, lim:200, refresh:60000,  vwapWin:12 },
+  '4h':  { etq:'4H',  nombre:'4 horas',    lb:30, w:6, lim:180, refresh:300000, vwapWin:6 },
+  '6h':  { etq:'6H',  nombre:'6 horas',    lb:30, w:6, lim:180, refresh:300000, vwapWin:4 },
+  '12h': { etq:'12H', nombre:'12 horas',   lb:40, w:7, lim:150, refresh:900000, vwapWin:2 },
+  '1d':  { etq:'1D',  nombre:'1 día',      lb:40, w:7, lim:150, refresh:900000, vwapWin:0 },
+  '1w':  { etq:'1W',  nombre:'1 semana',   lb:40, w:7, lim:150, refresh:900000, vwapWin:0 },
+};
+/* Velas extra que se piden SOLO para que las medias lleguen bien sembradas a
+   la ventana visible. ema() arranca en el primer cierre: con 150 velas la
+   EMA200 todavía arrastra un 22 % de ese valor inicial; con 300 más queda
+   por debajo del 1 %. Es la misma petición única, y para 1H (200+300)
+   coincide con las 500 velas que ya usa el motor de señal.               */
+const CALENTAMIENTO_EMA = 300;
+const refrescoDe = tf => INTERVALOS[tf].refresh;
+const textoRefresco = tf => { const ms = refrescoDe(tf); return ms <= 60000 ? `${ms / 1000} s` : `${ms / 60000} min`; };
 const UMBRALES = [0.40, 0.60, 0.80];   /* [EDITABLE] SWING / LONG-SHORT / MAX */
 
 const $ = id => document.getElementById(id);
@@ -585,6 +648,9 @@ function nivelesLiquidez(vel, w = 5) {
 /* ══════════ SEÑAL TESLA 369 (portada + indicador #10 futuros) ══════════ */
 /* [EDITABLE] pesos — suman 1.00. Fase Lunar rebajada de 15% a 10%
    para dar 5% al nuevo indicador de Sentimiento de Futuros.        */
+/* Lectura numérica de la fase lunar (−1..+1). La usa el indicador #7 y la
+   quinta tarjeta de la matriz multi-timeframe: una sola definición. */
+const señalLunar = lun => lun.mult >= 1 ? 0.6 : lun.mult >= 0.9 ? 0.1 : -0.5;
 function señalTesla(vel, lunar, fg, futuros) {
   const cs = vel.map(c => c.close), n = vel.length, u = n - 1;
   const rsiArr = rsi(cs, 14), rsiV = rsiArr[u];
@@ -636,7 +702,7 @@ function señalTesla(vel, lunar, fg, futuros) {
     mk('adx','ADX Direccional',0.10,adxV,adxDir,0.2,`ADX ${adxV.toFixed(1)} ${adxV>20?'tendencia válida':'sin tendencia'} · DI+ ${dip.toFixed(0)} / DI- ${dim.toFixed(0)}`),
     mk('st','SuperTrend',0.10,stV,stV,0.5,stV>0?'Estructura alcista':'Estructura bajista'),
     mk('vwap','VWAP Position',0.10,vwapPct*100,vwapN,0.2,`${(vwapPct*100).toFixed(2)}% ${vwapPct>=0?'sobre':'bajo'} VWAP`),
-    mk('lunar','Fase Lunar',0.10,lunar.mult,lunar.mult>=1?0.6:lunar.mult>=0.9?0.1:-0.5,0.3,`${lunar.nombre} ×${lunar.mult} — ${lunar.arquetipo}`),
+    mk('lunar','Fase Lunar',0.10,lunar.mult,señalLunar(lunar),0.3,`${lunar.nombre} ×${lunar.mult} — ${lunar.arquetipo}`),
     mk('fg','Fear & Greed',0.10,fg??50,fgN,0.3,fg!==null?`${fg} — lectura contrarian`:'Sin datos'),
     mk('obv','OBV Momentum',0.05,obvM,obvM,0.3,obvM>=0?'Volumen acompaña compras':'Volumen acompaña ventas'),
     mk('fut','Futuros L/S + OI',0.05,futuros?.ratio??0,futN,0.3,futDet),
@@ -668,11 +734,18 @@ function señalTesla(vel, lunar, fg, futuros) {
   return { score, rawScore, cls, acc, color, inds, confs, esLong, esShort,
            adxV, rsiV, vwapNiv, precio, multLunar: lunar.mult };
 }
-function multiTimeframe(s4, s1, sw) {
-  const final = s4*0.30 + s1*0.50 + sw*0.20;
-  const nLong = [s4,s1,sw].filter(s => s > 0.1).length;
-  const nShort = [s4,s1,sw].filter(s => s < -0.1).length;
-  return { final, alineado: nLong >= 2 || nShort >= 2, nLong, nShort };
+/* Cinco componentes con peso: 1H×0.15 + 4H×0.25 + 1D×0.35 + 1W×0.15 + Lunar×0.10.
+   "Alineado" exige que al menos 3 de los 5 miren al mismo lado (|s| > 0.1).
+   La divergencia enfrenta el marco táctico (1H) con el estructural (1D):
+   signos opuestos y ambos con |s| > 0.4 es un aviso de reducir tamaño.   */
+function multiTimeframe(tfs) {
+  const final = tfs.reduce((a, t) => a + t.s * t.w, 0);
+  const nLong = tfs.filter(t => t.s > 0.1).length;
+  const nShort = tfs.filter(t => t.s < -0.1).length;
+  const s1h = tfs.find(t => t.id === '1h')?.s ?? 0;
+  const s1d = tfs.find(t => t.id === '1d')?.s ?? 0;
+  const divergencia = Math.sign(s1h) !== Math.sign(s1d) && Math.abs(s1h) > 0.4 && Math.abs(s1d) > 0.4;
+  return { final, alineado: nLong >= 3 || nShort >= 3, nLong, nShort, divergencia, s1h, s1d };
 }
 
 /* ══════════ API BINANCE + F&G + FUTUROS ══════════ */
@@ -724,7 +797,12 @@ async function futuros(sym) {
 /* ══════════ ESTADO GLOBAL ══════════ */
 const estado = {
   sym: LS.get('lo369_sym') || 'SOLUSDT',
-  velas1h: [], tickers: {}, fg: null, fut: null,
+  /* intervalo del gráfico; si lo guardado no existe en INTERVALOS, 1H */
+  tf: INTERVALOS[LS.get('lo369_tf')] ? LS.get('lo369_tf') : '1h',
+  velas1h: [], velas1hDe: null, tickers: {}, fg: null, fut: null,
+  velasTF: [], velasTFde: { sym: null, tf: null },   /* velas del gráfico y a quién pertenecen */
+  ultimoOkTF: null, errorTF: null, reintentoTF: false,
+  filtroAlertas: 'todos',
   señal: null, mtf: null, tfs: [], filtros: [], bloqueado: false,
   histSeñal: [],           /* [{t, s}] señal vela a vela 7d */
   bt: null,                /* stats del mini backtest */
@@ -739,10 +817,16 @@ const estado = {
 async function cargar(primeraVez) {
   const sym = estado.sym;          /* símbolo al que pertenece ESTA carga (fuera del try:
                                       el catch también lo necesita para descartarse) */
+  const tf = estado.tf, cfgTF = INTERVALOS[tf];
   try {
-    const [v1h, v4h, v1d, v1w, fg, fut, ...ticks] = await Promise.all([
+    const [v1h, v4h, v1d, v1w, fg, fut, vTF, ...ticks] = await Promise.all([
       velas(sym, '1h', 500), velas(sym, '4h', 300), velas(sym, '1d', 200), velas(sym, '1w', 120),
-      fearGreed(), futuros(sym), ...SIMBOLOS.map(s => ticker(s).catch(() => null)),
+      fearGreed(), futuros(sym),
+      /* velas del intervalo del gráfico. En 1H se reutilizan las 500 del motor.
+         Si esta petición falla, NO tumba la carga entera: el gráfico avisa y
+         reintenta, y señal, matriz y alertas siguen en vivo. */
+      tf === '1h' ? Promise.resolve(null) : velas(sym, tf, cfgTF.lim + CALENTAMIENTO_EMA).catch(e => ({ fallo: e })),
+      ...SIMBOLOS.map(s => ticker(s).catch(() => null)),
     ]);
     /* CARRERA: si el usuario cambió de activo mientras esperábamos, esta respuesta
        está obsoleta. Pintarla rotularía las velas del activo viejo con el nombre
@@ -750,7 +834,14 @@ async function cargar(primeraVez) {
     if (sym !== estado.sym) return;
 
     SIMBOLOS.forEach((s, i) => { if (ticks[i]) estado.tickers[s] = ticks[i]; });
-    estado.velas1h = v1h; estado.fg = fg; estado.fut = fut;
+    estado.velas1h = v1h; estado.velas1hDe = sym; estado.fg = fg; estado.fut = fut;
+    /* si el usuario cambió de intervalo mientras esperábamos, cambiarTF ya
+       lanzó su propia carga: estas velas no le corresponden al gráfico */
+    if (tf === estado.tf) {
+      if (tf === '1h') adoptarVelasTF(v1h, sym, '1h');
+      else if (vTF && vTF.fallo) fallarVelasTF(vTF.fallo, sym, tf, 0);
+      else if (vTF) adoptarVelasTF(vTF, sym, tf);
+    }
 
     const lun = faseLunar();
     const fgV = fg ? fg.v : null;
@@ -759,9 +850,13 @@ async function cargar(primeraVez) {
     const s1 = señalTesla(v1d, lun, fgV, fut).score;
     const sw = señalTesla(v1w, lun, fgV, fut).score;
     estado.tfs = [
-      { l:'4H — Timing', s:s4, w:0.30 }, { l:'1D — Swing', s:s1, w:0.50 }, { l:'1W — Macro', s:sw, w:0.20 },
+      { id:'1h',    l:'1H — Táctico', s:estado.señal.score, w:0.15 },
+      { id:'4h',    l:'4H — Timing',  s:s4,                 w:0.25 },
+      { id:'1d',    l:'1D — Swing',   s:s1,                 w:0.35 },
+      { id:'1w',    l:'1W — Macro',   s:sw,                 w:0.15 },
+      { id:'lunar', l:'Lunar — Ciclo', s:señalLunar(lun),   w:0.10 },
     ];
-    estado.mtf = multiTimeframe(s4, s1, sw);
+    estado.mtf = multiTimeframe(estado.tfs);
 
     calcularFiltros(v1h, lun, fgV);
     revisarAlertas(sym);           /* el símbolo llega de la carga que lo produjo */
@@ -797,10 +892,116 @@ async function cargar(primeraVez) {
     /* si ya había un tablero pintado NO se borra: se marca claramente como
        congelado, para que nadie confunda datos viejos con datos en vivo */
     err.textContent = estado.hayDatos
-      ? `Sin conexión con Binance (${e.message}). Lo que ves está CONGELADO desde las ${estado.ultimoOk.toLocaleTimeString('es-PE')}. Reintentando cada 60 s…`
-      : `No se pudieron cargar datos en vivo (${e.message}). Reintentando cada 60 s…`;
+      ? `Sin conexión con Binance (${e.message}). Lo que ves está CONGELADO (desde las ${estado.ultimoOk.toLocaleTimeString('es-PE')}). Reintentando cada ${textoRefresco(estado.tf)}…`
+      : `No se pudieron cargar datos en vivo (${e.message}). Reintentando cada ${textoRefresco(estado.tf)}…`;
   }
 }
+
+/* ---------- velas del intervalo del gráfico ---------- */
+function adoptarVelasTF(v, sym, tf) {
+  estado.velasTF = v; estado.velasTFde = { sym, tf };
+  estado.ultimoOkTF = new Date(); estado.errorTF = null; estado.reintentoTF = false;
+}
+function fallarVelasTF(e, sym, tf, intento) {
+  estado.errorTF = e.message || 'sin respuesta';
+  /* velas de otro intervalo o de otro activo NO se dejan a la vista bajo un
+     título que no les corresponde: si el fallo es de un refresco del mismo
+     intervalo, se conservan y se rotulan como congeladas */
+  if (estado.velasTFde.tf !== tf || estado.velasTFde.sym !== sym) estado.velasTF = [];
+  estado.reintentoTF = intento < 1;
+  if (estado.reintentoTF) setTimeout(() => {
+    if (sym === estado.sym && tf === estado.tf && estado.errorTF) cargarVelasTF(sym, tf, intento + 1);
+  }, 4000);
+}
+/* Carga SOLO las velas del intervalo (al cambiar de chip o al reintentar):
+   no vuelve a pedir señal, futuros ni tickers. */
+async function cargarVelasTF(sym, tf, intento = 0) {
+  const cfg = INTERVALOS[tf];
+  try {
+    const v = (tf === '1h' && estado.velas1hDe === sym && estado.velas1h.length)
+      ? estado.velas1h
+      : await velas(sym, tf, cfg.lim + CALENTAMIENTO_EMA);
+    if (sym !== estado.sym || tf !== estado.tf) return;      /* respuesta obsoleta */
+    adoptarVelasTF(v, sym, tf);
+  } catch (e) {
+    if (sym !== estado.sym || tf !== estado.tf) return;
+    fallarVelasTF(e, sym, tf, intento);
+  }
+  pintarChart(); pintarErrorTF(); pintarHace();
+}
+function cambiarTF(tf) {
+  if (!INTERVALOS[tf] || tf === estado.tf) return;
+  estado.tf = tf;
+  LS.set('lo369_tf', tf);
+  pintarSelectorTF(); pintarTituloChart(); pintarHace();
+  if (estado.mtf) pintarMTF();                  /* resalta la tarjeta del intervalo */
+  programarRefresco();                          /* nueva cadencia, cuenta desde ahora */
+  cargarVelasTF(estado.sym, tf);
+}
+function programarRefresco() {
+  clearInterval(estado.timerRefresh);
+  estado.timerRefresh = setInterval(() => cargar(false), refrescoDe(estado.tf));
+}
+function pintarErrorTF() {
+  const el = $('errorTF');
+  if (!estado.errorTF) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  const cfg = INTERVALOS[estado.tf];
+  const congelado = estado.velasTF.length > 0 && estado.ultimoOkTF;
+  el.style.display = 'flex';
+  el.innerHTML = `<span>No se pudieron cargar las velas de ${cfg.etq} (${estado.errorTF}). ` +
+    (congelado
+      ? `El gráfico muestra las últimas velas buenas (congeladas desde las ${estado.ultimoOkTF.toLocaleTimeString('es-PE')}). `
+      : 'El resto del terminal sigue en vivo. ') +
+    (estado.reintentoTF ? 'Reintentando en 4 s…' : 'El reintento automático también falló.') +
+    `</span><button class="btn-ref" type="button" id="btnReintentarTF">Reintentar</button>`;
+  el.querySelector('#btnReintentarTF').addEventListener('click', () => cargarVelasTF(estado.sym, estado.tf, 1));
+}
+function pintarSelectorTF() {
+  $('selectorTF').innerHTML = Object.entries(INTERVALOS).map(([k, c]) =>
+    `<button class="tf-chip ${k === estado.tf ? 'on' : ''}" type="button" data-tf="${k}" role="tab" aria-selected="${k === estado.tf}">${c.etq}</button>`
+  ).join('');
+}
+$('selectorTF').addEventListener('click', e => { const b = e.target.closest('.tf-chip'); if (b) cambiarTF(b.dataset.tf); });
+function pintarTituloChart() {
+  const cfg = INTERVALOS[estado.tf], corto = ACTIVOS[estado.sym].corto;
+  $('tituloChart').textContent = `${corto}/USDT · ${cfg.etq} · Mapa de Sweeps`;
+  const conVwap = cfg.vwapWin > 0;
+  $('leyendaChart').innerHTML =
+    `<span><i style="color:#38bdf8">━</i> EMA20</span><span><i style="color:#22c55e">━</i> EMA50</span>` +
+    `<span><i style="color:#f472b6">━</i> EMA200</span>` +
+    (conVwap
+      ? `<span><i style="color:#e2e8f0">┄</i> VWAP (${cfg.vwapWin} velas = 1 día)</span>`
+      : `<span title="El VWAP es intradía: en diario y semanal no aplica"><i style="color:#e2e8f0">┄</i> VWAP oculto en ${cfg.etq} · guía: ribbon EMA 20/50/200</span>`) +
+    `<span><i style="color:#a5b4fc">┄</i> liquidez (ventana ${cfg.w})</span>` +
+    `<span><i style="color:#facc15">▮</i> volumen climático (≥1.5× la media de 20)</span>` +
+    `<span style="opacity:.6">▮ la última barra es la vela en curso</span>`;
+  $('lienzoVelas').setAttribute('aria-label',
+    `Gráfico de velas de ${cfg.nombre} con medias móviles${conVwap ? ', VWAP' : ''}, niveles de liquidez, marcas de sweep e histograma de volumen`);
+}
+/* "actualizado hace X" — se refiere a las velas del gráfico; ámbar cuando
+   llevan más del doble de la cadencia sin renovarse */
+function pintarHace() {
+  const el = $('haceAct'), t = estado.ultimoOkTF;
+  const cad = `cada ${textoRefresco(estado.tf)}`;
+  if (!t) { el.textContent = `sin datos aún · ${cad}`; el.classList.remove('viejo'); return; }
+  const s = Math.max(0, Math.round((Date.now() - t.getTime()) / 1000));
+  const hace = s < 60 ? `${s} s` : s < 3600 ? `${Math.floor(s / 60)} min` : `${Math.floor(s / 3600)} h ${Math.floor(s % 3600 / 60)} min`;
+  el.textContent = `actualizado hace ${hace} · ${cad}`;
+  el.classList.toggle('viejo', s * 1000 > refrescoDe(estado.tf) * 2);
+}
+setInterval(pintarHace, 1000);
+(() => {
+  let refrescando = false;
+  $('btnRefrescar').addEventListener('click', async () => {
+    if (refrescando) return;
+    refrescando = true;
+    const b = $('btnRefrescar');
+    b.setAttribute('aria-busy', 'true'); b.disabled = true;
+    programarRefresco();                       /* la cuenta vuelve a empezar desde ahora */
+    try { await cargar(false); }
+    finally { b.removeAttribute('aria-busy'); b.disabled = false; refrescando = false; }
+  });
+})();
 
 /* ---------- 3 · filtros de no-operación ---------- */
 function calcularFiltros(v1h, lun, fgV) {
@@ -824,34 +1025,43 @@ function calcularFiltros(v1h, lun, fgV) {
 /* ---------- 2 · protocolo de alertas ---------- */
 function zonaDe(s) { const a = Math.abs(s); const z = a >= 0.80 ? 3 : a >= 0.60 ? 2 : a >= 0.40 ? 1 : 0; return z * (s >= 0 ? 1 : -1); }
 const NOMBRE_ZONA = { 1:'SWING LONG', 2:'LONG', 3:'MAX LONG', '-1':'SWING SHORT', '-2':'SHORT', '-3':'MAX SHORT' };
+/* La señal se evalúa en los cuatro marcos que ya calcula la matriz. La zona
+   previa se recuerda por activo Y por intervalo: un cruce en 4H no es un
+   cruce en 1H. La tarjeta lunar no genera alertas. */
+const TF_ALERTA = ['1h', '4h', '1d', '1w'];
 function revisarAlertas(sym) {
-  const s = estado.señal.score;
-  const z = zonaDe(s), prev = estado.zonaPrev[sym];
-  estado.zonaPrev[sym] = z;
-  if (prev === undefined) return;                       /* primera lectura: no hay cruce */
-  if (z === prev) return;                               /* sigue en la misma zona */
-  /* Se avisa en TODO cruce de umbral, no solo al subir: salir de LONG hacia HOLD
-     o perder el nivel MAX es información de gestión tan accionable como entrar. */
-  if (z !== 0) dispararAlerta(sym, z, s, Math.abs(z) > Math.abs(prev) || Math.sign(z) !== Math.sign(prev));
-  else dispararAlerta(sym, 0, s, false);
+  estado.tfs.filter(t => TF_ALERTA.includes(t.id)).forEach(t => {
+    const s = t.s, clave = `${sym}:${t.id}`;
+    const z = zonaDe(s), prev = estado.zonaPrev[clave];
+    estado.zonaPrev[clave] = z;
+    if (prev === undefined) return;                     /* primera lectura: no hay cruce */
+    if (z === prev) return;                             /* sigue en la misma zona */
+    /* Se avisa en TODO cruce de umbral, no solo al subir: salir de LONG hacia HOLD
+       o perder el nivel MAX es información de gestión tan accionable como entrar. */
+    if (z !== 0) dispararAlerta(sym, t.id, z, s, Math.abs(z) > Math.abs(prev) || Math.sign(z) !== Math.sign(prev));
+    else dispararAlerta(sym, t.id, 0, s, false);
+  });
 }
-function dispararAlerta(sym, z, s, escalada) {
+function dispararAlerta(sym, tf, z, s, escalada) {
   const dir = z > 0 ? 'long' : z < 0 ? 'short' : 'neutro';
   const nombre = z === 0 ? 'SALIDA DE ZONA' : (NOMBRE_ZONA[z] || 'SEÑAL');
   const precio = estado.tickers[sym]?.precio ?? estado.señal.precio;
   const icono = z > 0 ? '🟢' : z < 0 ? '🔴' : '⚪';
-  /* banner persistente hasta confirmar */
+  const etqTF = INTERVALOS[tf]?.etq ?? tf;
+  /* banner persistente hasta confirmar. Se APILA: dos marcos pueden cruzar
+     en la misma carga y antes el segundo borraba al primero. */
   const b = $('bannerAlerta');
-  b.innerHTML = `<div class="caja ${dir}">
-    <span>${icono} ${z === 0 ? 'La señal salió de zona operativa' : 'Cruce de umbral: ' + nombre} — ${ACTIVOS[sym].corto} · señal ${s >= 0 ? '+' : ''}${s.toFixed(3)} · ${fmt$(precio)}</span>
-    <button class="ok">Confirmar</button></div>`;
+  b.insertAdjacentHTML('afterbegin', `<div class="caja ${dir}">
+    <span>${icono} ${z === 0 ? 'La señal salió de zona operativa' : 'Cruce de umbral: ' + nombre} — ${ACTIVOS[sym].corto} · ${etqTF} · señal ${s >= 0 ? '+' : ''}${s.toFixed(3)} · ${fmt$(precio)}</span>
+    <button class="ok" type="button">Confirmar</button></div>`);
   b.classList.add('on');
-  b.querySelector('.ok').addEventListener('click', () => b.classList.remove('on'));
+  const caja = b.firstElementChild;
+  caja.querySelector('.ok').addEventListener('click', () => { caja.remove(); if (!b.children.length) b.classList.remove('on'); });
   /* sonido (WebAudio, sin archivos) — solo en escaladas, no al desinflarse */
   if (estado.sonido && escalada) beep(z > 0);
   /* historial persistente */
   const h = leerLS('lo369_alertas', []);
-  h.unshift({ t: Date.now(), sym, nombre, s: +s.toFixed(3), precio });
+  h.unshift({ t: Date.now(), sym, tf, nombre, s: +s.toFixed(3), precio });
   LS.set('lo369_alertas', JSON.stringify(h.slice(0, 50)));
   pintarAlertas();
 }
@@ -921,13 +1131,14 @@ function calcularHistorial(v1h) {
 
 /* ══════════ PINTADO ══════════ */
 function pintarTodo() {
-  pintarTabs(); pintarSemaforo(); pintarChart(); pintarGauge(); pintarMTF();
+  pintarTabs(); pintarSemaforo();
+  pintarSelectorTF(); pintarTituloChart(); pintarErrorTF(); pintarHace();
+  pintarChart(); pintarGauge(); pintarMTF();
   /* pintarHistorial NO va aquí: depende de calcularHistorial, que se difiere
      a requestIdleCallback para no bloquear el repintado del gráfico */
   pintarIndicadores(); pintarLiquidez(); pintarLunar();
   pintarDiario(); pintarAlertas();
   $('chipFG').textContent = estado.fg ? `F&G ${estado.fg.v} · ${estado.fg.txt}` : 'F&G —';
-  $('tituloChart').textContent = `${ACTIVOS[estado.sym].corto}/USDT`;
   /* Prellenar el formulario del diario con el contexto vivo — pero NUNCA pisar lo
      que el usuario está escribiendo: si ya empezó a rellenar o tiene el foco
      dentro del formulario, se respeta su entrada. */
@@ -957,9 +1168,9 @@ function cambiarActivo(sym) {
   const m = $('principal');
   m.classList.remove('cambiando'); void m.offsetWidth; m.classList.add('cambiando');
   $('cargando').style.display = 'block'; $('tablero').style.display = 'none';
-  clearInterval(estado.timerRefresh);
+  estado.velasTF = [];                       /* las del activo anterior no valen */
   cargar(true);
-  estado.timerRefresh = setInterval(() => cargar(false), REFRESH_MS);
+  programarRefresco();
 }
 
 function pintarSemaforo() {
@@ -1005,6 +1216,7 @@ function estiloTexto(ctx, o) {
   ctx.textBaseline = o.base || 'middle';
 }
 
+const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 const geoChart = { pts: null };
 function pintarChart() {
   const cv = $('lienzoVelas'), ctx = cv.getContext('2d');
@@ -1031,9 +1243,10 @@ function pintarChart() {
   const padL = 8, padR = movil ? 48 : 62, padT = 10, padB = 22;
   const iw = cssW - padL - padR;
   const N = movil ? 48 : clamp(Math.round(iw / 7), 40, 120);
-  const full = estado.velas1h;
+  const tf = estado.tf, cfg = INTERVALOS[tf];
+  const full = estado.velasTF;
   const V = full.slice(-N);
-  if (!V.length) return;
+  if (!V.length) { $('resumenVelas').textContent = ''; geoChart.pts = null; return; }
   const base = Math.max(0, full.length - V.length);   /* nunca negativo */
   const nLiq = movil ? 1 : 2;
 
@@ -1061,16 +1274,24 @@ function pintarChart() {
     ctx.fillText(fmtP(p, dec), cssW - padR + 6, Y(p));
   }
 
-  /* --- Eje temporal: una marca por día, no cada 24 velas --- */
+  /* --- Eje temporal: la marca cae en el cambio de unidad natural del
+     intervalo (día en intradía, mes en diario y semanal), nunca cada N
+     velas. El espaciado mínimo evita el amontonamiento en 4H y 1W. --- */
   estiloTexto(ctx, { px: 10, color: C_EJE, align: 'center' });
-  let ultimaMarca = -999, diaPrev = null;
+  const diario = cfg.vwapWin === 0;                    /* 1D y 1W */
+  const sepMin = diario ? 52 : 40;
+  let ultimaMarca = -999, clavePrev = null;
   V.forEach((c, i) => {
-    const d = new Date(c.time * 1000), dia = d.getDate();
-    if (diaPrev !== null && dia !== diaPrev && X(i) - ultimaMarca > 40) {
-      ctx.fillText(`${dia}/${d.getMonth() + 1}`, X(i), cssH - 10);
+    const d = new Date(c.time * 1000);
+    const clave = diario ? `${d.getMonth()}-${d.getFullYear()}` : `${d.getDate()}-${d.getMonth()}`;
+    if (clavePrev !== null && clave !== clavePrev && X(i) - ultimaMarca > sepMin) {
+      const etq = diario
+        ? MESES[d.getMonth()] + (d.getMonth() === 0 || tf === '1w' ? ` '${String(d.getFullYear()).slice(-2)}` : '')
+        : `${d.getDate()}/${d.getMonth() + 1}`;
+      ctx.fillText(etq, X(i), cssH - 10);
       ultimaMarca = X(i);
     }
-    diaPrev = dia;
+    clavePrev = clave;
   });
 
   const px = V[V.length - 1].close;
@@ -1081,7 +1302,7 @@ function pintarChart() {
   ctx.beginPath(); ctx.rect(padL, padT, iw, ih); ctx.clip();
 
   /* niveles de liquidez */
-  const { hs, ls } = nivelesLiquidez(V, 5);
+  const { hs, ls } = nivelesLiquidez(V, cfg.w);
   const arriba = [...new Set(hs.filter(h => h > px))].sort((a,b) => a-b).slice(0, nLiq);
   const abajo  = [...new Set(ls.filter(l => l < px))].sort((a,b) => b-a).slice(0, nLiq);
   const niveles = [...arriba, ...abajo];
@@ -1091,9 +1312,11 @@ function pintarChart() {
   niveles.forEach(nv => { const y = snapY(Y(nv)); ctx.moveTo(padL, y); ctx.lineTo(cssW - padR, y); });
   ctx.stroke();
 
-  /* VWAP — en gris claro: el ámbar pasa a significar volumen climático */
-  if (!movil) {
-    const vw = vwapSerie(full.slice(-(V.length + 24)), 24).slice(-V.length);
+  /* VWAP — en gris claro: el ámbar pasa a significar volumen climático.
+     Es intradía: la ventana son las velas que forman un día en este
+     intervalo, y en 1D/1W (vwapWin 0) no se dibuja. */
+  if (!movil && cfg.vwapWin > 0) {
+    const vw = vwapSerie(full.slice(-(V.length + cfg.vwapWin)), cfg.vwapWin).slice(-V.length);
     ctx.strokeStyle = 'rgba(226,232,240,.8)'; ctx.lineWidth = 1.2;
     ctx.beginPath();
     vw.forEach((v, i) => i ? ctx.lineTo(X(i), Y(v)) : ctx.moveTo(X(0), Y(v)));
@@ -1179,7 +1402,7 @@ function pintarChart() {
   ctx.stroke(); ctx.setLineDash([]);
 
   /* --- Marcas de sweep --- */
-  const sweeps = detectarSweeps(full, 20, 1.5).filter(e => e.i >= base);
+  const sweeps = detectarSweeps(full, cfg.lb, 1.5).filter(e => e.i >= base);
   estiloTexto(ctx, { px: 9, peso: 'bold', color: C_ALZA, align: 'center' });
   sweeps.forEach(e => {
     const i = e.i - base, c = full[e.i];
@@ -1204,15 +1427,16 @@ function pintarChart() {
   estiloTexto(ctx, { px: 10, peso: 'bold', color: '#0b0e1c', align: 'left' });
   ctx.fillText(fmtP(px, dec), cssW - padR + 6, Y(px));
 
-  geoChart.pts = { V, X, Y, padL, padR, cssW, cssH, dec };
+  geoChart.pts = { V, X, Y, padL, padR, cssW, cssH, dec, tf };
 
   /* --- Resumen en texto (lectura sin ratón y sin vista) --- */
   const alc = sweeps.filter(e => e.tipo === 'bull').length, baj = sweeps.length - alc;
   const nClimax = climax.filter(Boolean).length;
   const volMedio = medias.length ? medias[medias.length - 1] : 0;
   $('resumenVelas').textContent =
-    `${ACTIVOS[estado.sym].corto}/USDT en velas de 1 hora: últimas ${V.length} velas entre ${fmtP(mn, dec)} y ${fmtP(mx, dec)}, ` +
-    `precio actual ${fmtP(px, dec)}. En la ventana visible hay ${alc} barrido${alc === 1 ? '' : 's'} de mínimos y ${baj} de máximos con volumen alto ` +
+    `${ACTIVOS[estado.sym].corto}/USDT en velas de ${cfg.nombre}: últimas ${V.length} velas entre ${fmtP(mn, dec)} y ${fmtP(mx, dec)}, ` +
+    `precio actual ${fmtP(px, dec)}. En la ventana visible hay ${alc} barrido${alc === 1 ? '' : 's'} de mínimos y ${baj} de máximos con volumen alto, ` +
+    `mirando ${cfg.lb} velas atrás ` +
     `(posible acumulación o distribución: es una inferencia del modelo, no una orden observada). ` +
     `El histograma marca ${nClimax} vela${nClimax === 1 ? '' : 's'} con volumen climático, es decir al menos 1,5 veces la media de las 20 anteriores ` +
     `(media actual ${Math.round(volMedio).toLocaleString('es-PE')}). La última barra corresponde a la vela en curso y su volumen todavía es parcial.`;
@@ -1225,7 +1449,10 @@ $('lienzoVelas').addEventListener('mousemove', e => {
   const c = g.V[i], t = $('tipVela');
   const d = new Date(c.time * 1000);
   const dec = g.dec ?? 2;   /* mismos decimales que el eje: BTC no se lee como SOL */
-  t.innerHTML = `<b>${d.getDate()}/${d.getMonth()+1} ${String(d.getHours()).padStart(2,'0')}:00</b><br>
+  const cuando = INTERVALOS[g.tf]?.vwapWin === 0
+    ? `${d.getDate()}/${d.getMonth()+1}/${String(d.getFullYear()).slice(-2)}`
+    : `${d.getDate()}/${d.getMonth()+1} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  t.innerHTML = `<b>${cuando}</b><br>
     O ${fmtP(c.open, dec)} · H ${fmtP(c.high, dec)}<br>L ${fmtP(c.low, dec)} · C <b>${fmtP(c.close, dec)}</b><br>Vol ${(c.volume/1000).toFixed(1)}K`;
   t.style.display = 'block';
   t.style.left = Math.min(innerWidth - 150, e.clientX + 14) + 'px';
@@ -1273,8 +1500,8 @@ function pintarGauge() {
   $('gBloqueo').classList.toggle('on', bloq);
   /* confirmaciones (3 propias + alineación MTF) */
   const dirLong = estado.señal.score >= 0;
-  const alineadoDir = dirLong ? estado.mtf.nLong >= 2 : estado.mtf.nShort >= 2;
-  const confs = [...s.confs, { l:'≥2/3 timeframes alineados', ok: alineadoDir }];
+  const alineadoDir = dirLong ? estado.mtf.nLong >= 3 : estado.mtf.nShort >= 3;
+  const confs = [...s.confs, { l:'≥3/5 timeframes alineados', ok: alineadoDir }];
   $('gConfs').innerHTML = confs.map(c =>
     `<div class="${c.ok ? 'c-ok' : 'c-no'}">${c.ok ? '✓' : '○'} ${c.l}</div>`).join('');
   $('gRaw').textContent = `score técnico ${s.rawScore >= 0 ? '+' : ''}${s.rawScore.toFixed(3)}`;
@@ -1282,24 +1509,35 @@ function pintarGauge() {
 }
 
 function pintarMTF() {
-  const m = estado.mtf;
+  const m = estado.mtf; if (!m) return;
   /* el chip mira la MISMA dirección que el medidor: antes podía decir "alineado"
      con 2 timeframes largos mientras la señal de 1H era corta */
   const dirLong = estado.señal.score >= 0;
-  const alineadoDir = dirLong ? m.nLong >= 2 : m.nShort >= 2;
+  const n = dirLong ? m.nLong : m.nShort;
+  const alineadoDir = n >= 3;
   $('chipMTF').className = 'chip-alineado ' + (alineadoDir ? 'si' : 'no');
   $('chipMTF').textContent = alineadoDir
-    ? `✓ ≥2 de 3 timeframes acompañan al ${dirLong ? 'lado largo' : 'lado corto'}`
-    : '✗ los timeframes no acompañan a la señal de 1H';
+    ? `✓ ${n} de 5 acompañan al ${dirLong ? 'lado largo' : 'lado corto'} (mín. 3)`
+    : `✗ solo ${n} de 5 acompañan a la señal de 1H (mín. 3)`;
   $('mtfGrid').innerHTML = estado.tfs.map(tf => {
     const col = tf.s > 0.1 ? '#34d399' : tf.s < -0.1 ? '#fb7185' : '#facc15';
-    return `<div class="mtf"><div class="l">${tf.l} <span style="color:var(--tinta3)">(w ${tf.w})</span></div>
-      <div class="v" style="color:${col}">${tf.s >= 0 ? '+' : ''}${tf.s.toFixed(2)}</div>
+    const flecha = tf.s > 0.1 ? '▲' : tf.s < -0.1 ? '▼' : '●';
+    const activa = tf.id === estado.tf;          /* la tarjeta del intervalo del gráfico */
+    return `<div class="mtf ${activa ? 'activa' : ''}" data-tf="${tf.id}">
+      <div class="l">${tf.l} <span style="color:var(--tinta3)">(w ${tf.w.toFixed(2)})</span>${activa ? '<em class="eng">◀ intervalo del gráfico</em>' : ''}</div>
+      <div class="v" style="color:${col}"><span class="dir" aria-hidden="true">${flecha}</span> ${tf.s >= 0 ? '+' : ''}${tf.s.toFixed(2)}</div>
       <div class="barra"><i style="width:${Math.abs(tf.s)*100}%;background:${col};margin-left:${tf.s < 0 ? 'auto' : 0}"></i></div></div>`;
   }).join('') + `
     <div class="mtf final"><div class="l" style="color:#c4b5fd">CONFIANZA FINAL</div>
       <div class="v" style="color:${m.final >= 0 ? '#34d399' : '#fb7185'}">${m.final >= 0 ? '+' : ''}${m.final.toFixed(3)}</div>
-      <div class="l" style="margin-top:4px">4H×0.3 + 1D×0.5 + 1W×0.2</div></div>`;
+      <div class="l" style="margin-top:4px">1H×.15 + 4H×.25 + 1D×.35 + 1W×.15 + Lunar×.10</div></div>`;
+  const av = $('avisoDiv');
+  if (m.divergencia) {
+    av.style.display = 'flex';
+    av.innerHTML = `<span aria-hidden="true">⚠</span><span><b>Divergencia táctica vs. estructural — reducir tamaño.</b> ` +
+      `1H marca ${m.s1h >= 0 ? '+' : ''}${m.s1h.toFixed(2)} y 1D marca ${m.s1d >= 0 ? '+' : ''}${m.s1d.toFixed(2)}: ` +
+      `el corto plazo empuja contra la estructura diaria. Escala del modelo, no una orden.</span>`;
+  } else { av.style.display = 'none'; av.innerHTML = ''; }
 }
 
 function pintarIndicadores() {
@@ -1519,16 +1757,31 @@ function pintarDiario() {
 
 /* ---------- historial de alertas ---------- */
 function pintarAlertas() {
-  const h = leerLS('lo369_alertas', []);
+  const todas = leerLS('lo369_alertas', []);
+  const f = estado.filtroAlertas;
+  /* las alertas guardadas antes de esta versión no llevan tf: todas eran de 1H */
+  const h = f === 'todos' ? todas : todas.filter(a => (a.tf || '1h') === f);
   $('sinAlertas').style.display = h.length ? 'none' : 'block';
+  $('sinAlertas').textContent = todas.length
+    ? `Ninguna alerta en ${INTERVALOS[f]?.etq ?? f} en este navegador (hay ${todas.length} en otros marcos).`
+    : 'Aún no se ha disparado ninguna alerta en este navegador.';
   $('cuerpoAlertas').innerHTML = h.map(a => {
     const d = new Date(a.t);
     const col = a.nombre.includes('SHORT') ? '#fb7185' : '#34d399';
     return `<tr><td>${d.getDate()}/${d.getMonth()+1} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</td>
-      <td>${ACTIVOS[a.sym]?.corto ?? a.sym}</td><td style="color:${col}">${a.nombre}</td>
+      <td>${ACTIVOS[a.sym]?.corto ?? a.sym}</td><td>${INTERVALOS[a.tf || '1h']?.etq ?? a.tf}</td><td style="color:${col}">${a.nombre}</td>
       <td>${a.s >= 0 ? '+' : ''}${a.s}</td><td>${fmt$(a.precio)}</td></tr>`;
   }).join('');
+  $('filtroAlertas').querySelectorAll('.tf-chip').forEach(c => {
+    const on = c.dataset.f === f;
+    c.classList.toggle('on', on); c.setAttribute('aria-pressed', on);
+  });
 }
+$('filtroAlertas').addEventListener('click', e => {
+  const b = e.target.closest('.tf-chip'); if (!b) return;
+  estado.filtroAlertas = b.dataset.f;
+  pintarAlertas();
+});
 /* toggle de sonido */
 $('btnSonido').setAttribute('aria-pressed', estado.sonido);
 $('btnSonido').textContent = estado.sonido ? '🔔' : '🔕';
@@ -1578,18 +1831,18 @@ $('btnSonido').addEventListener('click', () => {
    el monoespaciado de respaldo, más ancho, y descuadra el eje. Se repinta
    una vez cuando la fuente real está lista. */
 if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(() => { if (estado.velas1h.length) pintarChart(); });
+  document.fonts.ready.then(() => { if (estado.velasTF.length) pintarChart(); });
 }
 
 /* ---------- arranque ---------- */
 cargar(true);
-estado.timerRefresh = setInterval(() => cargar(false), REFRESH_MS);
+programarRefresco();
 /* el resize se agrupa: arrastrar el borde de la ventana disparaba un repintado
    completo (velas + historial) en cada píxel */
 let tempResize = null;
 addEventListener('resize', () => {
   clearTimeout(tempResize);
-  tempResize = setTimeout(() => { if (estado.velas1h.length){ pintarChart(); pintarHistorial(); } }, 160);
+  tempResize = setTimeout(() => { if (estado.velasTF.length) pintarChart(); if (estado.histSeñal.length) pintarHistorial(); }, 160);
 });
 </script>
 </body>
