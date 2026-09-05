@@ -1,0 +1,1505 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LUNAR ORACLE 369 — Gráfico</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#070812">
+<meta name="color-scheme" content="dark">
+<style>html{background:#070812}</style>
+<meta name="description" content="Vista de gráfico a pantalla completa del terminal Lunar Oracle 369. Herramienta educativa.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════════════
+   LUNAR ORACLE 369 — GRÁFICO
+   Vista de análisis a pantalla completa. Se abre en su propia
+   pestaña desde el terminal (oraculo.html) y se maneja con ratón,
+   teclado y gestos, como un programa y no como un panel.
+
+   SOBRE LA COPIA DEL MOTOR
+   El bloque marcado "MOTOR 369 · copia sincronizada" más abajo es
+   una copia literal de oraculo.html, líneas 568 a 792. No se
+   extrae a un fichero compartido a propósito: los dos archivos
+   tienen que seguir siendo autocontenidos y descargables de una
+   pieza, y un <script src> los rompería al abrirlos desde
+   file://. El precio de esa decisión es que hay que sincronizar a
+   mano; los marcadores existen para poder compararlos con diff:
+     diff <(sed -n '568,792p' oraculo.html) \
+          <(sed -n '/INICIO MOTOR 369/,/FIN MOTOR 369/p' grafico.html)
+   ══════════════════════════════════════════════════════════════ */
+:root{
+  --fondo:#070812; --panel:#0b0e1c; --panel2:#101427; --borde:#232a44; --borde2:#38416b;
+  --tinta:#e7eaf6; --tinta2:#8b93b8; --tinta3:#7d86ae;
+  --violeta:#a78bfa; --verde:#34d399; --rojo:#fb7185; --ambar:#facc15; --liq:#a5b4fc;
+  --num:'Space Grotesk',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+  --barra:46px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{background:var(--fondo);color:var(--tinta);font-family:var(--sans);font-weight:300;
+  -webkit-font-smoothing:antialiased;overscroll-behavior:none}
+button{font:inherit;background:none;border:0;cursor:pointer;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--violeta);outline-offset:2px;border-radius:6px}
+
+/* ---------- barra superior ---------- */
+.barra{height:var(--barra);display:flex;align-items:center;gap:10px;padding:0 10px;
+  background:rgba(7,8,18,.92);border-bottom:1px solid var(--borde);position:relative;z-index:5;
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.barra::-webkit-scrollbar{display:none}
+.marca{display:flex;align-items:center;gap:7px;flex:none}
+.marca .g{font-size:17px;filter:drop-shadow(0 0 7px rgba(167,139,250,.7))}
+.marca b{font-family:var(--num);font-size:11px;font-weight:700;letter-spacing:.13em;
+  background:linear-gradient(90deg,#c4b5fd,#818cf8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.volver{font-family:var(--num);font-size:9.5px;color:var(--tinta3);text-decoration:none;
+  border:1px solid var(--borde);border-radius:99px;padding:3px 9px;white-space:nowrap;flex:none}
+.volver:hover{color:var(--violeta);border-color:var(--violeta)}
+.sep{width:1px;height:20px;background:var(--borde);flex:none}
+.grupo{display:flex;gap:3px;flex:none}
+.chip{font-family:var(--num);font-size:10.5px;color:var(--tinta3);border:1px solid var(--borde2);
+  border-radius:7px;padding:3px 8px;white-space:nowrap;transition:color .12s,border-color .12s,background .12s}
+.chip:hover{color:var(--tinta);border-color:var(--liq)}
+.chip.on{color:#e0e7ff;border-color:var(--liq);background:rgba(99,102,241,.2)}
+.chip.act{color:#fff;border-color:var(--violeta);background:linear-gradient(135deg,rgba(124,58,237,.55),rgba(99,102,241,.35))}
+.precio-vivo{font-family:var(--num);font-size:12px;font-weight:600;flex:none;min-width:96px}
+.precio-vivo .pc{font-size:10px;margin-left:5px}
+.sube{color:var(--verde)} .baja{color:var(--rojo)}
+.estado-vivo{display:flex;align-items:center;gap:5px;font-family:var(--num);font-size:9.5px;
+  color:var(--tinta3);margin-left:auto;flex:none;white-space:nowrap}
+.punto{width:6px;height:6px;border-radius:50%;background:var(--verde);animation:lat 1.6s ease-in-out infinite}
+@keyframes lat{0%,100%{opacity:1}50%{opacity:.3}}
+.icono{border:1px solid var(--borde2);border-radius:7px;padding:3px 8px;font-size:12px;color:var(--tinta3);flex:none}
+.icono:hover{color:var(--violeta);border-color:var(--violeta)}
+.icono.on{color:#ddd6fe;border-color:var(--violeta);background:rgba(124,58,237,.2)}
+
+/* ---------- escenario ---------- */
+.escena{position:relative;height:calc(100% - var(--barra));touch-action:none}
+#lienzo{display:block;width:100%;height:100%;cursor:crosshair}
+.escena.arrastrando #lienzo{cursor:grabbing}
+.escena.midiendo #lienzo{cursor:cell}
+
+/* la caja OHLCV va fija arriba a la izquierda: pegada al cursor tapa justo la
+   vela que se está mirando */
+.lectura{position:absolute;top:8px;left:10px;pointer-events:none;font-family:var(--num);
+  font-size:10.5px;line-height:1.65;color:var(--tinta2);text-shadow:0 1px 3px rgba(0,0,0,.9)}
+.lectura b{color:var(--tinta)}
+.lectura .t{color:var(--violeta);font-weight:600}
+
+.aviso{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;z-index:4;
+  font-family:var(--num);font-size:10.5px;color:#ddd6fe;background:rgba(11,13,24,.94);
+  border:1px solid rgba(167,139,250,.5);border-radius:99px;padding:6px 14px;
+  box-shadow:0 8px 22px rgba(0,0,0,.55);white-space:nowrap}
+.aviso[hidden]{display:none}
+.aviso:hover{background:rgba(124,58,237,.3)}
+
+.cargando{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--num);
+  font-size:12px;color:var(--tinta3);background:var(--fondo);z-index:6;text-align:center;padding:20px}
+.cargando.oculto{display:none}
+.error{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:6;max-width:min(620px,calc(100% - 24px));
+  border:1px solid rgba(250,204,21,.5);background:rgba(20,16,4,.95);color:#fde68a;border-radius:10px;
+  padding:9px 14px;font-size:11.5px;line-height:1.5}
+.error[hidden]{display:none}
+
+/* ---------- panel de capas ---------- */
+.capas{position:absolute;top:8px;right:8px;z-index:4;background:rgba(11,14,28,.95);
+  border:1px solid var(--borde);border-radius:11px;padding:9px 11px;width:212px;
+  box-shadow:0 14px 34px rgba(0,0,0,.6);font-size:11px}
+.capas[hidden]{display:none}
+.capas h3{font-family:var(--num);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--tinta3);margin-bottom:7px;font-weight:600}
+.capas label{display:flex;align-items:center;gap:7px;padding:3px 0;color:var(--tinta2);cursor:pointer}
+.capas label:hover{color:var(--tinta)}
+.capas input{accent-color:var(--violeta);width:13px;height:13px;flex:none}
+.capas .muestra{width:14px;height:2px;border-radius:2px;flex:none}
+.capas label.no{opacity:.42;cursor:not-allowed}
+.capas .nota{font-size:9.5px;color:var(--tinta3);line-height:1.5;margin-top:7px;
+  border-top:1px solid var(--borde);padding-top:7px}
+.capas select{width:100%;font:inherit;font-size:10.5px;font-family:var(--num);color:var(--tinta);
+  background:var(--panel2);border:1px solid var(--borde2);border-radius:7px;padding:4px 6px;margin-top:4px}
+
+/* ---------- ayuda de atajos ---------- */
+.ayuda-atajos{position:absolute;inset:0;z-index:8;background:rgba(4,5,12,.9);display:grid;place-items:center;padding:18px}
+.ayuda-atajos[hidden]{display:none}
+.ayuda-atajos .caja{background:var(--panel);border:1px solid var(--borde2);border-radius:14px;
+  padding:18px 22px;max-width:520px;width:100%;max-height:100%;overflow:auto}
+.ayuda-atajos h2{font-family:var(--num);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--violeta);margin-bottom:12px}
+.ayuda-atajos dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:12px;align-items:baseline}
+.ayuda-atajos dt{font-family:var(--num);font-size:10.5px;color:#ddd6fe;white-space:nowrap}
+.ayuda-atajos dd{color:var(--tinta2)}
+.ayuda-atajos .pie{margin-top:14px;padding-top:12px;border-top:1px solid var(--borde);
+  font-size:11px;color:var(--tinta3);line-height:1.6}
+.ayuda-atajos .cerrar{margin-top:12px;border:1px solid var(--borde2);border-radius:8px;
+  padding:6px 14px;font-family:var(--num);font-size:11px;color:var(--tinta2)}
+.ayuda-atajos .cerrar:hover{color:var(--violeta);border-color:var(--violeta)}
+
+@media(max-width:700px){
+  :root{--barra:42px}
+  .capas{width:180px;top:6px;right:6px;padding:8px 9px}
+  .marca .g{display:none}
+  .lectura{font-size:9.5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="barra">
+  <span class="marca"><span class="g">🔮</span><b>LO 369</b></span>
+  <a class="volver" id="volver" href="oraculo">← Terminal</a>
+  <span class="sep"></span>
+  <span class="grupo" id="activos" role="tablist" aria-label="Activo"></span>
+  <span class="sep"></span>
+  <span class="grupo" id="intervalos" role="tablist" aria-label="Intervalo"></span>
+  <span class="sep"></span>
+  <span class="precio-vivo" id="precioVivo">…</span>
+  <span class="estado-vivo" id="estadoVivo"><span class="punto" id="punto"></span><span id="txtVivo">CONECTANDO</span></span>
+  <button class="icono" id="btnCapas" type="button" aria-pressed="false" title="Capas e indicadores (C)">≡</button>
+  <button class="icono" id="btnAuto" type="button" aria-pressed="true" title="Escala de precio automática (A)">⇕</button>
+  <button class="icono" id="btnBorrar" type="button" title="Borrar todos los dibujos de esta vista">🗑</button>
+  <button class="icono" id="btnAyuda" type="button" title="Atajos de teclado (?)">?</button>
+</div>
+
+<div class="escena" id="escena">
+  <canvas id="lienzo"></canvas>
+  <div class="lectura" id="lectura"></div>
+  <button class="aviso" id="alPresente" type="button" hidden>Volver al presente →</button>
+  <div class="error" id="error" role="status" hidden></div>
+  <div class="capas" id="panelCapas" hidden>
+    <h3>Capas</h3>
+    <div id="listaCapas"></div>
+    <h3 style="margin-top:10px">Panel inferior</h3>
+    <select id="selOsc" aria-label="Indicador del panel inferior">
+      <option value="ninguno">Sin panel</option>
+      <option value="rsi">RSI (14)</option>
+      <option value="macd">MACD histograma</option>
+      <option value="senal">Señal Tesla 369</option>
+    </select>
+    <p class="nota" id="notaCapas"></p>
+  </div>
+  <div class="cargando" id="cargando">Conectando con Binance…</div>
+</div>
+
+<div class="ayuda-atajos" id="ayudaAtajos" hidden>
+  <div class="caja">
+    <h2>Cómo se maneja</h2>
+    <dl>
+      <dt>Arrastrar</dt><dd>Desplaza en el tiempo</dd>
+      <dt>Rueda / pinza</dt><dd>Zoom sobre el cursor, no sobre el centro</dd>
+      <dt>Arrastrar el eje derecho</dt><dd>Escala de precio manual</dd>
+      <dt>Doble clic</dt><dd>Vuelve a escala automática y al presente</dd>
+      <dt>Shift + arrastrar</dt><dd>Regla: variación, velas y tiempo entre dos puntos</dd>
+      <dt>Alt + clic</dt><dd>Línea horizontal en ese precio</dd>
+      <dt>Arrastrar un dibujo</dt><dd>Lo mueve. Clic derecho sobre él lo borra</dd>
+      <dt>1 … 6</dt><dd>Intervalo: 15m, 30m, 1H, 4H, 1D, 1W</dd>
+      <dt>B / E / S</dt><dd>Activo: BTC, ETH, SOL</dd>
+      <dt>← →</dt><dd>Desplaza · <b>+ −</b> zoom · <b>0</b> restablece</dd>
+      <dt>A</dt><dd>Alterna escala automática</dd>
+      <dt>C</dt><dd>Muestra u oculta las capas</dd>
+      <dt>Esc</dt><dd>Cancela la herramienta activa</dd>
+    </dl>
+    <p class="pie"><b>Herramienta educativa.</b> No es asesoría financiera. Los barridos y los
+      niveles de liquidez son inferencias de un modelo propio sobre datos públicos, no órdenes
+      observadas en el libro.</p>
+    <button class="cerrar" id="cerrarAyuda" type="button">Entendido</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ══════════ CONFIGURACIÓN ══════════ */
+const ACTIVOS = {
+  BTCUSDT: { corto:'BTC', tecla:'b' },
+  ETHUSDT: { corto:'ETH', tecla:'e' },
+  SOLUSDT: { corto:'SOL', tecla:'s' },
+};
+const SIMBOLOS = Object.keys(ACTIVOS);
+/* mismos parámetros que el terminal: el barrido y la liquidez escalan con el
+   marco temporal, y vwapWin son las velas que forman un día (0 = no aplica) */
+const INTERVALOS = {
+  '15m': { etq:'15m', nombre:'15 minutos', lb:12, w:4, vwapWin:96 },
+  '30m': { etq:'30m', nombre:'30 minutos', lb:12, w:4, vwapWin:48 },
+  '1h':  { etq:'1H',  nombre:'1 hora',     lb:20, w:5, vwapWin:24 },
+  '4h':  { etq:'4H',  nombre:'4 horas',    lb:30, w:6, vwapWin:6  },
+  '1d':  { etq:'1D',  nombre:'1 día',      lb:40, w:7, vwapWin:0  },
+  '1w':  { etq:'1W',  nombre:'1 semana',   lb:40, w:7, vwapWin:0  },
+};
+const ORDEN_TF = Object.keys(INTERVALOS);
+const LOTE = 1000;              /* tope de velas por petición en Binance */
+const MIN_VELAS = 20, MAX_VELAS = 1000;
+const C_ALZA='#34d399', C_BAJA='#fb7185', C_EJE='#7d86ae', C_REJILLA='#1b2138', C_LIQ='#a5b4fc';
+const EMAS = [[20,'#38bdf8',1],[50,'#22c55e',1.6],[200,'#f472b6',2]];
+const C_VWAP='#e2e8f0', C_CLIMAX='rgba(250,204,21,.55)', C_VIOLETA='#a78bfa';
+
+const $ = id => document.getElementById(id);
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const LS = {
+  get(k,d=null){ try{ const v=localStorage.getItem(k); return v===null?d:v; }catch{ return d; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch{} },
+};
+function leerLS(clave, pd){ try{ const v=JSON.parse(LS.get(clave)); return v ?? pd; }catch{ return pd; } }
+const fmt$ = (v,d) => '$' + v.toLocaleString('en-US',{minimumFractionDigits:d??(v>=1000?0:2),maximumFractionDigits:d??(v>=1000?0:2)});
+function decDe(p){ p=Math.abs(p); return p>=10000?0:p>=1000?1:p>=1?2:p>=0.01?4:6; }
+const fmtP = (v,d) => v.toLocaleString('es-PE',{minimumFractionDigits:d,maximumFractionDigits:d});
+function estiloTexto(ctx,o){
+  ctx.font = `${o.peso?o.peso+' ':''}${o.px}px "Space Grotesk",ui-monospace,monospace`;
+  ctx.fillStyle = o.color; ctx.textAlign = o.align||'left'; ctx.textBaseline = o.base||'middle';
+}
+
+/* ═══════════ INICIO MOTOR 369 · copia sincronizada de oraculo.html ═══════════
+   Copiado literalmente, no transcrito. Para comprobar que no han divergido:
+     diff <(sed -n '/MOTOR LUNAR (portado/,/^}$/p' oraculo.html) \
+          <(sed -n '/INICIO MOTOR 369/,/FIN MOTOR 369/p' grafico.html)
+   No se extrae a un .js compartido porque los dos archivos tienen que
+   seguir abriéndose de una pieza desde file://, y un <script src> los
+   rompería en la copia descargada.                                      */
+/* ══════════ MOTOR LUNAR (portado íntegro) ══════════ */
+const SYNODIC = 29.530588853;
+const REF_NEW_MOON = Date.UTC(2000, 0, 6, 18, 14) / 1000;
+const FASES = [
+  { nombre:'Luna Nueva',       emoji:'🌑', mult:0.8, arquetipo:'La Semilla',  sesgo:'Acumulación silenciosa. Volatilidad comprimida.' },
+  { nombre:'Creciente',        emoji:'🌒', mult:1.2, arquetipo:'El Brote',    sesgo:'Momentum naciente. Mejor ventana de entrada LONG.' },
+  { nombre:'Cuarto Creciente', emoji:'🌓', mult:1.3, arquetipo:'El Tronco',   sesgo:'Máximo multiplicador. Tendencia con convicción.' },
+  { nombre:'Gibosa Creciente', emoji:'🌔', mult:1.1, arquetipo:'La Flor',     sesgo:'Continuación. Gestionar posiciones abiertas.' },
+  { nombre:'Luna Llena',       emoji:'🌕', mult:0.9, arquetipo:'El Fruto',    sesgo:'Euforia = posible techo local. Tomar parciales.' },
+  { nombre:'Gibosa Menguante', emoji:'🌖', mult:0.7, arquetipo:'La Cosecha',  sesgo:'Distribución post-euforia. Presión vendedora.' },
+  { nombre:'Cuarto Menguante', emoji:'🌗', mult:0.6, arquetipo:'La Poda',     sesgo:'Pánico = posible suelo. Sweeps de liquidez frecuentes.' },
+  { nombre:'Menguante',        emoji:'🌘', mult:0.7, arquetipo:'El Compost',  sesgo:'Agotamiento vendedor. Preparar próxima acumulación.' },
+];
+function faseLunar(fecha = new Date()) {
+  const ahora = fecha.getTime() / 1000;
+  const dias = (ahora - REF_NEW_MOON) / 86400;
+  const edad = ((dias % SYNODIC) + SYNODIC) % SYNODIC;
+  const frac = edad / SYNODIC;
+  const ilum = Math.round(((1 - Math.cos(2 * Math.PI * frac)) / 2) * 100);
+  const idx = Math.floor(((frac * 8) + 0.5) % 8);
+  const f = FASES[idx], sig = FASES[(idx + 1) % 8];
+  /* La fase i está CENTRADA en frac = i/8 y termina en (i+0.5)/8 — por eso idx
+     lleva el +0.5 al redondear. La Luna Nueva es la única que cruza el fin del
+     ciclo (empieza en 0.9375 y acaba en 0.0625 del siguiente), así que su
+     frontera se busca sumando una vuelta completa. */
+  let fronteraFrac = (idx + 0.5) / 8;
+  if (fronteraFrac <= frac) fronteraFrac += 1;
+  const horas = (fronteraFrac - frac) * SYNODIC * 24;
+  return { ...f, idx, ilum, edad, frac, sig, horasSig: horas };
+}
+
+/* ══════════ INDICADORES (portados íntegros) ══════════ */
+function ema(vs, p) { if (!vs.length) return []; const k = 2 / (p + 1); const o = [vs[0]]; for (let i = 1; i < vs.length; i++) o.push(vs[i] * k + o[i-1] * (1-k)); return o; }
+function sma(vs, p) { const o = []; for (let i = 0; i < vs.length; i++) { if (i < p-1) { o.push(null); continue; } let s = 0; for (let j = i-p+1; j <= i; j++) s += vs[j]; o.push(s / p); } return o; }
+function rsi(cs, p = 14) {
+  if (cs.length < p + 1) return cs.map(() => 50);
+  const g = [0], l = [0];
+  for (let i = 1; i < cs.length; i++) { const d = cs[i] - cs[i-1]; g.push(Math.max(d, 0)); l.push(Math.max(-d, 0)); }
+  const o = new Array(p).fill(50);
+  let ag = g.slice(1, p+1).reduce((a,b) => a+b, 0) / p, al = l.slice(1, p+1).reduce((a,b) => a+b, 0) / p;
+  o.push(al === 0 ? 100 : 100 - 100 / (1 + ag/al));
+  for (let i = p+1; i < cs.length; i++) { ag = (ag*(p-1) + g[i]) / p; al = (al*(p-1) + l[i]) / p; o.push(al === 0 ? 100 : 100 - 100 / (1 + ag/al)); }
+  return o;
+}
+function macd(cs, f = 12, s = 26, sp = 9) { const ef = ema(cs, f), es = ema(cs, s); const linea = cs.map((_, i) => ef[i] - es[i]); const senal = ema(linea, sp); return { linea, senal, hist: linea.map((v, i) => v - senal[i]) }; }
+function bollingerB(cs, p = 20, m = 2) {
+  const mid = sma(cs, p);
+  return cs.map((c, i) => { const md = mid[i]; if (md === null) return 0.5; let s = 0; for (let j = i-p+1; j <= i; j++) s += (cs[j]-md)**2; const sd = Math.sqrt(s/p); const u = md + m*sd, l = md - m*sd; return u === l ? 0.5 : (c-l)/(u-l); });
+}
+function adx(vel, p = 14) {
+  const n = vel.length;
+  if (n < p*2) return { adx: new Array(n).fill(0), pdi: new Array(n).fill(0), mdi: new Array(n).fill(0) };
+  const tr = [0], pm = [0], mm = [0];
+  for (let i = 1; i < n; i++) {
+    const h = vel[i].high, l = vel[i].low, pc = vel[i-1].close;
+    tr.push(Math.max(h-l, Math.abs(h-pc), Math.abs(l-pc)));
+    const up = h - vel[i-1].high, dn = vel[i-1].low - l;
+    pm.push(up > dn && up > 0 ? up : 0); mm.push(dn > up && dn > 0 ? dn : 0);
+  }
+  const su = arr => { const o = new Array(p).fill(0); let s = arr.slice(1, p+1).reduce((a,b) => a+b, 0); o.push(s); for (let i = p+1; i < n; i++) { s = s - s/p + arr[i]; o.push(s); } return o; };
+  const st = su(tr), sp2 = su(pm), sm2 = su(mm);
+  const pdi = st.map((v, i) => (i < p || v === 0 ? 0 : 100*sp2[i]/v));
+  const mdi = st.map((v, i) => (i < p || v === 0 ? 0 : 100*sm2[i]/v));
+  const dx = pdi.map((x, i) => { const y = mdi[i]; return x+y === 0 ? 0 : 100*Math.abs(x-y)/(x+y); });
+  const o = new Array(p*2 - 1).fill(0);
+  let a = dx.slice(p, p*2).reduce((x,y) => x+y, 0) / p; o.push(a);
+  for (let i = p*2; i < n; i++) { a = (a*(p-1) + dx[i]) / p; o.push(a); }
+  return { adx: o, pdi, mdi };
+}
+function atr(vel, p = 14) {
+  const n = vel.length;
+  if (n < p+1) return new Array(n).fill(0);
+  const tr = [vel[0].high - vel[0].low];
+  for (let i = 1; i < n; i++) { const h = vel[i].high, l = vel[i].low, pc = vel[i-1].close; tr.push(Math.max(h-l, Math.abs(h-pc), Math.abs(l-pc))); }
+  const o = new Array(p).fill(0);
+  let a = tr.slice(0, p).reduce((x,y) => x+y, 0) / p; o.push(a);
+  for (let i = p+1; i < n; i++) { a = (a*(p-1) + tr[i]) / p; o.push(a); }
+  return o;
+}
+function superTrend(vel, p = 10, m = 3) {
+  const n = vel.length, a = atr(vel, p), dir = new Array(n).fill(1);
+  let pu = Infinity, pl = 0, pd = 1;
+  for (let i = p; i < n; i++) {
+    const hl2 = (vel[i].high + vel[i].low) / 2;
+    let ub = hl2 + m*a[i], lb = hl2 - m*a[i];
+    const pc = vel[i-1].close;
+    if (ub >= pu && pc <= pu) ub = pu;
+    if (lb <= pl && pc >= pl) lb = pl;
+    let d = pd;
+    if (pd === 1 && vel[i].close < lb) d = -1;
+    else if (pd === -1 && vel[i].close > ub) d = 1;
+    dir[i] = d; pu = ub; pl = lb; pd = d;
+  }
+  return dir;
+}
+/* VWAP rodante: devuelve NIVELES (para el gráfico) y posición % */
+function vwapSerie(vel, p = 24) {
+  return vel.map((c, i) => {
+    const de = Math.max(0, i - p + 1);
+    let pv = 0, v = 0;
+    for (let j = de; j <= i; j++) { const tp = (vel[j].high + vel[j].low + vel[j].close) / 3; pv += tp * vel[j].volume; v += vel[j].volume; }
+    return v === 0 ? c.close : pv / v;
+  });
+}
+function obvMomentum(vel, lb = 10) {
+  if (vel.length < lb + 2) return 0;
+  const obv = [0];
+  for (let i = 1; i < vel.length; i++) { const d = vel[i].close - vel[i-1].close; obv.push(obv[i-1] + (d > 0 ? vel[i].volume : d < 0 ? -vel[i].volume : 0)); }
+  const r = obv.slice(-lb - 1);
+  const pend = (r[r.length-1] - r[0]) / lb;
+  const av = vel.slice(-lb).reduce((a,c) => a + c.volume, 0) / lb;
+  return av === 0 ? 0 : clamp(pend / av, -1, 1);
+}
+function detectarSweeps(vel, lb = 20, volMult = 1.5) {
+  const ev = [];
+  for (let i = lb; i < vel.length; i++) {
+    const c = vel[i], prev = vel.slice(i-lb, i);
+    const minP = Math.min(...prev.map(x => x.low)), maxP = Math.max(...prev.map(x => x.high));
+    const av = prev.reduce((a,x) => a + x.volume, 0) / lb, vr = c.volume / av;
+    if (!isFinite(vr)) continue;                       /* volumen previo 0: sin referencia */
+    if (c.low < minP && c.close > minP && vr >= volMult) ev.push({ i, tipo:'bull', nivel:minP, vr });
+    if (c.high > maxP && c.close < maxP && vr >= volMult) ev.push({ i, tipo:'bear', nivel:maxP, vr });
+  }
+  return ev;
+}
+function nivelesLiquidez(vel, w = 5) {
+  const hs = [], ls = [];
+  for (let i = w; i < vel.length - w; i++) {
+    let esH = true, esL = true;
+    for (let j = i-w; j <= i+w; j++) { if (vel[j].high > vel[i].high) esH = false; if (vel[j].low < vel[i].low) esL = false; }
+    if (esH) hs.push(vel[i].high);
+    if (esL) ls.push(vel[i].low);
+  }
+  return { hs, ls };
+}
+
+/* ══════════ SEÑAL TESLA 369 (portada + indicador #10 futuros) ══════════ */
+/* [EDITABLE] pesos — suman 1.00. Fase Lunar rebajada de 15% a 10%
+   para dar 5% al nuevo indicador de Sentimiento de Futuros.        */
+/* Lectura numérica de la fase lunar (−1..+1). La usa el indicador #7 y la
+   quinta tarjeta de la matriz multi-timeframe: una sola definición. */
+const señalLunar = lun => lun.mult >= 1 ? 0.6 : lun.mult >= 0.9 ? 0.1 : -0.5;
+function señalTesla(vel, lunar, fg, futuros) {
+  const cs = vel.map(c => c.close), n = vel.length, u = n - 1;
+  const rsiArr = rsi(cs, 14), rsiV = rsiArr[u];
+  const mac = macd(cs), histV = mac.hist[u];
+  const histN = clamp(histV / (cs[u] * 0.002), -1, 1);
+  const pctB = bollingerB(cs)[u];
+  const ax = adx(vel, 14), adxV = ax.adx[u], dip = ax.pdi[u], dim = ax.mdi[u];
+  const stV = superTrend(vel, 10, 3)[u];
+  const vwapNiv = vwapSerie(vel, 24)[u];
+  const vwapPct = vwapNiv === 0 ? 0 : (cs[u] - vwapNiv) / vwapNiv;
+  const obvM = obvMomentum(vel, 10);
+
+  const rsiN = clamp((rsiV - 50) / 25, -1, 1);
+  const bbN = clamp((pctB - 0.5) * 2, -1, 1);
+  const adxDir = adxV > 20 ? clamp((dip - dim) / 40, -1, 1) : 0;
+  const vwapN = clamp(vwapPct / 0.01, -1, 1);
+  const fgN = fg !== null ? -((fg - 50) / 50) : 0;                      /* contrarian */
+  /* Indicador #10 — SENTIMIENTO DE FUTUROS (ratio long/short + open interest).
+     El ratio global de cuentas casi nunca baja de 1,5 (el minorista vive largo),
+     así que compararlo contra 1,0 lo dejaría clavado en −1 para siempre. Se
+     compara contra su PROPIA media de las últimas 24 h: lo que informa es que la
+     multitud esté MÁS larga de lo habitual (contrarian bajista) o menos.
+     El OI aporta convicción: si crece mientras el precio sube, confirma; si
+     crece mientras cae, confirma a la baja. */
+  let futN = 0, futDet = 'Sin datos de futuros (fapi)';
+  if (futuros && futuros.ratio) {
+    const media = futuros.ratioMedia || futuros.ratio;
+    const desvio = media ? (futuros.ratio - media) / (media * 0.25) : 0;
+    const ratioN = clamp(-desvio, -1, 1);                    /* contrarian */
+    let oiN = 0;
+    if (futuros.oi && futuros.oiPrev) {
+      const oiChg = (futuros.oi - futuros.oiPrev) / futuros.oiPrev;
+      const dirPrecio = cs[u] >= cs[Math.max(0, u - 24)] ? 1 : -1;
+      oiN = clamp(oiChg / 0.08, -1, 1) * dirPrecio;          /* OI creciente confirma la dirección */
+    }
+    futN = clamp(ratioN * 0.6 + oiN * 0.4, -1, 1);
+    futDet = `L/S ${futuros.ratio.toFixed(2)} vs media 24h ${media.toFixed(2)}` +
+             (futuros.oi ? ` · OI ${(futuros.oi/1e3).toFixed(1)}K` : '');
+  }
+
+  const mk = (id, nombre, peso, crudo, norm, umbral, detalle) => ({
+    id, nombre, peso, crudo, norm, ponderado: norm * peso,
+    estado: norm > umbral ? 'bull' : norm < -umbral ? 'bear' : 'neutro', detalle,
+  });
+  const inds = [
+    mk('rsi','RSI (14)',0.15,rsiV,rsiN,0.4,`${rsiV.toFixed(1)} — ${rsiV>70?'sobrecompra':rsiV<30?'sobreventa':'zona media'}`),
+    mk('macd','MACD Hist',0.15,histV,histN,0.05,`${histV>=0?'Momentum comprador':'Momentum vendedor'} (${histV.toFixed(3)})`),
+    mk('bb','Bollinger %B',0.10,pctB,bbN,0.3,`%B ${pctB.toFixed(2)} — ${pctB>0.8?'techo de banda':pctB<0.2?'suelo de banda':'cuerpo central'}`),
+    mk('adx','ADX Direccional',0.10,adxV,adxDir,0.2,`ADX ${adxV.toFixed(1)} ${adxV>20?'tendencia válida':'sin tendencia'} · DI+ ${dip.toFixed(0)} / DI- ${dim.toFixed(0)}`),
+    mk('st','SuperTrend',0.10,stV,stV,0.5,stV>0?'Estructura alcista':'Estructura bajista'),
+    mk('vwap','VWAP Position',0.10,vwapPct*100,vwapN,0.2,`${(vwapPct*100).toFixed(2)}% ${vwapPct>=0?'sobre':'bajo'} VWAP`),
+    mk('lunar','Fase Lunar',0.10,lunar.mult,señalLunar(lunar),0.3,`${lunar.nombre} ×${lunar.mult} — ${lunar.arquetipo}`),
+    mk('fg','Fear & Greed',0.10,fg??50,fgN,0.3,fg!==null?`${fg} — lectura contrarian`:'Sin datos'),
+    mk('obv','OBV Momentum',0.05,obvM,obvM,0.3,obvM>=0?'Volumen acompaña compras':'Volumen acompaña ventas'),
+    mk('fut','Futuros L/S + OI',0.05,futuros?.ratio??0,futN,0.3,futDet),
+  ];
+  const rawScore = inds.reduce((a, i) => a + i.ponderado, 0);
+  const score = clamp(rawScore * lunar.mult, -1, 1);
+
+  let cls, acc, color;
+  if (score >= 0.80)      { cls='MAX LONG';    acc='Entrada completa'; color='#00ff9d'; }
+  else if (score >= 0.60) { cls='LONG';        acc='Entrada 70%';      color='#4ade80'; }
+  else if (score >= 0.40) { cls='SWING LONG';  acc='Entrada 50%';      color='#a3e635'; }
+  else if (score > -0.40) { cls='HOLD';        acc='No operar';        color='#facc15'; }
+  else if (score > -0.60) { cls='SWING SHORT'; acc='Corto 50%';        color='#fb923c'; }
+  else if (score > -0.80) { cls='SHORT';       acc='Corto 70%';        color='#f87171'; }
+  else                    { cls='MAX SHORT';   acc='Corto completo';   color='#ff2d55'; }
+
+  const precio = cs[u];
+  /* el <= cierra la frontera exacta de −0.400, donde la etiqueta ya dice SWING SHORT */
+  const esLong = score > 0.40, esShort = score <= -0.40;
+  const confs = esShort ? [
+    { l:'Señal < −0.40', ok: score < -0.40 },
+    { l:'ADX > 20', ok: adxV > 20 },
+    { l:'Precio < VWAP', ok: precio < vwapNiv },
+  ] : [
+    { l:'Señal > +0.40', ok: score > 0.40 },
+    { l:'ADX > 20', ok: adxV > 20 },
+    { l:'Precio > VWAP', ok: precio > vwapNiv },
+  ];
+  return { score, rawScore, cls, acc, color, inds, confs, esLong, esShort,
+           adxV, rsiV, vwapNiv, precio, multLunar: lunar.mult };
+}
+/* ═══════════ FIN MOTOR 369 ═══════════ */
+
+/* ══════════ SERIES VECTORIZADAS ══════════
+   La señal candela a candela del terminal recalcula TODO el motor sobre cada
+   prefijo: es O(n²) y por eso allí se limita a 168 velas y se difiere a
+   requestIdleCallback. Aquí hace falta sobre cientos de velas y en cada
+   cambio de vista, así que se calcula al revés: cada indicador da su serie
+   completa de una pasada (todos son O(n)) y luego se combinan índice a
+   índice. Mismos pesos y mismas normalizaciones que señalTesla; si aquella
+   cambia, esto cambia con ella.
+   Fear & Greed y futuros valen 0: no tienen histórico gratuito, y meter el
+   valor de hoy en velas de hace semanas sería mirar al futuro.          */
+function serieSenal369(vel) {
+  const n = vel.length;
+  if (n < 210) return new Array(n).fill(null);
+  const cs = vel.map(c => c.close);
+  const rsiA = rsi(cs, 14);
+  const macA = macd(cs);
+  const bbA  = bollingerB(cs);
+  const axA  = adx(vel, 14);
+  const stA  = superTrend(vel, 10, 3);
+  const vwA  = vwapSerie(vel, 24);
+  /* OBV acumulado una vez, y su pendiente en ventana móvil de 10 */
+  const obv = [0];
+  for (let i = 1; i < n; i++) {
+    const d = cs[i] - cs[i-1];
+    obv.push(obv[i-1] + (d > 0 ? vel[i].volume : d < 0 ? -vel[i].volume : 0));
+  }
+  const out = new Array(n).fill(null);
+  for (let i = 200; i < n; i++) {
+    const lb = 10;
+    let obvN = 0;
+    if (i >= lb) {
+      const pend = (obv[i] - obv[i-lb]) / lb;
+      let sv = 0; for (let j = i-lb+1; j <= i; j++) sv += vel[j].volume;
+      const av = sv / lb;
+      obvN = av === 0 ? 0 : clamp(pend / av, -1, 1);
+    }
+    const histN = clamp(macA.hist[i] / (cs[i] * 0.002), -1, 1);
+    const rsiN  = clamp((rsiA[i] - 50) / 25, -1, 1);
+    const bbN   = clamp((bbA[i] - 0.5) * 2, -1, 1);
+    const adxD  = axA.adx[i] > 20 ? clamp((axA.pdi[i] - axA.mdi[i]) / 40, -1, 1) : 0;
+    const vwapN = vwA[i] === 0 ? 0 : clamp(((cs[i] - vwA[i]) / vwA[i]) / 0.01, -1, 1);
+    const lun   = faseLunar(new Date(vel[i].time * 1000));
+    const crudo = rsiN*0.15 + histN*0.15 + bbN*0.10 + adxD*0.10 + stA[i]*0.10 +
+                  vwapN*0.10 + senalLunarLocal(lun)*0.10 + 0*0.10 + obvN*0.05 + 0*0.05;
+    out[i] = clamp(crudo * lun.mult, -1, 1);
+  }
+  return out;
+}
+const senalLunarLocal = lun => lun.mult >= 1 ? 0.6 : lun.mult >= 0.9 ? 0.1 : -0.5;
+
+/* ══════════ API BINANCE ══════════ */
+const SPOT = 'https://api.binance.com';
+async function pedirVelas(sym, intervalo, limite, hasta) {
+  let u = `${SPOT}/api/v3/klines?symbol=${sym}&interval=${intervalo}&limit=${limite}`;
+  if (hasta) u += `&endTime=${hasta}`;
+  const r = await fetch(u);
+  if (!r.ok) throw new Error('klines ' + r.status);
+  return (await r.json()).map(k => ({
+    time: Math.floor(k[0]/1000), open:+k[1], high:+k[2], low:+k[3], close:+k[4], volume:+k[5],
+  }));
+}
+
+/* ══════════ ESTADO ══════════ */
+/* El hash manda: un enlace pegado en otro sitio restaura la vista. Si no hay,
+   se hereda del terminal por localStorage, que es la misma pestaña de origen. */
+function leerHash() {
+  const m = /^#([A-Z]+USDT)\/([0-9a-z]+)$/.exec(location.hash || '');
+  if (!m) return null;
+  if (!ACTIVOS[m[1]] || !INTERVALOS[m[2]]) return null;
+  return { sym: m[1], tf: m[2] };
+}
+const inicial = leerHash();
+const estado = {
+  sym: inicial ? inicial.sym : (ACTIVOS[LS.get('lo369_sym')] ? LS.get('lo369_sym') : 'SOLUSDT'),
+  tf:  inicial ? inicial.tf  : (INTERVALOS[LS.get('lo369_tf')] ? LS.get('lo369_tf') : '1h'),
+  velas: [],
+  cargando: false, sinMasHistoria: false, error: null,
+  ticker: null,
+  senal: null,           /* serie de la señal 369, perezosa */
+  senalDe: null,         /* clave sym|tf|n con la que se calculó */
+};
+/* Vista en espacio de índices con decimales, para que el zoom sea continuo.
+   desde puede ser negativo (hueco a la izquierda) y desde+velas puede pasar
+   del final (hueco a la derecha, que hace falta para operar cómodo). */
+const vista = { desde: 0, velas: 150, auto: true, mn: 0, mx: 1, pegado: true };
+
+const CAPAS_DEF = { ema20:true, ema50:true, ema200:true, vwap:true, liq:true, sweeps:true, senal:false };
+const capas = Object.assign({}, CAPAS_DEF, leerLS('lo369_capas', {}));
+let oscilador = LS.get('lo369_osc') || 'ninguno';
+
+const claveDibujos = () => `${estado.sym}|${estado.tf}`;
+let dibujos = leerLS('lo369_dibujos', {});
+const misDibujos = () => (dibujos[claveDibujos()] = dibujos[claveDibujos()] || []);
+const guardarDibujos = () => LS.set('lo369_dibujos', JSON.stringify(dibujos));
+
+/* geometría del último pintado, que usan el cursor y las herramientas */
+const geo = { X:null, Y:null, iDeX:null, pDeY:null, padL:0, padR:0, padT:0, ih:0,
+              cssW:0, cssH:0, paso:1, dec:2, yVol:0, hVol:0, yOsc:0, hOsc:0 };
+
+/* ══════════ CARGA ══════════ */
+function anchoVela(tf) {
+  const s = { '15m':900, '30m':1800, '1h':3600, '4h':14400, '1d':86400, '1w':604800 };
+  return s[tf];
+}
+async function cargarSerie(primera) {
+  const sym = estado.sym, tf = estado.tf;
+  estado.cargando = true;
+  if (primera) { $('cargando').classList.remove('oculto'); $('cargando').textContent = 'Cargando ' + ACTIVOS[sym].corto + ' · ' + INTERVALOS[tf].nombre + '…'; }
+  try {
+    const v = await pedirVelas(sym, tf, LOTE);
+    if (sym !== estado.sym || tf !== estado.tf) return;      /* respuesta obsoleta */
+    estado.velas = v;
+    estado.sinMasHistoria = false;
+    estado.senal = null;
+    estado.error = null;
+    encuadreInicial();
+    $('cargando').classList.add('oculto');
+    pintarError();
+  } catch (e) {
+    if (sym !== estado.sym || tf !== estado.tf) return;
+    estado.error = e.message || 'sin respuesta';
+    if (!estado.velas.length) $('cargando').textContent = 'No se pudieron cargar las velas (' + estado.error + '). Reintentando…';
+    else $('cargando').classList.add('oculto');
+    pintarError();
+    setTimeout(() => { if (sym === estado.sym && tf === estado.tf) cargarSerie(primera); }, 5000);
+  } finally {
+    estado.cargando = false;
+    pedirPintado();
+  }
+}
+/* Historia hacia atrás en bloques, cuando el usuario se acerca al principio.
+   Se ancla por tiempo, no por índice: los dibujos también, justo por esto. */
+async function cargarMasHistoria() {
+  if (estado.cargando || estado.sinMasHistoria || !estado.velas.length) return;
+  const sym = estado.sym, tf = estado.tf;
+  estado.cargando = true;
+  try {
+    const hasta = estado.velas[0].time * 1000 - 1;
+    const v = await pedirVelas(sym, tf, LOTE, hasta);
+    if (sym !== estado.sym || tf !== estado.tf) return;
+    const nuevos = v.filter(c => c.time < estado.velas[0].time);
+    if (!nuevos.length) { estado.sinMasHistoria = true; return; }
+    estado.velas = nuevos.concat(estado.velas);
+    vista.desde += nuevos.length;          /* la vista no se mueve bajo el usuario */
+    estado.senal = null;
+  } catch { estado.sinMasHistoria = true; }
+  finally { estado.cargando = false; pedirPintado(); }
+}
+function encuadreInicial() {
+  const n = estado.velas.length;
+  vista.velas = clamp(Math.round(anchoUtil() / 7), 60, 220);
+  vista.desde = n - vista.velas + margenDer() * 0.5;
+  vista.auto = true; vista.pegado = true;
+  $('btnAuto').setAttribute('aria-pressed', 'true');
+}
+
+/* ══════════ TIEMPO REAL ══════════ */
+/* Misma arquitectura que el terminal: el ticker marca el segundo y mueve el
+   cierre de la vela en curso; el kline trae volumen real y cambio de vela. */
+const WS_URL = 'wss://stream.binance.com:9443/stream?streams=';
+const vivo = { ws:null, abierto:false, intentos:0, temporizador:null, ultimoMensaje:0 };
+function cerrarVivo() {
+  clearTimeout(vivo.temporizador);
+  if (vivo.ws) { const w = vivo.ws; vivo.ws = null; w.onclose=null; w.onmessage=null; w.onerror=null; w.onopen=null; try{ w.close(); }catch{} }
+  vivo.abierto = false;
+}
+function reconectar() {
+  clearTimeout(vivo.temporizador);
+  const espera = Math.min(30000, 1000 * Math.pow(2, vivo.intentos++));
+  vivo.temporizador = setTimeout(conectarVivo, espera);
+}
+function conectarVivo() {
+  cerrarVivo();
+  const sym = estado.sym.toLowerCase(), tf = estado.tf;
+  let ws;
+  try { ws = new WebSocket(`${WS_URL}${sym}@ticker/${sym}@kline_${tf}`); }
+  catch { reconectar(); return; }
+  vivo.ws = ws;
+  ws.onopen = () => { if (vivo.ws !== ws) return; vivo.abierto = true; vivo.intentos = 0; vivo.ultimoMensaje = Date.now(); pintarEstadoVivo(); };
+  ws.onmessage = ev => {
+    if (vivo.ws !== ws) return;
+    let d; try { d = JSON.parse(ev.data); } catch { return; }
+    const m = d && d.data; if (!m) return;
+    vivo.ultimoMensaje = Date.now();
+    if (m.e === '24hrTicker') recibirTicker(m);
+    else if (m.e === 'kline') recibirKline(m);
+  };
+  ws.onerror = () => {};
+  ws.onclose = () => { if (vivo.ws !== ws) return; vivo.abierto = false; vivo.ws = null; pintarEstadoVivo(); reconectar(); };
+}
+function recibirTicker(m) {
+  if (m.s !== estado.sym) return;
+  estado.ticker = { precio:+m.c, chg:+m.P };
+  pintarPrecio();
+  const u = estado.velas[estado.velas.length - 1];
+  if (u) {
+    const p = +m.c;
+    if (isFinite(p) && p > 0) {
+      u.close = p;
+      if (p > u.high) u.high = p;
+      if (p < u.low) u.low = p;
+      pedirPintado();
+    }
+  }
+}
+function recibirKline(m) {
+  if (m.s !== estado.sym || m.k.i !== estado.tf) return;
+  const k = m.k;
+  const v = { time: Math.floor(k.t/1000), open:+k.o, high:+k.h, low:+k.l, close:+k.c, volume:+k.v };
+  const arr = estado.velas, u = arr[arr.length - 1];
+  if (!u) return;
+  if (v.time === u.time) arr[arr.length - 1] = v;
+  else if (v.time > u.time) {
+    arr.push(v);
+    /* pegado al presente el encuadre avanza con la vela nueva; si el usuario
+       se fue al pasado, el gráfico NO salta bajo sus manos */
+    if (vista.pegado) vista.desde += 1;
+    estado.senal = null;
+  } else return;
+  pedirPintado();
+}
+/* Vigía: en redes móviles el socket enmudece al cambiar de celda sin disparar
+   close, y el gráfico se quedaría diciendo "en vivo" con datos congelados. */
+setInterval(() => {
+  if (vivo.abierto && Date.now() - vivo.ultimoMensaje > 20000) { vivo.intentos = 0; conectarVivo(); }
+}, 5000);
+
+/* ══════════ GEOMETRÍA ══════════ */
+const lienzo = $('lienzo'), escena = $('escena');
+function anchoUtil(){ return Math.max(120, escena.clientWidth - 8 - (escena.clientWidth < 500 ? 52 : 66)); }
+function margenDer(){ return vista.velas * 0.16; }   /* hueco a la derecha para operar cómodo */
+
+/* Un solo repintado por fotograma. Sin esto, la rueda del ratón dispara
+   decenas de pintados por segundo y se pierden fotogramas. */
+let pendiente = false;
+function pedirPintado() {
+  if (pendiente) return;
+  pendiente = true;
+  requestAnimationFrame(() => { pendiente = false; pintar(); });
+}
+
+function limitarVista() {
+  const n = estado.velas.length;
+  vista.velas = clamp(vista.velas, MIN_VELAS, Math.min(MAX_VELAS, Math.max(MIN_VELAS, n)));
+  const min = -vista.velas * 0.5;                    /* algo de hueco a la izquierda */
+  const max = n - vista.velas + margenDer();
+  vista.desde = clamp(vista.desde, min, Math.max(min, max));
+  /* pegado = la ultima vela esta a la vista. Es lo que decide si el encuadre
+     avanza solo cuando nace una vela; medirlo contra el margen derecho lo
+     dejaba en falso nada mas arrancar. */
+  vista.pegado = (vista.desde + vista.velas) >= n - 0.5;
+}
+
+/* ══════════ PINTADO ══════════ */
+function pintar() {
+  const ctx = lienzo.getContext('2d');
+  const DPR = Math.min(2, devicePixelRatio || 1);
+  const cssW = escena.clientWidth, cssH = escena.clientHeight;
+  if (!cssW || !cssH) return;
+  /* bitmap en píxeles enteros: con anchos fraccionarios la escala real queda
+     en ~1,9987 y la deriva se acumula hacia la derecha, justo donde va el eje */
+  lienzo.width = Math.round(cssW * DPR);
+  lienzo.height = Math.round(cssH * DPR);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.clearRect(0, 0, cssW, cssH);
+  ctx.fillStyle = '#070812'; ctx.fillRect(0, 0, cssW, cssH);
+
+  const full = estado.velas;
+  if (!full.length) return;
+  limitarVista();
+
+  const movil = cssW < 500;
+  const padL = 8, padR = movil ? 52 : 66, padT = 10, padB = 20;
+  const iw = cssW - padL - padR;
+  const hTotal = cssH - padT - padB;
+  const conOsc = oscilador !== 'ninguno';
+  const hVol = Math.round(hTotal * (movil ? 0.15 : 0.16));
+  const hOsc = conOsc ? Math.round(hTotal * (movil ? 0.17 : 0.18)) : 0;
+  const gap = 12;
+  const ih = hTotal - hVol - hOsc - gap * (conOsc ? 2 : 1);
+  const yVol = padT + ih + gap + hVol;                       /* línea cero del volumen */
+  const yOsc = conOsc ? yVol + gap + hOsc : 0;
+
+  const paso = iw / vista.velas;
+  const X = i => padL + (i - vista.desde + 0.5) * paso;
+  const iDeX = x => vista.desde + (x - padL) / paso - 0.5;
+  /* rango de índices realmente visibles, recortado a la serie */
+  const i0 = Math.max(0, Math.floor(vista.desde) - 1);
+  const i1 = Math.min(full.length - 1, Math.ceil(vista.desde + vista.velas) + 1);
+  if (i1 < i0) return;
+  const V = full.slice(i0, i1 + 1);
+
+  /* --- escala de precio --- */
+  let mn, mx;
+  if (vista.auto) {
+    mn = Infinity; mx = -Infinity;
+    for (const c of V) { if (c.low < mn) mn = c.low; if (c.high > mx) mx = c.high; }
+    /* las medias visibles también cuentan: si no, la EMA200 se sale del cuadro */
+    const cierres = full.map(c => c.close);
+    if (capas.ema20 || capas.ema50 || capas.ema200) {
+      EMAS.forEach(([p, , ], k) => {
+        const nombre = 'ema' + p;
+        if (!capas[nombre]) return;
+        const s = ema(cierres, p);
+        for (let i = i0; i <= i1; i++) { if (s[i] < mn) mn = s[i]; if (s[i] > mx) mx = s[i]; }
+      });
+    }
+    if (!isFinite(mn) || !isFinite(mx)) return;
+    const r = (mx - mn) || 1;
+    mn -= r * 0.05; mx += r * 0.05;
+    vista.mn = mn; vista.mx = mx;
+  } else { mn = vista.mn; mx = vista.mx; }
+
+  const Y = p => padT + ih - ((p - mn) / (mx - mn)) * ih;
+  const pDeY = y => mn + (padT + ih - y) / ih * (mx - mn);
+  const snapY = y => Math.round(y) + 0.5;
+  const snap = x => Math.round(x * DPR) / DPR;
+  const ult = full[full.length - 1];
+  const px = ult.close;
+  const dec = decDe(px);
+
+  Object.assign(geo, { X, Y, iDeX, pDeY, padL, padR, padT, ih, cssW, cssH, paso, dec, yVol, hVol, yOsc, hOsc, i0, i1, mn, mx });
+
+  /* --- rejilla y eje de precio: paso "redondo", no el rango partido en 4 --- */
+  estiloTexto(ctx, { px: 10, color: C_EJE });
+  ctx.strokeStyle = C_REJILLA; ctx.lineWidth = 1;
+  const objetivo = (mx - mn) / Math.max(3, Math.round(ih / 60));
+  const mag = Math.pow(10, Math.floor(Math.log10(objetivo)));
+  const norm = objetivo / mag;
+  const pasoP = (norm >= 5 ? 5 : norm >= 2 ? 2 : 1) * mag;
+  /* El eje derecho lo comparten la rejilla, los niveles de liquidez y la
+     pastilla del precio. Se anota cada altura ya ocupada para que la
+     siguiente etiqueta se descarte en vez de escribirse encima. */
+  const ocupadoEje = [];
+  const cabeEnEje = (y, sep) => {
+    if (ocupadoEje.some(o => Math.abs(o - y) < (sep || 12))) return false;
+    ocupadoEje.push(y); return true;
+  };
+  /* La pastilla del precio manda sobre todo lo demás, así que reserva su
+     hueco ANTES de que la rejilla escriba: si se apunta después, la cifra de
+     la rejilla ya está puesta y la pastilla acaba tapándola a medias. */
+  ocupadoEje.push(clamp(Y(full[full.length-1].close), padT + 8, padT + ih - 8));
+  for (let p = Math.ceil(mn / pasoP) * pasoP; p <= mx; p += pasoP) {
+    const y = snapY(Y(p));
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(cssW - padR, y); ctx.stroke();
+    if (cabeEnEje(Y(p), 14)) ctx.fillText(fmtP(p, dec), cssW - padR + 6, Y(p));
+  }
+
+  /* --- eje temporal: marca en el cambio de unidad natural del intervalo --- */
+  const diario = INTERVALOS[estado.tf].vwapWin === 0;
+  const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  estiloTexto(ctx, { px: 10, color: C_EJE, align: 'center' });
+  ctx.strokeStyle = C_REJILLA;
+  let ultimaMarca = -999, clavePrev = null;
+  for (let i = i0; i <= i1; i++) {
+    const d = new Date(full[i].time * 1000);
+    const clave = diario ? `${d.getMonth()}-${d.getFullYear()}` : `${d.getDate()}-${d.getMonth()}`;
+    const x = X(i);
+    if (clavePrev !== null && clave !== clavePrev && x - ultimaMarca > (diario ? 58 : 46) && x > padL + 14 && x < cssW - padR - 14) {
+      ctx.beginPath(); ctx.moveTo(snapY(x), padT); ctx.lineTo(snapY(x), padT + ih); ctx.stroke();
+      ctx.fillStyle = C_EJE;
+      ctx.fillText(diario ? MESES[d.getMonth()] + (d.getMonth() === 0 ? " '" + String(d.getFullYear()).slice(-2) : '') : `${d.getDate()}/${d.getMonth()+1}`, x, cssH - 8);
+      ultimaMarca = x;
+    }
+    clavePrev = clave;
+  }
+
+  ctx.save();
+  ctx.beginPath(); ctx.rect(padL, padT, iw, ih); ctx.clip();
+
+  /* --- niveles de liquidez --- */
+  let niveles = [];
+  if (capas.liq) {
+    const { hs, ls } = nivelesLiquidez(V, INTERVALOS[estado.tf].w);
+    const nLiq = movil ? 2 : 3;
+    const arriba = [...new Set(hs.filter(h => h > px))].sort((a,b)=>a-b).slice(0, nLiq);
+    const abajo  = [...new Set(ls.filter(l => l < px))].sort((a,b)=>b-a).slice(0, nLiq);
+    niveles = [...arriba, ...abajo];
+    ctx.setLineDash([4,4]); ctx.strokeStyle = 'rgba(165,180,252,.5)'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    niveles.forEach(nv => { const y = snapY(Y(nv)); ctx.moveTo(padL, y); ctx.lineTo(cssW - padR, y); });
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  /* --- VWAP: intradía. En 1D y 1W (vwapWin 0) no aplica y no se dibuja --- */
+  const cfg = INTERVALOS[estado.tf];
+  if (capas.vwap && cfg.vwapWin > 0) {
+    const desde = Math.max(0, i0 - cfg.vwapWin);
+    const vw = vwapSerie(full.slice(desde, i1 + 1), cfg.vwapWin);
+    ctx.strokeStyle = 'rgba(226,232,240,.8)'; ctx.lineWidth = 1.2;
+    ctx.setLineDash([4,3]); ctx.beginPath();
+    for (let i = i0; i <= i1; i++) {
+      const v = vw[i - desde]; if (v === undefined) continue;
+      i === i0 ? ctx.moveTo(X(i), Y(v)) : ctx.lineTo(X(i), Y(v));
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  /* --- EMAs: el grosor codifica el periodo --- */
+  const cierres = full.map(c => c.close);
+  EMAS.forEach(([p, col, gr]) => {
+    if (!capas['ema' + p]) return;
+    const s = ema(cierres, p);
+    ctx.strokeStyle = col; ctx.lineWidth = gr; ctx.beginPath();
+    for (let i = i0; i <= i1; i++) i === i0 ? ctx.moveTo(X(i), Y(s[i])) : ctx.lineTo(X(i), Y(s[i]));
+    ctx.stroke();
+  });
+
+  /* --- velas, agrupadas por color: dos trazos en vez de uno por vela --- */
+  const cw = Math.max(1, paso * 0.66);
+  const finas = cw < 2.2;                     /* muy juntas: solo la mecha */
+  [[true, C_ALZA],[false, C_BAJA]].forEach(([alza, col]) => {
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = i0; i <= i1; i++) {
+      const c = full[i]; if ((c.close >= c.open) !== alza) continue;
+      const x = snapY(X(i));
+      ctx.moveTo(x, Y(c.high)); ctx.lineTo(x, Y(c.low));
+    }
+    ctx.stroke();
+    if (finas) return;
+    ctx.beginPath();
+    for (let i = i0; i <= i1; i++) {
+      const c = full[i]; if ((c.close >= c.open) !== alza) continue;
+      const y1 = Y(Math.max(c.open, c.close)), y2 = Y(Math.min(c.open, c.close));
+      ctx.rect(snap(X(i) - cw/2), y1, cw, Math.max(1, y2 - y1));
+    }
+    ctx.fill();
+  });
+
+  /* --- banda de la señal 369 bajo el precio --- */
+  if (capas.senal) pintarBandaSenal(ctx, X, padT, ih, i0, i1);
+
+  /* --- marcas de barrido --- */
+  if (capas.sweeps) {
+    const sw = detectarSweeps(full.slice(Math.max(0, i0 - cfg.lb), i1 + 1), cfg.lb, 1.5);
+    const base = Math.max(0, i0 - cfg.lb);
+    estiloTexto(ctx, { px: 9, peso: 'bold', color: C_ALZA, align: 'center' });
+    sw.forEach(e => {
+      const gi = base + e.i; if (gi < i0 || gi > i1) return;
+      const c = full[gi];
+      ctx.fillStyle = e.tipo === 'bull' ? C_ALZA : C_BAJA;
+      ctx.fillText((e.tipo === 'bull' ? '▲' : '▼') + e.vr.toFixed(1) + '×',
+        clamp(X(gi), padL + 16, cssW - padR - 16),
+        e.tipo === 'bull' ? Y(c.low) + 12 : Y(c.high) - 12);
+    });
+  }
+
+  /* --- dibujos del usuario, anclados en tiempo y precio --- */
+  pintarDibujos(ctx, X, Y, padL, cssW - padR, padT, padT + ih);
+  ctx.restore();
+
+  /* --- volumen --- */
+  pintarVolumen(ctx, full, i0, i1, X, cw, finas, yVol, hVol, cfg);
+
+  /* --- panel del oscilador --- */
+  if (conOsc) pintarOscilador(ctx, full, i0, i1, X, cw, finas, yOsc, hOsc, padL, cssW - padR);
+
+  /* --- etiquetas del eje derecho --- */
+  if (capas.liq) {
+    estiloTexto(ctx, { px: 9.5, color: C_LIQ });
+    niveles.forEach(nv => {
+      const y = Y(nv);
+      if (y < padT || y > padT + ih) return;
+      if (!cabeEnEje(y, 13)) return;              /* ya hay una cifra a esa altura */
+      ctx.fillStyle = nv > px ? '#fecdd3' : '#a7f3d0';
+      ctx.fillText(fmtP(nv, dec), cssW - padR + 6, y);
+    });
+  }
+  /* pastilla del precio actual, con texto oscuro para que se lea encima */
+  const yPx = clamp(Y(px), padT + 8, padT + ih - 8);
+  ctx.strokeStyle = C_VIOLETA; ctx.setLineDash([2,3]); ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(padL, snapY(yPx)); ctx.lineTo(cssW - padR, snapY(yPx)); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = C_VIOLETA;
+  ctx.fillRect(cssW - padR + 2, yPx - 8, padR - 6, 16);
+  estiloTexto(ctx, { px: 10, peso: 'bold', color: '#0b0e1c' });
+  ctx.fillText(fmtP(px, dec), cssW - padR + 6, yPx);
+
+  /* --- mira y herramientas encima de todo --- */
+  pintarMira(ctx);
+  pintarRegla(ctx);
+
+  /* escala manual: hay que poder saberlo sin abrir un menú */
+  if (!vista.auto) {
+    estiloTexto(ctx, { px: 9, color: C_EJE, align: 'right' });
+    ctx.fillText('escala fija', cssW - padR - 6, padT + 8);
+  }
+  $('alPresente').hidden = vista.pegado;
+}
+
+/* --- volumen: media de las 20 PREVIAS sin incluirse, igual que detectarSweeps,
+   para que las barras ámbar coincidan con las marcas de barrido --- */
+function pintarVolumen(ctx, full, i0, i1, X, cw, finas, yBase, h, cfg) {
+  const media = i => { let s = 0, n = 0; for (let j = Math.max(0, i-20); j < i; j++) { s += full[j].volume; n++; } return n ? s/n : 0; };
+  const vis = [];
+  for (let i = i0; i <= i1; i++) vis.push(full[i].volume);
+  const ord = [...vis].sort((a,b)=>a-b);
+  const maxV = ord[Math.min(ord.length-1, Math.floor(ord.length*0.95))] || 1;
+  const YV = v => yBase - Math.min(1.15, v / maxV) * h;
+  const ultimo = full.length - 1;
+  const grupos = [
+    { t: i => { const m = media(i); return m > 0 && full[i].volume >= 1.5 * m; }, c: C_CLIMAX },
+    { t: i => { const m = media(i); return !(m > 0 && full[i].volume >= 1.5*m) && full[i].close >= full[i].open; }, c:'rgba(52,211,153,.30)' },
+    { t: i => { const m = media(i); return !(m > 0 && full[i].volume >= 1.5*m) && full[i].close <  full[i].open; }, c:'rgba(251,113,133,.30)' },
+  ];
+  grupos.forEach(g => {
+    ctx.fillStyle = g.c; ctx.beginPath();
+    for (let i = i0; i <= i1; i++) {
+      if (i === ultimo || !g.t(i)) continue;
+      const y = YV(full[i].volume);
+      ctx.rect(Math.round(X(i) - cw/2), y, Math.max(1, cw), Math.max(1, yBase - y));
+    }
+    ctx.fill();
+  });
+  /* la última vela está EN CURSO: su volumen es parcial y va atenuado */
+  if (ultimo >= i0 && ultimo <= i1) {
+    const c = full[ultimo], y = YV(c.volume);
+    ctx.fillStyle = c.close >= c.open ? 'rgba(52,211,153,.15)' : 'rgba(251,113,133,.15)';
+    ctx.fillRect(Math.round(X(ultimo) - cw/2), y, Math.max(1, cw), Math.max(1, yBase - y));
+  }
+  ctx.strokeStyle = 'rgba(125,134,174,.55)'; ctx.lineWidth = 1; ctx.setLineDash([3,3]);
+  ctx.beginPath();
+  for (let i = i0; i <= i1; i++) { const y = YV(media(i)); i === i0 ? ctx.moveTo(X(i), y) : ctx.lineTo(X(i), y); }
+  ctx.stroke(); ctx.setLineDash([]);
+  estiloTexto(ctx, { px: 9, color: C_EJE });
+  ctx.fillText('VOL', geo.cssW - geo.padR + 6, yBase - h + 6);
+}
+
+/* --- panel inferior: RSI, MACD o la señal 369 --- */
+function pintarOscilador(ctx, full, i0, i1, X, cw, finas, yBase, h, x0, x1) {
+  const tipo = oscilador;
+  const cierres = full.map(c => c.close);
+  ctx.strokeStyle = C_REJILLA; ctx.lineWidth = 1;
+  const linea = y => { ctx.beginPath(); ctx.moveTo(x0, Math.round(y)+0.5); ctx.lineTo(x1, Math.round(y)+0.5); ctx.stroke(); };
+  estiloTexto(ctx, { px: 9, color: C_EJE });
+  if (tipo === 'rsi') {
+    const s = rsi(cierres, 14);
+    const Y = v => yBase - (v/100) * h;
+    [30,50,70].forEach(v => { linea(Y(v)); ctx.fillStyle = C_EJE; ctx.fillText(String(v), geo.cssW - geo.padR + 6, Y(v)); });
+    ctx.strokeStyle = '#c4b5fd'; ctx.lineWidth = 1.4; ctx.beginPath();
+    for (let i = i0; i <= i1; i++) i === i0 ? ctx.moveTo(X(i), Y(s[i])) : ctx.lineTo(X(i), Y(s[i]));
+    ctx.stroke();
+    ctx.fillStyle = C_EJE; ctx.fillText('RSI 14', x0 + 4, yBase - h + 6);
+  } else if (tipo === 'macd') {
+    const m = macd(cierres);
+    let mx = 1e-9;
+    for (let i = i0; i <= i1; i++) mx = Math.max(mx, Math.abs(m.hist[i]));
+    const cero = yBase - h/2;
+    const Y = v => cero - (v/mx) * (h/2) * 0.9;
+    linea(cero);
+    for (let i = i0; i <= i1; i++) {
+      const v = m.hist[i];
+      ctx.fillStyle = v >= 0 ? 'rgba(52,211,153,.6)' : 'rgba(251,113,133,.6)';
+      const y = Y(v);
+      ctx.fillRect(Math.round(X(i) - cw/2), Math.min(y, cero), Math.max(1, cw), Math.max(1, Math.abs(cero - y)));
+    }
+    ctx.fillStyle = C_EJE; ctx.fillText('MACD hist', x0 + 4, yBase - h + 6);
+  } else if (tipo === 'senal') {
+    const s = serieSenalCache();
+    const cero = yBase - h/2;
+    const Y = v => cero - v * (h/2) * 0.92;
+    [[0.6,'rgba(52,211,153,.10)'],[-0.6,'rgba(251,113,133,.10)']].forEach(([v,c]) => {
+      ctx.fillStyle = c; ctx.fillRect(x0, Math.min(Y(v), Y(Math.sign(v))), x1-x0, Math.abs(Y(v)-Y(Math.sign(v))));
+    });
+    linea(cero);
+    [0.4,-0.4].forEach(v => { ctx.strokeStyle = '#252b47'; linea(Y(v)); });
+    ctx.strokeStyle = C_VIOLETA; ctx.lineWidth = 1.5; ctx.beginPath();
+    let arrancado = false;
+    for (let i = i0; i <= i1; i++) {
+      const v = s[i]; if (v === null || v === undefined) continue;
+      arrancado ? ctx.lineTo(X(i), Y(v)) : (ctx.moveTo(X(i), Y(v)), arrancado = true);
+    }
+    ctx.stroke();
+    ctx.fillStyle = C_EJE;
+    ctx.fillText(arrancado ? 'Señal 369 · sin F&G ni futuros' : 'Señal 369 · faltan velas de calentamiento', x0 + 4, yBase - h + 6);
+    ctx.fillText('+1', geo.cssW - geo.padR + 6, Y(1)); ctx.fillText('−1', geo.cssW - geo.padR + 6, Y(-1));
+  }
+}
+/* La serie de la señal es lo más caro del lienzo: se calcula una vez por
+   (activo, intervalo, número de velas) y se reutiliza en cada fotograma. */
+function serieSenalCache() {
+  const clave = `${estado.sym}|${estado.tf}|${estado.velas.length}`;
+  if (estado.senalDe !== clave || !estado.senal) {
+    estado.senal = serieSenal369(estado.velas);
+    estado.senalDe = clave;
+  }
+  return estado.senal;
+}
+/* Banda bajo el precio: color por zona, para leer el régimen sin panel aparte */
+function pintarBandaSenal(ctx, X, padT, ih, i0, i1) {
+  const s = serieSenalCache();
+  const y = padT + ih - 7, alto = 5;
+  for (let i = i0; i <= i1; i++) {
+    const v = s[i]; if (v === null || v === undefined) continue;
+    const a = Math.abs(v);
+    ctx.fillStyle = a < 0.4 ? 'rgba(250,204,21,.28)'
+      : v > 0 ? (a >= 0.8 ? 'rgba(0,255,157,.85)' : a >= 0.6 ? 'rgba(74,222,128,.7)' : 'rgba(163,230,53,.55)')
+              : (a >= 0.8 ? 'rgba(255,45,85,.85)' : a >= 0.6 ? 'rgba(248,113,113,.7)' : 'rgba(251,146,60,.55)');
+    ctx.fillRect(Math.round(X(i) - geo.paso/2), y, Math.max(1, Math.ceil(geo.paso)), alto);
+  }
+}
+
+/* ══════════ MIRA, REGLA Y DIBUJOS ══════════ */
+const cursor = { x: null, y: null, dentro: false };
+const regla = { activa: false, x0:0, y0:0, x1:0, y1:0 };
+
+function pintarMira(ctx) {
+  if (!cursor.dentro || cursor.x === null) { $('lectura').innerHTML = lecturaUltima(); return; }
+  const { padL, padR, padT, ih, cssW, cssH, dec } = geo;
+  const x = clamp(cursor.x, padL, cssW - padR);
+  const y = clamp(cursor.y, padT, cssH - 20);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(167,139,250,.45)'; ctx.lineWidth = 1; ctx.setLineDash([3,3]);
+  ctx.beginPath();
+  ctx.moveTo(padL, Math.round(y)+0.5); ctx.lineTo(cssW - padR, Math.round(y)+0.5);
+  ctx.moveTo(Math.round(x)+0.5, padT); ctx.lineTo(Math.round(x)+0.5, cssH - 20);
+  ctx.stroke(); ctx.setLineDash([]);
+  /* pastilla de precio en el eje derecho */
+  if (y <= padT + ih) {
+    const p = geo.pDeY(y);
+    ctx.fillStyle = '#38416b';
+    ctx.fillRect(cssW - padR + 2, y - 8, padR - 6, 16);
+    estiloTexto(ctx, { px: 10, peso: 'bold', color: '#e7eaf6' });
+    ctx.fillText(fmtP(p, dec), cssW - padR + 6, y);
+  }
+  /* pastilla de fecha en el eje inferior */
+  const i = Math.round(geo.iDeX(x));
+  const c = estado.velas[i];
+  if (c) {
+    const d = new Date(c.time * 1000);
+    const diario = INTERVALOS[estado.tf].vwapWin === 0;
+    const txt = diario
+      ? `${d.getDate()}/${d.getMonth()+1}/${String(d.getFullYear()).slice(-2)}`
+      : `${d.getDate()}/${d.getMonth()+1} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    estiloTexto(ctx, { px: 10, color: '#e7eaf6', align: 'center' });
+    const w = ctx.measureText(txt).width + 14;
+    ctx.fillStyle = '#38416b';
+    ctx.fillRect(clamp(x - w/2, padL, cssW - padR - w), cssH - 20, w, 16);
+    ctx.fillStyle = '#e7eaf6';
+    ctx.fillText(txt, clamp(x, padL + w/2, cssW - padR - w/2), cssH - 12);
+  }
+  ctx.restore();
+  $('lectura').innerHTML = lecturaDe(i);
+}
+function lecturaUltima() { return lecturaDe(estado.velas.length - 1); }
+function lecturaDe(i) {
+  const c = estado.velas[i];
+  if (!c) return '';
+  const d = new Date(c.time * 1000), dec = geo.dec ?? 2;
+  const p2 = n => String(n).padStart(2,'0');
+  const diario = INTERVALOS[estado.tf].vwapWin === 0;
+  const cuando = diario ? `${p2(d.getDate())}/${p2(d.getMonth()+1)}/${d.getFullYear()}`
+                        : `${p2(d.getDate())}/${p2(d.getMonth()+1)} ${p2(d.getHours())}:${p2(d.getMinutes())}`;
+  const col = c.close >= c.open ? '#34d399' : '#fb7185';
+  const varPc = ((c.close - c.open) / c.open * 100);
+  const enCurso = i === estado.velas.length - 1 ? ' <span style="color:#facc15">· en curso</span>' : '';
+  const s = capas.senal || oscilador === 'senal' ? (estado.senal ? estado.senal[i] : null) : null;
+  return `<span class="t">${ACTIVOS[estado.sym].corto}/USDT · ${INTERVALOS[estado.tf].etq}</span> ${cuando}${enCurso}<br>` +
+    `A <b>${fmtP(c.open,dec)}</b> · M <b>${fmtP(c.high,dec)}</b> · m <b>${fmtP(c.low,dec)}</b> · ` +
+    `C <b style="color:${col}">${fmtP(c.close,dec)}</b> <span style="color:${col}">${varPc>=0?'+':''}${varPc.toFixed(2)}%</span><br>` +
+    `Vol ${(c.volume>=1000? (c.volume/1000).toFixed(1)+'K' : c.volume.toFixed(2))}` +
+    (s !== null && s !== undefined ? ` · Señal <b>${s>=0?'+':''}${s.toFixed(3)}</b>` : '');
+}
+function pintarRegla(ctx) {
+  if (!regla.activa) return;
+  const p0 = geo.pDeY(regla.y0), p1 = geo.pDeY(regla.y1);
+  const i0 = Math.round(geo.iDeX(regla.x0)), i1 = Math.round(geo.iDeX(regla.x1));
+  const velas = Math.abs(i1 - i0);
+  const pc = p0 === 0 ? 0 : (p1 - p0) / p0 * 100;
+  const alza = p1 >= p0;
+  const x = Math.min(regla.x0, regla.x1), y = Math.min(regla.y0, regla.y1);
+  const w = Math.abs(regla.x1 - regla.x0), h = Math.abs(regla.y1 - regla.y0);
+  ctx.save();
+  ctx.fillStyle = alza ? 'rgba(52,211,153,.13)' : 'rgba(251,113,133,.13)';
+  ctx.strokeStyle = alza ? C_ALZA : C_BAJA; ctx.lineWidth = 1;
+  ctx.fillRect(x, y, w, h); ctx.strokeRect(Math.round(x)+0.5, Math.round(y)+0.5, w, h);
+  const seg = velas * anchoVela(estado.tf);
+  const dur = seg >= 86400 ? (seg/86400).toFixed(1) + ' d' : seg >= 3600 ? (seg/3600).toFixed(1) + ' h' : Math.round(seg/60) + ' min';
+  const txt = `${pc>=0?'+':''}${pc.toFixed(2)}%  ·  ${fmtP(Math.abs(p1-p0), geo.dec)}  ·  ${velas} velas  ·  ${dur}`;
+  estiloTexto(ctx, { px: 11, peso: 'bold', color: '#0b0e1c', align: 'center' });
+  const tw = ctx.measureText(txt).width + 16;
+  const tx = clamp(x + w/2, geo.padL + tw/2, geo.cssW - geo.padR - tw/2);
+  const ty = clamp(y - 12, geo.padT + 10, geo.cssH - 30);
+  ctx.fillStyle = alza ? C_ALZA : C_BAJA;
+  ctx.fillRect(tx - tw/2, ty - 9, tw, 18);
+  ctx.fillStyle = '#0b0e1c';
+  ctx.fillText(txt, tx, ty);
+  ctx.restore();
+}
+/* Los dibujos se anclan en TIEMPO y precio, no en índice: al cargar más
+   historia todos los índices se desplazan y quedarían descolocados. */
+function pintarDibujos(ctx, X, Y, x0, x1, yTop, yBot) {
+  const iDeT = t => {
+    const v = estado.velas, paso = anchoVela(estado.tf);
+    return (t - v[0].time) / paso;
+  };
+  misDibujos().forEach((d, k) => {
+    const sel = k === dibujoActivo;
+    ctx.lineWidth = sel ? 2 : 1.4;
+    ctx.strokeStyle = sel ? '#fde68a' : (d.color || C_VIOLETA);
+    if (d.tipo === 'h') {
+      const y = Y(d.p);
+      if (y < yTop - 40 || y > yBot + 40) return;
+      ctx.setLineDash([6,4]); ctx.beginPath();
+      ctx.moveTo(x0, Math.round(y)+0.5); ctx.lineTo(x1, Math.round(y)+0.5); ctx.stroke();
+      ctx.setLineDash([]);
+      estiloTexto(ctx, { px: 9.5, color: sel ? '#fde68a' : '#c4b5fd' });
+      ctx.fillText(fmtP(d.p, geo.dec), x0 + 4, y - 8);
+    } else if (d.tipo === 't') {
+      ctx.beginPath();
+      ctx.moveTo(X(iDeT(d.t1)), Y(d.p1)); ctx.lineTo(X(iDeT(d.t2)), Y(d.p2));
+      ctx.stroke();
+      if (sel) {
+        ctx.fillStyle = '#fde68a';
+        [[d.t1,d.p1],[d.t2,d.p2]].forEach(([t,p]) => { ctx.beginPath(); ctx.arc(X(iDeT(t)), Y(p), 4, 0, 6.2832); ctx.fill(); });
+      }
+    }
+  });
+}
+let dibujoActivo = null;
+function dibujoEn(x, y) {
+  const v = estado.velas; if (!v.length) return null;
+  const iDeT = t => (t - v[0].time) / anchoVela(estado.tf);
+  const lista = misDibujos();
+  for (let k = lista.length - 1; k >= 0; k--) {
+    const d = lista[k];
+    if (d.tipo === 'h') { if (Math.abs(geo.Y(d.p) - y) < 6) return k; }
+    else {
+      const ax = geo.X(iDeT(d.t1)), ay = geo.Y(d.p1), bx = geo.X(iDeT(d.t2)), by = geo.Y(d.p2);
+      const L2 = (bx-ax)**2 + (by-ay)**2;
+      if (L2 === 0) continue;
+      const t = clamp(((x-ax)*(bx-ax) + (y-ay)*(by-ay)) / L2, 0, 1);
+      const dx = x - (ax + t*(bx-ax)), dy = y - (ay + t*(by-ay));
+      if (Math.hypot(dx, dy) < 7) return k;
+    }
+  }
+  return null;
+}
+
+/* ══════════ INTERACCIÓN ══════════ */
+const pos = e => { const r = lienzo.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+let arrastre = null;
+
+function zoomEn(factor, xAncla) {
+  const iAncla = geo.iDeX ? geo.iDeX(xAncla) : vista.desde + vista.velas/2;
+  const nuevas = clamp(vista.velas * factor, MIN_VELAS, Math.min(MAX_VELAS, Math.max(MIN_VELAS, estado.velas.length)));
+  const iw = geo.cssW - geo.padL - geo.padR;
+  const pasoN = iw / nuevas;
+  /* el ancla se queda BAJO el cursor: es lo que distingue un zoom usable */
+  vista.desde = iAncla - ((xAncla - geo.padL) / pasoN - 0.5);
+  vista.velas = nuevas;
+  limitarVista();
+  if (vista.desde < 60) cargarMasHistoria();
+  pedirPintado();
+}
+
+lienzo.addEventListener('wheel', e => {
+  e.preventDefault();
+  zoomEn(e.deltaY > 0 ? 1.12 : 1/1.12, pos(e).x);
+}, { passive: false });
+
+lienzo.addEventListener('mousedown', e => {
+  if (e.button === 2) return;
+  const p = pos(e);
+  cursor.x = p.x; cursor.y = p.y; cursor.dentro = true;
+  /* Alt + clic deja una línea horizontal en ese precio */
+  if (e.altKey && p.x < geo.cssW - geo.padR && p.y < geo.padT + geo.ih) {
+    misDibujos().push({ tipo:'h', p: geo.pDeY(p.y) });
+    guardarDibujos(); pedirPintado(); return;
+  }
+  if (e.shiftKey) { regla.activa = true; regla.x0 = regla.x1 = p.x; regla.y0 = regla.y1 = p.y;
+    arrastre = { modo:'regla' }; escena.classList.add('midiendo'); return; }
+  /* el eje derecho arrastra la escala de precio */
+  if (p.x > geo.cssW - geo.padR) { arrastre = { modo:'escala', y: p.y, mn: vista.mn, mx: vista.mx };
+    vista.auto = false; $('btnAuto').setAttribute('aria-pressed','false'); return; }
+  const k = dibujoEn(p.x, p.y);
+  if (k !== null) {
+    dibujoActivo = k;
+    const d = misDibujos()[k];
+    arrastre = { modo:'dibujo', k, p, orig: JSON.parse(JSON.stringify(d)) };
+    pedirPintado(); return;
+  }
+  dibujoActivo = null;
+  arrastre = { modo:'pan', x: p.x, desde: vista.desde, movido: false };
+  escena.classList.add('arrastrando');
+});
+
+addEventListener('mousemove', e => {
+  const p = pos(e);
+  const dentro = p.x >= 0 && p.y >= 0 && p.x <= lienzo.clientWidth && p.y <= lienzo.clientHeight;
+  cursor.x = p.x; cursor.y = p.y; cursor.dentro = dentro;
+  if (arrastre) {
+    if (arrastre.modo === 'pan') {
+      const dx = p.x - arrastre.x;
+      if (Math.abs(dx) > 2) arrastre.movido = true;
+      vista.desde = arrastre.desde - dx / geo.paso;
+      limitarVista();
+      if (vista.desde < 60) cargarMasHistoria();
+    } else if (arrastre.modo === 'regla') { regla.x1 = p.x; regla.y1 = p.y; }
+    else if (arrastre.modo === 'escala') {
+      /* arrastrar hacia abajo comprime, hacia arriba expande */
+      const f = Math.exp((p.y - arrastre.y) / 260);
+      const c = (arrastre.mn + arrastre.mx) / 2, semi = (arrastre.mx - arrastre.mn) / 2 * f;
+      vista.mn = c - semi; vista.mx = c + semi;
+    } else if (arrastre.modo === 'dibujo') {
+      const d = misDibujos()[arrastre.k], o = arrastre.orig;
+      const dp = geo.pDeY(p.y) - geo.pDeY(arrastre.p.y);
+      const dt = Math.round((p.x - arrastre.p.x) / geo.paso) * anchoVela(estado.tf);
+      if (d.tipo === 'h') d.p = o.p + dp;
+      else { d.t1 = o.t1 + dt; d.t2 = o.t2 + dt; d.p1 = o.p1 + dp; d.p2 = o.p2 + dp; }
+    }
+  }
+  pedirPintado();
+});
+
+addEventListener('mouseup', () => {
+  if (arrastre && arrastre.modo === 'regla') { regla.activa = false; }
+  if (arrastre && arrastre.modo === 'dibujo') guardarDibujos();
+  arrastre = null;
+  escena.classList.remove('arrastrando','midiendo');
+  pedirPintado();
+});
+lienzo.addEventListener('mouseleave', () => { cursor.dentro = false; pedirPintado(); });
+
+/* clic derecho sobre un dibujo lo borra, sin menú contextual del navegador */
+lienzo.addEventListener('contextmenu', e => {
+  const p = pos(e);
+  const k = dibujoEn(p.x, p.y);
+  if (k === null) return;
+  e.preventDefault();
+  misDibujos().splice(k, 1);
+  dibujoActivo = null;
+  guardarDibujos(); pedirPintado();
+});
+/* doble clic: escala automática y de vuelta al presente */
+lienzo.addEventListener('dblclick', () => {
+  vista.auto = true; $('btnAuto').setAttribute('aria-pressed','true');
+  encuadreInicial(); pedirPintado();
+});
+
+/* --- táctil: un dedo desplaza, dos hacen zoom --- */
+let toque = null;
+const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+lienzo.addEventListener('touchstart', e => {
+  const t = e.touches;
+  if (t.length === 1) toque = { modo:'pan', x: t[0].clientX, desde: vista.desde };
+  else if (t.length === 2) toque = { modo:'zoom', d: dist(t), velas: vista.velas,
+    x: (t[0].clientX + t[1].clientX)/2 - lienzo.getBoundingClientRect().left };
+}, { passive: true });
+lienzo.addEventListener('touchmove', e => {
+  if (!toque) return;
+  e.preventDefault();
+  const t = e.touches;
+  if (toque.modo === 'pan' && t.length === 1) {
+    vista.desde = toque.desde - (t[0].clientX - toque.x) / geo.paso;
+    limitarVista();
+    if (vista.desde < 60) cargarMasHistoria();
+  } else if (toque.modo === 'zoom' && t.length === 2) {
+    const f = toque.d / dist(t);
+    vista.velas = clamp(toque.velas * f, MIN_VELAS, Math.min(MAX_VELAS, estado.velas.length));
+    limitarVista();
+  }
+  pedirPintado();
+}, { passive: false });
+lienzo.addEventListener('touchend', () => { toque = null; }, { passive: true });
+
+/* --- teclado --- */
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
+  const k = e.key.toLowerCase();
+  if (e.key === 'Escape') { regla.activa = false; dibujoActivo = null; $('ayudaAtajos').hidden = true; $('panelCapas').hidden = true; $('btnCapas').setAttribute('aria-pressed','false'); pedirPintado(); return; }
+  if (e.key === '?' || (k === '/' && e.shiftKey)) { $('ayudaAtajos').hidden = !$('ayudaAtajos').hidden; return; }
+  const idx = ORDEN_TF.indexOf(estado.tf);
+  if (k >= '1' && k <= '6') { cambiarTF(ORDEN_TF[+k - 1]); return; }
+  const sym = SIMBOLOS.find(s => ACTIVOS[s].tecla === k);
+  if (sym) { cambiarActivo(sym); return; }
+  if (e.key === 'ArrowLeft')  { vista.desde -= Math.max(1, vista.velas * 0.1); limitarVista(); if (vista.desde < 60) cargarMasHistoria(); pedirPintado(); e.preventDefault(); }
+  else if (e.key === 'ArrowRight') { vista.desde += Math.max(1, vista.velas * 0.1); limitarVista(); pedirPintado(); e.preventDefault(); }
+  else if (e.key === '+' || e.key === '=') zoomEn(1/1.25, geo.cssW/2);
+  else if (e.key === '-' || e.key === '_') zoomEn(1.25, geo.cssW/2);
+  else if (k === '0') { vista.auto = true; $('btnAuto').setAttribute('aria-pressed','true'); encuadreInicial(); pedirPintado(); }
+  else if (k === 'a') alternarAuto();
+  else if (k === 'c') alternarCapas();
+});
+
+/* ══════════ INTERFAZ ══════════ */
+function pintarBarra() {
+  $('activos').innerHTML = SIMBOLOS.map(s =>
+    `<button class="chip ${s === estado.sym ? 'act' : ''}" data-sym="${s}" role="tab" aria-selected="${s === estado.sym}">${ACTIVOS[s].corto}</button>`).join('');
+  $('intervalos').innerHTML = ORDEN_TF.map(t =>
+    `<button class="chip ${t === estado.tf ? 'on' : ''}" data-tf="${t}" role="tab" aria-selected="${t === estado.tf}">${INTERVALOS[t].etq}</button>`).join('');
+}
+$('activos').addEventListener('click', e => { const b = e.target.closest('[data-sym]'); if (b) cambiarActivo(b.dataset.sym); });
+$('intervalos').addEventListener('click', e => { const b = e.target.closest('[data-tf]'); if (b) cambiarTF(b.dataset.tf); });
+
+function sincronizarHash() {
+  const h = `#${estado.sym}/${estado.tf}`;
+  if (location.hash !== h) history.replaceState(null, '', h);
+}
+function cambiarActivo(sym) {
+  if (sym === estado.sym || !ACTIVOS[sym]) return;
+  estado.sym = sym; LS.set('lo369_sym', sym);
+  estado.velas = []; estado.ticker = null; estado.senal = null; dibujoActivo = null;
+  sincronizarHash(); pintarBarra(); pintarPrecio(); actualizarVolver();
+  cargarSerie(true); conectarVivo();
+}
+function cambiarTF(tf) {
+  if (tf === estado.tf || !INTERVALOS[tf]) return;
+  estado.tf = tf; LS.set('lo369_tf', tf);
+  estado.velas = []; estado.senal = null; dibujoActivo = null;
+  sincronizarHash(); pintarBarra(); actualizarVolver(); pintarNotaCapas();
+  cargarSerie(true); conectarVivo();
+}
+function pintarPrecio() {
+  const t = estado.ticker;
+  const el = $('precioVivo');
+  if (!t) { el.textContent = '…'; return; }
+  el.innerHTML = `${fmt$(t.precio)}<span class="pc ${t.chg >= 0 ? 'sube' : 'baja'}">${t.chg >= 0 ? '▲' : '▼'}${Math.abs(t.chg).toFixed(2)}%</span>`;
+  document.title = `${fmt$(t.precio)} ${ACTIVOS[estado.sym].corto} · LO 369`;
+}
+function pintarEstadoVivo() {
+  $('txtVivo').textContent = vivo.abierto ? 'TIEMPO REAL' : 'RECONECTANDO';
+  $('punto').style.background = vivo.abierto ? 'var(--verde)' : 'var(--ambar)';
+  $('estadoVivo').title = vivo.abierto
+    ? 'Precio y vela en curso por WebSocket de Binance, cada segundo'
+    : 'Sin stream: reintentando con espera creciente. Las velas ya cargadas siguen siendo válidas.';
+}
+function pintarError() {
+  const el = $('error');
+  if (!estado.error || !estado.velas.length) { el.hidden = true; return; }
+  el.hidden = false;
+  el.textContent = `No se pudo refrescar desde Binance (${estado.error}). Lo que ves son las últimas velas buenas. Reintentando…`;
+}
+function actualizarVolver() {
+  const local = location.protocol === 'file:';
+  const base = local ? 'https://kippuu.com/oraculo' : 'oraculo';
+  $('volver').href = base;
+  if (local) { $('volver').target = '_blank'; $('volver').rel = 'noopener'; }
+}
+function alternarAuto() {
+  vista.auto = !vista.auto;
+  $('btnAuto').setAttribute('aria-pressed', String(vista.auto));
+  pedirPintado();
+}
+function alternarCapas() {
+  const p = $('panelCapas');
+  p.hidden = !p.hidden;
+  $('btnCapas').setAttribute('aria-pressed', String(!p.hidden));
+}
+$('btnAuto').addEventListener('click', alternarAuto);
+$('btnCapas').addEventListener('click', alternarCapas);
+$('btnAyuda').addEventListener('click', () => { $('ayudaAtajos').hidden = false; });
+$('cerrarAyuda').addEventListener('click', () => { $('ayudaAtajos').hidden = true; });
+$('ayudaAtajos').addEventListener('click', e => { if (e.target === $('ayudaAtajos')) $('ayudaAtajos').hidden = true; });
+$('alPresente').addEventListener('click', () => { encuadreInicial(); pedirPintado(); });
+$('btnBorrar').addEventListener('click', () => {
+  const n = misDibujos().length;
+  if (!n) return;
+  if (!confirm(`Se borran los ${n} dibujo(s) de ${ACTIVOS[estado.sym].corto} en ${INTERVALOS[estado.tf].etq}. Los de otros activos e intervalos no se tocan.`)) return;
+  dibujos[claveDibujos()] = []; dibujoActivo = null;
+  guardarDibujos(); pedirPintado();
+});
+
+const DEF_CAPAS = [
+  { k:'ema20',  t:'EMA 20',  c:'#38bdf8' },
+  { k:'ema50',  t:'EMA 50',  c:'#22c55e' },
+  { k:'ema200', t:'EMA 200', c:'#f472b6' },
+  { k:'vwap',   t:'VWAP',    c:'#e2e8f0' },
+  { k:'liq',    t:'Niveles de liquidez', c:'#a5b4fc' },
+  { k:'sweeps', t:'Marcas de barrido',   c:'#facc15' },
+  { k:'senal',  t:'Banda de señal 369',  c:'#a78bfa' },
+];
+function pintarPanelCapas() {
+  const sinVwap = INTERVALOS[estado.tf].vwapWin === 0;
+  $('listaCapas').innerHTML = DEF_CAPAS.map(d => {
+    const no = d.k === 'vwap' && sinVwap;
+    return `<label class="${no ? 'no' : ''}"><input type="checkbox" data-capa="${d.k}" ${capas[d.k] ? 'checked' : ''} ${no ? 'disabled' : ''}>` +
+      `<span class="muestra" style="background:${d.c}"></span>${d.t}</label>`;
+  }).join('');
+  pintarNotaCapas();
+}
+function pintarNotaCapas() {
+  const cfg = INTERVALOS[estado.tf];
+  $('notaCapas').textContent = cfg.vwapWin === 0
+    ? `El VWAP es intradía y en ${cfg.etq} no aplica: no hay una sesión diaria dentro de la vela. Guíate por el ribbon de EMAs. Barridos con ${cfg.lb} velas de referencia.`
+    : `VWAP sobre ${cfg.vwapWin} velas, que es un día en ${cfg.etq}. Barridos con ${cfg.lb} velas de referencia y liquidez con ventana ${cfg.w}.`;
+}
+$('listaCapas').addEventListener('change', e => {
+  const c = e.target.dataset.capa; if (!c) return;
+  capas[c] = e.target.checked;
+  LS.set('lo369_capas', JSON.stringify(capas));
+  pedirPintado();
+});
+$('selOsc').value = oscilador;
+$('selOsc').addEventListener('change', e => {
+  oscilador = e.target.value; LS.set('lo369_osc', oscilador);
+  pedirPintado();
+});
+
+/* ══════════ ARRANQUE ══════════ */
+let tempResize = null;
+addEventListener('resize', () => { clearTimeout(tempResize); tempResize = setTimeout(pedirPintado, 100); });
+addEventListener('hashchange', () => {
+  const h = leerHash();
+  if (!h) return;
+  if (h.sym !== estado.sym) cambiarActivo(h.sym);
+  if (h.tf !== estado.tf) cambiarTF(h.tf);
+});
+/* Space Grotesk llega por Google Fonts: el primer pintado cae en el
+   monoespaciado de respaldo, más ancho, y descuadra el eje. */
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => pedirPintado());
+
+sincronizarHash();
+pintarBarra(); pintarPanelCapas(); pintarEstadoVivo(); actualizarVolver();
+cargarSerie(true);
+conectarVivo();
+</script>
+</body>
+</html>
