@@ -1,647 +1,919 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Biblioteca — Archivo · KIPU</title>
+<meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#0a070f">
 <meta name="color-scheme" content="dark">
 <style>html{background:#0a070f}</style>
-<title>Biblioteca — Gnosis y hermetismo · KIPU</title>
-<!-- ============================================================
-     BIBLIOTECA GNÓSTICO-HERMÉTICA — página de presentación
-     PRESENTA el archivo; no lo reproduce. El archivo vive fuera de
-     este repositorio (Escritorio/gnosis), en Markdown plano, porque
-     este repo se despliega íntegro a un sitio público y el material
-     personal no debe publicarse por defecto.
-     Todo el contenido de esta página está destilado de los archivos
-     reales: README.md, TAXONOMIA.md, CONVENCIONES.md, CRONOLOGIA.md
-     y MAPA.md. No se ha añadido ninguna afirmación que no esté allí.
-     ============================================================ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
+/* ══════════════════════════════════════════════════════════════
+   BIBLIOTECA — sistema de archivo
+   Mismo lenguaje que KIPU Pro (barra, ventana con luces, dock y
+   cristal) con la paleta propia del archivo: negro y oro.
+
+   DÓNDE VIVEN LOS FICHEROS
+   En IndexedDB, dentro de este navegador. No hay servidor: el
+   repositorio de esta web despliega su contenido íntegro a un sitio
+   público, así que subir aquí un archivo personal lo publicaría en
+   internet. localStorage tampoco sirve: guarda texto y ronda los
+   5 MB, y un solo PDF lo desborda. IndexedDB admite Blobs y usa
+   una fracción del disco.
+   El precio es que la biblioteca vive en ESTE navegador y en este
+   equipo. Por eso el respaldo no es un adorno: es la única forma
+   de moverla o de sobrevivir a un borrado de datos del sitio.
+   ══════════════════════════════════════════════════════════════ */
 :root{
-  --tinta:#0a070f; --tinta-2:#120d1a; --panel:#15101f;
-  --oro:#E8C766; --oro-alto:#F7E6BC; --oro-bajo:#A87F1E;
-  --texto:#E7E2D6; --texto-2:rgba(231,226,214,.62); --texto-3:rgba(231,226,214,.38);
-  --linea:rgba(232,199,102,.18); --linea-2:rgba(255,255,255,.07);
-  --serif:'EB Garamond',Georgia,serif; --sans:'Inter',system-ui,sans-serif;
+  --oro:#E8C766; --oro-hi:#F7E7B4; --oro-dim:rgba(232,199,102,.34);
+  --tinta:#0a070f; --cristal:rgba(20,16,28,.62); --cristal-hi:rgba(34,28,48,.74);
+  --linea:rgba(255,255,255,.09); --txt:#efe9dd; --txt-dim:rgba(239,233,221,.55);
+  --verde:#3ddc97; --rojo:#f87171; --radio:18px;
+  --sans:'Inter',system-ui,sans-serif; --disp:'Space Grotesk',sans-serif; --serif:'EB Garamond',Georgia,serif;
 }
-*{margin:0;padding:0;box-sizing:border-box}
-body{
-  background:var(--tinta); color:var(--texto);
-  font-family:var(--sans); font-weight:300; line-height:1.7;
-  -webkit-font-smoothing:antialiased; overflow-x:hidden;
-}
-a{color:var(--oro); text-decoration:none}
-a:hover{color:var(--oro-alto)}
-:focus-visible{outline:2px solid var(--oro); outline-offset:3px; border-radius:3px}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--sans);color:var(--txt);background:var(--tinta);font-weight:300}
+button,input,select,textarea{font-family:inherit;color:inherit}
+button{background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--oro);outline-offset:2px;border-radius:6px}
 
-/* ---------- barra ---------- */
-.barra{
-  position:sticky; top:0; z-index:50; display:flex; align-items:center;
-  justify-content:space-between; gap:16px; padding:12px 22px;
-  background:rgba(10,7,15,.86); backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--linea-2);
+/* ---------- fondo ---------- */
+#fondo{position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(80% 60% at 50% -10%,rgba(232,199,102,.10),transparent 60%),
+    radial-gradient(70% 50% at 12% 100%,rgba(124,58,237,.13),transparent 65%),
+    radial-gradient(60% 45% at 92% 78%,rgba(232,199,102,.07),transparent 60%),
+    linear-gradient(175deg,#120d1c 0%,#0a070f 55%,#07050b 100%);
 }
-.barra a.volver{
-  font-size:11px; letter-spacing:.18em; text-transform:uppercase;
-  color:var(--texto-2); border:1px solid var(--linea); border-radius:99px;
-  padding:6px 14px; white-space:nowrap;
-}
-.barra a.volver:hover{color:var(--oro); border-color:var(--oro)}
-.barra .sello{font-family:var(--serif); font-size:13px; letter-spacing:.26em; color:var(--texto-3); text-transform:uppercase}
+/* la ogdóada del icono, muy tenue, como marca de agua del archivo */
+#glifo{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.055;
+  display:grid;place-items:center}
+#glifo svg{width:min(78vmin,720px);height:auto;animation:girar 240s linear infinite}
+@keyframes girar{to{transform:rotate(360deg)}}
+#velo{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(4,3,8,.5) 0%,transparent 20%,transparent 62%,rgba(4,3,8,.6) 100%)}
 
-/* ---------- portada ---------- */
-.portada{
-  position:relative; padding:76px 22px 60px; text-align:center; overflow:hidden;
-  border-bottom:1px solid var(--linea-2);
-}
-.portada::before{
-  content:""; position:absolute; inset:0; pointer-events:none;
-  background:radial-gradient(60% 55% at 50% 0%, rgba(232,199,102,.10), transparent 70%);
-}
-.portada .interior{position:relative; max-width:760px; margin:0 auto}
-.ogdoada{width:88px; height:88px; margin:0 auto 26px; display:block; opacity:.9}
-h1{
-  font-family:var(--serif); font-weight:500; font-size:clamp(30px,6vw,50px);
-  line-height:1.15; letter-spacing:.01em; color:var(--oro-alto);
-}
-.portada .bajada{
-  margin-top:16px; font-size:clamp(15px,2.4vw,17px); color:var(--texto-2);
-  max-width:56ch; margin-left:auto; margin-right:auto;
-}
-/* etiqueta y cifra van en elementos propios: como texto suelto dentro de un
-   inline-flex, el "·" separador formaba caja aparte y caía solo a la segunda
-   línea. Sin él, la pastilla se parte limpia cuando no cabe en una. */
-.estado-chip{
-  display:inline-flex; align-items:baseline; flex-wrap:wrap;
-  justify-content:center; gap:4px 14px; margin-top:26px;
-  font-size:11px; letter-spacing:.14em; text-transform:uppercase;
-  border:1px solid var(--linea); border-radius:99px; padding:8px 18px;
-  color:var(--texto-2); background:rgba(232,199,102,.05);
-}
-.estado-chip i{font-style:normal; white-space:nowrap; color:var(--oro-bajo)}
-.estado-chip b{color:var(--oro); font-weight:600}
+/* ---------- barra superior ---------- */
+#barra{position:fixed;top:0;left:0;right:0;height:46px;z-index:40;display:flex;align-items:center;
+  justify-content:space-between;padding:0 18px;gap:14px;
+  background:rgba(10,7,15,.72);backdrop-filter:blur(20px) saturate(1.3);
+  -webkit-backdrop-filter:blur(20px) saturate(1.3);border-bottom:1px solid var(--linea)}
+#barra .izq{display:flex;align-items:center;gap:14px;font-size:12.5px;letter-spacing:.08em;min-width:0}
+#barra .miga{font-family:var(--disp);font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--txt);text-decoration:none;white-space:nowrap}
+#barra .miga:hover{color:var(--oro-hi)}
+#barra .sub{opacity:.5;font-weight:400;letter-spacing:.13em;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+#barra .der{display:flex;align-items:center;gap:16px;font-size:11.5px;letter-spacing:.09em;color:var(--txt-dim);flex:none}
+#barra .der b{color:var(--oro);font-weight:600}
+#reloj{font-variant-numeric:tabular-nums}
 
-/* ---------- estructura general ---------- */
-main{max-width:880px; margin:0 auto; padding:0 22px 80px}
-section{padding:54px 0; border-bottom:1px solid var(--linea-2)}
-section:last-of-type{border-bottom:none}
-.num{
-  font-family:var(--serif); font-size:12px; letter-spacing:.3em;
-  color:var(--oro-bajo); text-transform:uppercase; display:block; margin-bottom:10px;
-}
-h2{
-  font-family:var(--serif); font-weight:500; font-size:clamp(23px,4vw,31px);
-  line-height:1.25; color:var(--oro-alto); margin-bottom:14px;
-}
-h3{
-  font-family:var(--serif); font-weight:600; font-size:18px;
-  color:var(--texto); margin:30px 0 8px;
-}
-p{margin-bottom:15px; color:var(--texto-2)}
-p strong,li strong{color:var(--texto); font-weight:500}
-.entradilla{font-size:16.5px; color:var(--texto); margin-bottom:22px}
+/* ---------- ventana ---------- */
+#escritorio{position:fixed;inset:46px 0 78px;z-index:10;display:grid;place-items:center;padding:16px}
+.ventana{width:min(1180px,100%);height:100%;display:flex;flex-direction:column;overflow:hidden;
+  background:var(--cristal);backdrop-filter:blur(26px) saturate(1.4);
+  -webkit-backdrop-filter:blur(26px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.12);border-radius:var(--radio);
+  box-shadow:0 40px 90px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);
+  opacity:0;transform:scale(.97) translateY(12px);
+  transition:opacity .32s ease,transform .34s cubic-bezier(.2,.9,.25,1.1)}
+.ventana.abierta{opacity:1;transform:none}
+.titulo-barra{display:flex;align-items:center;gap:12px;padding:12px 16px;flex:0 0 auto;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),transparent);border-bottom:1px solid var(--linea)}
+.luces{display:flex;gap:8px}
+.luces button{width:12px;height:12px;border-radius:50%;filter:saturate(.6);transition:transform .15s,filter .15s}
+.luces button:hover{transform:scale(1.18);filter:saturate(1.3)}
+.l-cerrar{background:#ff5f57}.l-min{background:#febc2e}.l-max{background:#28c840}
+.titulo{font-family:var(--disp);font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  flex:1;text-align:center;transform:translateX(-26px)}
+.titulo small{color:var(--oro-hi);letter-spacing:.2em;margin-left:8px;font-size:10px;font-weight:500}
+.cuerpo{flex:1;display:flex;min-height:0}
 
-/* ---------- cita destacada ---------- */
-blockquote{
-  margin:26px 0; padding:16px 22px; border-left:2px solid var(--oro-bajo);
-  background:rgba(232,199,102,.045); border-radius:0 8px 8px 0;
-  font-family:var(--serif); font-size:17.5px; font-style:italic; color:var(--texto);
-}
+/* ---------- panel lateral ---------- */
+.lateral{flex:0 0 216px;border-right:1px solid var(--linea);padding:14px 10px;overflow-y:auto;
+  display:flex;flex-direction:column;gap:16px}
+.lateral h3{font-family:var(--disp);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--txt-dim);padding:0 8px;margin-bottom:6px;font-weight:600}
+.filtro{display:flex;align-items:center;gap:9px;width:100%;padding:7px 9px;border-radius:9px;
+  font-size:12.5px;color:var(--txt-dim);text-align:left;transition:background .14s,color .14s}
+.filtro:hover{background:rgba(255,255,255,.05);color:var(--txt)}
+.filtro.on{background:rgba(232,199,102,.14);color:var(--oro-hi)}
+.filtro .n{margin-left:auto;font-family:var(--disp);font-size:10.5px;opacity:.6;font-variant-numeric:tabular-nums}
+.filtro .pt{width:7px;height:7px;border-radius:50%;flex:none}
+.medidor{margin-top:auto;padding:10px 9px;border-top:1px solid var(--linea);font-size:10.5px;color:var(--txt-dim);line-height:1.6}
+.medidor .barra-uso{height:5px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden;margin:6px 0 5px}
+.medidor .barra-uso i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--oro),var(--oro-hi));transition:width .4s}
+.medidor b{color:var(--txt);font-weight:600}
+.medidor .persistente{color:var(--verde)} .medidor .volatil{color:#fbbf24}
 
-/* ---------- las tres capas ---------- */
-.capas{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:24px 0}
-@media(max-width:720px){.capas{grid-template-columns:1fr}}
-.capa{
-  padding:16px 17px; border-radius:11px; background:var(--panel);
-  border:1px solid var(--linea-2); border-top:2px solid;
-}
-.capa.t{border-top-color:#7ec8a9}
-.capa.i{border-top-color:var(--oro)}
-.capa.e{border-top-color:#b48ad6}
-.capa .et{
-  font-family:ui-monospace,monospace; font-size:10.5px; letter-spacing:.13em;
-  font-weight:600; display:block; margin-bottom:7px;
-}
-.capa.t .et{color:#7ec8a9} .capa.i .et{color:var(--oro)} .capa.e .et{color:#b48ad6}
-.capa p{font-size:13.5px; margin:0; line-height:1.6}
+/* ---------- zona principal ---------- */
+.principal{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
+.herramientas{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--linea);flex:none;flex-wrap:wrap}
+.buscador{flex:1;min-width:130px;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.28);
+  border:1px solid var(--linea);border-radius:10px;padding:7px 11px}
+.buscador input{flex:1;min-width:0;background:none;border:none;font-size:13px;outline:none}
+.buscador input::placeholder{color:rgba(239,233,221,.34)}
+.buscador .lupa{opacity:.45;font-size:12px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linea);border-radius:10px;
+  padding:7px 13px;font-size:12px;color:var(--txt-dim);white-space:nowrap;transition:all .14s}
+.btn:hover{color:var(--txt);border-color:var(--oro-dim);background:rgba(232,199,102,.08)}
+.btn.oro{color:#1a1206;background:linear-gradient(135deg,var(--oro),#d4a94a);border-color:transparent;font-weight:600}
+.btn.oro:hover{filter:brightness(1.12)}
+.btn.peligro:hover{color:var(--rojo);border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.1)}
+.vista-btn{display:flex;border:1px solid var(--linea);border-radius:10px;overflow:hidden}
+.vista-btn button{padding:7px 11px;font-size:12px;color:var(--txt-dim)}
+.vista-btn button.on{background:rgba(232,199,102,.16);color:var(--oro-hi)}
 
-/* ---------- árbol de carpetas ---------- */
-.arbol{
-  font-family:ui-monospace,SFMono-Regular,monospace; font-size:12.5px; line-height:1.85;
-  background:var(--tinta-2); border:1px solid var(--linea-2); border-radius:11px;
-  padding:18px 20px; margin:22px 0; overflow-x:auto; color:var(--texto-2);
-}
-.arbol .c{color:var(--oro)}
-.arbol .g{color:var(--texto-3)}
+.lista{flex:1;overflow-y:auto;padding:14px;scrollbar-width:thin;scrollbar-color:rgba(232,199,102,.35) transparent}
+.lista::-webkit-scrollbar{width:9px}
+.lista::-webkit-scrollbar-thumb{background:rgba(232,199,102,.28);border-radius:9px}
+.rejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:13px}
 
-/* ---------- tablas ---------- */
-.tabla-scroll{overflow-x:auto; margin:20px 0}
-table{width:100%; border-collapse:collapse; font-size:14px; min-width:480px}
-th{
-  text-align:left; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--oro-bajo); font-weight:600; padding:9px 12px;
-  border-bottom:1px solid var(--linea);
-}
-td{padding:10px 12px; border-bottom:1px solid var(--linea-2); color:var(--texto-2); vertical-align:top}
-td:first-child{color:var(--texto); font-weight:500; white-space:nowrap}
+.obra{background:rgba(255,255,255,.035);border:1px solid var(--linea);border-radius:13px;
+  overflow:hidden;text-align:left;transition:transform .16s,border-color .16s,background .16s;
+  display:flex;flex-direction:column}
+.obra:hover{transform:translateY(-3px);border-color:var(--oro-dim);background:rgba(232,199,102,.07)}
+.obra .tapa{aspect-ratio:3/4;display:grid;place-items:center;position:relative;
+  background:linear-gradient(160deg,#1b1526,#0a070f);overflow:hidden}
+.obra .tapa img{width:100%;height:100%;object-fit:cover}
+.obra .ext{font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:.14em;
+  color:var(--oro);border:1px solid var(--oro-dim);border-radius:7px;padding:5px 9px}
+.obra .datos{padding:9px 10px 11px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.obra .tit{font-family:var(--serif);font-size:14px;line-height:1.3;color:var(--txt);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.obra .aut{font-size:10.5px;color:var(--txt-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.obra .pie{display:flex;gap:5px;align-items:center;margin-top:3px;flex-wrap:wrap}
+.eti{font-family:var(--disp);font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;
+  border-radius:5px;padding:2px 6px;border:1px solid currentColor;opacity:.85;white-space:nowrap}
 
-/* ---------- fichas de tradición ---------- */
-.tradiciones{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:22px 0}
-@media(max-width:720px){.tradiciones{grid-template-columns:1fr}}
-.trad{
-  padding:15px 17px; border-radius:11px; background:var(--panel);
-  border:1px solid var(--linea-2);
-}
-.trad h4{
-  font-family:var(--serif); font-size:16.5px; font-weight:600;
-  color:var(--oro-alto); margin-bottom:5px;
-}
-.trad p{font-size:13.5px; margin:0; line-height:1.6}
+/* vista de tabla */
+.tabla{width:100%;border-collapse:collapse;font-size:12.5px}
+.tabla th{text-align:left;font-family:var(--disp);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--txt-dim);padding:8px 10px;border-bottom:1px solid var(--linea);font-weight:600;position:sticky;top:0;
+  background:rgba(20,16,28,.96);backdrop-filter:blur(8px)}
+.tabla td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--txt-dim);vertical-align:middle}
+.tabla tr{cursor:pointer}
+.tabla tr:hover td{background:rgba(232,199,102,.07);color:var(--txt)}
+.tabla td.t{color:var(--txt);font-family:var(--serif);font-size:14px}
+.tabla td.num{text-align:right;font-family:var(--disp);font-size:11px;font-variant-numeric:tabular-nums}
 
-/* ---------- esquema cosmológico ---------- */
-.aviso{
-  margin:22px 0; padding:15px 18px; border-radius:11px;
-  background:rgba(180,138,214,.09); border:1px solid rgba(180,138,214,.32);
-  font-size:14px; color:var(--texto);
-}
-.aviso b{color:#d9bff0}
-.escalera{margin:24px 0; display:flex; flex-direction:column; gap:0}
-.peldano{
-  display:grid; grid-template-columns:118px 1fr; gap:16px; align-items:start;
-  padding:11px 0; border-bottom:1px dashed var(--linea-2);
-}
-@media(max-width:600px){.peldano{grid-template-columns:1fr; gap:2px}}
-.peldano:last-child{border-bottom:none}
-.peldano .p-n{
-  font-family:var(--serif); font-size:15px; color:var(--oro); font-weight:600;
-}
-.peldano .p-d{font-size:13.5px; color:var(--texto-2); line-height:1.6}
+/* ---------- vacío y arrastre ---------- */
+.vacio{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;text-align:center;padding:30px 24px;color:var(--txt-dim)}
+.vacio .icn{font-size:44px;opacity:.5}
+.vacio h2{font-family:var(--serif);font-size:23px;color:var(--txt);font-weight:400}
+.vacio p{font-size:13px;line-height:1.7;max-width:460px}
+.vacio .apunte{font-size:11.5px;line-height:1.65;max-width:480px;border:1px solid var(--linea);
+  border-radius:11px;padding:11px 15px;background:rgba(0,0,0,.22)}
+.vacio .apunte b{color:var(--oro-hi);font-weight:600}
+#soltar{position:absolute;inset:0;z-index:20;display:none;place-items:center;
+  background:rgba(10,7,15,.9);border:2px dashed var(--oro);border-radius:14px;margin:8px}
+#soltar.on{display:grid}
+#soltar div{text-align:center;font-family:var(--disp);letter-spacing:.16em;text-transform:uppercase;
+  font-size:13px;color:var(--oro-hi)}
+#soltar span{display:block;font-family:var(--sans);font-size:11.5px;letter-spacing:.04em;
+  text-transform:none;color:var(--txt-dim);margin-top:8px}
 
-/* ---------- lista de discutidos ---------- */
-ul.limpia{list-style:none; margin:16px 0}
-ul.limpia li{
-  position:relative; padding-left:22px; margin-bottom:11px;
-  font-size:14.5px; color:var(--texto-2); line-height:1.65;
-}
-ul.limpia li::before{
-  content:"◈"; position:absolute; left:0; top:0; color:var(--oro-bajo); font-size:11px;
-}
-.marca{
-  display:inline-block; font-family:ui-monospace,monospace; font-size:10px;
-  letter-spacing:.08em; text-transform:uppercase; padding:2px 7px; border-radius:5px;
-  margin-right:7px; vertical-align:1px;
-}
-.m-cons{background:rgba(126,200,169,.15); color:#7ec8a9; border:1px solid rgba(126,200,169,.3)}
-.m-disc{background:rgba(232,199,102,.13); color:var(--oro); border:1px solid rgba(232,199,102,.3)}
-.m-trad{background:rgba(180,138,214,.13); color:#b48ad6; border:1px solid rgba(180,138,214,.3)}
-.m-verif{background:rgba(255,255,255,.06); color:var(--texto-3); border:1px solid var(--linea-2)}
+/* ---------- dock ---------- */
+#dock{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:40;
+  display:flex;align-items:center;gap:6px;padding:8px 11px;border-radius:20px;
+  background:rgba(20,16,28,.58);backdrop-filter:blur(22px) saturate(1.5);
+  -webkit-backdrop-filter:blur(22px) saturate(1.5);border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 22px 50px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12)}
+#dock button{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;font-size:17px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  transition:transform .16s cubic-bezier(.2,1.2,.3,1),background .16s}
+#dock button:hover{transform:translateY(-6px) scale(1.08);background:rgba(232,199,102,.18)}
+#dock .sep{width:1px;height:26px;background:rgba(255,255,255,.14);margin:0 3px}
 
-/* ---------- pie ---------- */
-footer{
-  border-top:1px solid var(--linea-2); padding:34px 22px 46px;
-  text-align:center; font-size:12.5px; color:var(--texto-3); line-height:1.8;
+/* ---------- panel de detalle ---------- */
+#detalle{position:fixed;inset:0;z-index:60;display:none;place-items:center;padding:18px;
+  background:rgba(4,3,8,.72);backdrop-filter:blur(6px)}
+#detalle.on{display:grid}
+.ficha{width:min(760px,100%);max-height:100%;display:flex;flex-direction:column;overflow:hidden;
+  background:var(--cristal-hi);backdrop-filter:blur(26px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.14);border-radius:var(--radio);
+  box-shadow:0 40px 90px rgba(0,0,0,.7)}
+.ficha-cuerpo{overflow-y:auto;padding:18px 22px 22px;display:flex;flex-direction:column;gap:14px}
+.campo{display:flex;flex-direction:column;gap:5px}
+.campo label{font-family:var(--disp);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--txt-dim);font-weight:600}
+.campo input,.campo select,.campo textarea{background:rgba(0,0,0,.3);border:1px solid var(--linea);
+  border-radius:9px;padding:8px 11px;font-size:13px;outline:none;width:100%}
+.campo input:focus,.campo select:focus,.campo textarea:focus{border-color:var(--oro-dim)}
+.campo textarea{resize:vertical;min-height:76px;line-height:1.6;font-family:var(--serif);font-size:15px}
+.rejilla-campos{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.meta-fija{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;
+  border:1px solid var(--linea);border-radius:11px;padding:11px 13px;background:rgba(0,0,0,.22)}
+.meta-fija div{font-size:11px;color:var(--txt-dim);line-height:1.5}
+.meta-fija b{display:block;font-family:var(--disp);font-size:9px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--txt-dim);opacity:.7;margin-bottom:2px;font-weight:600}
+.meta-fija span{color:var(--txt);font-size:12.5px}
+.acciones{display:flex;gap:9px;flex-wrap:wrap;padding-top:4px}
+
+/* ---------- avisos ---------- */
+#avisos{position:fixed;right:14px;bottom:74px;z-index:70;display:flex;flex-direction:column-reverse;
+  gap:8px;max-width:min(360px,calc(100vw - 28px));pointer-events:none}
+.aviso{pointer-events:auto;background:rgba(16,12,24,.97);border:1px solid var(--linea);
+  border-left:3px solid var(--oro);border-radius:10px;padding:9px 13px;font-size:12px;line-height:1.5;
+  color:var(--txt-dim);box-shadow:0 12px 30px rgba(0,0,0,.6);animation:entrar .22s ease;transition:opacity .3s}
+.aviso.ok{border-left-color:var(--verde)} .aviso.mal{border-left-color:var(--rojo)}
+@keyframes entrar{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+#progreso{position:fixed;top:46px;left:0;right:0;height:2px;z-index:50;background:transparent}
+#progreso i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--oro),var(--oro-hi));transition:width .2s}
+
+@media(max-width:820px){
+  #escritorio{inset:46px 0 76px;padding:8px}
+  /* Por debajo de este ancho el lateral no cabe al lado, así que se esconde y
+     se abre superpuesto desde el botón ☰. Sin ese botón los filtros quedaban
+     sencillamente inalcanzables en pantallas estrechas. */
+  .lateral{display:none}
+  .lateral.movil{display:flex;position:absolute;inset:0;z-index:30;flex:1;
+    background:rgba(16,12,24,.985);border-right:none;padding-top:10px}
+  #btnLateral{display:inline-flex!important}
+  .titulo{transform:none;font-size:11.5px}
+  .rejilla{grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px}
+  .rejilla-campos{grid-template-columns:1fr}
+  #barra .sub{display:none}
+  #dock button{width:38px;height:38px;font-size:15px}
 }
-footer .ruta{font-family:ui-monospace,monospace; color:var(--texto-2)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 
-<div class="barra">
-  <a class="volver" href="santa-catarina">← Escritorio</a>
-  <span class="sello">Archivo</span>
+<div id="fondo"></div>
+<div id="glifo" aria-hidden="true">
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="#E8C766" stroke-width=".5" fill="none">
+      <path d="M50 50 L50 4M50 50 L82 18M50 50 L96 50M50 50 L82 82M50 50 L50 96M50 50 L18 82M50 50 L4 50M50 50 L18 18"/>
+      <circle cx="50" cy="50" r="34"/><circle cx="50" cy="50" r="24"/><circle cx="50" cy="50" r="13"/>
+    </g>
+  </svg>
 </div>
+<div id="velo" aria-hidden="true"></div>
 
-<header class="portada">
-  <div class="interior">
-    <svg class="ogdoada" viewBox="0 0 100 100" aria-hidden="true">
-      <g stroke="rgba(232,199,102,.35)" stroke-width="1">
-        <path d="M50 50 L50 10M50 50 L78 22M50 50 L90 50M50 50 L78 78M50 50 L50 90M50 50 L22 78M50 50 L10 50M50 50 L22 22"/>
-      </g>
-      <circle cx="50" cy="50" r="32" fill="none" stroke="rgba(232,199,102,.45)" stroke-width="1.2"/>
-      <circle cx="50" cy="50" r="21" fill="none" stroke="rgba(232,199,102,.25)" stroke-width="1"/>
-      <circle cx="50" cy="50" r="6" fill="#E8C766"/>
-      <circle cx="50" cy="50" r="12" fill="none" stroke="rgba(247,230,188,.5)" stroke-width="1"/>
-    </svg>
-    <h1>Gnosis y hermetismo</h1>
-    <p class="bajada">
-      Un archivo de trabajo sobre el gnosticismo de los primeros siglos y la tradición
-      hermética que se le entrelaza. Su valor no crece con el número de ficheros, sino
-      con la densidad de sus conexiones internas.
-    </p>
-    <span class="estado-chip"><i>Estado actual</i><b>34 carpetas, 20 archivos, 0 materiales ingeridos</b></span>
+<header id="barra">
+  <div class="izq">
+    <a class="miga" href="santa-catarina">← Escritorio</a>
+    <span class="sub">Biblioteca · Archivo local</span>
+  </div>
+  <div class="der">
+    <span id="cuenta">— obras</span>
+    <span id="reloj">—</span>
   </div>
 </header>
+<div id="progreso"><i></i></div>
 
-<main>
-
-<!-- ============ 01 · QUÉ ES ============ -->
-<section>
-  <span class="num">01 · Qué es</span>
-  <h2>Una biblioteca de trabajo, no un proyecto</h2>
-  <p class="entradilla">
-    Carpetas y archivos de texto plano donde se depositan, ordenan y anotan materiales
-    del gnosticismo de los siglos <span style="white-space:nowrap">I–IV</span> y de la
-    tradición hermética. Su lógica es la del archivo, no la del proyecto: no tiene fecha
-    de entrega ni estado «terminado».
-  </p>
-
-  <h3>Lo que no es</h3>
-  <p>
-    <strong>No es una web</strong> ni una app: no hay build, ni servidor, ni base de datos,
-    ni plugin del que dependa. Se lee con cualquier editor de texto.
-    <strong>No es un montón de PDFs sueltos</strong>: un PDF sin procesar no está archivado,
-    está pendiente, porque lo que se archiva es la <em>lectura</em> del material —resumen,
-    metadatos, términos extraídos, conexiones—, no el fichero binario.
-    Y <strong>no es un devocionario</strong> ni un manual de práctica.
-  </p>
-
-  <h3>Los dos ejes, y su cruce</h3>
-  <p>
-    <strong>Gnosticismo clásico:</strong> los textos coptos de Nag Hammadi, las escuelas
-    setiana, valentiniana y basilidiana, el marcionismo, los mandeos —la única de estas
-    corrientes con continuidad comunitaria hasta hoy— y el maniqueísmo. Junto a ellos, los
-    testimonios heresiológicos: fuentes hostiles, pero durante siglos las únicas
-    disponibles, y aún hoy imprescindibles para reconstruir sistemas que no han llegado
-    por vía directa.
-  </p>
-  <p>
-    <strong>Hermetismo y esoterismo:</strong> el Corpus Hermeticum griego y el Asclepio
-    latino, la Tabla de Esmeralda, la alquimia, la cábala, el neoplatonismo, la teosofía
-    moderna. Y también la historia de recepción de todo ello.
-  </p>
-  <p>
-    No se tocan de vez en cuando: se cruzan constantemente. Comparten vocabulario técnico,
-    el problema del ascenso del alma a través de las esferas, el medio cultural del Egipto
-    grecorromano y, sobre todo, su historia moderna —buena parte de lo que hoy llamamos
-    «gnosticismo» y «hermetismo» se reconstruyó a la vez, con las mismas herramientas y a
-    menudo con las mismas confusiones. Que se crucen no significa que sean lo mismo:
-    sostener la distinción sin negar el contacto es tarea permanente de la biblioteca.
-  </p>
-
-  <div class="aviso">
-    <b>Una disputa que consta desde la portada.</b> La categoría misma de «gnosticismo»
-    está discutida en los estudios actuales: hay una línea consolidada que sostiene que es
-    una construcción moderna, heredera de la polémica heresiológica, que agrupa fenómenos
-    demasiado heterogéneos para un mismo nombre. Aquí el término se usa por comodidad
-    operativa y porque la bibliografía lo usa, no porque se dé el debate por resuelto.
-  </div>
-</section>
-
-<!-- ============ 02 · EL MÉTODO ============ -->
-<section>
-  <span class="num">02 · El método</span>
-  <h2>Tres capas, o por qué esto no es una carpeta de PDFs</h2>
-  <p class="entradilla">
-    La biblioteca no se distingue por lo que guarda, sino por cómo obliga a escribirlo.
-    Cada párrafo declara de antemano su estatuto. En un campo donde abundan las citas
-    apócrifas y las atribuciones cómodas, esa disciplina es lo único que separa un archivo
-    de un rumor ordenado.
-  </p>
-
-  <div class="capas">
-    <div class="capa t">
-      <span class="et">[TEXTO]</span>
-      <p>Lo que el documento dice. Descripción de lo que está escrito, sin conclusiones.</p>
+<main id="escritorio">
+  <section class="ventana" id="ventana">
+    <div class="titulo-barra">
+      <span class="luces">
+        <button class="l-cerrar" id="lCerrar" type="button" aria-label="Volver al escritorio"></button>
+        <button class="l-min" type="button" aria-label="Minimizar" disabled></button>
+        <button class="l-max" type="button" aria-label="Maximizar" disabled></button>
+      </span>
+      <span class="titulo">Biblioteca <small id="subtitulo">GNOSIS Y HERMETISMO</small></span>
     </div>
-    <div class="capa i">
-      <span class="et">[TRADICIÓN]</span>
-      <p>Lo que la tradición o los estudiosos han interpretado. Lectura ajena, atribuida.</p>
+    <div class="cuerpo">
+      <aside class="lateral" id="lateral">
+        <div>
+          <h3>Colección</h3>
+          <div id="filtrosClase"></div>
+        </div>
+        <div>
+          <h3>Fiabilidad</h3>
+          <div id="filtrosFiab"></div>
+        </div>
+        <div class="medidor" id="medidor"></div>
+      </aside>
+      <div class="principal" id="principal">
+        <div class="herramientas">
+          <button class="btn" id="btnLateral" type="button" style="display:none"
+            aria-expanded="false" aria-controls="lateral" title="Colecciones y filtros">☰ Filtros</button>
+          <div class="buscador">
+            <span class="lupa" aria-hidden="true">⌕</span>
+            <input id="buscar" type="search" placeholder="Buscar por título, autor, etiqueta o nota…" aria-label="Buscar en la biblioteca">
+          </div>
+          <div class="vista-btn" role="group" aria-label="Forma de ver">
+            <button id="vRejilla" type="button" class="on" aria-pressed="true" title="Rejilla">▦</button>
+            <button id="vTabla" type="button" aria-pressed="false" title="Lista">☰</button>
+          </div>
+          <button class="btn oro" id="btnAnadir" type="button">＋ Añadir archivos</button>
+        </div>
+        <div class="lista" id="lista"></div>
+        <div id="soltar"><div>Suelta aquí<span>Se guardan en este navegador. No se suben a ningún servidor.</span></div></div>
+      </div>
     </div>
-    <div class="capa e">
-      <span class="et">[ESPECULACIÓN]</span>
-      <p>Hipótesis propia, sin probar. Nada asciende de aquí sin evidencia documentada.</p>
-    </div>
-  </div>
-
-  <p>
-    Los marcadores van <strong>en línea, uno por párrafo</strong>, y no como encabezados de
-    sección. La razón es concreta: el riesgo real no es escribir un bloque interpretativo
-    creyéndolo descriptivo, sino la frase que empieza describiendo y termina interpretando
-    a mitad de camino. Marcando párrafo a párrafo, ese deslizamiento no tiene dónde
-    esconderse — y además los marcadores se pueden buscar con cualquier buscador de texto.
-  </p>
-
-  <h3>Las reglas duras</h3>
-  <ul class="limpia">
-    <li>Sin la cita exacta delante se escribe <strong>«cita por verificar»</strong>. Nunca se
-      reconstruye de memoria un versículo, un logion o la numeración de un tratado.</li>
-    <li>Sin la referencia comprobada se escribe <strong>«referencia por verificar»</strong>,
-      jamás una página o un volumen inventados.</li>
-    <li>Las atribuciones discutidas se redactan como tales: <strong>«atribuido a Hermes
-      Trismegisto»</strong> no es lo mismo que «de Hermes Trismegisto».</li>
-    <li>Cuando una traducción es polémica, se señala y se da el término copto o griego.</li>
-    <li>Las dataciones van <strong>en rango</strong>, con los extremos y quién defiende cada
-      uno. Nunca una fecha cerrada donde el consenso da un intervalo.</li>
-    <li>Lo moderno con apariencia de antiguo se marca <code>apocrifa-moderna</code>: sin
-      juicio de valor, pero sin ambigüedad.</li>
-    <li>Si dos fuentes se contradicen, <strong>no se armonizan</strong>. El conflicto se
-      registra en los archivos de ambas.</li>
-  </ul>
-</section>
-
-<!-- ============ 03 · ESTRUCTURA ============ -->
-<section>
-  <span class="num">03 · Estructura</span>
-  <h2>La numeración mide distancia a la fuente</h2>
-  <p class="entradilla">
-    Las carpetas van de <code>00</code> a <code>99</code>. El número no indica importancia:
-    indica distancia respecto al texto. Cuanto más bajo, más cerca de la fuente; cuanto más
-    alto, más cerca de la elaboración propia.
-  </p>
-
-  <div class="arbol">
-<span class="c">00-indice/</span>            <span class="g">índice maestro · taxonomía · glosario · cronología · mapa</span>
-<span class="c">01-fuentes-primarias/</span> <span class="g">nag-hammadi · corpus-hermeticum · otros-coptos-y-griegos · heresiologia</span>
-<span class="c">02-tradiciones/</span>      <span class="g">once corrientes, de los setianos a la recepción moderna</span>
-<span class="c">03-estudios/</span>         <span class="g">ediciones-y-traducciones · articulos · libros</span>
-<span class="c">04-notas/</span>            <span class="g">literarias · permanentes · fugaces</span>
-<span class="c">05-temas/</span>            <span class="g">una síntesis por concepto mayor</span>
-<span class="c">06-publicacion/</span>      <span class="g">borradores · publicado · activos</span>
-<span class="c">07-inbox/</span>            <span class="g">todo lo nuevo cae aquí antes de clasificarse</span>
-<span class="c">99-meta/</span>             <span class="g">plantillas · convenciones · registro de ingestas</span>
-  </div>
-
-  <h3>Por qué cada separación existe</h3>
-  <p>
-    <strong>La heresiología va en fuentes primarias.</strong> Ireneo o Epifanio son fuentes
-    antiguas de primera mano <em>para nosotros</em>, aunque sean testimonio hostil y de
-    segunda mano respecto de las doctrinas que describen. Tratarlos como estudios modernos
-    sería un error de categoría; tratarlos como descripción neutral, un error de método.
-  </p>
-  <p>
-    <strong>Los textos y las escuelas van aparte</strong> porque un texto no es una escuela.
-    La adscripción de un tratado concreto a una corriente concreta es casi siempre una
-    hipótesis moderna, a veces frágil y a veces disputada. Con las carpetas separadas, el
-    texto se archiva mientras su adscripción sigue en discusión, y cambiar de hipótesis no
-    obliga a mover nada.
-  </p>
-  <p>
-    <strong>Los estudios van aparte</strong> porque un estudio sobre los valentinianos no es
-    una fuente valentiniana, por bueno que sea. Y <strong>los temas son otra capa</strong>:
-    una síntesis de segundo orden que reúne y confronta lo que varias fuentes dicen sobre un
-    mismo concepto, incluidos sus desacuerdos. Es el nivel donde la biblioteca deja de
-    acumular y empieza a pensar.
-  </p>
-  <p>
-    <strong>El inbox puede estar lleno.</strong> Que tenga elementos no es un fallo: es la
-    prueba de que el sistema recibe material. Que lleve meses sin vaciarse, eso sí es una
-    señal.
-  </p>
-</section>
-
-<!-- ============ 04 · TRADICIONES ============ -->
-<section>
-  <span class="num">04 · Tradiciones</span>
-  <h2>Once corrientes, no una masa llamada «gnosticismo»</h2>
-  <p class="entradilla">
-    La biblioteca no tiene carpeta llamada «gnosticismo»: tiene once tradiciones concretas,
-    cada una con su perfil y sus fronteras discutidas.
-  </p>
-
-  <div class="tradiciones">
-    <div class="trad"><h4>Setianos</h4><p>Densa impronta bíblica y poca o ninguna cristología. El trasfondo judío es más sólido aquí que en ninguna otra corriente.</p></div>
-    <div class="trad"><h4>Valentinianos</h4><p>Se mueven en ambiente cristiano. Se dividieron en ramas oriental e itálica.</p></div>
-    <div class="trad"><h4>Basilidianos</h4><p>Los dos resúmenes heresiológicos conservados describen sistemas difícilmente compatibles: sólo puede archivarse «Basílides según Ireneo» y «Basílides según Hipólito».</p></div>
-    <div class="trad"><h4>Marcionismo</h4><p>Opone el dios extraño y bueno del evangelio al dios justo del Antiguo Testamento, pero sin pleroma de eones ni caída de la sabiduría. Su motor es exegético, no mitológico.</p></div>
-    <div class="trad"><h4>Mandeos</h4><p>Otro vocabulario y otra historia. La única de estas comunidades que ha sobrevivido de forma continuada hasta hoy.</p></div>
-    <div class="trad"><h4>Maniqueísmo</h4><p>Dos principios coeternos, luz y tiniebla: no hay error de un eón caído, sino agresión de un principio contra otro. Y es una religión con canon, iglesia y jerarquía, no una escuela de maestros.</p></div>
-    <div class="trad"><h4>Hermetismo</h4><p>En general <em>no</em> es anticósmico: en buena parte de los tratados el cosmos es bello y el ascenso es camino de conocimiento, no fuga de una cárcel.</p></div>
-    <div class="trad"><h4>Alquimia</h4><p>Comparte con ambos ejes el ambiente intelectual del Egipto romano. De la grecoegipcia pasa a la árabe y de ahí a la latina.</p></div>
-    <div class="trad"><h4>Cábala</h4><p>Su relación con el gnosticismo antiguo es tesis discutida: el problema es de mecanismo, no se ha documentado canal de transmisión entre los siglos IV y XII.</p></div>
-    <div class="trad"><h4>Neoplatonismo</h4><p>Vecindad y polémica, no descendencia. Comparten léxico y problemas platónicos, y discrepan justamente por eso.</p></div>
-    <div class="trad"><h4>Recepción moderna</h4><p>Lo que los siglos XIX–XXI hicieron con este material. Parte legítima del objeto de estudio, siempre que no se confunda con su origen.</p></div>
-  </div>
-
-  <h3>Cinco grados de fiabilidad</h3>
-  <p>
-    No miden la calidad de un texto, sino su relación con las fuentes. Una obra de
-    divulgación excelente sigue siendo divulgación.
-  </p>
-  <div class="tabla-scroll">
-    <table>
-      <thead><tr><th>Valor</th><th>Qué significa</th></tr></thead>
-      <tbody>
-        <tr><td>primaria</td><td>El texto mismo del corpus, en edición o traducción.</td></tr>
-        <tr><td>secundaria</td><td>Estudio académico sobre el material.</td></tr>
-        <tr><td>divulgacion</td><td>Difusión no especializada. Puede ser buena y seguir siendo divulgación.</td></tr>
-        <tr><td>especulativa</td><td>Interpretación sin respaldo documental establecido.</td></tr>
-        <tr><td>apocrifa-moderna</td><td>Obra moderna que se presenta como transmisión antigua. Se marca sin juicio de valor, pero sin ambigüedad.</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<!-- ============ 05 · LAS TRES FECHAS ============ -->
-<section>
-  <span class="num">05 · Cronología</span>
-  <h2>Un texto casi nunca tiene una sola fecha</h2>
-  <p class="entradilla">
-    Distinguir cuándo se escribió un texto, cuándo se copió el ejemplar que hoy tenemos y
-    cuándo se tradujo es la disciplina básica de este campo. Confundirlas es el error más
-    frecuente y más costoso.
-  </p>
-
-  <div class="tabla-scroll">
-    <table>
-      <thead><tr><th>Fecha</th><th>Qué mide</th></tr></thead>
-      <tbody>
-        <tr><td>Composición</td><td>Cuándo se escribió la obra. Casi siempre hipótesis.</td></tr>
-        <tr><td>Manuscrito</td><td>Cuándo se copió el ejemplar conservado.</td></tr>
-        <tr><td>Traducción</td><td>Cuándo se vertió a la lengua en que ha llegado. Puede ser siglos posterior.</td></tr>
-        <tr><td>Edición</td><td>Cuándo se descubrió o publicó. No dice nada sobre su antigüedad.</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <blockquote>
-    Decir que un tratado de Nag Hammadi «es del siglo IV» es confundir el papiro con la
-    obra. Decir que «es del siglo II» es afirmar como cierto lo que en muchos casos es una
-    hipótesis.
-  </blockquote>
-
-  <p>
-    Los códices coptos se sitúan de forma bastante estable hacia mediados del
-    <span style="white-space:nowrap">s. IV</span>, mientras que los textos que contienen se
-    componen, según cada caso, entre los <span style="white-space:nowrap">ss. II y IV</span>.
-    Los trece códices reúnen tratados de tradiciones dispares y <strong>no forman una
-    «biblioteca gnóstica» homogénea</strong>: la fecha de copia es común, las de composición
-    no lo son.
-  </p>
-
-  <h3>Cada entrada lleva su grado de certeza</h3>
-  <p>
-    <span class="marca m-cons">consenso</span> acuerdo amplio, discrepancias marginales.<br>
-    <span class="marca m-disc">discutido</span> posiciones enfrentadas y vigentes; se dan ambas.<br>
-    <span class="marca m-trad">tradicional</span> heredado de la propia tradición, no establecido críticamente: se registra porque circula, no porque se suscriba.<br>
-    <span class="marca m-verif">por verificar</span> no puede confirmarse sin el material delante.
-  </p>
-
-  <h3>1614, el punto de inflexión</h3>
-  <p>
-    Isaac Casaubon demuestra, con argumentos de lengua y de contenido, que los tratados del
-    Corpus Hermeticum no pueden ser de una antigüedad egipcia anterior a Moisés, como
-    sostenía la lectura renacentista, sino de época imperial romana. Hoy se sitúan
-    aproximadamente entre los <span style="white-space:nowrap">ss. I y III d.C.</span>
-  </p>
-  <blockquote>
-    El hermetismo renacentista es históricamente real e influyente, pero su autoconciencia
-    cronológica era falsa. Ambos datos son verdaderos a la vez y hay que registrar los dos.
-  </blockquote>
-  <p>
-    Conviene además no confundir dos cronologías distintas: la de composición y la de
-    <strong>descubrimiento y edición</strong>. Entre el hallazgo de un corpus y su
-    disponibilidad efectiva pasan de veinte a sesenta años, y en ese intervalo circulan
-    versiones parciales y traducciones apresuradas. Los códices Brucianus y Askewianus
-    pusieron material gnóstico copto al alcance de Europa mucho antes de 1945, y los
-    relatos populares suelen olvidarlo.
-  </p>
-</section>
-
-<!-- ============ 06 · EL ESQUEMA ============ -->
-<section>
-  <span class="num">06 · El esquema</span>
-  <h2>Un promedio que no existe en ninguna fuente</h2>
-
-  <div class="aviso">
-    <b>Advertencia, antes del esquema y no después.</b> Lo que sigue es un esquema
-    <em>compuesto</em>, montado con fines de orientación: <b>ninguna escuela concreta
-    sostiene exactamente esto</b>. Se construyó tomando rasgos recurrentes de varias
-    corrientes y alineándolos en una secuencia. Las diferencias reales están precisamente
-    en los detalles que el esquema aplana. Úsese como índice de conceptos, nunca como
-    resumen doctrinal.
-  </div>
-
-  <div class="escalera">
-    <div class="peldano"><span class="p-n">Lo inefable</span><span class="p-d">Principio primero, incognoscible, sin nombre.</span></div>
-    <div class="peldano"><span class="p-n">Pleroma</span><span class="p-d">Plenitud de los eones, emanados por pares o series.</span></div>
-    <div class="peldano"><span class="p-n">El error</span><span class="p-d">Deseo, audacia o ignorancia de un eón último.</span></div>
-    <div class="peldano"><span class="p-n">Producto defectuoso</span><span class="p-d">Aborto, sombra, materia informe.</span></div>
-    <div class="peldano"><span class="p-n">Demiurgo</span><span class="p-d">Artesano del mundo; se cree único dios.</span></div>
-    <div class="peldano"><span class="p-n">Arcontes</span><span class="p-d">Potencias planetarias, guardianes de las esferas.</span></div>
-    <div class="peldano"><span class="p-n">Heimarmene</span><span class="p-d">Destino astral, ley, sujeción.</span></div>
-    <div class="peldano"><span class="p-n">El cosmos</span><span class="p-d">Región de la mezcla: mundo material, esferas, cuerpo fabricado por los arcontes.</span></div>
-    <div class="peldano"><span class="p-n">La chispa</span><span class="p-d">Pneuma o simiente de lo alto, atrapada en el cuerpo.</span></div>
-    <div class="peldano"><span class="p-n">La llamada</span><span class="p-d">Revelador o redentor que desciende atravesando las esferas.</span></div>
-    <div class="peldano"><span class="p-n">Gnosis</span><span class="p-d">Reconocimiento de la propia procedencia.</span></div>
-    <div class="peldano"><span class="p-n">El ascenso</span><span class="p-d">Paso por las esferas, contraseñas, despojo.</span></div>
-    <div class="peldano"><span class="p-n">Retorno</span><span class="p-d">Restauración y reintegración de lo disperso.</span></div>
-  </div>
-
-  <h3>Lo que el esquema aplana</h3>
-  <p>
-    Cinco contrapuntos que impiden leerlo como doctrina real: <strong>Marción</strong> no
-    despliega pleroma ni caída de la sabiduría. El <strong>maniqueísmo</strong> parte de dos
-    principios coeternos, no de un error. Los <strong>mandeos</strong> usan otro vocabulario
-    y otra historia. El <strong>hermetismo</strong> en general no es anticósmico.
-    Y de <strong>Basílides</strong> sólo tenemos versiones incompatibles entre sí.
-  </p>
-  <p>
-    Hay además una cuestión de forma: varios de estos textos son himnos, plegarias, diálogos
-    de revelación o instrucciones prácticas, no tratados sistemáticos.
-    <em>El sistema, muchas veces, lo pusieron los heresiólogos primero y los manuales
-    modernos después.</em>
-  </p>
-</section>
-
-<!-- ============ 07 · LO DISCUTIDO ============ -->
-<section>
-  <span class="num">07 · Lo discutido</span>
-  <h2>Ocho filiaciones que el mapa dibuja con línea punteada</h2>
-  <p class="entradilla">
-    El mapa de influencias distingue cuatro tipos de trazo, y la distinción es el contenido,
-    no el adorno: un diagrama de flechas iguales mentiría. Estas ocho relaciones se han
-    afirmado, no probado — y cada una arrastra su disputa a cualquier material que llegue
-    por ella.
-  </p>
-
-  <ul class="limpia">
-    <li><span class="marca m-disc">discutido</span><strong>Origen judío del gnosticismo.</strong> Ganó terreno tras Nag Hammadi, pero no es unánime y es más sólido para el setianismo que para el valentinianismo.</li>
-    <li><span class="marca m-disc">discutido</span><strong>Gnosticismo como herejía cristiana.</strong></li>
-    <li><span class="marca m-disc">abandonada</span><strong>Mito iranio del redentor.</strong> Se sostenía sobre fuentes más tardías que aquello que pretendía explicar. Se conserva como pieza de historiografía, no como explicación vigente.</li>
-    <li><span class="marca m-disc">discutido</span><strong>Mandeos y maniqueísmo temprano.</strong></li>
-    <li><span class="marca m-disc">discutido</span><strong>Préstamos mutuos entre setianos y hermetismo filosófico.</strong></li>
-    <li><span class="marca m-disc">muy discutido</span><strong>Continuidad hacia los dualismos medievales.</strong> Buena parte de la evidencia cátara procede de fuentes inquisitoriales que tenían interés activo en identificar a los acusados con herejías antiguas ya condenadas.</li>
-    <li><span class="marca m-disc">discutido</span><strong>Transmisión maniquea por Asia Menor y los Balcanes.</strong></li>
-    <li><span class="marca m-disc">discutido</span><strong>Restos gnósticos en la cábala temprana.</strong> El problema es de mecanismo: no hay canal documentado entre los siglos IV y XII, y las semejanzas pueden explicarse por un fondo común que reaparece de forma independiente.</li>
-  </ul>
-
-  <h3>Jung: interpretación, no reconstrucción</h3>
-  <p>
-    La obra junguiana sobre alquimia y textos gnósticos es una interpretación psicológica
-    del siglo XX. Leerla como si describiera lo que los alquimistas o los gnósticos creían
-    es un error de género, frecuente en la divulgación. Su influencia sobre el interés
-    moderno por estos materiales es innegable y está bien documentada; su valor como
-    historia es otra discusión.
-  </p>
-
-  <div class="capa e" style="margin-top:26px">
-    <span class="et">[ESPECULACIÓN]</span>
-    <p>
-      La biblioteca anota como sospecha propia, sin base probatoria y para poder refutarla
-      más adelante, que buena parte de las «continuidades» del mapa podrían ser reapariciones
-      independientes de un repertorio limitado de soluciones a un mismo problema —cómo
-      explicar un mundo defectuoso desde un principio perfecto— más que transmisiones reales.
-      Si el material futuro documenta canales concretos, la nota se corrige o se borra.
-    </p>
-  </div>
-</section>
-
-<!-- ============ 08 · CÓMO CRECE ============ -->
-<section>
-  <span class="num">08 · Cómo crece</span>
-  <h2>El recorrido de un material</h2>
-  <p class="entradilla">
-    Todo lo nuevo cae en <code>07-inbox/</code>, sin excepción. A partir de ahí, cada
-    material recorre el mismo camino antes de considerarse archivado.
-  </p>
-
-  <div class="escalera">
-    <div class="peldano"><span class="p-n">Leer</span><span class="p-d">Entero, antes de opinar.</span></div>
-    <div class="peldano"><span class="p-n">Fichar</span><span class="p-d">Rellenar los metadatos. Campo indeterminable → <code>desconocido</code>, nunca inventado.</span></div>
-    <div class="peldano"><span class="p-n">Resumir</span><span class="p-d">De cinco a diez líneas: qué es, de qué habla, por qué importa en el corpus.</span></div>
-    <div class="peldano"><span class="p-n">Extraer</span><span class="p-d">Los términos técnicos nuevos van al glosario con la fuente exacta donde aparecen.</span></div>
-    <div class="peldano"><span class="p-n">Colocar</span><span class="p-d">En su carpeta. Si hay duda entre dos, se elige una y se explica el criterio.</span></div>
-    <div class="peldano"><span class="p-n">Conectar</span><span class="p-d">Tres conexiones concretas con material ya archivado, anotadas en <em>ambos</em> lados.</span></div>
-    <div class="peldano"><span class="p-n">Registrar</span><span class="p-d">Índice maestro y bitácora de ingestas, con fecha.</span></div>
-  </div>
-
-  <h3>Los cuatro estados</h3>
-  <div class="tabla-scroll">
-    <table>
-      <thead><tr><th>Estado</th><th>Qué lleva encima</th></tr></thead>
-      <tbody>
-        <tr><td>crudo</td><td>Está, pero nadie lo ha leído del todo.</td></tr>
-        <tr><td>procesado</td><td>Metadatos y resumen hechos; colocado en su sitio.</td></tr>
-        <tr><td>anotado</td><td>Términos extraídos, conexiones tendidas, lectura por capas.</td></tr>
-        <tr><td>sintetizado</td><td>Su contenido ya alimenta una nota temática.</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p>
-    El estado mide cuánto trabajo lleva encima un archivo, no su importancia. Y puede
-    <strong>retroceder</strong>: si se detecta un error, el archivo vuelve a un estado
-    anterior hasta resolverlo.
-  </p>
-</section>
-
+  </section>
 </main>
 
-<footer>
-  El archivo vive fuera de este sitio, en Markdown plano:
-  <span class="ruta">Escritorio/gnosis/</span><br>
-  Esta página lo presenta; no lo reproduce. Contenido destilado de
-  <span class="ruta">README.md</span>, <span class="ruta">TAXONOMIA.md</span>,
-  <span class="ruta">CONVENCIONES.md</span>, <span class="ruta">CRONOLOGIA.md</span> y
-  <span class="ruta">MAPA.md</span>.<br><br>
-  Ninguna entrada procede todavía de una edición consultada. No se ha datado ningún tratado
-  individual de Nag Hammadi ni del Corpus Hermeticum: es intencionado.
-</footer>
+<nav id="dock" aria-label="Acciones">
+  <button id="dAnadir" type="button" title="Añadir archivos y libros">＋</button>
+  <button id="dBuscar" type="button" title="Buscar (barra /)">⌕</button>
+  <span class="sep"></span>
+  <button id="dExportar" type="button" title="Respaldo: descarga todo el archivo, fichas y ficheros, en un solo fichero">⤓</button>
+  <button id="dImportar" type="button" title="Restaurar desde un respaldo">⤒</button>
+  <span class="sep"></span>
+  <button id="dAyuda" type="button" title="Cómo funciona y dónde viven los ficheros">?</button>
+</nav>
 
+<div id="detalle" role="dialog" aria-modal="true" aria-label="Ficha de la obra"></div>
+<div id="avisos" role="status" aria-live="polite"></div>
+<input type="file" id="entrada" multiple hidden>
+<input type="file" id="entradaRespaldo" accept="application/json,.json" hidden>
+
+<script>
+'use strict';
+/* ══════════ ALMACÉN (IndexedDB) ══════════
+   Dos almacenes en vez de uno. Si la ficha y el fichero vivieran juntos,
+   dibujar la rejilla leería del disco cada PDF: con cincuenta libros de
+   diez megas eso son quinientos megas para pintar unas tarjetas. Así el
+   listado toca solo "fichas", que son kilobytes, y "ficheros" se abre
+   únicamente cuando alguien pide una obra concreta.                    */
+const BD_NOMBRE = 'kipu_biblioteca', BD_VER = 1;
+let bd = null;
+
+function abrirBD() {
+  return new Promise((res, rej) => {
+    const p = indexedDB.open(BD_NOMBRE, BD_VER);
+    p.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('fichas')) {
+        const s = d.createObjectStore('fichas', { keyPath: 'id' });
+        s.createIndex('anadido', 'anadido');
+        s.createIndex('clase', 'clase');
+      }
+      if (!d.objectStoreNames.contains('ficheros')) d.createObjectStore('ficheros', { keyPath: 'id' });
+    };
+    p.onsuccess = () => res(p.result);
+    p.onerror = () => rej(p.error || new Error('no se pudo abrir la base local'));
+    p.onblocked = () => rej(new Error('hay otra pestaña de la Biblioteca abierta con una versión distinta'));
+  });
+}
+function tx(almacenes, modo) { return bd.transaction(almacenes, modo); }
+function pedir(req) { return new Promise((res, rej) => { req.onsuccess = () => res(req.result); req.onerror = () => rej(req.error); }); }
+
+async function leerFichas() {
+  return pedir(tx(['fichas'], 'readonly').objectStore('fichas').getAll());
+}
+async function guardarFicha(f) {
+  const t = tx(['fichas'], 'readwrite');
+  await pedir(t.objectStore('fichas').put(f));
+  return new Promise((res, rej) => { t.oncomplete = res; t.onerror = () => rej(t.error); });
+}
+async function guardarObra(ficha, blob) {
+  const t = tx(['fichas', 'ficheros'], 'readwrite');
+  t.objectStore('fichas').put(ficha);
+  t.objectStore('ficheros').put({ id: ficha.id, blob });
+  return new Promise((res, rej) => {
+    t.oncomplete = res;
+    /* la cuota llena aborta la transacción entera: ficha y fichero entran o
+       no entra ninguno, nunca una ficha huérfana apuntando a nada */
+    t.onerror = () => rej(t.error);
+    t.onabort = () => rej(t.error || new Error('no cabe: almacenamiento lleno'));
+  });
+}
+async function leerFichero(id) {
+  const r = await pedir(tx(['ficheros'], 'readonly').objectStore('ficheros').get(id));
+  return r ? r.blob : null;
+}
+async function borrarObra(id) {
+  const t = tx(['fichas', 'ficheros'], 'readwrite');
+  t.objectStore('fichas').delete(id);
+  t.objectStore('ficheros').delete(id);
+  return new Promise((res, rej) => { t.oncomplete = res; t.onerror = () => rej(t.error); });
+}
+
+/* ══════════ TAXONOMÍA ══════════
+   Fiabilidad no mide calidad, mide qué tipo de peso probatorio tiene el
+   material: una obra de divulgación excelente sigue siendo divulgación.
+   Estado mide cuánto trabajo lleva encima, no su importancia.          */
+const CLASES = [
+  { k:'fuente',   t:'Fuentes primarias', c:'#F7E7B4', d:'Textos del propio corpus, en edición o traducción' },
+  { k:'heresio',  t:'Heresiología',      c:'#fca5a5', d:'Lo que reportaron los adversarios, desde fuera y con intención polémica' },
+  { k:'estudio',  t:'Estudios',          c:'#93c5fd', d:'Material académico secundario' },
+  { k:'nota',     t:'Notas',             c:'#c4b5fd', d:'Apuntes propios' },
+  { k:'inbox',    t:'Sin clasificar',    c:'#94a3b8', d:'Entró y todavía no tiene sitio' },
+];
+const FIABILIDADES = [
+  { k:'primaria',        t:'Primaria',         c:'#F7E7B4' },
+  { k:'secundaria',      t:'Secundaria',       c:'#93c5fd' },
+  { k:'divulgacion',     t:'Divulgación',      c:'#86efac' },
+  { k:'especulativa',    t:'Especulativa',     c:'#fbbf24' },
+  { k:'apocrifa-moderna',t:'Apócrifa moderna', c:'#fca5a5' },
+  { k:'desconocida',     t:'Desconocida',      c:'#94a3b8' },
+];
+const ESTADOS = ['crudo','procesado','anotado','sintetizado'];
+const claseDe = k => CLASES.find(c => c.k === k) || CLASES[4];
+const fiabDe  = k => FIABILIDADES.find(f => f.k === k) || FIABILIDADES[5];
+
+/* ══════════ ESTADO ══════════ */
+const estado = { fichas: [], filtroClase: 'todo', filtroFiab: 'todo', busca: '', vista: 'rejilla', abierta: null };
+const $ = id => document.getElementById(id);
+const urlsVivas = new Set();     /* object URLs que hay que revocar al salir */
+
+const EXT_IMG = ['jpg','jpeg','png','gif','webp','avif','bmp'];
+function extDe(nombre) {
+  const m = /\.([a-z0-9]{1,6})$/i.exec(nombre || '');
+  return m ? m[1].toLowerCase() : '';
+}
+function tamTexto(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(0) + ' KB';
+  if (b < 1073741824) return (b/1048576).toFixed(1) + ' MB';
+  return (b/1073741824).toFixed(2) + ' GB';
+}
+/* El nombre del fichero suele traer basura: guiones bajos, la extensión y
+   marcas de quien lo escaneó. Se limpia para proponer un título, y siempre
+   se puede corregir a mano. */
+function tituloDesdeNombre(nombre) {
+  return nombre
+    .replace(/\.[a-z0-9]{1,6}$/i, '')
+    .replace(/[_+]+/g, ' ')
+    .replace(/\s*\((?:z-?lib(?:\.org)?|libgen|annas?-?archive)[^)]*\)/ig, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim() || nombre;
+}
+function aviso(texto, clase = '', ms = 4600) {
+  const el = document.createElement('div');
+  el.className = 'aviso ' + clase;
+  el.textContent = texto;
+  $('avisos').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 320); }, ms);
+}
+function descargarBlob(blob, nombre) {
+  const u = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = u; a.download = nombre;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 5000);
+}
+
+/* ══════════ ALTA DE OBRAS ══════════ */
+async function anadirFicheros(lista) {
+  const ficheros = [...lista];
+  if (!ficheros.length) return;
+  const barra = $('progreso').firstElementChild;
+  let hechos = 0, fallos = 0;
+  for (const f of ficheros) {
+    const ext = extDe(f.name);
+    const ficha = {
+      id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2)),
+      nombre: f.name, tipo: f.type || '', ext, tam: f.size, anadido: Date.now(),
+      titulo: tituloDesdeNombre(f.name), autor: '', tradicion: '', anio: '',
+      clase: 'inbox', fiabilidad: 'desconocida', estado: 'crudo',
+      etiquetas: [], notas: '', portada: null,
+    };
+    /* si la obra es una imagen, ella misma hace de portada */
+    if (EXT_IMG.includes(ext)) ficha.portada = true;
+    try {
+      await guardarObra(ficha, f);
+      estado.fichas.push(ficha);
+      hechos++;
+    } catch (e) {
+      fallos++;
+      aviso(`No se pudo guardar "${f.name}": ${e && e.message ? e.message : 'error de almacenamiento'}`, 'mal', 8000);
+    }
+    barra.style.width = Math.round((hechos + fallos) / ficheros.length * 100) + '%';
+  }
+  setTimeout(() => { barra.style.width = '0'; }, 500);
+  pintarTodo(); actualizarMedidor();
+  if (hechos) aviso(hechos === 1
+    ? `"${estado.fichas[estado.fichas.length-1].titulo}" entró en Sin clasificar. Ábrela para ponerle ficha.`
+    : `${hechos} obras entraron en Sin clasificar. Ábrelas para ponerles ficha.`, 'ok', 6000);
+  if (fallos && hechos) aviso(`${fallos} no se pudieron guardar.`, 'mal');
+}
+
+/* ══════════ ESPACIO Y PERMANENCIA ══════════ */
+/* Sin permiso de persistencia, el navegador puede vaciar IndexedDB cuando
+   el disco aprieta, sin avisar. Para una biblioteca eso es perderlo todo,
+   así que se pide, y si no se concede se dice claramente.              */
+async function pedirPersistencia() {
+  try {
+    if (!navigator.storage || !navigator.storage.persist) return null;
+    if (await navigator.storage.persisted()) return true;
+    return await navigator.storage.persist();
+  } catch { return null; }
+}
+async function actualizarMedidor() {
+  const el = $('medidor');
+  const n = estado.fichas.length;
+  const bytes = estado.fichas.reduce((a, f) => a + (f.tam || 0), 0);
+  let cuota = null, usado = null;
+  try {
+    if (navigator.storage && navigator.storage.estimate) {
+      const e = await navigator.storage.estimate();
+      cuota = e.quota; usado = e.usage;
+    }
+  } catch {}
+  const persistente = await (navigator.storage && navigator.storage.persisted ? navigator.storage.persisted().catch(() => null) : Promise.resolve(null));
+  const pct = (cuota && usado) ? Math.min(100, usado / cuota * 100) : 0;
+  el.innerHTML =
+    `<b>${n}</b> obra${n === 1 ? '' : 's'} · <b>${tamTexto(bytes)}</b>` +
+    (cuota ? `<div class="barra-uso"><i style="width:${pct.toFixed(1)}%"></i></div>
+       ${tamTexto(usado)} de ${tamTexto(cuota)} disponibles` : '') +
+    `<div style="margin-top:6px">` +
+    (persistente === true
+      ? '<span class="persistente">● Almacenamiento permanente</span>'
+      : persistente === false
+        ? '<span class="volatil">● El navegador podría vaciarlo si el disco aprieta. Haz respaldo.</span>'
+        : '<span>● Estado de permanencia desconocido</span>') +
+    `</div>`;
+  $('cuenta').textContent = `${n} obra${n === 1 ? '' : 's'}`;
+}
+
+/* ══════════ FILTRADO Y PINTADO ══════════ */
+function visibles() {
+  const q = estado.busca.trim().toLowerCase();
+  return estado.fichas
+    .filter(f => estado.filtroClase === 'todo' || f.clase === estado.filtroClase)
+    .filter(f => estado.filtroFiab === 'todo' || f.fiabilidad === estado.filtroFiab)
+    .filter(f => !q || [f.titulo, f.autor, f.tradicion, f.notas, f.nombre, (f.etiquetas||[]).join(' ')]
+      .join(' ').toLowerCase().includes(q))
+    .sort((a, b) => b.anadido - a.anadido);
+}
+function pintarFiltros() {
+  const cuenta = k => estado.fichas.filter(f => f.clase === k).length;
+  const cuentaF = k => estado.fichas.filter(f => f.fiabilidad === k).length;
+  $('filtrosClase').innerHTML =
+    `<button class="filtro ${estado.filtroClase==='todo'?'on':''}" data-clase="todo">
+       <span class="pt" style="background:#E8C766"></span>Todo<span class="n">${estado.fichas.length}</span></button>` +
+    CLASES.map(c => `<button class="filtro ${estado.filtroClase===c.k?'on':''}" data-clase="${c.k}" title="${c.d}">
+       <span class="pt" style="background:${c.c}"></span>${c.t}<span class="n">${cuenta(c.k)}</span></button>`).join('');
+  $('filtrosFiab').innerHTML =
+    `<button class="filtro ${estado.filtroFiab==='todo'?'on':''}" data-fiab="todo">Cualquiera<span class="n">${estado.fichas.length}</span></button>` +
+    FIABILIDADES.map(f => `<button class="filtro ${estado.filtroFiab===f.k?'on':''}" data-fiab="${f.k}">
+       <span class="pt" style="background:${f.c}"></span>${f.t}<span class="n">${cuentaF(f.k)}</span></button>`).join('');
+}
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function pintarLista() {
+  const el = $('lista'), v = visibles();
+  if (!estado.fichas.length) { el.innerHTML = plantillaVacio(); return; }
+  if (!v.length) {
+    el.innerHTML = `<div class="vacio"><div class="icn">⌕</div><h2>Nada con ese criterio</h2>
+      <p>Hay ${estado.fichas.length} obra${estado.fichas.length===1?'':'s'} en el archivo, pero ninguna encaja con el filtro o la búsqueda de ahora.</p></div>`;
+    return;
+  }
+  if (estado.vista === 'tabla') {
+    el.innerHTML = `<table class="tabla"><thead><tr>
+      <th>Título</th><th>Autor</th><th>Colección</th><th>Fiabilidad</th><th>Tipo</th><th style="text-align:right">Tamaño</th><th style="text-align:right">Añadida</th>
+      </tr></thead><tbody>${v.map(f => {
+        const c = claseDe(f.clase), fi = fiabDe(f.fiabilidad);
+        return `<tr data-id="${f.id}" tabindex="0">
+          <td class="t">${esc(f.titulo)}</td><td>${esc(f.autor) || '—'}</td>
+          <td style="color:${c.c}">${c.t}</td><td style="color:${fi.c}">${fi.t}</td>
+          <td>${esc(f.ext.toUpperCase()) || '—'}</td>
+          <td class="num">${tamTexto(f.tam)}</td>
+          <td class="num">${new Date(f.anadido).toLocaleDateString('es-PE')}</td></tr>`;
+      }).join('')}</tbody></table>`;
+  } else {
+    el.innerHTML = `<div class="rejilla">${v.map(f => {
+      const c = claseDe(f.clase), fi = fiabDe(f.fiabilidad);
+      return `<button class="obra" data-id="${f.id}" type="button">
+        <span class="tapa" data-portada="${f.portada ? f.id : ''}">
+          <span class="ext">${esc(f.ext.toUpperCase()) || 'ARCH'}</span></span>
+        <span class="datos">
+          <span class="tit">${esc(f.titulo)}</span>
+          <span class="aut">${esc(f.autor) || 'Autor por determinar'}</span>
+          <span class="pie">
+            <span class="eti" style="color:${c.c}">${c.t}</span>
+            ${f.fiabilidad !== 'desconocida' ? `<span class="eti" style="color:${fi.c}">${fi.t}</span>` : ''}
+          </span></span></button>`;
+    }).join('')}</div>`;
+    /* las portadas se leen del disco DESPUÉS de pintar y solo las visibles:
+       cargarlas dentro del bucle bloquearía la rejilla entera */
+    cargarPortadas();
+  }
+}
+function plantillaVacio() {
+  return `<div class="vacio">
+    <div class="icn">📖</div>
+    <h2>El archivo está vacío</h2>
+    <p>Arrastra libros y documentos a esta ventana, o pulsa <b>Añadir archivos</b>.
+       Admite PDF, EPUB, texto, imágenes y cualquier otro formato.</p>
+    <div class="apunte"><b>Dónde quedan.</b> En este navegador, no en un servidor.
+      La web de KIPU publica en internet todo lo que lleva dentro, así que un archivo
+      personal no puede vivir ahí. El precio es que la biblioteca es de este equipo:
+      usa el respaldo del dock para moverla o para no perderla.</div>
+  </div>`;
+}
+/* Portadas perezosas, y solo para las obras que son imágenes. Se revocan los
+   object URL anteriores: si no, cada repintado deja megas colgando en memoria. */
+let urlsPortada = [];
+async function cargarPortadas() {
+  urlsPortada.forEach(u => URL.revokeObjectURL(u));
+  urlsPortada = [];
+  const nodos = [...document.querySelectorAll('.tapa[data-portada]')].filter(n => n.dataset.portada);
+  for (const n of nodos) {
+    try {
+      const b = await leerFichero(n.dataset.portada);
+      if (!b) continue;
+      const u = URL.createObjectURL(b);
+      urlsPortada.push(u);
+      const img = new Image();
+      img.src = u; img.alt = '';
+      n.innerHTML = ''; n.appendChild(img);
+    } catch {}
+  }
+}
+function pintarTodo() { pintarFiltros(); pintarLista(); }
+
+/* ══════════ FICHA DE LA OBRA ══════════ */
+function abrirFicha(id) {
+  const f = estado.fichas.find(x => x.id === id);
+  if (!f) return;
+  estado.abierta = id;
+  const opc = (arr, sel, campo) => arr.map(o => {
+    const k = typeof o === 'string' ? o : o.k, t = typeof o === 'string' ? (o[0].toUpperCase()+o.slice(1)) : o.t;
+    return `<option value="${k}" ${k === sel ? 'selected' : ''}>${t}</option>`;
+  }).join('');
+  $('detalle').innerHTML = `<section class="ficha">
+    <div class="titulo-barra">
+      <span class="luces"><button class="l-cerrar" id="fCerrar" type="button" aria-label="Cerrar ficha"></button>
+        <button class="l-min" type="button" disabled></button><button class="l-max" type="button" disabled></button></span>
+      <span class="titulo">Ficha</span>
+    </div>
+    <div class="ficha-cuerpo">
+      <div class="meta-fija">
+        <div><b>Fichero</b><span title="${esc(f.nombre)}">${esc(f.nombre.length > 34 ? f.nombre.slice(0,32)+'…' : f.nombre)}</span></div>
+        <div><b>Formato</b><span>${esc(f.ext.toUpperCase()) || '—'}</span></div>
+        <div><b>Tamaño</b><span>${tamTexto(f.tam)}</span></div>
+        <div><b>Entró</b><span>${new Date(f.anadido).toLocaleDateString('es-PE')}</span></div>
+      </div>
+      <div class="campo"><label for="fTitulo">Título</label><input id="fTitulo" value="${esc(f.titulo)}"></div>
+      <div class="rejilla-campos">
+        <div class="campo"><label for="fAutor">Autor o atribución</label>
+          <input id="fAutor" value="${esc(f.autor)}" placeholder="atribuido a… si está en disputa"></div>
+        <div class="campo"><label for="fTrad">Tradición o materia</label>
+          <input id="fTrad" value="${esc(f.tradicion)}" placeholder="valentiniano, hermético, sethiano…"></div>
+        <div class="campo"><label for="fAnio">Fecha de composición</label>
+          <input id="fAnio" value="${esc(f.anio)}" placeholder="s. II · 1614 · desconocida"></div>
+        <div class="campo"><label for="fEtiq">Etiquetas</label>
+          <input id="fEtiq" value="${esc((f.etiquetas||[]).join(', '))}" placeholder="separadas por comas"></div>
+        <div class="campo"><label for="fClase">Colección</label><select id="fClase">${opc(CLASES, f.clase)}</select></div>
+        <div class="campo"><label for="fFiab">Fiabilidad</label><select id="fFiab">${opc(FIABILIDADES, f.fiabilidad)}</select></div>
+      </div>
+      <div class="campo"><label for="fEstado">Estado del trabajo</label><select id="fEstado">${opc(ESTADOS, f.estado)}</select></div>
+      <div class="campo"><label for="fNotas">Notas</label>
+        <textarea id="fNotas" placeholder="Qué dice el texto, qué interpreta la tradición y qué es especulación. Marca cada capa: si no consta la cita exacta, escribe «cita por verificar» en vez de reconstruirla.">${esc(f.notas)}</textarea></div>
+      <div class="acciones">
+        <button class="btn oro" id="fGuardar" type="button">Guardar ficha</button>
+        <button class="btn" id="fAbrir" type="button">Abrir</button>
+        <button class="btn" id="fDescargar" type="button">Descargar</button>
+        <button class="btn peligro" id="fBorrar" type="button" style="margin-left:auto">Eliminar del archivo</button>
+      </div>
+    </div></section>`;
+  $('detalle').classList.add('on');
+  $('fCerrar').addEventListener('click', cerrarFicha);
+  $('fTitulo').focus();
+  $('fGuardar').addEventListener('click', async () => {
+    Object.assign(f, {
+      titulo: $('fTitulo').value.trim() || f.nombre,
+      autor: $('fAutor').value.trim(), tradicion: $('fTrad').value.trim(), anio: $('fAnio').value.trim(),
+      clase: $('fClase').value, fiabilidad: $('fFiab').value, estado: $('fEstado').value,
+      etiquetas: $('fEtiq').value.split(',').map(s => s.trim()).filter(Boolean),
+      notas: $('fNotas').value,
+    });
+    try { await guardarFicha(f); pintarTodo(); cerrarFicha(); aviso('Ficha guardada.', 'ok', 2600); }
+    catch (e) { aviso('No se pudo guardar la ficha: ' + e.message, 'mal'); }
+  });
+  $('fAbrir').addEventListener('click', async () => {
+    try {
+      const b = await leerFichero(f.id);
+      if (!b) throw new Error('el fichero no está en el archivo');
+      /* el tipo se rehace desde la extensión cuando el navegador no lo trajo:
+         sin él, un PDF se descarga en vez de abrirse en el visor */
+      const tipo = f.tipo || ({ pdf:'application/pdf', txt:'text/plain', md:'text/plain',
+        html:'text/html', json:'application/json', epub:'application/epub+zip' }[f.ext] || '');
+      const u = URL.createObjectURL(tipo ? new Blob([b], { type: tipo }) : b);
+      urlsVivas.add(u);
+      window.open(u, '_blank', 'noopener');
+    } catch (e) { aviso('No se pudo abrir: ' + e.message, 'mal'); }
+  });
+  $('fDescargar').addEventListener('click', async () => {
+    try {
+      const b = await leerFichero(f.id);
+      if (!b) throw new Error('el fichero no está en el archivo');
+      descargarBlob(b, f.nombre);
+    } catch (e) { aviso('No se pudo descargar: ' + e.message, 'mal'); }
+  });
+  $('fBorrar').addEventListener('click', async () => {
+    if (!confirm(`Se elimina "${f.titulo}" del archivo, con su fichero.\n\nEsto no se puede deshacer. ¿Continuar?`)) return;
+    try {
+      await borrarObra(f.id);
+      estado.fichas = estado.fichas.filter(x => x.id !== f.id);
+      cerrarFicha(); pintarTodo(); actualizarMedidor();
+      aviso('Obra eliminada.', '', 3000);
+    } catch (e) { aviso('No se pudo eliminar: ' + e.message, 'mal'); }
+  });
+}
+function cerrarFicha() { $('detalle').classList.remove('on'); $('detalle').innerHTML = ''; estado.abierta = null; }
+
+/* ══════════ RESPALDO ══════════ */
+/* El respaldo lleva los ficheros dentro, en base64. Un JSON con solo las
+   fichas serviría de índice pero no salvaría un solo libro, que es
+   justamente lo que hay que salvar.                                    */
+const aBase64 = blob => new Promise((res, rej) => {
+  const r = new FileReader();
+  r.onload = () => res(String(r.result).split(',')[1] || '');
+  r.onerror = () => rej(r.error);
+  r.readAsDataURL(blob);
+});
+function deBase64(b64, tipo) {
+  const bin = atob(b64), n = bin.length, u = new Uint8Array(n);
+  for (let i = 0; i < n; i++) u[i] = bin.charCodeAt(i);
+  return new Blob([u], { type: tipo || '' });
+}
+async function exportarRespaldo() {
+  if (!estado.fichas.length) { aviso('No hay nada que respaldar todavía.', ''); return; }
+  const bytes = estado.fichas.reduce((a, f) => a + (f.tam || 0), 0);
+  if (bytes > 400 * 1048576 &&
+      !confirm(`El archivo pesa ${tamTexto(bytes)} y el respaldo va en un solo fichero, algo más grande todavía.\n\nPuede tardar y consumir bastante memoria. ¿Continuar?`)) return;
+  const barra = $('progreso').firstElementChild;
+  const obras = [];
+  try {
+    for (let i = 0; i < estado.fichas.length; i++) {
+      const f = estado.fichas[i];
+      const b = await leerFichero(f.id);
+      obras.push({ ficha: f, datos: b ? await aBase64(b) : null });
+      barra.style.width = Math.round((i+1) / estado.fichas.length * 100) + '%';
+    }
+    const d = new Date(), p = n => String(n).padStart(2,'0');
+    descargarBlob(
+      new Blob([JSON.stringify({ formato:'kipu-biblioteca', version:1, exportado:new Date().toISOString(), obras })],
+        { type:'application/json' }),
+      `biblioteca-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}.json`);
+    aviso(`Respaldo con ${obras.length} obra${obras.length===1?'':'s'} descargado. Guárdalo fuera de este equipo.`, 'ok', 7000);
+  } catch (e) { aviso('El respaldo falló: ' + (e.message || e), 'mal', 8000); }
+  finally { barra.style.width = '0'; }
+}
+async function importarRespaldo(texto) {
+  let d;
+  try { d = JSON.parse(texto); } catch { throw new Error('el archivo no es JSON válido'); }
+  if (!d || d.formato !== 'kipu-biblioteca') throw new Error('no es un respaldo de esta biblioteca');
+  if (!Array.isArray(d.obras)) throw new Error('el respaldo no trae obras');
+  const yaHay = estado.fichas.length;
+  if (!confirm(`Se añaden ${d.obras.length} obra(s) del respaldo del ${d.exportado ? new Date(d.exportado).toLocaleString('es-PE') : 'origen desconocido'}.\n\n` +
+    `Las ${yaHay} que ya hay NO se borran: las repetidas se saltan por identificador.\n\n¿Continuar?`)) return;
+  const barra = $('progreso').firstElementChild;
+  let nuevas = 0, saltadas = 0, fallos = 0;
+  const conocidos = new Set(estado.fichas.map(f => f.id));
+  for (let i = 0; i < d.obras.length; i++) {
+    const o = d.obras[i];
+    try {
+      if (!o || !o.ficha || !o.ficha.id) { fallos++; continue; }
+      if (conocidos.has(o.ficha.id)) { saltadas++; continue; }
+      const blob = o.datos ? deBase64(o.datos, o.ficha.tipo) : new Blob([]);
+      await guardarObra(o.ficha, blob);
+      estado.fichas.push(o.ficha); conocidos.add(o.ficha.id); nuevas++;
+    } catch { fallos++; }
+    barra.style.width = Math.round((i+1) / d.obras.length * 100) + '%';
+  }
+  setTimeout(() => { barra.style.width = '0'; }, 400);
+  pintarTodo(); actualizarMedidor();
+  aviso(`Restauradas ${nuevas}. ${saltadas ? saltadas + ' ya estaban. ' : ''}${fallos ? fallos + ' fallaron.' : ''}`, fallos ? 'mal' : 'ok', 7000);
+}
+
+/* ══════════ CABLEADO ══════════ */
+$('btnAnadir').addEventListener('click', () => $('entrada').click());
+$('dAnadir').addEventListener('click', () => $('entrada').click());
+$('entrada').addEventListener('change', async e => {
+  const fs = e.target.files; e.target.value = '';
+  await anadirFicheros(fs);
+});
+/* el lateral superpuesto se cierra solo al elegir un filtro: dejarlo abierto
+   tapando la rejilla obligaría a un segundo toque para ver el resultado */
+function lateralMovil(abrir) {
+  const l = $('lateral');
+  const on = abrir === undefined ? !l.classList.contains('movil') : abrir;
+  l.classList.toggle('movil', on);
+  $('btnLateral').setAttribute('aria-expanded', String(on));
+}
+$('btnLateral').addEventListener('click', () => lateralMovil());
+$('dBuscar').addEventListener('click', () => $('buscar').focus());
+$('dExportar').addEventListener('click', exportarRespaldo);
+$('dImportar').addEventListener('click', () => $('entradaRespaldo').click());
+$('entradaRespaldo').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  try { await importarRespaldo(await f.text()); }
+  catch (err) { aviso('No se pudo importar: ' + (err.message || err), 'mal', 8000); }
+});
+$('buscar').addEventListener('input', e => { estado.busca = e.target.value; pintarLista(); });
+$('vRejilla').addEventListener('click', () => cambiarVista('rejilla'));
+$('vTabla').addEventListener('click', () => cambiarVista('tabla'));
+function cambiarVista(v) {
+  estado.vista = v;
+  try { localStorage.setItem('kipu_bib_vista', v); } catch {}
+  $('vRejilla').classList.toggle('on', v === 'rejilla');
+  $('vTabla').classList.toggle('on', v === 'tabla');
+  $('vRejilla').setAttribute('aria-pressed', String(v === 'rejilla'));
+  $('vTabla').setAttribute('aria-pressed', String(v === 'tabla'));
+  pintarLista();
+}
+$('filtrosClase').addEventListener('click', e => {
+  const b = e.target.closest('[data-clase]'); if (!b) return;
+  estado.filtroClase = b.dataset.clase; pintarTodo(); lateralMovil(false);
+});
+$('filtrosFiab').addEventListener('click', e => {
+  const b = e.target.closest('[data-fiab]'); if (!b) return;
+  estado.filtroFiab = b.dataset.fiab; pintarTodo(); lateralMovil(false);
+});
+$('lista').addEventListener('click', e => {
+  const n = e.target.closest('[data-id]'); if (n) abrirFicha(n.dataset.id);
+});
+$('lista').addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const n = e.target.closest('[data-id]'); if (!n) return;
+  e.preventDefault(); abrirFicha(n.dataset.id);
+});
+$('detalle').addEventListener('click', e => { if (e.target === $('detalle')) cerrarFicha(); });
+$('lCerrar').addEventListener('click', () => { location.href = 'santa-catarina'; });
+$('dAyuda').addEventListener('click', () => {
+  alert(
+    'BIBLIOTECA — cómo funciona\n\n' +
+    'DÓNDE VIVEN LOS FICHEROS\n' +
+    'En este navegador, en su base de datos local (IndexedDB). No se suben a ningún servidor.\n' +
+    'La web de KIPU publica en internet todo lo que lleva dentro, así que un archivo personal\n' +
+    'no puede alojarse ahí. Por eso la biblioteca es de este equipo y de este navegador.\n\n' +
+    'RESPALDO\n' +
+    'El botón ⤓ del dock descarga TODO, fichas y ficheros, en un solo archivo. Es la única\n' +
+    'forma de llevarla a otro equipo o de sobrevivir a un borrado de datos del sitio.\n' +
+    'El botón ⤒ restaura, sin borrar lo que ya haya: las repetidas se saltan.\n\n' +
+    'AL PONER FICHA\n' +
+    'Fiabilidad no mide calidad, mide qué peso probatorio tiene el material: una obra de\n' +
+    'divulgación excelente sigue siendo divulgación. Marca las atribuciones en disputa como\n' +
+    'tales. Si no tienes la cita exacta a la vista, escribe «cita por verificar» en lugar de\n' +
+    'reconstruirla de memoria.\n\n' +
+    'ATAJOS\n' +
+    '/ busca · Esc cierra · Enter abre la obra seleccionada');
+});
+addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if ($('detalle').classList.contains('on')) cerrarFicha();
+    else lateralMovil(false);
+    return;
+  }
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+  if (e.key === '/') { e.preventDefault(); $('buscar').focus(); }
+});
+
+/* arrastrar y soltar sobre toda la ventana */
+const zona = $('principal');
+let contadorArrastre = 0;    /* dragenter/leave se disparan por cada hijo */
+['dragenter','dragover'].forEach(ev => zona.addEventListener(ev, e => {
+  if (!e.dataTransfer || ![...e.dataTransfer.types].includes('Files')) return;
+  e.preventDefault();
+  if (ev === 'dragenter') contadorArrastre++;
+  $('soltar').classList.add('on');
+}));
+zona.addEventListener('dragleave', () => { if (--contadorArrastre <= 0) { contadorArrastre = 0; $('soltar').classList.remove('on'); } });
+zona.addEventListener('drop', async e => {
+  e.preventDefault();
+  contadorArrastre = 0; $('soltar').classList.remove('on');
+  if (e.dataTransfer && e.dataTransfer.files.length) await anadirFicheros(e.dataTransfer.files);
+});
+addEventListener('beforeunload', () => { urlsVivas.forEach(u => URL.revokeObjectURL(u)); });
+
+function reloj() {
+  const d = new Date();
+  const dias = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+  $('reloj').textContent = `${dias[d.getDay()]}, ${d.getDate()} ${['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'][d.getMonth()]} · ` +
+    `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+/* ══════════ ARRANQUE ══════════ */
+(async () => {
+  reloj(); setInterval(reloj, 30000);
+  try { estado.vista = localStorage.getItem('kipu_bib_vista') || 'rejilla'; } catch {}
+  cambiarVista(estado.vista);
+  requestAnimationFrame(() => $('ventana').classList.add('abierta'));
+  try {
+    bd = await abrirBD();
+  } catch (e) {
+    /* modo privado restrictivo o almacenamiento bloqueado: la ventana no se
+       queda muda, dice qué pasa y por qué no puede guardar nada */
+    $('lista').innerHTML = `<div class="vacio"><div class="icn">⚠</div>
+      <h2>Este navegador no deja guardar</h2>
+      <p>No se pudo abrir la base local: ${esc(e.message || e)}.</p>
+      <div class="apunte">La Biblioteca guarda los ficheros en el almacenamiento del navegador.
+        Suele fallar en ventanas privadas o con los datos del sitio bloqueados. Abre la página
+        en una ventana normal y permite el almacenamiento para este sitio.</div></div>`;
+    $('btnAnadir').disabled = true;
+    return;
+  }
+  await pedirPersistencia();
+  try { estado.fichas = await leerFichas(); } catch { estado.fichas = []; }
+  pintarTodo();
+  actualizarMedidor();
+})();
+</script>
 </body>
 </html>
