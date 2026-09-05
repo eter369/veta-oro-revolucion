@@ -259,6 +259,40 @@ table.trades .cerrar:hover{color:var(--rojo);border-color:var(--rojo)}
 .filtro-tf{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:8px;font-family:var(--num);font-size:10px;color:var(--tinta3)}
 .filtro-tf span{margin-right:4px}
 
+/* ---------- barra de exportación ---------- */
+.barra-export{display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  background:var(--panel);border:1px solid var(--borde);border-radius:14px;padding:10px 12px}
+.barra-export .etq{font-family:var(--num);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta3)}
+.btn-exp{display:inline-flex;align-items:center;gap:6px;font-family:var(--num);font-size:11px;
+  color:var(--tinta2);border:1px solid var(--borde2);border-radius:9px;padding:6px 11px;
+  transition:color .15s,border-color .15s,background .15s;white-space:nowrap}
+.btn-exp:hover:not(:disabled){color:var(--violeta);border-color:var(--violeta);background:rgba(167,139,250,.08)}
+.btn-exp:disabled{opacity:.38;cursor:not-allowed}
+.btn-exp[aria-busy="true"]{cursor:progress;opacity:.6}
+.btn-exp.destacado{border-color:rgba(167,139,250,.55);color:#ddd6fe;background:rgba(124,58,237,.16)}
+@media(max-width:700px){.btn-exp{font-size:10px;padding:5px 8px;gap:4px}.barra-export{gap:6px}.barra-export .etq{width:100%}}
+
+/* ---------- avisos efímeros ---------- */
+#tostadas{position:fixed;right:14px;bottom:14px;z-index:60;display:flex;flex-direction:column-reverse;gap:8px;
+  max-width:min(360px,calc(100vw - 28px));pointer-events:none}
+.tostada{pointer-events:auto;background:#0b0d18;border:1px solid var(--borde2);border-left-width:3px;
+  border-radius:10px;padding:9px 13px;font-size:12px;line-height:1.5;color:var(--tinta2);
+  box-shadow:0 12px 30px rgba(0,0,0,.55);animation:tostadaEntra .22s ease;transition:opacity .3s}
+.tostada.ok{border-left-color:var(--verde)}
+.tostada.mal{border-left-color:var(--rojo)}
+.tostada.info{border-left-color:var(--violeta)}
+@keyframes tostadaEntra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- ayuda por módulo ---------- */
+.ayuda{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;flex:none;
+  border:1px solid var(--borde2);color:var(--tinta3);font-family:var(--num);font-size:9px;font-weight:700;cursor:help}
+.ayuda:hover,.ayuda:focus-visible{color:var(--violeta);border-color:var(--violeta)}
+.btn-cancelar{border:1px solid var(--borde2);border-radius:9px;padding:9px 14px;font-size:12px;color:var(--tinta3);white-space:nowrap}
+.btn-cancelar:hover{color:var(--rojo);border-color:var(--rojo)}
+table.trades .editar{border:1px solid var(--borde2);border-radius:6px;padding:2px 8px;font-size:10px;color:var(--tinta3);margin-right:4px}
+table.trades .editar:hover{color:var(--violeta);border-color:var(--violeta)}
+tr.en-edicion td{background:rgba(124,58,237,.14)}
+
 footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(--tinta3);padding:6px 16px 30px;line-height:1.7;max-width:900px;margin:0 auto}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -298,6 +332,17 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
     porcentajes de entrada, los targets y los límites de exposición son la escala interna del modelo,
     no una recomendación personalizada. Ninguna cifra de esta página es una promesa de resultados.
   </p>
+  <div class="barra-export" id="barraExport">
+    <span class="etq">Exportar</span>
+    <button class="btn-exp destacado" id="expTerminal" type="button">⬇️ Descargar Terminal</button>
+    <button class="btn-exp" id="expPDF"     type="button" disabled>📄 Reporte PDF</button>
+    <button class="btn-exp" id="expCSV"     type="button" disabled>📊 CSV</button>
+    <button class="btn-exp" id="expPNG"     type="button" disabled>🖼️ PNG</button>
+    <button class="btn-exp" id="expJSON"    type="button">💾 Exportar JSON</button>
+    <button class="btn-exp" id="impJSON"    type="button">📥 Importar JSON</button>
+    <button class="btn-exp" id="expTexto"   type="button" disabled>🔗 Copiar resumen</button>
+    <input type="file" id="ficheroJSON" accept="application/json,.json" hidden>
+  </div>
   <div class="cargando" id="cargando">Conectando con Binance y calculando señal Tesla 369…</div>
   <div class="error-datos" id="errorDatos" style="display:none"></div>
 
@@ -305,14 +350,14 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
 
     <!-- ============ 3 · SEMÁFORO DE NO-OPERACIÓN ============ -->
     <section class="panel">
-      <h2>Filtros de no-operación · semáforo de mercado <span class="mini">si CUALQUIER luz está en rojo, la señal queda bloqueada</span></h2>
+      <h2 data-ayuda="semaforo">Filtros de no-operación · semáforo de mercado <span class="mini">si CUALQUIER luz está en rojo, la señal queda bloqueada</span></h2>
       <div id="semaforo"></div>
     </section>
 
     <!-- ============ CHART + GAUGE ============ -->
     <div class="fila-2">
       <section class="panel">
-        <h2><span id="tituloChart">…</span> <span class="mini">⬆ barrido de mínimos con volumen alto — posible acumulación</span></h2>
+        <h2 data-ayuda="chart"><span id="tituloChart">…</span> <span class="mini">⬆ barrido de mínimos con volumen alto — posible acumulación</span></h2>
         <div class="barra-tf">
           <div class="tf-chips" id="selectorTF" role="tablist" aria-label="Intervalo del gráfico"></div>
           <div class="tf-estado">
@@ -326,7 +371,7 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
         <p class="resumen-canvas" id="resumenVelas"></p>
       </section>
       <section class="panel">
-        <h2>Señal Tesla 369 · 1H</h2>
+        <h2 data-ayuda="senal">Señal Tesla 369 · 1H</h2>
         <div class="gauge-wrap">
           <div id="gaugeGlow"></div>
           <svg id="gaugeSvg" width="230" height="132" viewBox="0 0 230 132"></svg>
@@ -344,7 +389,7 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
 
     <!-- ============ MULTI-TIMEFRAME ============ -->
     <section class="panel">
-      <h2>Confianza Multi-Timeframe <span class="chip-alineado" id="chipMTF" style="margin-left:auto">…</span></h2>
+      <h2 data-ayuda="mtf">Confianza Multi-Timeframe <span class="chip-alineado" id="chipMTF" style="margin-left:auto">…</span></h2>
       <div class="mtf-grid" id="mtfGrid"></div>
       <div class="aviso-div" id="avisoDiv" style="display:none" role="status"></div>
     </section>
@@ -352,15 +397,15 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
     <!-- ============ INDICADORES / LIQUIDEZ / LUNAR ============ -->
     <div class="fila-3">
       <section class="panel">
-        <h2>10 Indicadores Ponderados</h2>
+        <h2 data-ayuda="indicadores">10 Indicadores Ponderados</h2>
         <div id="listaInd"></div>
       </section>
       <section class="panel">
-        <h2>Mapa de liquidez <span class="mini">inferido de máximos y mínimos locales — no son órdenes observadas</span></h2>
+        <h2 data-ayuda="liquidez">Mapa de liquidez <span class="mini">inferido de máximos y mínimos locales — no son órdenes observadas</span></h2>
         <div id="mapaLiq"></div>
       </section>
       <section class="panel" style="border-color:rgba(139,92,246,.4);background:linear-gradient(180deg,rgba(30,16,60,.9),var(--panel))">
-        <h2 style="color:#c4b5fd">Reloj Lunar · Tesla 369</h2>
+        <h2 data-ayuda="lunar" style="color:#c4b5fd">Reloj Lunar · Tesla 369</h2>
         <div class="lunar-cab">
           <span class="emoji" id="lunEmoji">🌑</span>
           <div>
@@ -382,7 +427,7 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
 
     <!-- ============ 5 · HISTORIAL DE SEÑAL + MINI BACKTEST ============ -->
     <section class="panel">
-      <h2>Historial de Señal · últimos 7 días (1H) <span class="mini">reconstrucción sin F&amp;G ni futuros (no tienen histórico gratuito) · el backtest es hipotético</span></h2>
+      <h2 data-ayuda="historial">Historial de Señal · últimos 7 días (1H) <span class="mini">reconstrucción sin F&amp;G ni futuros (no tienen histórico gratuito) · el backtest es hipotético</span></h2>
       <canvas id="lienzoHist" height="190" role="img" aria-label="Serie de la señal Tesla 369 durante los últimos 7 días con bandas de umbral"></canvas>
       <p class="resumen-canvas" id="resumenHist"></p>
       <div class="bt-stats" id="btStats"></div>
@@ -390,7 +435,7 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
 
     <!-- ============ 4 · DIARIO DE OPERACIONES ============ -->
     <section class="panel">
-      <h2>Diario de Operaciones · Control de Riesgo Acumulado <span class="mini">persistente en este navegador (localStorage)</span></h2>
+      <h2 data-ayuda="diario">Diario de Operaciones · Control de Riesgo Acumulado <span class="mini">persistente en este navegador (localStorage)</span></h2>
       <form class="diario-form" id="formTrade">
         <!-- cada control va DENTRO de su <label>: así tiene nombre accesible sin depender de for/id -->
         <div><label for="tAct">Activo</label><select id="tAct"><option>BTC</option><option>ETH</option><option selected>SOL</option></select></div>
@@ -401,7 +446,8 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
         <div><label for="tTam">Tamaño (unid.)</label><input id="tTam" type="number" step="any" required></div>
         <div><label for="tFase">Fase lunar</label><input id="tFase" readonly></div>
         <div><label for="tSen">Señal al entrar</label><input id="tSen" readonly></div>
-        <button class="btn-v" type="submit">Registrar</button>
+        <button class="btn-v" id="btnRegistrar" type="submit">Registrar</button>
+        <button class="btn-cancelar" id="btnCancelarEdicion" type="button" style="display:none">Cancelar</button>
       </form>
       <div class="tabla-scroll" tabindex="0" role="region" aria-label="Operaciones registradas (desplazable)"><table class="trades"><thead><tr>
         <th scope="col">Fecha</th><th scope="col">Activo</th><th scope="col">Dir</th><th scope="col">Entrada</th><th scope="col">Stop</th><th scope="col">Target</th><th scope="col">Tamaño</th><th scope="col">Fase</th><th scope="col">Señal</th><th scope="col">Estado</th><th scope="col">P&L</th><th></th>
@@ -420,7 +466,7 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
 
     <!-- ============ 2 · HISTORIAL DE ALERTAS ============ -->
     <section class="panel">
-      <h2>Historial de Alertas Tesla 369 <span class="mini">umbrales: SWING ±0.40 · LONG/SHORT ±0.60 · MAX ±0.80 · evaluados en 1H, 4H, 1D y 1W</span></h2>
+      <h2 data-ayuda="alertas">Historial de Alertas Tesla 369 <span class="mini">umbrales: SWING ±0.40 · LONG/SHORT ±0.60 · MAX ±0.80 · evaluados en 1H, 4H, 1D y 1W</span></h2>
       <div class="filtro-tf" id="filtroAlertas" role="group" aria-label="Filtrar alertas por timeframe">
         <span>Timeframe:</span>
         <button class="tf-chip on" type="button" data-f="todos" aria-pressed="true">Todos</button>
@@ -444,6 +490,7 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
 </footer>
 
 <div id="tipVela"></div>
+<div id="tostadas" role="status" aria-live="polite"></div>
 
 <script>
 'use strict';
@@ -1335,14 +1382,14 @@ function pintarTodo() {
   /* pintarHistorial NO va aquí: depende de calcularHistorial, que se difiere
      a requestIdleCallback para no bloquear el repintado del gráfico */
   pintarIndicadores(); pintarLiquidez(); pintarLunar();
-  pintarDiario(); pintarAlertas();
+  pintarDiario(); pintarAlertas(); habilitarExportacion();
   $('chipFG').textContent = estado.fg ? `F&G ${estado.fg.v} · ${estado.fg.txt}` : 'F&G —';
   /* Prellenar el formulario del diario con el contexto vivo — pero NUNCA pisar lo
      que el usuario está escribiendo: si ya empezó a rellenar o tiene el foco
      dentro del formulario, se respeta su entrada. */
   const lun = faseLunar();
   const form = $('formTrade');
-  const editando = form.contains(document.activeElement) || $('tEnt').value !== '';
+  const editando = editandoTrade !== null || form.contains(document.activeElement) || $('tEnt').value !== '';
   if (!editando) {
     $('tFase').value = `${lun.emoji} ${lun.nombre}`;
     $('tSen').value = (estado.señal.score >= 0 ? '+' : '') + estado.señal.score.toFixed(3);
@@ -1887,16 +1934,57 @@ const guardarTrades = t => LS.set('lo369_trades', JSON.stringify(t));
 $('capital').value = LS.get('lo369_capital') || 10000;
 $('capital').addEventListener('input', () => { LS.set('lo369_capital', $('capital').value); pintarDiario(); });
 
+/* id de la operación que se está editando, o null si el formulario da de alta */
+let editandoTrade = null;
+function salirDeEdicion() {
+  editandoTrade = null;
+  $('btnRegistrar').textContent = 'Registrar';
+  $('btnCancelarEdicion').style.display = 'none';
+  $('formTrade').querySelectorAll('input:not([readonly])').forEach(i => i.value = '');
+}
+function editarTrade(id) {
+  const t = lsTrades().find(x => x.id === id);
+  if (!t) return;
+  editandoTrade = id;
+  $('tAct').value = t.act; $('tDir').value = t.dir;
+  $('tEnt').value = t.ent; $('tStop').value = t.stop;
+  $('tTgt').value = t.tgt; $('tTam').value = t.tam;
+  /* fase y señal quedan como estaban al abrirla: son el contexto de ENTONCES,
+     no el de ahora, y reescribirlos falsearía el registro */
+  $('tFase').value = t.fase; $('tSen').value = t.sen;
+  $('btnRegistrar').textContent = 'Guardar cambios';
+  $('btnCancelarEdicion').style.display = '';
+  pintarDiario();
+  $('formTrade').scrollIntoView({ block: 'center', behavior: 'smooth' });
+  $('tEnt').focus();
+}
+$('btnCancelarEdicion').addEventListener('click', () => { salirDeEdicion(); pintarDiario(); });
 $('formTrade').addEventListener('submit', e => {
   e.preventDefault();
   const t = lsTrades();
-  t.unshift({
-    id: Date.now(), fecha: Date.now(), act: $('tAct').value, dir: $('tDir').value,
+  const campos = {
+    act: $('tAct').value, dir: $('tDir').value,
     ent: +$('tEnt').value, stop: +$('tStop').value, tgt: +$('tTgt').value, tam: +$('tTam').value,
-    fase: $('tFase').value, sen: $('tSen').value, estadoT: 'abierto', salida: null, pl: null,
-  });
-  guardarTrades(t);
-  e.target.querySelectorAll('input:not([readonly])').forEach(i => i.value = '');
+  };
+  if (editandoTrade !== null) {
+    const x = t.find(o => o.id === editandoTrade);
+    if (x) {
+      Object.assign(x, campos);
+      /* si ya estaba cerrada, el P&L se recalcula con la entrada corregida */
+      if (x.estadoT === 'cerrado' && x.salida !== null)
+        x.pl = (x.salida - x.ent) * x.tam * (x.dir === 'LONG' ? 1 : -1);
+      guardarTrades(t);
+      tostada('Operación actualizada.', 'ok', 3000);
+    }
+    salirDeEdicion();
+  } else {
+    t.unshift({
+      id: Date.now(), fecha: Date.now(), ...campos,
+      fase: $('tFase').value, sen: $('tSen').value, estadoT: 'abierto', salida: null, pl: null,
+    });
+    guardarTrades(t);
+    e.target.querySelectorAll('input:not([readonly])').forEach(i => i.value = '');
+  }
   pintarDiario();
 });
 
@@ -1914,14 +2002,17 @@ function pintarDiario() {
     const plTxt = pl === null ? '—' : (pl >= 0 ? '+' : '−') + fmt$(Math.abs(pl), 2);
     const plCol = pl === null ? 'var(--tinta3)' : pl >= 0 ? '#34d399' : '#fb7185';
     const d = new Date(t.fecha);
-    return `<tr><td>${d.getDate()}/${d.getMonth()+1} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</td>
+    return `<tr class="${t.id === editandoTrade ? 'en-edicion' : ''}"><td>${d.getDate()}/${d.getMonth()+1} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</td>
       <td>${t.act}</td><td style="color:${t.dir === 'LONG' ? '#34d399' : '#fb7185'}">${t.dir}</td>
       <td>${t.ent}</td><td>${t.stop}</td><td>${t.tgt}</td><td>${t.tam}</td>
       <td style="font-size:12px">${t.fase.split(' ')[0]}</td><td>${t.sen}</td>
       <td>${t.estadoT}</td><td style="color:${plCol}">${plTxt}</td>
-      <td>${t.estadoT === 'abierto' ? `<button class="cerrar" data-id="${t.id}" aria-label="Cerrar la operación de ${t.act} abierta en ${t.ent}">cerrar</button>` : ''}</td></tr>`;
+      <td><button class="editar" data-id="${t.id}" aria-label="Editar la operación de ${t.act} abierta en ${t.ent}">editar</button>${
+        t.estadoT === 'abierto' ? `<button class="cerrar" data-id="${t.id}" aria-label="Cerrar la operación de ${t.act} abierta en ${t.ent}">cerrar</button>` : ''}</td></tr>`;
   }).join('') || `<tr><td colspan="12" style="text-align:center;color:var(--tinta3);padding:16px 8px">
       Aún no hay operaciones registradas. Al anotar una, aparecerá aquí con su riesgo y su P&amp;L.</td></tr>`;
+  $('cuerpoTrades').querySelectorAll('.editar').forEach(b =>
+    b.addEventListener('click', () => editarTrade(+b.dataset.id)));
   $('cuerpoTrades').querySelectorAll('.cerrar').forEach(b => b.addEventListener('click', () => {
     const trades2 = lsTrades();
     const t = trades2.find(x => x.id === +b.dataset.id);
@@ -2002,6 +2093,501 @@ $('btnSonido').addEventListener('click', () => {
   $('btnSonido').setAttribute('aria-pressed', estado.sonido);
   $('btnSonido').textContent = estado.sonido ? '🔔' : '🔕';
   if (estado.sonido) beep(true);   /* gesto del usuario: desbloquea el AudioContext */
+});
+
+/* ══════════════════════════════════════════════════════════════
+   EXPORTACIÓN — descarga del propio terminal, PDF, CSV, PNG,
+   respaldo JSON y resumen al portapapeles.
+   Ninguna de estas funciones envía nada a ningún sitio: todo se
+   arma en el navegador y se descarga desde ahí.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ---------- utilidades comunes ---------- */
+function tostada(msg, clase = 'info', ms = 4600) {
+  const el = document.createElement('div');
+  el.className = 'tostada ' + clase;
+  el.textContent = msg;
+  $('tostadas').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 320); }, ms);
+}
+function descargarBlob(blob, nombre) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = nombre;
+  document.body.appendChild(a); a.click(); a.remove();
+  /* revocar de inmediato aborta la descarga en algunos navegadores */
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+function selloFecha() {
+  const d = new Date(), p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
+}
+/* Envuelve un botón: evita la doble pulsación, marca el estado ocupado y
+   convierte cualquier fallo en un aviso legible en vez de un error mudo. */
+function alPulsar(id, fn) {
+  const b = $(id);
+  b.addEventListener('click', async () => {
+    if (b.dataset.ocupado) return;
+    b.dataset.ocupado = '1'; b.setAttribute('aria-busy', 'true');
+    try { await fn(); }
+    catch (e) { tostada('No se pudo completar: ' + (e && e.message ? e.message : e), 'mal', 7000); }
+    finally { delete b.dataset.ocupado; b.removeAttribute('aria-busy'); }
+  });
+}
+const DISCLAIMER = 'Herramienta educativa. No es asesoria financiera.';
+
+/* ---------- ⬇️ descargar el terminal ---------- */
+async function descargarTerminal() {
+  let html = null, via = 'copia exacta del archivo';
+  try {
+    const r = await fetch(location.href, { cache: 'no-store' });
+    if (r.ok) { const t = await r.text(); if (/<\/html>/i.test(t)) html = t; }
+  } catch {}
+  if (!html) {
+    /* fetch bloqueado (origen file:// o CORS): se serializa el DOM vivo. El
+       archivo resultante funciona igual, porque los scripts se ejecutan otra
+       vez al abrirlo y vuelven a pedir los datos. */
+    html = '<!doctype html>\n' + document.documentElement.outerHTML;
+    via = 'reconstruido desde la página';
+  }
+  descargarBlob(new Blob([html], { type: 'text/html;charset=utf-8' }), `lunar-oracle-369-${selloFecha()}.html`);
+  tostada(`Terminal descargado, ${via}. Ábrelo con doble clic: se reconecta solo a Binance.`, 'ok', 7000);
+}
+
+/* ---------- 📊 CSV ---------- */
+const csvCampo = v => {
+  const s = (v === null || v === undefined) ? '' : String(v);
+  return /[",;\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+};
+const csvFila = a => a.map(csvCampo).join(',');
+function construirCSV() {
+  const L = [];
+  L.push('# LUNAR ORACLE 369 - exportacion ' + new Date().toISOString());
+  L.push('# ' + DISCLAIMER);
+  L.push('');
+  L.push('# SECCION 1 - DIARIO DE OPERACIONES');
+  L.push(csvFila(['fecha_iso','activo','direccion','entrada','stop','target','tamano','fase_lunar','senal_al_entrar','estado','salida','pl']));
+  lsTrades().forEach(t => L.push(csvFila([
+    new Date(t.fecha).toISOString(), t.act, t.dir, t.ent, t.stop, t.tgt, t.tam,
+    t.fase, t.sen, t.estadoT, t.salida ?? '',
+    (t.pl === null || t.pl === undefined) ? '' : (+t.pl).toFixed(2),
+  ])));
+  L.push('');
+  L.push(`# SECCION 2 - HISTORIAL DE SENAL 7 DIAS (${ACTIVOS[estado.sym].corto}, velas 1H, reconstruido sin F&G ni futuros)`);
+  L.push(csvFila(['fecha_iso','senal']));
+  estado.histSeñal.forEach(p => L.push(csvFila([new Date(p.t * 1000).toISOString(), p.s.toFixed(4)])));
+  L.push('');
+  L.push('# SECCION 3 - HISTORIAL DE ALERTAS');
+  L.push(csvFila(['fecha_iso','activo','timeframe','alerta','senal','precio']));
+  leerLS('lo369_alertas', []).forEach(a => L.push(csvFila([
+    new Date(a.t).toISOString(), a.sym, a.tf || '1h', a.nombre, a.s, a.precio,
+  ])));
+  return L.join('\r\n');
+}
+function exportarCSV() {
+  /* el BOM hace que Excel abra los acentos bien en vez de como mojibake */
+  descargarBlob(new Blob(['\ufeff' + construirCSV()], { type: 'text/csv;charset=utf-8' }),
+    `lunar-oracle-369-${selloFecha()}.csv`);
+  const n = lsTrades().length, h = estado.histSeñal.length;
+  tostada(`CSV descargado: ${n} operacion(es), ${h} puntos de señal y el historial de alertas, en tres secciones.`, 'ok', 6000);
+}
+
+/* ---------- 💾 respaldo JSON ---------- */
+function construirJSON() {
+  return {
+    formato: 'lunar-oracle-369', version: 1,
+    exportado: new Date().toISOString(),
+    capital: +$('capital').value || 10000,
+    trades: lsTrades(),
+    alertas: leerLS('lo369_alertas', []),
+    preferencias: { activo: estado.sym, intervalo: estado.tf, sonido: estado.sonido },
+    nota: DISCLAIMER,
+  };
+}
+function exportarJSON() {
+  const d = construirJSON();
+  descargarBlob(new Blob([JSON.stringify(d, null, 2)], { type: 'application/json;charset=utf-8' }),
+    `lunar-oracle-369-respaldo-${selloFecha()}.json`);
+  tostada(`Respaldo guardado: ${d.trades.length} operacion(es) y ${d.alertas.length} alerta(s).`, 'ok');
+}
+function importarJSON(texto) {
+  let d;
+  try { d = JSON.parse(texto); } catch { throw new Error('el archivo no es JSON válido'); }
+  if (!d || d.formato !== 'lunar-oracle-369') throw new Error('no es un respaldo de este terminal');
+  if (!Array.isArray(d.trades)) throw new Error('el respaldo no trae diario de operaciones');
+  const actuales = lsTrades().length;
+  /* restaurar PISA lo que hay: se pregunta con las dos cifras a la vista */
+  const ok = confirm(
+    `Restaurar ${d.trades.length} operación(es) y ${(d.alertas || []).length} alerta(s)\n` +
+    `del respaldo del ${d.exportado ? new Date(d.exportado).toLocaleString('es-PE') : 'origen desconocido'}.\n\n` +
+    `Esto REEMPLAZA las ${actuales} operación(es) guardadas ahora en este navegador.\n\n¿Continuar?`);
+  if (!ok) { tostada('Importación cancelada. No se tocó nada.', 'info'); return; }
+  guardarTrades(d.trades);
+  if (Array.isArray(d.alertas)) LS.set('lo369_alertas', JSON.stringify(d.alertas));
+  if (d.capital) { $('capital').value = d.capital; LS.set('lo369_capital', String(d.capital)); }
+  salirDeEdicion();
+  pintarDiario(); pintarAlertas();
+  tostada(`Respaldo restaurado: ${d.trades.length} operación(es).`, 'ok');
+}
+
+/* ---------- 🖼️ PNG ---------- */
+/* El medidor es un SVG sin texto: se serializa y se rasteriza tal cual. Así
+   la tarjeta sale sin html2canvas ni ninguna otra dependencia. */
+function svgAImagen(svg) {
+  return new Promise((res, rej) => {
+    const s = new XMLSerializer().serializeToString(svg);
+    const img = new Image();
+    img.onload = () => res(img);
+    img.onerror = () => rej(new Error('no se pudo rasterizar el medidor'));
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s);
+  });
+}
+async function exportarPNG() {
+  const s = estado.señal;
+  if (!s) throw new Error('todavía no hay señal que exportar');
+  const gr = $('lienzoVelas');
+  if (!gr.width) throw new Error('el gráfico aún no está dibujado');
+  const E = 2, W = 1120, M = 30;                 /* E: densidad de exportación */
+  const anchoGraf = W - M * 2;
+  const hGraf = Math.round(anchoGraf * gr.height / gr.width);
+  const hCab = 96, hPanel = 214, hPie = 50;
+  const H = hCab + hGraf + hPanel + hPie;
+  const cv = document.createElement('canvas');
+  cv.width = W * E; cv.height = H * E;
+  const c = cv.getContext('2d');
+  c.setTransform(E, 0, 0, E, 0, 0);
+  const F = (px, peso) => `${peso ? peso + ' ' : ''}${px}px "Space Grotesk",ui-monospace,monospace`;
+
+  c.fillStyle = '#070812'; c.fillRect(0, 0, W, H);
+  /* cabecera */
+  c.fillStyle = '#a78bfa'; c.font = F(19, 'bold'); c.textBaseline = 'alphabetic';
+  c.fillText('LUNAR ORACLE 369', M, 40);
+  c.fillStyle = '#7d86ae'; c.font = F(10);
+  c.fillText('TERMINAL MULTI-ACTIVO — SWEEP INTELLIGENCE', M, 58);
+  const lun = faseLunar();
+  c.textAlign = 'right';
+  c.fillStyle = '#e7eaf6'; c.font = F(15, 'bold');
+  c.fillText(`${ACTIVOS[estado.sym].corto}/USDT · ${INTERVALOS[estado.tf].etq}`, W - M, 40);
+  c.fillStyle = '#7d86ae'; c.font = F(10);
+  c.fillText(`${new Date().toLocaleString('es-PE')} · ${lun.nombre} ×${lun.mult} · ilum. ${lun.ilum}%`, W - M, 58);
+  c.textAlign = 'left';
+  c.strokeStyle = '#232a44'; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(M, 74.5); c.lineTo(W - M, 74.5); c.stroke();
+
+  /* gráfico de velas */
+  c.drawImage(gr, M, hCab, anchoGraf, hGraf);
+
+  /* panel de señal */
+  const yP = hCab + hGraf + 14;
+  c.fillStyle = '#0b0e1c'; c.strokeStyle = '#232a44';
+  if (c.roundRect) { c.beginPath(); c.roundRect(M, yP, anchoGraf, hPanel - 26, 14); c.fill(); c.stroke(); }
+  else { c.fillRect(M, yP, anchoGraf, hPanel - 26); c.strokeRect(M, yP, anchoGraf, hPanel - 26); }
+  try {
+    const img = await svgAImagen($('gaugeSvg'));
+    c.drawImage(img, M + 16, yP + 14, 268, 154);
+  } catch { /* sin medidor la tarjeta sigue siendo válida */ }
+  const xT = M + 300;
+  c.fillStyle = estado.bloqueado ? '#fb7185' : s.color;
+  c.font = F(30, 'bold');
+  c.fillText(estado.bloqueado ? 'BLOQUEADO' : s.cls, xT, yP + 46);
+  c.font = F(38, 'bold');
+  c.fillText((s.score >= 0 ? '+' : '') + s.score.toFixed(3), xT, yP + 92);
+  c.fillStyle = '#7d86ae'; c.font = F(11);
+  c.fillText(estado.bloqueado ? 'FILTRO ACTIVO — EL MODELO NO VALIDA' : `escala del modelo · ${s.acc}`, xT, yP + 112);
+  c.fillText(`score técnico ${s.rawScore >= 0 ? '+' : ''}${s.rawScore.toFixed(3)} × lunar ${s.multLunar}` +
+             `   ·   confianza MTF ${estado.mtf.final >= 0 ? '+' : ''}${estado.mtf.final.toFixed(3)}`, xT, yP + 130);
+  /* confirmaciones en dos columnas */
+  const dirLong = s.score >= 0;
+  const confs = [...s.confs, { l: '≥3/5 timeframes alineados', ok: (dirLong ? estado.mtf.nLong : estado.mtf.nShort) >= 3 }];
+  c.font = F(12);
+  confs.forEach((cf, i) => {
+    const x = xT + (i % 2) * 290, y = yP + 156 + Math.floor(i / 2) * 20;
+    c.fillStyle = cf.ok ? '#34d399' : '#4b5375';
+    c.fillText((cf.ok ? '\u2713 ' : '\u25cb ') + cf.l, x, y);
+  });
+
+  /* pie */
+  c.fillStyle = '#7d86ae'; c.font = F(10);
+  c.fillText('Herramienta educativa. No es asesoría financiera. Datos de Binance y Alternative.me. Cálculo lunar local.', M, H - 20);
+
+  const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+  if (!blob) throw new Error('el navegador no generó la imagen');
+  descargarBlob(blob, `lunar-oracle-369-${ACTIVOS[estado.sym].corto}-${selloFecha()}.png`);
+  tostada('PNG descargado: gráfico de velas y panel de señal en una sola tarjeta.', 'ok');
+}
+
+/* ---------- 📄 PDF ---------- */
+function cargarScript(src) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = res;
+    s.onerror = () => rej(new Error('no se pudo cargar la librería de PDF desde el CDN'));
+    document.head.appendChild(s);
+  });
+}
+let jsPDFPendiente = null;
+async function obtenerJsPDF() {
+  if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
+  /* se carga solo al pulsar: no lastra el arranque del terminal */
+  if (!jsPDFPendiente) jsPDFPendiente = cargarScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
+    .catch(e => { jsPDFPendiente = null; throw e; });
+  await jsPDFPendiente;
+  if (!window.jspdf || !window.jspdf.jsPDF) throw new Error('la librería de PDF no quedó disponible');
+  return window.jspdf.jsPDF;
+}
+/* Las fuentes estándar del PDF son WinAnsi: los emoji y los símbolos
+   matemáticos saldrían como basura. Se traducen antes de escribir. */
+function txtPDF(s) {
+  return String(s)
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2190}-\u{21FF}\u{2600}-\u{27BF}\u{FE0F}\u{20E3}]/gu, '')
+    .replace(/≥/g, '>=').replace(/≤/g, '<=').replace(/×/g, 'x')
+    .replace(/[▲]/g, '+').replace(/[▼]/g, '-').replace(/[●◀▮┄━✓✕○⛔]/g, '')
+    .replace(/[−–—]/g, '-').replace(/[“”]/g, '"').replace(/[‘’]/g, "'")
+    .replace(/\s+/g, ' ').trim();
+}
+async function exportarPDF() {
+  const JsPDF = await obtenerJsPDF();
+  const s = estado.señal;
+  if (!s) throw new Error('todavía no hay señal que exportar');
+  const doc = new JsPDF({ unit: 'pt', format: 'a4' });
+  const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
+  const M = 40, ANCHO = W - M * 2;
+  let y = 0, pagina = 0;
+
+  const pie = () => {
+    doc.setFont('helvetica', 'normal').setFontSize(7).setTextColor(130, 138, 170);
+    doc.text(txtPDF(DISCLAIMER + ' Datos publicos de Binance y Alternative.me. Calculo lunar local.'), M, H - 24);
+    doc.text(String(pagina), W - M, H - 24, { align: 'right' });
+  };
+  const nuevaPagina = () => {
+    if (pagina) { pie(); doc.addPage(); }
+    pagina++;
+    doc.setFillColor(255, 255, 255).rect(0, 0, W, H, 'F');
+    doc.setFont('helvetica', 'bold').setFontSize(13).setTextColor(76, 29, 149);
+    doc.text('LUNAR ORACLE 369', M, 46);
+    doc.setFont('helvetica', 'normal').setFontSize(8).setTextColor(120, 120, 140);
+    doc.text(txtPDF(`${ACTIVOS[estado.sym].corto}/USDT · ${new Date().toLocaleString('es-PE')}`), W - M, 46, { align: 'right' });
+    doc.setDrawColor(220, 220, 232).line(M, 54, W - M, 54);
+    y = 78;
+  };
+  const sitio = alto => { if (y + alto > H - 46) nuevaPagina(); };
+  const titulo = t => {
+    sitio(34);
+    doc.setFont('helvetica', 'bold').setFontSize(10).setTextColor(60, 30, 120);
+    doc.text(txtPDF(t), M, y); y += 6;
+    doc.setDrawColor(224, 220, 240).line(M, y, W - M, y); y += 14;
+  };
+  const linea = (izq, der, negrita) => {
+    sitio(15);
+    doc.setFont('helvetica', negrita ? 'bold' : 'normal').setFontSize(8.6).setTextColor(40, 40, 55);
+    doc.text(txtPDF(izq), M, y);
+    if (der !== undefined) doc.text(txtPDF(der), W - M, y, { align: 'right' });
+    y += 13;
+  };
+  const parrafo = t => {
+    doc.setFont('helvetica', 'normal').setFontSize(8).setTextColor(95, 95, 120);
+    const ls = doc.splitTextToSize(txtPDF(t), ANCHO);
+    sitio(ls.length * 10 + 4);
+    doc.text(ls, M, y); y += ls.length * 10 + 6;
+  };
+
+  nuevaPagina();
+
+  /* — señal — */
+  titulo('1 · Senal Tesla 369 (1H)');
+  linea(estado.bloqueado ? 'BLOQUEADO POR FILTRO' : s.cls,
+        (s.score >= 0 ? '+' : '') + s.score.toFixed(3), true);
+  linea('Score tecnico (sin multiplicador lunar)', (s.rawScore >= 0 ? '+' : '') + s.rawScore.toFixed(3));
+  linea('Multiplicador lunar aplicado', 'x' + s.multLunar);
+  linea('Lectura del modelo', estado.bloqueado ? 'el modelo no valida' : s.acc);
+  const dirLong = s.score >= 0;
+  const alin = (dirLong ? estado.mtf.nLong : estado.mtf.nShort);
+  [...s.confs, { l: '>=3/5 timeframes alineados', ok: alin >= 3 }]
+    .forEach(cf => linea('   ' + (cf.ok ? '[x] ' : '[ ] ') + cf.l, cf.ok ? 'cumple' : 'no cumple'));
+  parrafo('Los porcentajes de entrada, los targets y los limites de exposicion son la escala interna del modelo, no una recomendacion personalizada.');
+
+  /* — semáforo — */
+  titulo('2 · Filtros de no-operacion');
+  estado.filtros.forEach(f => linea((f.ok ? '[OK] ' : '[!!] ') + f.n + ' - ' + f.d, f.ok ? 'en verde' : 'BLOQUEA'));
+
+  /* — multi-timeframe — */
+  titulo('3 · Confianza Multi-Timeframe');
+  estado.tfs.forEach(t => linea(`${t.l}  (peso ${t.w.toFixed(2)})`, (t.s >= 0 ? '+' : '') + t.s.toFixed(3)));
+  linea('CONFIANZA FINAL', (estado.mtf.final >= 0 ? '+' : '') + estado.mtf.final.toFixed(3), true);
+  linea('Marcos alineados con la senal', `${alin} de 5 (minimo 3)`);
+  if (estado.mtf.divergencia) parrafo('AVISO: divergencia tactica frente a estructural. 1H y 1D apuntan a lados opuestos con fuerza; el modelo sugiere reducir tamano.');
+
+  /* — indicadores — */
+  titulo('4 · Diez indicadores ponderados');
+  s.inds.forEach(i => linea(`${i.nombre} (${(i.peso * 100).toFixed(0)}%) - ${i.detalle}`,
+    (i.norm >= 0 ? '+' : '') + i.norm.toFixed(2)));
+
+  /* — luna — */
+  const lun = faseLunar(), a = ACTIVOS[estado.sym];
+  titulo('5 · Reloj lunar Tesla 369');
+  linea('Fase', `${lun.nombre} x${lun.mult}`, true);
+  linea('Arquetipo', lun.arquetipo);
+  linea('Iluminacion / dia del ciclo', `${lun.ilum}% · dia ${lun.edad.toFixed(1)} de 29.5`);
+  linea('Proxima fase', `${lun.sig.nombre} en ${Math.floor(lun.horasSig / 24)}d ${Math.floor(lun.horasSig % 24)}h`);
+  parrafo(lun.sesgo);
+  linea(`Stop sugerido para ${a.corto}`, `${a.stopATR}x ATR`);
+  linea('Targets del modelo', `${a.tgtMin}% - ${a.tgtMax}%`);
+  linea('Exposicion maxima que contempla el modelo', `${a.asigMax}%`);
+
+  /* — liquidez — */
+  titulo('6 · Mapa de liquidez inferido');
+  parrafo('Niveles deducidos de maximos y minimos locales. No son ordenes observadas en el libro.');
+  const filasLiq = [...$('mapaLiq').querySelectorAll('.liq-fila, .liq-sep')].slice(0, 12);
+  filasLiq.forEach(f => {
+    if (f.classList.contains('liq-sep')) { linea(f.textContent.trim(), undefined, true); return; }
+    const c = f.querySelectorAll('span');
+    linea('Nivel ' + c[0].textContent.trim(), c[2] ? c[2].textContent.trim() + ' toques' : '');
+  });
+
+  /* — historial y backtest — */
+  nuevaPagina();
+  titulo('7 · Historial de senal, 7 dias');
+  const hc = $('lienzoHist');
+  if (hc && hc.width) {
+    const hh = ANCHO * hc.height / hc.width;
+    sitio(hh + 10);
+    try { doc.addImage(hc.toDataURL('image/png'), 'PNG', M, y, ANCHO, hh); y += hh + 12; } catch {}
+  }
+  const b = estado.bt;
+  if (b && b.n) {
+    const pc = v => (v / b.n * 100).toFixed(0) + '%';
+    linea('Velas evaluadas', String(b.n));
+    linea('Tiempo por zona', `neutral ${pc(b.zonas.neutral)} · swing ${pc(b.zonas.swing)} · fuerte ${pc(b.zonas.fuerte)} · max ${pc(b.zonas.max)}`);
+    linea('Cruces de +/-0.80', String(b.señalesMax));
+    linea('Simulacion 1:2 hipotetica', `${b.wins}W / ${b.losses}L` + (b.abiertas ? ' · 1 abierta' : ''));
+    linea('Acierto simulado', b.winRate === null ? 'sin senales en la ventana' : b.winRate.toFixed(0) + '%', true);
+    if (b.total < 20) parrafo('AVISO DE MUESTRA: con ' + b.total + ' operacion(es) simuladas el porcentaje de acierto no es estadisticamente informativo. La reconstruccion excluye Fear & Greed y futuros porque no tienen historico gratuito, y la simulacion no incluye comisiones ni deslizamiento.');
+  }
+
+  /* — diario — */
+  titulo('8 · Diario de operaciones');
+  const trades = lsTrades();
+  if (!trades.length) parrafo('Sin operaciones registradas en este navegador.');
+  else {
+    const cols = [M, M + 74, M + 112, M + 148, M + 200, M + 252, M + 304, M + 360, M + 430];
+    const fila = (v, negrita) => {
+      sitio(14);
+      doc.setFont('helvetica', negrita ? 'bold' : 'normal').setFontSize(7.4).setTextColor(40, 40, 55);
+      v.forEach((x, i) => doc.text(txtPDF(x), cols[i], y));
+      y += 12;
+    };
+    fila(['Fecha', 'Activo', 'Dir', 'Entrada', 'Stop', 'Target', 'Tamano', 'Estado', 'P&L'], true);
+    trades.slice(0, 40).forEach(t => {
+      const d = new Date(t.fecha);
+      const pl = (t.pl === null || t.pl === undefined) ? '-' : (t.pl >= 0 ? '+' : '-') + Math.abs(t.pl).toFixed(2);
+      fila([`${d.getDate()}/${d.getMonth()+1}/${String(d.getFullYear()).slice(-2)}`, t.act, t.dir,
+            String(t.ent), String(t.stop), String(t.tgt), String(t.tam), t.estadoT, pl]);
+    });
+    if (trades.length > 40) parrafo(`Se listan las 40 mas recientes de ${trades.length}. El CSV las incluye todas.`);
+    y += 4;
+    linea('Riesgo consumido hoy', $('rDiaV').textContent + ' (limite 5%)');
+    linea('Riesgo consumido 7 dias', $('rSemV').textContent + ' (limite 10%)');
+    linea('Drawdown maximo de la curva', $('rDdV').textContent + ' (alerta 20%)');
+  }
+
+  pie();
+  doc.save(`lunar-oracle-369-${ACTIVOS[estado.sym].corto}-${selloFecha()}.pdf`);
+  tostada(`Reporte PDF generado, ${pagina} pagina(s).`, 'ok');
+}
+
+/* ---------- 🔗 resumen al portapapeles ---------- */
+function resumenTexto() {
+  const s = estado.señal, lun = faseLunar(), a = ACTIVOS[estado.sym];
+  const dirLong = s.score >= 0, alin = dirLong ? estado.mtf.nLong : estado.mtf.nShort;
+  const L = [];
+  L.push(`LUNAR ORACLE 369 — ${a.corto}/USDT`);
+  L.push(new Date().toLocaleString('es-PE'));
+  L.push('');
+  L.push(`Señal Tesla 369 (1H): ${estado.bloqueado ? 'BLOQUEADO POR FILTRO' : s.cls} ${s.score >= 0 ? '+' : ''}${s.score.toFixed(3)}`);
+  L.push(`  score técnico ${s.rawScore >= 0 ? '+' : ''}${s.rawScore.toFixed(3)} × lunar ${s.multLunar}`);
+  L.push(`  precio ${fmt$(s.precio)} · ADX ${s.adxV.toFixed(1)} · RSI ${s.rsiV.toFixed(0)}`);
+  L.push('');
+  L.push(`Confianza multi-timeframe: ${estado.mtf.final >= 0 ? '+' : ''}${estado.mtf.final.toFixed(3)} (${alin}/5 alineados, mínimo 3)`);
+  estado.tfs.forEach(t => L.push(`  ${t.l}: ${t.s >= 0 ? '+' : ''}${t.s.toFixed(2)}  (peso ${t.w.toFixed(2)})`));
+  if (estado.mtf.divergencia) L.push('  AVISO: divergencia táctica vs. estructural — reducir tamaño');
+  L.push('');
+  L.push('Filtros de no-operación:');
+  estado.filtros.forEach(f => L.push(`  ${f.ok ? '[OK]' : '[BLOQUEA]'} ${f.n} — ${f.d}`));
+  L.push('');
+  L.push(`Luna: ${lun.nombre} ×${lun.mult} · ${lun.arquetipo} · iluminación ${lun.ilum}% · día ${lun.edad.toFixed(1)} de 29.5`);
+  L.push(`  próxima fase ${lun.sig.nombre} en ${Math.floor(lun.horasSig / 24)}d ${Math.floor(lun.horasSig % 24)}h`);
+  L.push(`  ${a.corto}: stop ${a.stopATR}× ATR · targets ${a.tgtMin}–${a.tgtMax}% · exposición máx. ${a.asigMax}%`);
+  L.push('');
+  L.push(DISCLAIMER.replace('asesoria', 'asesoría'));
+  return L.join('\n');
+}
+async function copiarResumen() {
+  const t = resumenTexto();
+  try {
+    await navigator.clipboard.writeText(t);
+  } catch {
+    /* sin permiso de portapapeles o sin contexto seguro: método antiguo */
+    const ta = document.createElement('textarea');
+    ta.value = t;
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch {}
+    ta.remove();
+    if (!ok) throw new Error('el navegador bloqueó el portapapeles');
+  }
+  tostada('Resumen copiado. Ya puedes pegarlo donde quieras.', 'ok');
+}
+
+/* ---------- cableado de la barra ---------- */
+const BOTONES_CON_DATOS = ['expPDF', 'expCSV', 'expPNG', 'expTexto'];
+function habilitarExportacion() {
+  const listo = !!(estado.hayDatos && estado.señal);
+  BOTONES_CON_DATOS.forEach(id => {
+    const b = $(id);
+    b.disabled = !listo;
+    b.title = listo ? '' : 'Disponible en cuanto carguen los datos de mercado';
+  });
+}
+alPulsar('expTerminal', descargarTerminal);
+alPulsar('expPDF',      exportarPDF);
+alPulsar('expCSV',      exportarCSV);
+alPulsar('expPNG',      exportarPNG);
+alPulsar('expJSON',     exportarJSON);
+alPulsar('expTexto',    copiarResumen);
+$('impJSON').addEventListener('click', () => $('ficheroJSON').click());
+$('ficheroJSON').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';                      /* permite reimportar el mismo archivo */
+  if (!f) return;
+  try { importarJSON(await f.text()); }
+  catch (err) { tostada('No se pudo importar: ' + (err.message || err), 'mal', 7000); }
+});
+habilitarExportacion();
+
+/* ---------- tooltips por módulo ---------- */
+const AYUDAS = {
+  semaforo:'Cuatro condiciones de mercado que deben cumplirse a la vez. Si alguna se pone en rojo, el modelo no valida la señal aunque el número sea alto. No miden si la señal acierta: miden si el mercado está en condiciones de que signifique algo.',
+  chart:'Velas del intervalo elegido con tres medias, VWAP y los niveles donde el precio ya rebotó. Las marcas de barrido señalan velas que perforaron un extremo previo y volvieron dentro con volumen alto: el modelo lo interpreta como posible acumulación o distribución, no es una orden observada.',
+  senal:'Suma de los diez indicadores, cada uno con su peso, multiplicada por el factor de la fase lunar. Va de -1 a +1. Siempre se calcula sobre velas de 1 hora, aunque el gráfico esté en otro intervalo.',
+  mtf:'La misma señal leída en cuatro marcos temporales más el ciclo lunar. Sirve para ver si el corto plazo empuja en la misma dirección que la estructura. Cuando 1H y 1D se contradicen con fuerza, aparece el aviso de divergencia.',
+  indicadores:'Los diez componentes de la señal. La barra muestra hacia qué lado empuja cada uno y cuánto; el porcentaje es el peso que tiene en la suma. Verde empuja al alza, rojo a la baja, amarillo es zona neutra.',
+  liquidez:'Precios donde el mercado ya giró varias veces. La hipótesis del modelo es que ahí se acumulan órdenes de protección: encima del precio, las de quienes están cortos; debajo, las de quienes están largos. Está deducido de máximos y mínimos, no leído del libro de órdenes.',
+  lunar:'Fase lunar calculada localmente con el ciclo sinódico de 29.53 días, sin depender de ninguna API. El multiplicador escala la señal según la fase. La tarjeta de estrategia muestra los parámetros que el modelo asocia al activo seleccionado.',
+  historial:'La señal recalculada hora a hora sobre los últimos siete días. La reconstrucción excluye Fear & Greed y los datos de futuros porque no tienen histórico gratuito, y meter el valor de hoy en velas pasadas sería mirar al futuro. La simulación es hipotética: sin comisiones, sin deslizamiento y sin ejecución real.',
+  diario:'Tus operaciones, guardadas solo en este navegador. Los medidores suman el riesgo vivo de lo que sigue abierto más las pérdidas ya realizadas del período. Los límites del 5, 10 y 20 por ciento son los del propio modelo.',
+  alertas:'Cada vez que la señal cruza un umbral en 1H, 4H, 1D o 1W queda anotado aquí. Para anunciar una salida hace falta que la señal caiga un poco por debajo del umbral, de modo que un valor oscilando justo en la frontera no genere avisos en bucle.',
+};
+document.querySelectorAll('[data-ayuda]').forEach(h => {
+  const texto = AYUDAS[h.dataset.ayuda];
+  if (!texto) return;
+  const el = document.createElement('span');
+  el.className = 'ayuda'; el.tabIndex = 0; el.textContent = '?';
+  el.title = texto;
+  el.setAttribute('aria-label', 'Qué es esto: ' + texto);
+  /* antes del .mini, que lleva margin-left:auto y se va al extremo derecho */
+  const mini = h.querySelector('.mini, .chip-alineado');
+  h.insertBefore(el, mini || null);
 });
 
 /* ---------- 8 · cosmos de fondo (canvas ligero con parallax) ---------- */
