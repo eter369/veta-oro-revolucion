@@ -342,12 +342,7 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
     <span class="etq">Exportar</span>
     <button class="btn-exp destacado" id="expTerminal" type="button">⬇️ Descargar Terminal</button>
     <button class="btn-exp" id="expPDF"     type="button" disabled>📄 Reporte PDF</button>
-    <button class="btn-exp" id="expCSV"     type="button" disabled>📊 CSV</button>
     <button class="btn-exp" id="expPNG"     type="button" disabled>🖼️ PNG</button>
-    <button class="btn-exp" id="expJSON"    type="button">💾 Exportar JSON</button>
-    <button class="btn-exp" id="impJSON"    type="button">📥 Importar JSON</button>
-    <button class="btn-exp" id="expTexto"   type="button" disabled>🔗 Copiar resumen</button>
-    <input type="file" id="ficheroJSON" accept="application/json,.json" hidden>
   </div>
   <div class="cargando" id="cargando">Conectando con Binance y calculando señal Tesla 369…</div>
   <div class="error-datos" id="errorDatos" style="display:none"></div>
@@ -2252,81 +2247,6 @@ async function descargarTerminal() {
   tostada(`Terminal descargado, ${via}. Ábrelo con doble clic: se reconecta solo a Binance y guarda su propio diario.`, 'ok', 7000);
 }
 
-/* ---------- 📊 CSV ---------- */
-const csvCampo = v => {
-  const s = (v === null || v === undefined) ? '' : String(v);
-  return /[",;\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
-};
-const csvFila = a => a.map(csvCampo).join(',');
-function construirCSV() {
-  const L = [];
-  L.push('# LUNAR ORACLE 369 - exportacion ' + new Date().toISOString());
-  L.push('# ' + DISCLAIMER);
-  L.push('');
-  L.push('# SECCION 1 - DIARIO DE OPERACIONES');
-  L.push(csvFila(['fecha_iso','activo','direccion','entrada','stop','target','tamano','fase_lunar','senal_al_entrar','estado','salida','pl']));
-  lsTrades().forEach(t => L.push(csvFila([
-    new Date(t.fecha).toISOString(), t.act, t.dir, t.ent, t.stop, t.tgt, t.tam,
-    t.fase, t.sen, t.estadoT, t.salida ?? '',
-    (t.pl === null || t.pl === undefined) ? '' : (+t.pl).toFixed(2),
-  ])));
-  L.push('');
-  L.push(`# SECCION 2 - HISTORIAL DE SENAL 7 DIAS (${ACTIVOS[estado.sym].corto}, velas 1H, reconstruido sin F&G ni futuros)`);
-  L.push(csvFila(['fecha_iso','senal']));
-  estado.histSeñal.forEach(p => L.push(csvFila([new Date(p.t * 1000).toISOString(), p.s.toFixed(4)])));
-  L.push('');
-  L.push('# SECCION 3 - HISTORIAL DE ALERTAS');
-  L.push(csvFila(['fecha_iso','activo','timeframe','alerta','senal','precio']));
-  leerLS('lo369_alertas', []).forEach(a => L.push(csvFila([
-    new Date(a.t).toISOString(), a.sym, a.tf || '1h', a.nombre, a.s, a.precio,
-  ])));
-  return L.join('\r\n');
-}
-function exportarCSV() {
-  /* el BOM hace que Excel abra los acentos bien en vez de como mojibake */
-  descargarBlob(new Blob(['\ufeff' + construirCSV()], { type: 'text/csv;charset=utf-8' }),
-    `lunar-oracle-369-${selloFecha()}.csv`);
-  const n = lsTrades().length, h = estado.histSeñal.length;
-  tostada(`CSV descargado: ${n} operacion(es), ${h} puntos de señal y el historial de alertas, en tres secciones.`, 'ok', 6000);
-}
-
-/* ---------- 💾 respaldo JSON ---------- */
-function construirJSON() {
-  return {
-    formato: 'lunar-oracle-369', version: 1,
-    exportado: new Date().toISOString(),
-    capital: +$('capital').value || 10000,
-    trades: lsTrades(),
-    alertas: leerLS('lo369_alertas', []),
-    preferencias: { activo: estado.sym, intervalo: estado.tf, sonido: estado.sonido },
-    nota: DISCLAIMER,
-  };
-}
-function exportarJSON() {
-  const d = construirJSON();
-  descargarBlob(new Blob([JSON.stringify(d, null, 2)], { type: 'application/json;charset=utf-8' }),
-    `lunar-oracle-369-respaldo-${selloFecha()}.json`);
-  tostada(`Respaldo guardado: ${d.trades.length} operacion(es) y ${d.alertas.length} alerta(s).`, 'ok');
-}
-function importarJSON(texto) {
-  let d;
-  try { d = JSON.parse(texto); } catch { throw new Error('el archivo no es JSON válido'); }
-  if (!d || d.formato !== 'lunar-oracle-369') throw new Error('no es un respaldo de este terminal');
-  if (!Array.isArray(d.trades)) throw new Error('el respaldo no trae diario de operaciones');
-  const actuales = lsTrades().length;
-  /* restaurar PISA lo que hay: se pregunta con las dos cifras a la vista */
-  const ok = confirm(
-    `Restaurar ${d.trades.length} operación(es) y ${(d.alertas || []).length} alerta(s)\n` +
-    `del respaldo del ${d.exportado ? new Date(d.exportado).toLocaleString('es-PE') : 'origen desconocido'}.\n\n` +
-    `Esto REEMPLAZA las ${actuales} operación(es) guardadas ahora en este navegador.\n\n¿Continuar?`);
-  if (!ok) { tostada('Importación cancelada. No se tocó nada.', 'info'); return; }
-  guardarTrades(d.trades);
-  if (Array.isArray(d.alertas)) LS.set('lo369_alertas', JSON.stringify(d.alertas));
-  if (d.capital) { $('capital').value = d.capital; LS.set('lo369_capital', String(d.capital)); }
-  salirDeEdicion();
-  pintarDiario(); pintarAlertas();
-  tostada(`Respaldo restaurado: ${d.trades.length} operación(es).`, 'ok');
-}
 
 /* ---------- 🖼️ PNG ---------- */
 /* El medidor es un SVG sin texto: se serializa y se rasteriza tal cual. Así
@@ -2581,7 +2501,7 @@ async function exportarPDF() {
       fila([`${d.getDate()}/${d.getMonth()+1}/${String(d.getFullYear()).slice(-2)}`, t.act, t.dir,
             String(t.ent), String(t.stop), String(t.tgt), String(t.tam), t.estadoT, pl]);
     });
-    if (trades.length > 40) parrafo(`Se listan las 40 mas recientes de ${trades.length}. El CSV las incluye todas.`);
+    if (trades.length > 40) parrafo(`Se listan las 40 mas recientes de ${trades.length}.`);
     y += 4;
     linea('Riesgo consumido hoy', $('rDiaV').textContent + ' (limite 5%)');
     linea('Riesgo consumido 7 dias', $('rSemV').textContent + ' (limite 10%)');
@@ -2593,52 +2513,9 @@ async function exportarPDF() {
   tostada(`Reporte PDF generado, ${pagina} pagina(s).`, 'ok');
 }
 
-/* ---------- 🔗 resumen al portapapeles ---------- */
-function resumenTexto() {
-  const s = estado.señal, lun = faseLunar(), a = ACTIVOS[estado.sym];
-  const dirLong = s.score >= 0, alin = dirLong ? estado.mtf.nLong : estado.mtf.nShort;
-  const L = [];
-  L.push(`LUNAR ORACLE 369 — ${a.corto}/USDT`);
-  L.push(new Date().toLocaleString('es-PE'));
-  L.push('');
-  L.push(`Señal Tesla 369 (1H): ${estado.bloqueado ? 'BLOQUEADO POR FILTRO' : s.cls} ${s.score >= 0 ? '+' : ''}${s.score.toFixed(3)}`);
-  L.push(`  score técnico ${s.rawScore >= 0 ? '+' : ''}${s.rawScore.toFixed(3)} × lunar ${s.multLunar}`);
-  L.push(`  precio ${fmt$(s.precio)} · ADX ${s.adxV.toFixed(1)} · RSI ${s.rsiV.toFixed(0)}`);
-  L.push('');
-  L.push(`Confianza multi-timeframe: ${estado.mtf.final >= 0 ? '+' : ''}${estado.mtf.final.toFixed(3)} (${alin}/5 alineados, mínimo 3)`);
-  estado.tfs.forEach(t => L.push(`  ${t.l}: ${t.s >= 0 ? '+' : ''}${t.s.toFixed(2)}  (peso ${t.w.toFixed(2)})`));
-  if (estado.mtf.divergencia) L.push('  AVISO: divergencia táctica vs. estructural — reducir tamaño');
-  L.push('');
-  L.push('Filtros de no-operación:');
-  estado.filtros.forEach(f => L.push(`  ${f.ok ? '[OK]' : '[BLOQUEA]'} ${f.n} — ${f.d}`));
-  L.push('');
-  L.push(`Luna: ${lun.nombre} ×${lun.mult} · ${lun.arquetipo} · iluminación ${lun.ilum}% · día ${lun.edad.toFixed(1)} de 29.5`);
-  L.push(`  próxima fase ${lun.sig.nombre} en ${Math.floor(lun.horasSig / 24)}d ${Math.floor(lun.horasSig % 24)}h`);
-  L.push(`  ${a.corto}: stop ${a.stopATR}× ATR · targets ${a.tgtMin}–${a.tgtMax}% · exposición máx. ${a.asigMax}%`);
-  L.push('');
-  L.push(DISCLAIMER.replace('asesoria', 'asesoría'));
-  return L.join('\n');
-}
-async function copiarResumen() {
-  const t = resumenTexto();
-  try {
-    await navigator.clipboard.writeText(t);
-  } catch {
-    /* sin permiso de portapapeles o sin contexto seguro: método antiguo */
-    const ta = document.createElement('textarea');
-    ta.value = t;
-    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
-    document.body.appendChild(ta); ta.focus(); ta.select();
-    let ok = false;
-    try { ok = document.execCommand('copy'); } catch {}
-    ta.remove();
-    if (!ok) throw new Error('el navegador bloqueó el portapapeles');
-  }
-  tostada('Resumen copiado. Ya puedes pegarlo donde quieras.', 'ok');
-}
 
 /* ---------- cableado de la barra ---------- */
-const BOTONES_CON_DATOS = ['expPDF', 'expCSV', 'expPNG', 'expTexto'];
+const BOTONES_CON_DATOS = ['expPDF', 'expPNG'];
 function habilitarExportacion() {
   const listo = !!(estado.hayDatos && estado.señal);
   BOTONES_CON_DATOS.forEach(id => {
@@ -2649,19 +2526,9 @@ function habilitarExportacion() {
 }
 alPulsar('expTerminal', descargarTerminal);
 alPulsar('expPDF',      exportarPDF);
-alPulsar('expCSV',      exportarCSV);
 alPulsar('expPNG',      exportarPNG);
-alPulsar('expJSON',     exportarJSON);
-alPulsar('expTexto',    copiarResumen);
-$('impJSON').addEventListener('click', () => $('ficheroJSON').click());
-$('ficheroJSON').addEventListener('change', async e => {
-  const f = e.target.files && e.target.files[0];
-  e.target.value = '';                      /* permite reimportar el mismo archivo */
-  if (!f) return;
-  try { importarJSON(await f.text()); }
-  catch (err) { tostada('No se pudo importar: ' + (err.message || err), 'mal', 7000); }
-});
 habilitarExportacion();
+
 
 /* ---------- tooltips por módulo ---------- */
 const AYUDAS = {
