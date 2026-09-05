@@ -71,6 +71,15 @@ header.top{position:sticky;top:0;z-index:30;background:rgba(7,8,18,.86);backdrop
 .punto-vivo{width:6px;height:6px;border-radius:50%;display:inline-block;background:var(--verde);animation:vivoPulso 1.6s ease-in-out infinite}
 @keyframes vivoPulso{0%,100%{opacity:1}50%{opacity:.3}}
 .btn-son{border:1px solid var(--borde2);border-radius:8px;padding:4px 10px;font-size:12px}
+.btn-descarga{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(167,139,250,.5);
+  border-radius:8px;padding:4px 11px;font-family:var(--num);font-size:10px;letter-spacing:.06em;
+  color:#ddd6fe;background:rgba(124,58,237,.16);transition:filter .15s}
+.btn-descarga:hover:not(:disabled){filter:brightness(1.3)}
+.btn-descarga[aria-busy="true"]{opacity:.6;cursor:progress}
+@media(max-width:820px){.btn-descarga .txt{display:none}.btn-descarga{padding:4px 8px}}
+/* distintivo de la copia descargada: nadie debe confundirla con el sitio */
+.insignia-local{border:1px solid rgba(250,204,21,.5);background:rgba(250,204,21,.10);color:#fde68a;
+  border-radius:8px;padding:3px 9px;font-family:var(--num);font-size:9px;letter-spacing:.1em;white-space:nowrap}
 .btn-son[aria-pressed="true"]{border-color:var(--violeta);color:var(--violeta)}
 
 /* ---------- banner de alerta ----------
@@ -103,6 +112,9 @@ main.cambiando{animation:cambioActivo .45s ease}
 @media(max-width:1100px){.fila-2,.fila-3{grid-template-columns:1fr}}
 .cargando{text-align:center;padding:70px 0;color:var(--tinta3);font-family:var(--num);animation:vivoPulso 1.4s ease-in-out infinite}
 .error-datos{border:1px solid rgba(251,113,133,.5);background:rgba(251,113,133,.08);border-radius:12px;padding:12px 16px;font-size:13px;color:#fecdd3}
+/* mostrar la última lectura guardada no es un fallo, es un modo degradado:
+   ámbar, no rojo, para no gritar error cuando el terminal está haciendo algo útil */
+.error-datos.guardado{border-color:rgba(250,204,21,.5);background:rgba(250,204,21,.08);color:#fde68a}
 
 /* ---------- semáforo de filtros ---------- */
 #semaforo{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
@@ -283,6 +295,8 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
     <div class="top-der">
       <span class="chip-fg" id="chipFG">F&G …</span>
       <span id="cajaVivo"><span class="punto-vivo" id="puntoVivo"></span> <span id="estadoVivo">CARGANDO</span> · <span id="horaAct">…</span></span>
+      <button class="btn-descarga" id="btnDescargar" type="button"
+        title="Descargar este terminal como un solo archivo HTML que funciona por su cuenta">⬇ <span class="txt">Descargar</span></button>
       <button class="btn-son" id="btnSonido" aria-pressed="true" title="Sonido de alertas">🔔</button>
     </div>
   </div>
@@ -440,6 +454,7 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
 
 <footer>
   Datos en vivo: WebSocket público de Binance (precio y vela en curso, cada segundo) sobre su API REST (spot + futures) y Alternative.me Fear &amp; Greed · Cálculo lunar astronómico local · Reconciliación completa según el intervalo del gráfico (30 s a 15 min)<br>
+  Terminal descargable: el botón ⬇ de la cabecera entrega este mismo archivo, que funciona por su cuenta con doble clic.<br>
   Herramienta educativa de análisis probabilístico. No es asesoría financiera — la ejecución y el riesgo son tuyos.
 </footer>
 
@@ -881,6 +896,7 @@ async function cargar(primeraVez) {
     };
     if (window.requestIdleCallback) requestIdleCallback(trabajoPesado, { timeout: 2000 });
     else setTimeout(trabajoPesado, 60);
+    guardarSnapshot();
   } catch (e) {
     if (sym !== estado.sym) return;          /* falló una carga obsoleta: se ignora */
     estado.restOk = false;
@@ -888,11 +904,26 @@ async function cargar(primeraVez) {
     pintarEstadoVivo();
     const err = $('errorDatos');
     err.style.display = 'block';
-    /* si ya había un tablero pintado NO se borra: se marca claramente como
-       congelado, para que nadie confunda datos viejos con datos en vivo */
-    err.textContent = estado.hayDatos
-      ? `Sin conexión con Binance (${e.message}). Lo que ves está CONGELADO (desde las ${estado.ultimoOk.toLocaleTimeString('es-PE')}). Reintentando cada ${textoRefresco(estado.tf)}…`
-      : `No se pudieron cargar datos en vivo (${e.message}). Reintentando cada ${textoRefresco(estado.tf)}…`;
+    err.classList.remove('guardado');
+    /* Primer arranque sin red: en vez de una pantalla muerta se pinta la
+       última lectura guardada, rotulada con su fecha y sin disparar
+       alertas. Es lo que salva a la copia descargada estando sin señal. */
+    let deSnapshot = null;
+    if (!estado.hayDatos) deSnapshot = restaurarSnapshot();
+    if (deSnapshot) {
+      $('tablero').style.display = 'flex';
+      pintarTodo();
+      err.classList.add('guardado');
+      err.textContent = `Sin conexión con Binance (${e.message}). Esto NO son datos en vivo: es la última lectura ` +
+        `guardada en este navegador (del ${deSnapshot.toLocaleString('es-PE')}). No se disparan alertas sobre datos ` +
+        `viejos. Reintentando cada ${textoRefresco(estado.tf)}…`;
+    } else {
+      /* si ya había un tablero pintado NO se borra: se marca claramente como
+         congelado, para que nadie confunda datos viejos con datos en vivo */
+      err.textContent = estado.hayDatos
+        ? `Sin conexión con Binance (${e.message}). Lo que ves está CONGELADO (desde las ${estado.ultimoOk.toLocaleTimeString('es-PE')}). Reintentando cada ${textoRefresco(estado.tf)}…`
+        : `No se pudieron cargar datos en vivo (${e.message}). Reintentando cada ${textoRefresco(estado.tf)}…`;
+    }
   }
 }
 
@@ -2003,6 +2034,127 @@ $('btnSonido').addEventListener('click', () => {
   $('btnSonido').textContent = estado.sonido ? '🔔' : '🔕';
   if (estado.sonido) beep(true);   /* gesto del usuario: desbloquea el AudioContext */
 });
+
+/* ══════════════════════════════════════════════════════════════
+   EDICIÓN PORTÁTIL — descargar el terminal y hacer que la copia
+   descargada valga por sí sola.
+   El archivo que se entrega es idéntico al que sirve el sitio: no
+   hay build ni variantes que puedan divergir. Lo que cambia es el
+   comportamiento en tiempo de ejecución, según dónde se abra.
+   ══════════════════════════════════════════════════════════════ */
+const SITIO = 'https://kippuu.com/';
+const COPIA_LOCAL = location.protocol === 'file:';
+
+function descargarBlob(blob, nombre) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = nombre;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);   /* revocar ya aborta la descarga */
+}
+async function descargarTerminal() {
+  const b = $('btnDescargar');
+  b.setAttribute('aria-busy', 'true');
+  try {
+    let html = null;
+    try {
+      const r = await fetch(location.href, { cache: 'no-store' });
+      if (r.ok) { const t = await r.text(); if (/<\/html>/i.test(t)) html = t; }
+    } catch {}
+    if (!html) {
+      /* fetch bloqueado, típico al reexportar desde una copia en file://.
+         Se serializa el DOM: al abrirlo los scripts se ejecutan otra vez y
+         vuelven a pedir los datos, así que el archivo funciona igual. */
+      html = '<!doctype html>\n' + document.documentElement.outerHTML;
+    }
+    const d = new Date(), p = n => String(n).padStart(2, '0');
+    descargarBlob(new Blob([html], { type: 'text/html;charset=utf-8' }),
+      `lunar-oracle-369-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}.html`);
+    avisoDescarga();
+  } catch (e) {
+    alert('No se pudo preparar la descarga: ' + (e && e.message ? e.message : e));
+  } finally {
+    b.removeAttribute('aria-busy');
+  }
+}
+/* Aviso de una sola vez bajo el botón, sin librería de notificaciones. */
+function avisoDescarga() {
+  const previo = $('avisoDescarga');
+  if (previo) previo.remove();
+  const el = document.createElement('div');
+  el.id = 'avisoDescarga';
+  el.style.cssText = 'position:fixed;right:14px;bottom:14px;z-index:60;max-width:min(360px,calc(100vw - 28px));' +
+    'background:#0b0d18;border:1px solid var(--borde2);border-left:3px solid var(--verde);border-radius:10px;' +
+    'padding:10px 14px;font-size:12px;line-height:1.5;color:var(--tinta2);box-shadow:0 12px 30px rgba(0,0,0,.55)';
+  el.textContent = 'Terminal descargado. Ábrelo con doble clic: se reconecta solo a Binance y guarda su propio diario.';
+  document.body.appendChild(el);
+  setTimeout(() => { el.style.transition = 'opacity .3s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 320); }, 6000);
+}
+$('btnDescargar').addEventListener('click', descargarTerminal);
+
+/* ---------- copia descargada: enlaces y distintivo ---------- */
+function adaptarCopiaLocal() {
+  /* los enlaces relativos no llevan a ninguna parte fuera del sitio */
+  const v = document.querySelector('.volver');
+  if (v) { v.href = SITIO + 'santa-catarina'; v.textContent = '← kippuu.com'; v.target = '_blank'; v.rel = 'noopener'; }
+  const ins = document.createElement('span');
+  ins.className = 'insignia-local';
+  ins.textContent = 'COPIA LOCAL';
+  ins.title = 'Estás usando una copia descargada. Los datos de mercado siguen llegando en vivo de Binance, y el diario se guarda en este navegador, aparte del que tengas en el sitio.';
+  $('chipFG').before(ins);
+  document.title = 'LUNAR ORACLE 369 — copia local';
+}
+if (COPIA_LOCAL) adaptarCopiaLocal();
+
+/* ---------- última lectura guardada ----------
+   Sin esto, abrir el terminal sin conexión daba una pantalla muerta: el
+   error y nada más. Se guarda un retrato comprimido de las series en cada
+   carga buena y, si el primer arranque falla, se pinta ese retrato bien
+   rotulado como lo que es. Vale para el sitio, pero es lo que hace que la
+   copia descargada sirva de algo en un avión.                          */
+const CLAVE_SNAP = 'lo369_snapshot';
+const comprimirVelas = a => a.map(c => [c.time, c.open, c.high, c.low, c.close, +(+c.volume).toFixed(2)]);
+const descomprimirVelas = a => (a || []).map(x => ({ time:x[0], open:x[1], high:x[2], low:x[3], close:x[4], volume:x[5] }));
+function guardarSnapshot() {
+  const S = estado.velasSeñal;
+  if (!S || !S['1h'] || !S['1h'].length) return;
+  try {
+    const d = {
+      v: 1, t: Date.now(), sym: estado.sym, tf: estado.tf,
+      tickers: estado.tickers, fg: estado.fg, fut: estado.fut,
+      /* se recortan a lo justo para que las medias y el ADX salgan
+         sembrados: guardar las 500 completas no cabe en la cuota */
+      velas: {
+        '1h': comprimirVelas(S['1h'].slice(-400)),
+        '4h': comprimirVelas(S['4h'].slice(-300)),
+        '1d': comprimirVelas(S['1d'].slice(-200)),
+        '1w': comprimirVelas(S['1w'].slice(-120)),
+      },
+    };
+    if (!TF_SEÑAL.includes(estado.tf) && estado.velasTF.length)
+      d.velasTF = comprimirVelas(estado.velasTF.slice(-400));
+    LS.set(CLAVE_SNAP, JSON.stringify(d));
+  } catch {}            /* cuota llena o almacenamiento bloqueado: se sigue sin retrato */
+}
+function restaurarSnapshot() {
+  const d = leerLS(CLAVE_SNAP, null);
+  if (!d || d.v !== 1 || !d.velas || !d.velas['1h'] || !ACTIVOS[d.sym]) return null;
+  estado.sym = d.sym;
+  estado.tf = INTERVALOS[d.tf] ? d.tf : '1h';
+  estado.tickers = d.tickers || {};
+  estado.fg = d.fg || null;
+  estado.fut = d.fut || null;
+  estado.velasSeñal = {};
+  TF_SEÑAL.forEach(k => { estado.velasSeñal[k] = descomprimirVelas(d.velas[k]); });
+  estado.velas1h = estado.velasSeñal['1h'];
+  estado.velasTF = d.velasTF ? descomprimirVelas(d.velasTF) : estado.velasSeñal[estado.tf] || estado.velasSeñal['1h'];
+  estado.velasTFde = { sym: d.sym, tf: estado.tf };
+  if (!calcularSeñales()) return null;
+  /* NO se llama a revisarAlertas: un retrato de hace horas no es un cruce
+     que esté ocurriendo ahora, y avisar de él sería mentir. */
+  estado.hayDatos = true;
+  return new Date(d.t);
+}
 
 /* ---------- 8 · cosmos de fondo (canvas ligero con parallax) ---------- */
 (function(){
