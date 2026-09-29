@@ -2138,10 +2138,15 @@
     .pasarela-inner .ticker-status{ flex: none; }
     /* el botón viaja pegado al desfile: si fuera hermano suelto, al envolver
        se quedaría arriba separado de aquello que pausa */
-    /* La base la marca el ancho mínimo con el que el desfile aún se lee. Más
-       alta, el desfile baja de fila en escritorio y la barra crece 56 px que
-       le quita al titular; más baja, se envuelve tarde y queda un hilo. */
-    .pas-zona{ display: flex; align-items: center; gap: .6rem; flex: 1 1 230px; min-width: 0; }
+    /* La cripto va SIEMPRE en su propia franja, a lo ancho. Compartiendo fila
+       le quedaban unos 200 px y ahí no cabe ni un par de divisas: se veía
+       "17 ▼3.3%" suelto, un fragmento ilegible. Con el ancho completo entra
+       entera en escritorio y ni siquiera hace falta que desfile. */
+    .pas-zona{
+      display: flex; align-items: center; gap: .6rem;
+      flex: 1 1 100%; min-width: 0;
+      border-top: 1px solid var(--borde); padding-top: .38rem;
+    }
     /* Lo que sostiene el negocio no desfila. El dólar en soles, en reales y la
        onza de oro son la referencia del público minero: si hay que esperar a
        que pasen, la página falla justo en el dato que trajo al visitante. */
@@ -2189,7 +2194,11 @@
       @keyframes destelloBaja{ from{ background: rgba(176,93,74,.42); } to{ background: rgba(176,93,74,0); } }
     }
     .pas-item{ display: inline-flex; align-items: center; gap: .5rem; white-space: nowrap; }
-    .pas-item .coin{ display: inline-flex; flex: none; }
+    /* .coin nace en 32 px para el ticker antiguo. Aquí convive con banderas de
+       15x11, así que sin bajarlo la pastilla del oro medía 42 px de alto
+       contra 37 px de las otras dos y rompía la línea. */
+    .pas-item .coin{ display: inline-flex; flex: none; width: 20px; height: 20px; }
+    .pas-item .coin svg{ width: 12px; height: 12px; }
     .pas-label{ font-size: .64rem; font-weight: 600; letter-spacing: .12em; color: var(--humo-55); text-transform: uppercase; }
     .pas-value{ font-family: var(--f-display); font-weight: 700; font-size: .95rem; color: var(--humo); }
     .pas-item .ticker-chg{ font-size: .7rem; font-weight: 600; }
@@ -2211,8 +2220,11 @@
        árbol de accesibilidad: la bandera y el símbolo (S/, R$) ya identifican
        la divisa de un vistazo, y un lector de pantalla sigue leyendo
        "USD / PEN". Es lo que permite mantener las TRES pastillas ancladas en
-       tablet y en móvil en lugar de sacrificar alguna. */
-    @media (max-width: 860px){
+       tablet y en móvil en lugar de sacrificar alguna.
+       El corte está en 960 y no en 860 porque es ahí donde el chip de estado
+       y las tres pastillas con rótulo dejan de caber juntos: por debajo, los
+       anclados se iban a una tercera fila y la barra saltaba a 133 px. */
+    @media (max-width: 960px){
       .pas-anclados{ gap: .45rem; }
       .pas-anclados .pas-label{
         position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -2220,7 +2232,6 @@
       }
       .pas-anclados .ticker-chg{ display: none; }  /* la variación del oro sigue en el desfile */
       .pas-anclados .pas-item.principal{ padding: .24rem .55rem; gap: .4rem; }
-      .pas-anclados .coin{ width: 22px; height: 22px; }
     }
     @media (max-width: 560px){
       .pasarela-inner{ gap: .55rem; }
@@ -2228,7 +2239,7 @@
       .pas-anclados{ gap: .3rem; }
       .pas-anclados .pas-item.principal{ padding: .22rem .42rem; gap: .3rem; }
       .pas-anclados .pas-item.principal .pas-value{ font-size: .92rem; }
-      .pas-anclados .coin{ width: 20px; height: 20px; }
+      .pas-item .coin{ width: 18px; height: 18px; }
       .pas-grupo{ gap: 1.6rem; padding-right: 1.6rem; }
     }
 
