@@ -2130,20 +2130,64 @@
       background: rgba(18,20,26,.72);
       border-bottom: 1px solid var(--borde);
     }
-    .pasarela-inner{ display: flex; align-items: center; gap: 1.1rem; padding: .5rem 0; }
+    /* Envuelve a propósito. Con una sola fila rígida, el estado y las tres
+       pastillas ancladas se comen el ancho y el desfile quedaba en 0 px: la
+       cripta desaparecía entera por debajo de ~1100 px. Al envolver, el
+       desfile baja a su propia línea y se ve completo. */
+    .pasarela-inner{ display: flex; flex-wrap: wrap; align-items: center; gap: .45rem 1.1rem; padding: .5rem 0; }
     .pasarela-inner .ticker-status{ flex: none; }
+    /* el botón viaja pegado al desfile: si fuera hermano suelto, al envolver
+       se quedaría arriba separado de aquello que pausa */
+    /* La base la marca el ancho mínimo con el que el desfile aún se lee. Más
+       alta, el desfile baja de fila en escritorio y la barra crece 56 px que
+       le quita al titular; más baja, se envuelve tarde y queda un hilo. */
+    .pas-zona{ display: flex; align-items: center; gap: .6rem; flex: 1 1 230px; min-width: 0; }
+    /* Lo que sostiene el negocio no desfila. El dólar en soles, en reales y la
+       onza de oro son la referencia del público minero: si hay que esperar a
+       que pasen, la página falla justo en el dato que trajo al visitante. */
+    .pas-anclados{ display: flex; align-items: center; gap: .7rem; flex: none; }
     .pasarela{
-      flex: 1; min-width: 0; overflow: hidden;
+      flex: 1 1 auto; min-width: 0; overflow: hidden;
       -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
       mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
     }
+    /* sin desfile no hay nada que se corte por los bordes, así que el degradado
+       de máscara sobraría y solo apagaría el primer y el último dato */
+    .pasarela.sin-desfile{ -webkit-mask-image: none; mask-image: none; }
     .pasarela-track{ display: flex; width: max-content; }
     @media (prefers-reduced-motion: no-preference){
-      .pasarela-track{ animation: pasarelaDesfile 38s linear infinite; }
-      .pasarela:hover .pasarela-track{ animation-play-state: paused; }
+      /* La duración la calcula el JS a partir del ancho real del grupo, no es
+         fija: así añadir o quitar una divisa cambia el recorrido pero NO la
+         velocidad. Antes, con 38 s clavados, una séptima moneda aceleraba
+         toda la pasarela. */
+      .pasarela-track.desfilando{ animation: pasarelaDesfile var(--desfile-dur, 38s) linear infinite; }
+      .pasarela:hover .pasarela-track,
+      .pasarela:focus-within .pasarela-track,
+      .pasarela-track.en-pausa{ animation-play-state: paused; }
     }
     @keyframes pasarelaDesfile{ to{ transform: translateX(-50%); } }
     .pas-grupo{ display: flex; align-items: center; gap: 2.4rem; padding-right: 2.4rem; flex: none; }
+    /* Botón de pausa: el :hover no existe en táctil ni con teclado, y una
+       marquesina que no se puede detener es una trampa de accesibilidad. */
+    .pas-pausa{
+      flex: none; width: 26px; height: 26px; border-radius: 50%;
+      border: 1px solid var(--borde); background: rgba(18,20,26,.55);
+      color: var(--humo-55); display: grid; place-items: center;
+      font-size: .58rem; line-height: 1; cursor: pointer;
+    }
+    .pas-pausa:hover{ color: var(--oro-claro); border-color: var(--borde-oro); }
+    .pas-pausa[hidden]{ display: none; }
+    /* Acuse de cambio. Se anima el fondo y no el color del texto porque el
+       texto tiene un color distinto según la pastilla (oro) o no, y volver
+       a "inherit" lo dejaría desteñido. El fondo parte de nada y vuelve a
+       nada, así que no deja residuo en ninguna variante. */
+    .pas-value{ border-radius: 4px; padding: 0 .16rem; margin: 0 -.16rem; }
+    @media (prefers-reduced-motion: no-preference){
+      .pas-value.subio{ animation: destelloSube .6s ease-out; }
+      .pas-value.bajo{ animation: destelloBaja .6s ease-out; }
+      @keyframes destelloSube{ from{ background: rgba(46,125,107,.45); } to{ background: rgba(46,125,107,0); } }
+      @keyframes destelloBaja{ from{ background: rgba(176,93,74,.42); } to{ background: rgba(176,93,74,0); } }
+    }
     .pas-item{ display: inline-flex; align-items: center; gap: .5rem; white-space: nowrap; }
     .pas-item .coin{ display: inline-flex; flex: none; }
     .pas-label{ font-size: .64rem; font-weight: 600; letter-spacing: .12em; color: var(--humo-55); text-transform: uppercase; }
@@ -2163,9 +2207,29 @@
       .pasarela{ overflow-x: auto; scrollbar-width: none; }
       .pasarela::-webkit-scrollbar{ display: none; }
     }
+    /* Desde aquí los rótulos de los anclados se ocultan A LA VISTA pero no al
+       árbol de accesibilidad: la bandera y el símbolo (S/, R$) ya identifican
+       la divisa de un vistazo, y un lector de pantalla sigue leyendo
+       "USD / PEN". Es lo que permite mantener las TRES pastillas ancladas en
+       tablet y en móvil en lugar de sacrificar alguna. */
+    @media (max-width: 860px){
+      .pas-anclados{ gap: .45rem; }
+      .pas-anclados .pas-label{
+        position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+        overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+      }
+      .pas-anclados .ticker-chg{ display: none; }  /* la variación del oro sigue en el desfile */
+      .pas-anclados .pas-item.principal{ padding: .24rem .55rem; gap: .4rem; }
+      .pas-anclados .coin{ width: 22px; height: 22px; }
+    }
     @media (max-width: 560px){
-      .pasarela-inner{ gap: .7rem; }
+      .pasarela-inner{ gap: .55rem; }
       .pasarela-inner .ticker-status span:last-child{ display: none; } /* solo el punto pulsante */
+      .pas-anclados{ gap: .3rem; }
+      .pas-anclados .pas-item.principal{ padding: .22rem .42rem; gap: .3rem; }
+      .pas-anclados .pas-item.principal .pas-value{ font-size: .92rem; }
+      .pas-anclados .coin{ width: 20px; height: 20px; }
+      .pas-grupo{ gap: 1.6rem; padding-right: 1.6rem; }
     }
 
     /* ---------- Film de marca (click-to-play) ---------- */
@@ -2396,61 +2460,31 @@
           <span class="dot-live" aria-hidden="true"></span>
           <span id="ticker-status-text">Cargando precios…</span>
         </div>
-        <div class="pasarela">
-          <div class="pasarela-track">
-            <div class="pas-grupo">
-              <span class="pas-item principal ticker-item">
-                <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#D91023"/><rect x="6" width="6" height="13" fill="#F5F5F0"/></svg>
-                <span class="pas-label">USD / PEN</span>
-                <span class="pas-value" data-price="usd_pen">—</span>
-              </span>
-              <span class="pas-item principal ticker-item">
-                <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#009B3A"/><path d="M9 1.6 16.2 6.5 9 11.4 1.8 6.5Z" fill="#FEDF00"/><circle cx="9" cy="6.5" r="2.6" fill="#002776"/></svg>
-                <span class="pas-label">USD / BRL</span>
-                <span class="pas-value" data-price="usd_brl">—</span>
-              </span>
-              <span class="pas-item principal oro ticker-item">
-                <span class="coin" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.6 3.2h4.8l1.3 3.2H4.3l1.3-3.2Z" fill="#E8C766"/><path d="M2.7 8h4.8l1.3 3.2H1.4L2.7 8Z" fill="#E8C766"/><path d="M8.5 8h4.8l1.3 3.2H7.2L8.5 8Z" fill="#E8C766"/></svg></span>
-                <span class="pas-label">ORO / OZ</span>
-                <span class="pas-value" data-price="oro_usd">—</span>
-                <span class="ticker-chg" data-chg="oro">&nbsp;</span>
-              </span>
-              <span class="pas-item ticker-item">
-                <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4.5 2.5h5a2.4 2.4 0 0 1 0 4.8h-5M4.5 7.3h5.6a2.4 2.4 0 0 1 0 4.8H4.5M5.8 2.5v9.6M6.5 1v1.5M9 1v1.5M6.5 12.1v1.5M9 12.1v1.5" stroke="#E8C766" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                <span class="pas-label">BTC / USD</span>
-                <span class="pas-value" data-price="btc_usd">—</span>
-                <span class="ticker-chg" data-chg="btc">&nbsp;</span>
-              </span>
-              <span class="pas-item ticker-item">
-                <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1.5 12.5 8 8 10.8 3.5 8 8 1.5Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 12.2 12 9.6 8 15 4 9.6l4 2.6Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/></svg></span>
-                <span class="pas-label">ETH / USD</span>
-                <span class="pas-value" data-price="eth_usd">—</span>
-                <span class="ticker-chg" data-chg="eth">&nbsp;</span>
-              </span>
-              <span class="pas-item ticker-item">
-                <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4.9 2.9h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/><path d="M2.5 6.8h8.4l2.4 2.4H4.9L2.5 6.8Z" fill="#E8C766"/><path d="M4.9 10.7h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/></svg></span>
-                <span class="pas-label">SOL / USD</span>
-                <span class="pas-value" data-price="sol_usd">—</span>
-                <span class="ticker-chg" data-chg="sol">&nbsp;</span>
-              </span>
-            </div>
-            <div class="pas-grupo" aria-hidden="true">
-              <span class="pas-item principal ticker-item">
-                <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#D91023"/><rect x="6" width="6" height="13" fill="#F5F5F0"/></svg>
-                <span class="pas-label">USD / PEN</span>
-                <span class="pas-value" data-price="usd_pen">—</span>
-              </span>
-              <span class="pas-item principal ticker-item">
-                <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#009B3A"/><path d="M9 1.6 16.2 6.5 9 11.4 1.8 6.5Z" fill="#FEDF00"/><circle cx="9" cy="6.5" r="2.6" fill="#002776"/></svg>
-                <span class="pas-label">USD / BRL</span>
-                <span class="pas-value" data-price="usd_brl">—</span>
-              </span>
-              <span class="pas-item principal oro ticker-item">
-                <span class="coin" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.6 3.2h4.8l1.3 3.2H4.3l1.3-3.2Z" fill="#E8C766"/><path d="M2.7 8h4.8l1.3 3.2H1.4L2.7 8Z" fill="#E8C766"/><path d="M8.5 8h4.8l1.3 3.2H7.2L8.5 8Z" fill="#E8C766"/></svg></span>
-                <span class="pas-label">ORO / OZ</span>
-                <span class="pas-value" data-price="oro_usd">—</span>
-                <span class="ticker-chg" data-chg="oro">&nbsp;</span>
-              </span>
+        <!-- Anclados: siempre visibles, nunca desfilan -->
+        <div class="pas-anclados">
+          <span class="pas-item principal ticker-item">
+            <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#D91023"/><rect x="6" width="6" height="13" fill="#F5F5F0"/></svg>
+            <span class="pas-label">USD / PEN</span>
+            <span class="pas-value" data-price="usd_pen">—</span>
+          </span>
+          <span class="pas-item principal ticker-item">
+            <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#009B3A"/><path d="M9 1.6 16.2 6.5 9 11.4 1.8 6.5Z" fill="#FEDF00"/><circle cx="9" cy="6.5" r="2.6" fill="#002776"/></svg>
+            <span class="pas-label">USD / BRL</span>
+            <span class="pas-value" data-price="usd_brl">—</span>
+          </span>
+          <span class="pas-item principal oro ticker-item">
+            <span class="coin" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.6 3.2h4.8l1.3 3.2H4.3l1.3-3.2Z" fill="#E8C766"/><path d="M2.7 8h4.8l1.3 3.2H1.4L2.7 8Z" fill="#E8C766"/><path d="M8.5 8h4.8l1.3 3.2H7.2L8.5 8Z" fill="#E8C766"/></svg></span>
+            <span class="pas-label">ORO / OZ</span>
+            <span class="pas-value" data-price="oro_usd">—</span>
+            <span class="ticker-chg" data-chg="oro">&nbsp;</span>
+          </span>
+        </div>
+        <!-- Desfile: la cripto, que es contexto y no la referencia del cliente.
+             El segundo grupo lo clona el JS para que solo haya una fuente. -->
+        <div class="pas-zona">
+        <div class="pasarela" id="pasarela">
+          <div class="pasarela-track" id="pasarela-track">
+            <div class="pas-grupo" id="pas-grupo">
               <span class="pas-item ticker-item">
                 <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4.5 2.5h5a2.4 2.4 0 0 1 0 4.8h-5M4.5 7.3h5.6a2.4 2.4 0 0 1 0 4.8H4.5M5.8 2.5v9.6M6.5 1v1.5M9 1v1.5M6.5 12.1v1.5M9 12.1v1.5" stroke="#E8C766" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 <span class="pas-label">BTC / USD</span>
@@ -2472,9 +2506,11 @@
             </div>
           </div>
         </div>
+        <button class="pas-pausa" id="pas-pausa" type="button" aria-pressed="false"
+                aria-label="Pausar el desfile de precios" title="Pausar el desfile" hidden>❚❚</button>
+        </div>
       </div>
     </div>
-
     <!-- ============ 1. HERO ============ -->
     <section class="hero" id="inicio" aria-labelledby="hero-title" style="padding-bottom:0">
       <canvas id="cinta-oro" aria-hidden="true"></canvas>
@@ -3985,16 +4021,113 @@
     const fmtPEN3 = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN', minimumFractionDigits: 3, maximumFractionDigits: 3 });
     const fmtNum = (v, dec) => new Intl.NumberFormat('es-PE', { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(v);
 
+    /* ---------- Pasarela: desfile, pausa y medición ---------- */
+    const Pasarela = (function(){
+      const PX_POR_SEGUNDO = 45;          // el ritmo que ya tenía, ahora constante
+      const ventana = document.getElementById('pasarela');
+      const pista   = document.getElementById('pasarela-track');
+      const grupo   = document.getElementById('pas-grupo');
+      const boton   = document.getElementById('pas-pausa');
+      if (!ventana || !pista || !grupo) return { remedir(){}, destellar(){} };
+      const quieto = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let clon = null, enPausa = false;
+
+      function pintarBoton(){
+        if (!boton) return;
+        boton.setAttribute('aria-pressed', String(enPausa));
+        boton.textContent = enPausa ? '▶' : '❚❚';
+        const t = enPausa ? 'Reanudar el desfile' : 'Pausar el desfile';
+        boton.title = t; boton.setAttribute('aria-label', t + ' de precios');
+      }
+      function medir(){
+        if (quieto.matches){
+          // sin animación no hace falta clon ni botón: se navega a mano
+          if (clon){ clon.remove(); clon = null; }
+          pista.classList.remove('desfilando');
+          if (boton) boton.hidden = true;
+          return;
+        }
+        // el clon se quita ANTES de medir: con él, el ancho sería el doble
+        if (clon){ clon.remove(); clon = null; }
+        const cabe = grupo.scrollWidth <= ventana.clientWidth + 1;
+        ventana.classList.toggle('sin-desfile', cabe);
+        if (boton) boton.hidden = cabe;
+        if (cabe){
+          // una marquesina que se mueve sin necesidad es ruido, no información
+          pista.classList.remove('desfilando');
+          pista.style.removeProperty('--desfile-dur');
+          return;
+        }
+        /* El clon es lo que hace continuo el bucle: la animación lleva la
+           pista hasta -50 %, o sea exactamente un grupo, y en ese instante el
+           clon ocupa el sitio del original sin costura. Conserva los
+           data-price A PROPÓSITO, porque pintarTicker() escribe en todos los
+           nodos que los llevan y así el clon se mantiene al día solo; y va
+           con aria-hidden para que un lector de pantalla no lea los precios
+           por duplicado. */
+        clon = grupo.cloneNode(true);
+        clon.removeAttribute('id');
+        clon.setAttribute('aria-hidden', 'true');
+        pista.appendChild(clon);
+        pista.style.setProperty('--desfile-dur', (grupo.scrollWidth / PX_POR_SEGUNDO).toFixed(2) + 's');
+        pista.classList.add('desfilando');
+        pista.classList.toggle('en-pausa', enPausa);
+      }
+      function alternarPausa(v){
+        enPausa = (v === undefined) ? !enPausa : v;
+        pista.classList.toggle('en-pausa', enPausa);
+        pintarBoton();
+      }
+      if (boton) boton.addEventListener('click', () => alternarPausa());
+      // en táctil no hay hover: tocar la pasarela la detiene
+      ventana.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') alternarPausa(); });
+      let temp = null;
+      addEventListener('resize', () => { clearTimeout(temp); temp = setTimeout(medir, 140); });
+      if (quieto.addEventListener) quieto.addEventListener('change', medir);
+      // las cifras reales son más anchas que los guiones del arranque, y la
+      // tipografía de respaldo mide distinto: hay que volver a medir
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(medir);
+      medir();
+
+      return {
+        remedir: medir,
+        destellar(nodos, clase){
+          if (quieto.matches) return;
+          nodos.forEach(el => {
+            if (!el.classList.contains('pas-value')) return;   // solo en la pasarela
+            el.classList.remove('subio', 'bajo');
+            void el.offsetWidth;                                // reinicia si llega otro cambio encima
+            el.classList.add(clase);
+            setTimeout(() => el.classList.remove(clase), 700);
+          });
+        },
+      };
+    })();
+    const previosTicker = {};
+
     function pintarTicker(){
-      const set = (k, v) => document.querySelectorAll('[data-price="' + k + '"]').forEach(el => el.textContent = v);
+      /* set() compara contra el valor ANTERIOR para saber si subió o bajó. El
+         primer pintado no destella: venimos de un guion, no de un precio. */
+      const set = (k, v, n) => {
+        const nodos = document.querySelectorAll('[data-price="' + k + '"]');
+        if (!nodos.length) return;
+        const antes = previosTicker[k];
+        let dir = null;
+        if (typeof n === 'number' && isFinite(n)){
+          if (typeof antes === 'number' && n !== antes) dir = n > antes ? 'subio' : 'bajo';
+          previosTicker[k] = n;
+        }
+        nodos.forEach(el => { el.textContent = v; });
+        if (dir) Pasarela.destellar(nodos, dir);
+      };
       // Protagonistas de la pasarela: el dólar en soles y en reales, con sus símbolos
-      set('usd_pen', 'S/ ' + fmtNum(precios.usd_pen, 3));
-      set('usd_brl', 'R$ ' + fmtNum(precios.usd_brl, 3));
-      set('oro_usd', fmtUSD0.format(precios.oro_usd));
-      set('usdt_pen', fmtPEN3.format(precios.usdt_pen));
-      set('btc_usd', fmtUSD0.format(precios.btc_usd));
-      set('eth_usd', fmtUSD0.format(precios.eth_usd));
-      set('sol_usd', fmtUSD0.format(precios.sol_usd));
+      set('usd_pen', 'S/ ' + fmtNum(precios.usd_pen, 3), precios.usd_pen);
+      set('usd_brl', 'R$ ' + fmtNum(precios.usd_brl, 3), precios.usd_brl);
+      set('oro_usd', fmtUSD0.format(precios.oro_usd), precios.oro_usd);
+      set('usdt_pen', fmtPEN3.format(precios.usdt_pen), precios.usdt_pen);
+      set('btc_usd', fmtUSD0.format(precios.btc_usd), precios.btc_usd);
+      set('eth_usd', fmtUSD0.format(precios.eth_usd), precios.eth_usd);
+      set('sol_usd', fmtUSD0.format(precios.sol_usd), precios.sol_usd);
       const pintaChg = (clave, valor) => {
         document.querySelectorAll('[data-chg="' + clave + '"]').forEach(el => {
           if (typeof valor === 'number' && !isNaN(valor)){
@@ -4008,12 +4141,25 @@
       pintaChg('btc', precios.btc_chg);
       pintaChg('eth', precios.eth_chg);
       pintaChg('sol', precios.sol_chg);
+      // "▲ 0.6% 24h" es más ancho que el &nbsp; del arranque: hay que remedir
+      Pasarela.remedir();
       const status = document.getElementById('ticker-status');
       const statusText = document.getElementById('ticker-status-text');
       const hora = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
       if (precios.enVivo){
         status.classList.add('en-vivo'); status.classList.remove('referencial');
-        statusText.textContent = tUI('enVivo') + ' · ' + (precios.fuente || 'mercado') + ' · ' + hora;
+        // A la vista queda solo la hora, que es la prueba de que el dato está
+        // fresco. El nombre de la fuente iría a costa de una segunda fila: el
+        // contenedor está capado a ~1120 px y con él nunca cabe todo junto,
+        // así que vive en el title. Se construye con nodos y no con innerHTML
+        // porque precios.fuente viene de la red.
+        statusText.textContent = tUI('enVivo');
+        const det = document.createElement('span');
+        det.className = 'st-detalle';
+        det.textContent = ' · ' + hora;
+        statusText.appendChild(det);
+        // el detalle se oculta por ancho, así que se conserva accesible aquí
+        status.title = tUI('enVivo') + ' · ' + (precios.fuente || 'mercado') + ' · ' + hora;
       } else if (precios.primerIntentoHecho){
         status.classList.remove('en-vivo'); status.classList.add('referencial');
         statusText.textContent = tUI('sinConexion');
