@@ -2143,6 +2143,7 @@
        "17 ▼3.3%" suelto, un fragmento ilegible. Con el ancho completo entra
        entera en escritorio y ni siquiera hace falta que desfile. */
     .pas-zona{
+      position: relative;   /* ancla el rótulo "En pausa" sin que ocupe sitio */
       display: flex; align-items: center; gap: .6rem;
       flex: 1 1 100%; min-width: 0;
       border-top: 1px solid var(--borde); padding-top: .38rem;
@@ -2151,14 +2152,37 @@
        onza de oro son la referencia del público minero: si hay que esperar a
        que pasen, la página falla justo en el dato que trajo al visitante. */
     .pas-anclados{ display: flex; align-items: center; gap: .7rem; flex: none; }
+
+    /* Fundido de bordes. Antes era el 3 % por lado, unos 24 px: las divisas
+       se veían decapitadas en el borde más que saliendo de escena. Ahora son
+       40 px fijos, y solo mientras desfila. Va en una propiedad registrada
+       para poder animarla: un degradado de máscara no se interpola, pero una
+       longitud sí, y así el fundido aparece y se va en 200 ms en vez de
+       saltar al cruzar el umbral de "cabe / no cabe". */
+    @property --fundido{ syntax: '<length>'; inherits: false; initial-value: 0px; }
     .pasarela{
+      --fundido: 40px;
       flex: 1 1 auto; min-width: 0; overflow: hidden;
-      -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
-      mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fundido), #000 calc(100% - var(--fundido)), transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 var(--fundido), #000 calc(100% - var(--fundido)), transparent);
     }
     /* sin desfile no hay nada que se corte por los bordes, así que el degradado
        de máscara sobraría y solo apagaría el primer y el último dato */
-    .pasarela.sin-desfile{ -webkit-mask-image: none; mask-image: none; }
+    .pasarela.sin-desfile{ --fundido: 0px; }
+    /* el relleno final solo separa el grupo de su clon en el bucle; quieta, la
+       franja no tiene clon y esos 38 px eran sitio tirado */
+    .pasarela.sin-desfile .pas-grupo{ padding-right: 0; }
+    /* Compactar antes de desfilar. El aire entre divisas era de 68 px: 38 del
+       hueco del grupo más 29 de relleno y 1 de línea que los ítems heredan de
+       .ticker-item, del ticker antiguo. Desfilar sin fin para cubrir unos
+       pocos px es desproporcionado; primero se prueba apretando el aire, sin
+       tocar ningún tamaño de letra. */
+    .pasarela.compacta .pas-grupo{ gap: 1.3rem; }
+    .pasarela.compacta .pas-item{ gap: .38rem; }
+    .pasarela.compacta .ticker-item{ padding-right: 1.1rem; }
+    .pasarela.compacta .ticker-item:last-child{ padding-right: 0; }
+    .pasarela.compacta .ticker-chg.sube,
+    .pasarela.compacta .ticker-chg.baja{ padding: .12rem .36rem; }
     .pasarela-track{ display: flex; width: max-content; }
     @media (prefers-reduced-motion: no-preference){
       /* La duración la calcula el JS a partir del ancho real del grupo, no es
@@ -2175,23 +2199,104 @@
     /* Botón de pausa: el :hover no existe en táctil ni con teclado, y una
        marquesina que no se puede detener es una trampa de accesibilidad. */
     .pas-pausa{
+      position: relative;
       flex: none; width: 26px; height: 26px; border-radius: 50%;
       border: 1px solid var(--borde); background: rgba(18,20,26,.55);
       color: var(--humo-55); display: grid; place-items: center;
       font-size: .58rem; line-height: 1; cursor: pointer;
     }
+    /* Blanco táctil de 44 × 44 sin cambiar lo que se ve. El inset se cuenta
+       desde la caja de RELLENO, que mide 24,4 px (26 menos el borde): con 9 px
+       por lado salían 42,4. Con 10 salen 44,4. Y cuadrado, no redondo: el
+       tamaño mínimo de objetivo se mide en 44 × 44, y un círculo de 44 de
+       diámetro deja fuera las esquinas. No ocupa sitio en el flujo. */
+    .pas-pausa::before{ content: ""; position: absolute; inset: -10px; }
+    /* Los dos iconos conviven en la misma celda y se cruzan con opacidad: un
+       cambio de carácter en el texto no se puede fundir. */
+    .pas-pausa .ico{ grid-area: 1 / 1; }
+    .pas-pausa .ico-play{ opacity: 0; }
+    .pas-pausa[aria-pressed="true"] .ico-pausa{ opacity: 0; }
+    .pas-pausa[aria-pressed="true"] .ico-play{ opacity: 1; }
     .pas-pausa:hover{ color: var(--oro-claro); border-color: var(--borde-oro); }
-    .pas-pausa[hidden]{ display: none; }
+    /* Oculto SIN salir del flujo: el botón reserva siempre su sitio. Así la
+       ventana de la franja mide lo mismo desfile o no, y la cuenta de "cabe"
+       no depende del estado en que se hizo. Con display:none, desfilando la
+       ventana era 36 px más estrecha que quieta. visibility lo saca además
+       del orden de tabulación y del árbol de accesibilidad. */
+    .pas-pausa.oculto{ opacity: 0; visibility: hidden; pointer-events: none; }
+
+    /* Señal de pausa. Al pasar el ratón el desfile se detiene, y sin aviso
+       parece colgado. El rótulo es texto, así que se entiende sin color; el
+       idioma lo pone pintarTicker() en data-pausa. Va en posición absoluta
+       para no mover nada. */
+    .pas-zona::after{
+      content: attr(data-pausa);
+      position: absolute; right: calc(26px + 1rem);
+      top: calc(50% + .19rem);
+      transform: translate(4px, -50%);
+      font-size: .58rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--humo-55); background: rgba(18,20,26,.92);
+      padding: .16rem .55rem; border-radius: 99px; border: 1px solid var(--borde);
+      opacity: 0; pointer-events: none; white-space: nowrap;
+    }
+    .pas-zona:has(.pasarela-track.desfilando):has(.pasarela:hover, .pasarela:focus-within, .pasarela-track.en-pausa)::after{
+      opacity: 1; transform: translate(0, -50%);
+    }
+    .pas-zona:has(.pasarela-track.desfilando):has(.pasarela:hover, .pasarela:focus-within, .pasarela-track.en-pausa) .pas-pausa{
+      color: var(--oro-claro); border-color: var(--borde-oro);
+    }
+
     /* Acuse de cambio. Se anima el fondo y no el color del texto porque el
        texto tiene un color distinto según la pastilla (oro) o no, y volver
        a "inherit" lo dejaría desteñido. El fondo parte de nada y vuelve a
        nada, así que no deja residuo en ninguna variante. */
     .pas-value{ border-radius: 4px; padding: 0 .16rem; margin: 0 -.16rem; }
     @media (prefers-reduced-motion: no-preference){
-      .pas-value.subio{ animation: destelloSube .6s ease-out; }
-      .pas-value.bajo{ animation: destelloBaja .6s ease-out; }
+      /* Al matiz de siempre se le suma que la cifra entra: desde arriba si
+         sube, desde abajo si baja. El matiz dice "acaba de moverse" y el
+         desplazamiento dice hacia dónde. Solo transform y opacidad: .pas-value
+         es hijo de un flex, así que el transform funciona sin tocar su caja. */
+      .pas-value.subio{ animation: destelloSube .6s ease-out, cifraSube .28s cubic-bezier(.22,1,.36,1); }
+      .pas-value.bajo{ animation: destelloBaja .6s ease-out, cifraBaja .28s cubic-bezier(.22,1,.36,1); }
       @keyframes destelloSube{ from{ background: rgba(46,125,107,.45); } to{ background: rgba(46,125,107,0); } }
       @keyframes destelloBaja{ from{ background: rgba(176,93,74,.42); } to{ background: rgba(176,93,74,0); } }
+      @keyframes cifraSube{ from{ opacity: .15; transform: translateY(-6px); } to{ opacity: 1; transform: none; } }
+      @keyframes cifraBaja{ from{ opacity: .15; transform: translateY(6px); } to{ opacity: 1; transform: none; } }
+
+      /* Entrada: una vez, sin retrasar la lectura. El orden es el de la
+         importancia: estado, las tres pastillas, la franja.
+         fill-mode backwards y no both: backwards aplica el primer fotograma
+         durante el retraso del escalonado y al terminar devuelve cada pieza
+         a su estilo propio. both la dejaba retenida en el último fotograma,
+         que el navegador guarda como matrix(1,0,0,1,0,0): una transformación
+         invisible pero permanente, que crea contexto de apilamiento y capa
+         de composición en cinco elementos para siempre. Se ve igual y no
+         deja residuo. Si la animación no llega a correr, el contenido se ve
+         exactamente igual. */
+      .pasarela-inner > .ticker-status,
+      .pas-anclados > .pas-item,
+      .pasarela-inner > .pas-zona{ animation: pasEntra .45s cubic-bezier(.22,1,.36,1) backwards; }
+      .pas-anclados > .pas-item:nth-child(1){ animation-delay: 60ms; }
+      .pas-anclados > .pas-item:nth-child(2){ animation-delay: 120ms; }
+      .pas-anclados > .pas-item:nth-child(3){ animation-delay: 180ms; }
+      .pasarela-inner > .pas-zona{ animation-delay: 240ms; }
+      @keyframes pasEntra{ from{ opacity: 0; transform: translateY(8px); } to{ opacity: 1; transform: none; } }
+
+      /* El paso de "en vivo" a "referencial" era un corte seco. */
+      .ticker-status{ transition: color .2s ease, border-color .2s ease, background-color .2s ease; }
+      .ticker-status .dot-live{ transition: background-color .2s ease, box-shadow .2s ease; }
+
+      .pas-pausa{ transition: color .2s ease, border-color .2s ease, opacity .2s ease, visibility 0s linear 0s; }
+      /* al ocultarse, visibility espera a que acabe el fundido */
+      .pas-pausa.oculto{ transition: color .2s ease, border-color .2s ease, opacity .2s ease, visibility 0s linear .2s; }
+      .pas-pausa .ico{ transition: opacity .16s ease; }
+      .pas-zona::after{ transition: opacity .2s ease, transform .2s cubic-bezier(.22,1,.36,1); }
+      .pasarela{ transition: --fundido .2s ease; }
+
+      /* Fuera de pantalla no hay nada que mirar. La barra vive arriba del
+         todo, así que es la mayor parte de la visita. */
+      .pasarela-wrap.fuera .pasarela-track,
+      .pasarela-wrap.fuera .ticker-status .dot-live{ animation-play-state: paused; }
     }
     .pas-item{ display: inline-flex; align-items: center; gap: .5rem; white-space: nowrap; }
     /* .coin nace en 32 px para el ticker antiguo. Aquí convive con banderas de
@@ -2216,22 +2321,44 @@
       .pasarela{ overflow-x: auto; scrollbar-width: none; }
       .pasarela::-webkit-scrollbar{ display: none; }
     }
-    /* Desde aquí los rótulos de los anclados se ocultan A LA VISTA pero no al
-       árbol de accesibilidad: la bandera y el símbolo (S/, R$) ya identifican
-       la divisa de un vistazo, y un lector de pantalla sigue leyendo
-       "USD / PEN". Es lo que permite mantener las TRES pastillas ancladas en
-       tablet y en móvil en lugar de sacrificar alguna.
-       El corte está en 960 y no en 860 porque es ahí donde el chip de estado
-       y las tres pastillas con rótulo dejan de caber juntos: por debajo, los
-       anclados se iban a una tercera fila y la barra saltaba a 133 px. */
+
+    /* ── Densidad de los anclados ──
+       La decide Pasarela midiendo, no un ancho fijo, y va en data-densidad:
+         0  rótulo completo y variación del oro, relleno normal
+         1  lo mismo con relleno apretado (no se pierde información)
+         2  rótulo corto: PEN, BRL, ORO
+         3  rótulo corto, sin variación del oro
+         4  sin rótulo ni variación
+       El corte fijo en 960 px se puso cuando la cripto compartía fila; desde
+       que tiene la suya, a 876 px se escondían rótulos y variación mientras
+       sobraban 305 px a la derecha.
+       Lo que se oculta de los rótulos se oculta A LA VISTA, no al árbol de
+       accesibilidad: un lector de pantalla sigue leyendo "USD / PEN". */
+    .pas-anclados[data-densidad="2"] .lbl-largo,
+    .pas-anclados[data-densidad="3"] .lbl-largo,
+    .pas-anclados[data-densidad="4"] .pas-label{
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+    .pas-anclados[data-densidad="3"] .ticker-chg,
+    .pas-anclados[data-densidad="4"] .ticker-chg{ display: none; }
+    /* el relleno apretado respeta el de móvil, que es aún más ceñido */
+    @media (min-width: 561px){
+      .pas-anclados[data-densidad]:not([data-densidad="0"]){ gap: .45rem; }
+      .pas-anclados[data-densidad]:not([data-densidad="0"]) .pas-item.principal{ padding: .24rem .55rem; gap: .4rem; }
+    }
+    /* Respaldo si el JS no llega a correr: el comportamiento de antes, con el
+       corte fijo en 960 px. */
     @media (max-width: 960px){
-      .pas-anclados{ gap: .45rem; }
-      .pas-anclados .pas-label{
+      .pas-anclados:not([data-densidad]) .pas-label{
         position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
         overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
       }
-      .pas-anclados .ticker-chg{ display: none; }  /* la variación del oro sigue en el desfile */
-      .pas-anclados .pas-item.principal{ padding: .24rem .55rem; gap: .4rem; }
+      .pas-anclados:not([data-densidad]) .ticker-chg{ display: none; }
+    }
+    @media (min-width: 561px) and (max-width: 960px){
+      .pas-anclados:not([data-densidad]){ gap: .45rem; }
+      .pas-anclados:not([data-densidad]) .pas-item.principal{ padding: .24rem .55rem; gap: .4rem; }
     }
     @media (max-width: 560px){
       .pasarela-inner{ gap: .55rem; }
@@ -2241,6 +2368,7 @@
       .pas-anclados .pas-item.principal .pas-value{ font-size: .92rem; }
       .pas-item .coin{ width: 18px; height: 18px; }
       .pas-grupo{ gap: 1.6rem; padding-right: 1.6rem; }
+      .pasarela{ --fundido: 26px; }
     }
 
     /* ---------- Film de marca (click-to-play) ---------- */
@@ -2475,17 +2603,17 @@
         <div class="pas-anclados">
           <span class="pas-item principal ticker-item">
             <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#D91023"/><rect x="6" width="6" height="13" fill="#F5F5F0"/></svg>
-            <span class="pas-label">USD / PEN</span>
+            <span class="pas-label"><span class="lbl-largo">USD / </span>PEN</span>
             <span class="pas-value" data-price="usd_pen">—</span>
           </span>
           <span class="pas-item principal ticker-item">
             <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#009B3A"/><path d="M9 1.6 16.2 6.5 9 11.4 1.8 6.5Z" fill="#FEDF00"/><circle cx="9" cy="6.5" r="2.6" fill="#002776"/></svg>
-            <span class="pas-label">USD / BRL</span>
+            <span class="pas-label"><span class="lbl-largo">USD / </span>BRL</span>
             <span class="pas-value" data-price="usd_brl">—</span>
           </span>
           <span class="pas-item principal oro ticker-item">
             <span class="coin" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.6 3.2h4.8l1.3 3.2H4.3l1.3-3.2Z" fill="#E8C766"/><path d="M2.7 8h4.8l1.3 3.2H1.4L2.7 8Z" fill="#E8C766"/><path d="M8.5 8h4.8l1.3 3.2H7.2L8.5 8Z" fill="#E8C766"/></svg></span>
-            <span class="pas-label">ORO / OZ</span>
+            <span class="pas-label">ORO<span class="lbl-largo"> / OZ</span></span>
             <span class="pas-value" data-price="oro_usd">—</span>
             <span class="ticker-chg" data-chg="oro">&nbsp;</span>
           </span>
@@ -2517,8 +2645,8 @@
             </div>
           </div>
         </div>
-        <button class="pas-pausa" id="pas-pausa" type="button" aria-pressed="false"
-                aria-label="Pausar el desfile de precios" title="Pausar el desfile" hidden>❚❚</button>
+        <button class="pas-pausa oculto" id="pas-pausa" type="button" aria-pressed="false"
+                aria-label="Pausar el desfile de precios" title="Pausar el desfile">❚❚</button>
         </div>
       </div>
     </div>
@@ -3634,6 +3762,7 @@
         enVivo: 'En vivo',
         masTC: ' + TC oficial',
         sinConexion: 'Referencial (sin conexión)',
+        enPausa: 'En pausa',
         enEfectivo: 'en efectivo',
         viaLemon: 'vía Lemon Cash',
         enDolares: 'en dólares',
@@ -3658,6 +3787,7 @@
         enVivo: 'Ao vivo',
         masTC: ' + câmbio oficial',
         sinConexion: 'Referencial (sem conexão)',
+        enPausa: 'Em pausa',
         enEfectivo: 'em espécie',
         viaLemon: 'via Lemon Cash',
         enDolares: 'em dólares',
@@ -3682,6 +3812,7 @@
         enVivo: 'Live',
         masTC: ' + official FX rate',
         sinConexion: 'Reference (offline)',
+        enPausa: 'Paused',
         enEfectivo: 'in cash',
         viaLemon: 'via Lemon Cash',
         enDolares: 'in dollars',
@@ -3706,6 +3837,7 @@
         enVivo: '实时',
         masTC: ' + 官方汇率',
         sinConexion: '参考价（离线）',
+        enPausa: '已暂停',
         enEfectivo: '现金',
         viaLemon: '通过 Lemon Cash',
         enDolares: '美元',
@@ -3730,6 +3862,7 @@
         enVivo: '실시간',
         masTC: ' + 공식 환율',
         sinConexion: '참고용 (오프라인)',
+        enPausa: '일시정지',
         enEfectivo: '현금',
         viaLemon: 'Lemon Cash 이용',
         enDolares: '달러',
@@ -3754,6 +3887,7 @@
         enVivo: 'ライブ',
         masTC: ' + 公式為替レート',
         sinConexion: '参考値（オフライン）',
+        enPausa: '一時停止中',
         enEfectivo: '現金',
         viaLemon: 'Lemon Cash 経由',
         enDolares: '米ドル',
@@ -4035,54 +4169,136 @@
     /* ---------- Pasarela: desfile, pausa y medición ---------- */
     const Pasarela = (function(){
       const PX_POR_SEGUNDO = 45;          // el ritmo que ya tenía, ahora constante
-      const ventana = document.getElementById('pasarela');
-      const pista   = document.getElementById('pasarela-track');
-      const grupo   = document.getElementById('pas-grupo');
-      const boton   = document.getElementById('pas-pausa');
+      /* Margen para aflojar. Para pasar a un estado MÁS holgado (menos denso,
+         o de desfile a quieto) se exige esta holgura de más. Sin ella, al
+         redimensionar despacio justo en el umbral, el redondeo de subpíxel
+         hace que el estado vaya y vuelva varias veces seguidas. */
+      const HISTERESIS = 6;
+      const barra    = document.querySelector('.pasarela-wrap');
+      const fila     = document.querySelector('.pasarela-inner');
+      const estadoEl = document.getElementById('ticker-status');
+      const anclados = document.querySelector('.pas-anclados');
+      const ventana  = document.getElementById('pasarela');
+      const pista    = document.getElementById('pasarela-track');
+      const grupo    = document.getElementById('pas-grupo');
+      const boton    = document.getElementById('pas-pausa');
       if (!ventana || !pista || !grupo) return { remedir(){}, destellar(){} };
       const quieto = window.matchMedia('(prefers-reduced-motion: reduce)');
-      let clon = null, enPausa = false;
+      let clon = null, enPausa = false, densidad = null, modoFranja = null;
+
+      if (boton){
+        boton.removeAttribute('hidden');
+        boton.innerHTML = '<span class="ico ico-pausa" aria-hidden="true">❚❚</span>' +
+                          '<span class="ico ico-play" aria-hidden="true">▶</span>';
+      }
+
+      /* Medir con cifras de verdad. Al arrancar los precios son "—" y las
+         variaciones están vacías: medido así, todo cabe; llegan los datos,
+         deja de caber y la barra cambia a la vista un segundo después de
+         cargar. Se mide con plantillas del ancho real y se restaura en el
+         mismo turno, antes de que el navegador pinte. */
+      const PLANTILLA = { usd_pen: 'S/ 8.888', usd_brl: 'R$ 8.888', oro_usd: '$8,888',
+                          btc_usd: '$88,888', eth_usd: '$8,888', sol_usd: '$888' };
+      function conPlantillas(raiz, fn){
+        const restaurar = [];
+        raiz.querySelectorAll('[data-price],[data-chg]').forEach(el => {
+          if (el.textContent.trim() !== '—' && el.textContent.trim() !== '') return;
+          const antes = el.textContent;
+          const clases = el.hasAttribute('data-chg') && !el.classList.contains('sube') && !el.classList.contains('baja');
+          el.textContent = el.hasAttribute('data-chg') ? '▼ 8.8% 24h' : (PLANTILLA[el.dataset.price] || '$8,888');
+          if (clases) el.classList.add('baja');     // el chip lleva relleno y borde: sin clase mediría de menos
+          restaurar.push(() => { el.textContent = antes; if (clases) el.classList.remove('baja'); });
+        });
+        try { return fn(); } finally { restaurar.forEach(f => f()); }
+      }
+
+      /* ── Densidad de los anclados ──
+         Se mide el ancho que pide cada nivel y se elige el menos denso que
+         cabe. La elección depende SOLO del ancho disponible, no del nivel en
+         que se estaba: así no hay bucle de "sin rótulos cabe, con rótulos no".
+         El único recuerdo del nivel anterior es la histéresis. */
+      function elegirDensidad(){
+        if (!anclados || !fila || !estadoEl) return;
+        conPlantillas(anclados, () => {
+          const disponible = fila.clientWidth;
+          const hueco = parseFloat(getComputedStyle(fila).columnGap) || 0;
+          const anchoEstado = estadoEl.getBoundingClientRect().width;
+          const pide = [];
+          for (let d = 0; d <= 4; d++){
+            anclados.dataset.densidad = d;
+            pide[d] = anchoEstado + hueco + anclados.getBoundingClientRect().width;
+          }
+          let elegida = 4;
+          for (let d = 0; d <= 4; d++){
+            const holgura = (densidad !== null && d < densidad) ? HISTERESIS : 0;
+            if (pide[d] + holgura <= disponible){ elegida = d; break; }
+          }
+          anclados.dataset.densidad = elegida;
+          densidad = elegida;
+        });
+      }
+
+      /* ── Franja de cripto: quieta, quieta compacta o desfile ──
+         Se mide sin tocar la animación en curso: el ancho del grupo no depende
+         de la pista ni del clon, y quitar .desfilando para medir reiniciaría
+         el desfile desde cero en cada refresco de precios. */
+      const RANGO = { normal: 0, compacta: 1, desfile: 2 };
+      function elegirFranja(){
+        const eraCompacta = ventana.classList.contains('compacta');
+        const relleno = () => parseFloat(getComputedStyle(grupo).paddingRight) || 0;
+        const [normal, compacta] = conPlantillas(grupo, () => {
+          ventana.classList.remove('compacta'); const n = grupo.scrollWidth - relleno();
+          ventana.classList.add('compacta');    const c = grupo.scrollWidth - relleno();
+          return [n, c];
+        });
+        ventana.classList.toggle('compacta', eraCompacta);
+        const hueco = ventana.clientWidth;
+        const holgura = m => (modoFranja !== null && RANGO[m] < RANGO[modoFranja]) ? HISTERESIS : 0;
+        let modo = 'desfile';
+        if (normal + holgura('normal') <= hueco) modo = 'normal';
+        else if (compacta + holgura('compacta') <= hueco) modo = 'compacta';
+        aplicarFranja(modo);
+        modoFranja = modo;
+      }
+      function aplicarFranja(modo){
+        ventana.classList.toggle('compacta', modo === 'compacta');
+        ventana.classList.toggle('sin-desfile', modo !== 'desfile');
+        /* con movimiento reducido no hay desfile: si no cabe, la máscara se
+           queda como pista de que hay más y la franja se recorre a mano */
+        const desfila = modo === 'desfile' && !quieto.matches;
+        if (desfila){
+          /* El clon es lo que hace continuo el bucle: la animación lleva la
+             pista hasta -50 %, o sea exactamente un grupo, y en ese instante
+             el clon ocupa el sitio del original sin costura. Conserva los
+             data-price A PROPÓSITO, porque pintarTicker() escribe en todos los
+             nodos que los llevan y así el clon se mantiene al día solo; y va
+             con aria-hidden para que un lector de pantalla no lea los precios
+             por duplicado. Se crea una vez y se conserva: rehacerlo en cada
+             medición no aportaba nada. */
+          if (!clon){
+            clon = grupo.cloneNode(true);
+            clon.removeAttribute('id');
+            clon.setAttribute('aria-hidden', 'true');
+            pista.appendChild(clon);
+          }
+          pista.style.setProperty('--desfile-dur', (grupo.scrollWidth / PX_POR_SEGUNDO).toFixed(2) + 's');
+          pista.classList.add('desfilando');
+          pista.classList.toggle('en-pausa', enPausa);
+        } else {
+          if (clon){ clon.remove(); clon = null; }
+          pista.classList.remove('desfilando');
+          pista.style.removeProperty('--desfile-dur');
+        }
+        if (boton) boton.classList.toggle('oculto', !desfila);
+      }
+
+      function medir(){ elegirDensidad(); elegirFranja(); }
 
       function pintarBoton(){
         if (!boton) return;
         boton.setAttribute('aria-pressed', String(enPausa));
-        boton.textContent = enPausa ? '▶' : '❚❚';
         const t = enPausa ? 'Reanudar el desfile' : 'Pausar el desfile';
         boton.title = t; boton.setAttribute('aria-label', t + ' de precios');
-      }
-      function medir(){
-        if (quieto.matches){
-          // sin animación no hace falta clon ni botón: se navega a mano
-          if (clon){ clon.remove(); clon = null; }
-          pista.classList.remove('desfilando');
-          if (boton) boton.hidden = true;
-          return;
-        }
-        // el clon se quita ANTES de medir: con él, el ancho sería el doble
-        if (clon){ clon.remove(); clon = null; }
-        const cabe = grupo.scrollWidth <= ventana.clientWidth + 1;
-        ventana.classList.toggle('sin-desfile', cabe);
-        if (boton) boton.hidden = cabe;
-        if (cabe){
-          // una marquesina que se mueve sin necesidad es ruido, no información
-          pista.classList.remove('desfilando');
-          pista.style.removeProperty('--desfile-dur');
-          return;
-        }
-        /* El clon es lo que hace continuo el bucle: la animación lleva la
-           pista hasta -50 %, o sea exactamente un grupo, y en ese instante el
-           clon ocupa el sitio del original sin costura. Conserva los
-           data-price A PROPÓSITO, porque pintarTicker() escribe en todos los
-           nodos que los llevan y así el clon se mantiene al día solo; y va
-           con aria-hidden para que un lector de pantalla no lea los precios
-           por duplicado. */
-        clon = grupo.cloneNode(true);
-        clon.removeAttribute('id');
-        clon.setAttribute('aria-hidden', 'true');
-        pista.appendChild(clon);
-        pista.style.setProperty('--desfile-dur', (grupo.scrollWidth / PX_POR_SEGUNDO).toFixed(2) + 's');
-        pista.classList.add('desfilando');
-        pista.classList.toggle('en-pausa', enPausa);
       }
       function alternarPausa(v){
         enPausa = (v === undefined) ? !enPausa : v;
@@ -4092,12 +4308,21 @@
       if (boton) boton.addEventListener('click', () => alternarPausa());
       // en táctil no hay hover: tocar la pasarela la detiene
       ventana.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') alternarPausa(); });
+
+      /* Fuera de pantalla no se anima: el CSS pausa desfile y latido con .fuera */
+      if (barra && 'IntersectionObserver' in window){
+        new IntersectionObserver(
+          es => es.forEach(e => barra.classList.toggle('fuera', !e.isIntersecting)),
+          { threshold: 0 }
+        ).observe(barra);
+      }
+
       let temp = null;
       addEventListener('resize', () => { clearTimeout(temp); temp = setTimeout(medir, 140); });
       if (quieto.addEventListener) quieto.addEventListener('change', medir);
-      // las cifras reales son más anchas que los guiones del arranque, y la
-      // tipografía de respaldo mide distinto: hay que volver a medir
+      // la tipografía de respaldo mide distinto que la real: hay que volver a medir
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(medir);
+      pintarBoton();
       medir();
 
       return {
@@ -4152,8 +4377,6 @@
       pintaChg('btc', precios.btc_chg);
       pintaChg('eth', precios.eth_chg);
       pintaChg('sol', precios.sol_chg);
-      // "▲ 0.6% 24h" es más ancho que el &nbsp; del arranque: hay que remedir
-      Pasarela.remedir();
       const status = document.getElementById('ticker-status');
       const statusText = document.getElementById('ticker-status-text');
       const hora = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
@@ -4175,6 +4398,13 @@
         status.classList.remove('en-vivo'); status.classList.add('referencial');
         statusText.textContent = tUI('sinConexion');
       }
+      // el rótulo de la señal de pausa, en el idioma activo (lo lee el CSS)
+      const zonaPas = document.querySelector('.pas-zona');
+      if (zonaPas) zonaPas.dataset.pausa = tUI('enPausa');
+      /* Se remide AQUÍ y no antes: las cifras reales son más anchas que el
+         guion del arranque, y el texto del estado también cuenta para decidir
+         cuánto rótulo cabe en la fila de arriba. */
+      Pasarela.remedir();
       // Chip de estado dentro del cotizador
       const cotVivo = document.getElementById('cot-vivo');
       if (cotVivo){
