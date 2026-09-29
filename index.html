@@ -2125,128 +2125,122 @@
        aquí colapsaba hasta <body> y desplazaba 112px los overlays absolutos
        (la veta quedaba corrida y sobresalía tras el footer). */
     #main{ padding-top: var(--header-h); }
-    /* ══════════ BARRA DE COTIZACIONES ══════════
-       Dos grupos legibles en lugar de una marquesina: "Divisas y oro" arriba
-       y "Criptomonedas" debajo. Nada se mueve solo. El desfile automático se
-       retiró a propósito: obligaba a esperar a que un precio volviera a pasar,
-       y en móvil dejaba fragmentos ilegibles.                              */
-    .cotiz{
+    .pasarela-wrap{
       position: relative; z-index: 2;
-      background: linear-gradient(180deg, rgba(21,23,29,.94), rgba(14,16,20,.94));
+      background: rgba(18,20,26,.72);
       border-bottom: 1px solid var(--borde);
     }
-    .cotiz-inner{ display: flex; flex-direction: column; gap: .26rem; padding: .48rem 0 .52rem; }
-    .cotiz-fila{ display: flex; align-items: center; gap: .9rem; min-width: 0; }
-    .cotiz-fila.cripto{ border-top: 1px solid rgba(255,255,255,.055); padding-top: .34rem; }
-
-    /* Rótulo de grupo: discreto, solo para orientar. No compite con la cifra. */
-    .cotiz-rotulo{
-      flex: none; font-size: .56rem; font-weight: 600; letter-spacing: .2em;
-      text-transform: uppercase; color: rgba(237,234,227,.38); white-space: nowrap;
+    /* Envuelve a propósito. Con una sola fila rígida, el estado y las tres
+       pastillas ancladas se comen el ancho y el desfile quedaba en 0 px: la
+       cripta desaparecía entera por debajo de ~1100 px. Al envolver, el
+       desfile baja a su propia línea y se ve completo. */
+    .pasarela-inner{ display: flex; flex-wrap: wrap; align-items: center; gap: .45rem 1.1rem; padding: .5rem 0; }
+    .pasarela-inner .ticker-status{ flex: none; }
+    /* el botón viaja pegado al desfile: si fuera hermano suelto, al envolver
+       se quedaría arriba separado de aquello que pausa */
+    /* La cripto va SIEMPRE en su propia franja, a lo ancho. Compartiendo fila
+       le quedaban unos 200 px y ahí no cabe ni un par de divisas: se veía
+       "17 ▼3.3%" suelto, un fragmento ilegible. Con el ancho completo entra
+       entera en escritorio y ni siquiera hace falta que desfile. */
+    .pas-zona{
+      display: flex; align-items: center; gap: .6rem;
+      flex: 1 1 100%; min-width: 0;
+      border-top: 1px solid var(--borde); padding-top: .38rem;
     }
-    .cotiz-lista{ display: flex; align-items: center; min-width: 0; }
-    .cotiz-lista:focus-visible{ outline: 2px solid var(--oro); outline-offset: 3px; border-radius: 8px; }
-
-    /* Celda de cotización. Sin contorno dorado: no tiene acción, así que no
-       debe parecer un botón. La separación se marca con una línea de 1 px. */
-    /* min-height fija la altura: las celdas sin variación medían 1 px menos
-       que las que sí la llevan, y la línea de la barra quedaba irregular. */
-    .cot{ position: relative; display: flex; align-items: center; gap: .55rem; padding: .16rem .95rem; flex: none; min-height: 36px; }
-    .cot:first-child{ padding-left: 0; }
-    .cot + .cot::before{
-      content: ""; position: absolute; left: 0; top: 16%; bottom: 16%;
-      width: 1px; background: rgba(255,255,255,.085);
+    /* Lo que sostiene el negocio no desfila. El dólar en soles, en reales y la
+       onza de oro son la referencia del público minero: si hay que esperar a
+       que pasen, la página falla justo en el dato que trajo al visitante. */
+    .pas-anclados{ display: flex; align-items: center; gap: .7rem; flex: none; }
+    .pasarela{
+      flex: 1 1 auto; min-width: 0; overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
     }
-    .cot-ico{ width: 20px; height: 20px; display: grid; place-items: center; flex: none; }
-    .cot-ico svg{ display: block; }
-    .cot-ico.moneda svg{ width: 15px; height: 15px; }
-    .cot-ico.bandera svg{ width: 18px; height: 13px; border-radius: 2px; box-shadow: 0 0 0 1px rgba(255,255,255,.14); }
-    .cot-cuerpo{ display: flex; flex-direction: column; gap: .03rem; min-width: 0; }
-    .cot-par{
-      font-size: .55rem; font-weight: 600; letter-spacing: .15em; text-transform: uppercase;
-      color: rgba(237,234,227,.4); white-space: nowrap; line-height: 1.3;
-    }
-    .cot-linea{ display: flex; align-items: baseline; gap: .42rem; }
-    /* La cifra manda. Tabulares para que al cambiar de valor no se mueva nada
-       de lo que tiene al lado. */
-    .cot-precio{
-      font-family: var(--f-display); font-weight: 700; font-size: 1rem; line-height: 1.25;
-      color: var(--humo); white-space: nowrap;
-      font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1;
-      border-radius: 4px; padding: 0 .16rem; margin: 0 -.16rem;
-    }
-    .cot.destacado .cot-precio{ color: var(--oro-claro); }
-    /* La variación lleva flecha Y signo: se entiende sin depender del color,
-       que es lo que falla con daltonismo o en una captura en blanco y negro. */
-    .cot-var{ font-size: .62rem; font-weight: 600; white-space: nowrap; color: rgba(237,234,227,.42); }
-    .cot-var.sube{ color: #7FD3B4; }
-    .cot-var.baja{ color: #D8987F; }
-
-    /* Indicador de conexión */
-    .cotiz-estado{
-      display: inline-flex; align-items: center; gap: .48rem; flex: none;
-      font-size: .7rem; font-weight: 600; color: rgba(237,234,227,.5);
-      padding: .26rem .7rem; border-radius: 99px;
-      border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.035);
-    }
-    .cotiz-estado.en-vivo{ border-color: rgba(46,125,107,.34); background: rgba(46,125,107,.10); color: #9CD9C6; }
-    .cotiz-estado.referencial{ border-color: rgba(201,162,39,.3); background: rgba(201,162,39,.09); color: #E4CE93; }
-    .cotiz-punto{ width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
-
+    /* sin desfile no hay nada que se corte por los bordes, así que el degradado
+       de máscara sobraría y solo apagaría el primer y el último dato */
+    .pasarela.sin-desfile{ -webkit-mask-image: none; mask-image: none; }
+    .pasarela-track{ display: flex; width: max-content; }
     @media (prefers-reduced-motion: no-preference){
-      /* Entrada: una sola vez, sin retrasar la lectura. El escalonado lo lleva
-         --i desde el marcado, para no depender de :nth-child y poder reordenar. */
-      .cotiz-estado, .cotiz-rotulo, .cot{
-        animation: cotizEntra .45s cubic-bezier(.22,1,.36,1) both;
-        animation-delay: calc(var(--i, 0) * 60ms);
-      }
-      @keyframes cotizEntra{ from{ opacity: 0; transform: translateY(8px); } to{ opacity: 1; transform: none; } }
-
-      /* Solo la cifra que cambió se mueve: un fundido corto hacia abajo más un
-         matiz que se apaga en 600 ms. El matiz dice "acaba de moverse"; la
-         variación de al lado dice "lleva esto en 24 h". Son cosas distintas. */
-      .cot-precio.sube{ animation: cotizValor .3s cubic-bezier(.22,1,.36,1), cotizSube .6s ease-out; }
-      .cot-precio.baja{ animation: cotizValor .3s cubic-bezier(.22,1,.36,1), cotizBaja .6s ease-out; }
-      @keyframes cotizValor{ from{ opacity: 0; transform: translateY(-4px); } to{ opacity: 1; transform: none; } }
-      @keyframes cotizSube{ from{ background: rgba(46,125,107,.42); } to{ background: rgba(46,125,107,0); } }
-      @keyframes cotizBaja{ from{ background: rgba(176,93,74,.4); } to{ background: rgba(176,93,74,0); } }
-
-      .cotiz-estado.en-vivo .cotiz-punto{ animation: cotizLatido 2.6s ease-in-out infinite; }
-      @keyframes cotizLatido{ 0%,100%{ box-shadow: 0 0 0 0 rgba(91,198,168,.5); } 50%{ box-shadow: 0 0 0 5px rgba(91,198,168,0); } }
-      /* fuera de pantalla no hay nada que mirar: se detiene el latido */
-      .cotiz.fuera .cotiz-punto{ animation-play-state: paused; }
+      /* La duración la calcula el JS a partir del ancho real del grupo, no es
+         fija: así añadir o quitar una divisa cambia el recorrido pero NO la
+         velocidad. Antes, con 38 s clavados, una séptima moneda aceleraba
+         toda la pasarela. */
+      .pasarela-track.desfilando{ animation: pasarelaDesfile var(--desfile-dur, 38s) linear infinite; }
+      .pasarela:hover .pasarela-track,
+      .pasarela:focus-within .pasarela-track,
+      .pasarela-track.en-pausa{ animation-play-state: paused; }
     }
-
-    @media (max-width: 980px){
-      .cotiz-fila{ gap: .7rem; }
-      .cot{ padding: .16rem .7rem; }
-      .cot-par{ font-size: .52rem; letter-spacing: .12em; }
-      .cot-precio{ font-size: .94rem; }
+    @keyframes pasarelaDesfile{ to{ transform: translateX(-50%); } }
+    .pas-grupo{ display: flex; align-items: center; gap: 2.4rem; padding-right: 2.4rem; flex: none; }
+    /* Botón de pausa: el :hover no existe en táctil ni con teclado, y una
+       marquesina que no se puede detener es una trampa de accesibilidad. */
+    .pas-pausa{
+      flex: none; width: 26px; height: 26px; border-radius: 50%;
+      border: 1px solid var(--borde); background: rgba(18,20,26,.55);
+      color: var(--humo-55); display: grid; place-items: center;
+      font-size: .58rem; line-height: 1; cursor: pointer;
     }
-    /* En móvil cada cotización es una tarjeta y el grupo se desplaza a mano,
-       con anclaje por tarjeta. Nada se comprime ni se recorta, y el resto del
-       contenido asoma para que se vea que hay más. */
-    @media (max-width: 720px){
-      /* Son cuatro líneas (estado, divisas, rótulo, cripto) y cada píxel que
-         ocupan se lo quita al titular: todo va apretado a propósito. */
-      .cotiz-inner{ gap: .2rem; padding: .38rem 0 .42rem; }
-      .cotiz-fila{ flex-wrap: wrap; gap: .18rem .5rem; }
-      .cotiz-fila.cripto{ padding-top: .26rem; }
-      .cotiz-rotulo{ font-size: .5rem; letter-spacing: .16em; }
-      .cotiz-lista{
-        flex-basis: 100%; overflow-x: auto; scroll-snap-type: x proximity;
-        scrollbar-width: none; -webkit-overflow-scrolling: touch; gap: .38rem;
+    .pas-pausa:hover{ color: var(--oro-claro); border-color: var(--borde-oro); }
+    .pas-pausa[hidden]{ display: none; }
+    /* Acuse de cambio. Se anima el fondo y no el color del texto porque el
+       texto tiene un color distinto según la pastilla (oro) o no, y volver
+       a "inherit" lo dejaría desteñido. El fondo parte de nada y vuelve a
+       nada, así que no deja residuo en ninguna variante. */
+    .pas-value{ border-radius: 4px; padding: 0 .16rem; margin: 0 -.16rem; }
+    @media (prefers-reduced-motion: no-preference){
+      .pas-value.subio{ animation: destelloSube .6s ease-out; }
+      .pas-value.bajo{ animation: destelloBaja .6s ease-out; }
+      @keyframes destelloSube{ from{ background: rgba(46,125,107,.45); } to{ background: rgba(46,125,107,0); } }
+      @keyframes destelloBaja{ from{ background: rgba(176,93,74,.42); } to{ background: rgba(176,93,74,0); } }
+    }
+    .pas-item{ display: inline-flex; align-items: center; gap: .5rem; white-space: nowrap; }
+    /* .coin nace en 32 px para el ticker antiguo. Aquí convive con banderas de
+       15x11, así que sin bajarlo la pastilla del oro medía 42 px de alto
+       contra 37 px de las otras dos y rompía la línea. */
+    .pas-item .coin{ display: inline-flex; flex: none; width: 20px; height: 20px; }
+    .pas-item .coin svg{ width: 12px; height: 12px; }
+    .pas-label{ font-size: .64rem; font-weight: 600; letter-spacing: .12em; color: var(--humo-55); text-transform: uppercase; }
+    .pas-value{ font-family: var(--f-display); font-weight: 700; font-size: .95rem; color: var(--humo); }
+    .pas-item .ticker-chg{ font-size: .7rem; font-weight: 600; }
+    /* Protagonistas: el dólar en soles y en reales */
+    .pas-item.principal{
+      background: var(--oro-suave); border: 1px solid var(--borde-oro);
+      border-radius: 999px; padding: .26rem .85rem;
+    }
+    .pas-item.principal .pas-value{ color: var(--oro-claro); font-size: 1.04rem; }
+    .pas-item.principal .pas-label{ color: var(--oro); }
+    /* El oro, con el borde más presente: es LA referencia del público minero */
+    .pas-item.principal.oro{ border-color: rgba(201,162,39,.7); background: rgba(201,162,39,.16); }
+    .pas-item .bandera{ border-radius: 2px; box-shadow: 0 0 0 1px rgba(255,255,255,.12); flex: none; }
+    @media (prefers-reduced-motion: reduce){
+      .pasarela{ overflow-x: auto; scrollbar-width: none; }
+      .pasarela::-webkit-scrollbar{ display: none; }
+    }
+    /* Desde aquí los rótulos de los anclados se ocultan A LA VISTA pero no al
+       árbol de accesibilidad: la bandera y el símbolo (S/, R$) ya identifican
+       la divisa de un vistazo, y un lector de pantalla sigue leyendo
+       "USD / PEN". Es lo que permite mantener las TRES pastillas ancladas en
+       tablet y en móvil en lugar de sacrificar alguna.
+       El corte está en 960 y no en 860 porque es ahí donde el chip de estado
+       y las tres pastillas con rótulo dejan de caber juntos: por debajo, los
+       anclados se iban a una tercera fila y la barra saltaba a 133 px. */
+    @media (max-width: 960px){
+      .pas-anclados{ gap: .45rem; }
+      .pas-anclados .pas-label{
+        position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+        overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
       }
-      .cotiz-lista::-webkit-scrollbar{ display: none; }
-      .cot{
-        scroll-snap-align: start; padding: .24rem .6rem; min-height: 34px;
-        background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.06);
-        border-radius: 10px;
-      }
-      .cot:first-child{ padding-left: .6rem; }
-      .cot + .cot::before{ display: none; }
-      .cot-precio{ font-size: .9rem; }
-      .cotiz-estado{ font-size: .64rem; padding: .2rem .55rem; }
+      .pas-anclados .ticker-chg{ display: none; }  /* la variación del oro sigue en el desfile */
+      .pas-anclados .pas-item.principal{ padding: .24rem .55rem; gap: .4rem; }
+    }
+    @media (max-width: 560px){
+      .pasarela-inner{ gap: .55rem; }
+      .pasarela-inner .ticker-status span:last-child{ display: none; } /* solo el punto pulsante */
+      .pas-anclados{ gap: .3rem; }
+      .pas-anclados .pas-item.principal{ padding: .22rem .42rem; gap: .3rem; }
+      .pas-anclados .pas-item.principal .pas-value{ font-size: .92rem; }
+      .pas-item .coin{ width: 18px; height: 18px; }
+      .pas-grupo{ gap: 1.6rem; padding-right: 1.6rem; }
     }
 
     /* ---------- Film de marca (click-to-play) ---------- */
@@ -2471,80 +2465,61 @@
 
   <main id="main">
     <!-- Pasarela de precios: dólar en soles y reales como protagonistas + BTC/ETH/SOL -->
-    <div class="cotiz" id="cotiz" role="region" aria-label="Cotizaciones de referencia">
-      <div class="container cotiz-inner num">
-
-        <div class="cotiz-fila">
-          <span class="cotiz-estado" id="ticker-status" style="--i:0">
-            <span class="cotiz-punto" id="cotiz-punto" aria-hidden="true"></span>
-            <span id="ticker-status-text">Cargando precios…</span>
+    <div class="pasarela-wrap" role="region" aria-label="Precios de referencia en vivo">
+      <div class="container pasarela-inner num">
+        <div class="ticker-status en-vivo" id="ticker-status">
+          <span class="dot-live" aria-hidden="true"></span>
+          <span id="ticker-status-text">Cargando precios…</span>
+        </div>
+        <!-- Anclados: siempre visibles, nunca desfilan -->
+        <div class="pas-anclados">
+          <span class="pas-item principal ticker-item">
+            <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#D91023"/><rect x="6" width="6" height="13" fill="#F5F5F0"/></svg>
+            <span class="pas-label">USD / PEN</span>
+            <span class="pas-value" data-price="usd_pen">—</span>
           </span>
-          <span class="cotiz-rotulo" style="--i:1" aria-hidden="true">Divisas y oro</span>
-          <div class="cotiz-lista" id="lista-fiat" role="group" aria-label="Divisas y oro">
-            <div class="cot destacado" style="--i:2">
-              <span class="cot-ico bandera"><svg viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#D91023"/><rect x="6" width="6" height="13" fill="#F5F5F0"/></svg></span>
-              <span class="cot-cuerpo">
-                <span class="cot-par">USD / PEN</span>
-                <span class="cot-linea"><span class="cot-precio" data-price="usd_pen">—</span></span>
+          <span class="pas-item principal ticker-item">
+            <svg class="bandera" width="15" height="11" viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#009B3A"/><path d="M9 1.6 16.2 6.5 9 11.4 1.8 6.5Z" fill="#FEDF00"/><circle cx="9" cy="6.5" r="2.6" fill="#002776"/></svg>
+            <span class="pas-label">USD / BRL</span>
+            <span class="pas-value" data-price="usd_brl">—</span>
+          </span>
+          <span class="pas-item principal oro ticker-item">
+            <span class="coin" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5.6 3.2h4.8l1.3 3.2H4.3l1.3-3.2Z" fill="#E8C766"/><path d="M2.7 8h4.8l1.3 3.2H1.4L2.7 8Z" fill="#E8C766"/><path d="M8.5 8h4.8l1.3 3.2H7.2L8.5 8Z" fill="#E8C766"/></svg></span>
+            <span class="pas-label">ORO / OZ</span>
+            <span class="pas-value" data-price="oro_usd">—</span>
+            <span class="ticker-chg" data-chg="oro">&nbsp;</span>
+          </span>
+        </div>
+        <!-- Desfile: la cripto, que es contexto y no la referencia del cliente.
+             El segundo grupo lo clona el JS para que solo haya una fuente. -->
+        <div class="pas-zona">
+        <div class="pasarela" id="pasarela">
+          <div class="pasarela-track" id="pasarela-track">
+            <div class="pas-grupo" id="pas-grupo">
+              <span class="pas-item ticker-item">
+                <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4.5 2.5h5a2.4 2.4 0 0 1 0 4.8h-5M4.5 7.3h5.6a2.4 2.4 0 0 1 0 4.8H4.5M5.8 2.5v9.6M6.5 1v1.5M9 1v1.5M6.5 12.1v1.5M9 12.1v1.5" stroke="#E8C766" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="pas-label">BTC / USD</span>
+                <span class="pas-value" data-price="btc_usd">—</span>
+                <span class="ticker-chg" data-chg="btc">&nbsp;</span>
               </span>
-            </div>
-            <div class="cot destacado" style="--i:3">
-              <span class="cot-ico bandera"><svg viewBox="0 0 18 13" aria-hidden="true"><rect width="18" height="13" fill="#009B3A"/><path d="M9 1.6 16.2 6.5 9 11.4 1.8 6.5Z" fill="#FEDF00"/><circle cx="9" cy="6.5" r="2.6" fill="#002776"/></svg></span>
-              <span class="cot-cuerpo">
-                <span class="cot-par">USD / BRL</span>
-                <span class="cot-linea"><span class="cot-precio" data-price="usd_brl">—</span></span>
+              <span class="pas-item ticker-item">
+                <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1.5 12.5 8 8 10.8 3.5 8 8 1.5Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 12.2 12 9.6 8 15 4 9.6l4 2.6Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/></svg></span>
+                <span class="pas-label">ETH / USD</span>
+                <span class="pas-value" data-price="eth_usd">—</span>
+                <span class="ticker-chg" data-chg="eth">&nbsp;</span>
               </span>
-            </div>
-            <div class="cot destacado" style="--i:4">
-              <span class="cot-ico moneda"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5.6 3.2h4.8l1.3 3.2H4.3l1.3-3.2Z" fill="#E8C766"/><path d="M2.7 8h4.8l1.3 3.2H1.4L2.7 8Z" fill="#E8C766"/><path d="M8.5 8h4.8l1.3 3.2H7.2L8.5 8Z" fill="#E8C766"/></svg></span>
-              <span class="cot-cuerpo">
-                <span class="cot-par">Oro / onza</span>
-                <span class="cot-linea">
-                  <span class="cot-precio" data-price="oro_usd">—</span>
-                  <span class="cot-var" data-chg="oro"></span>
-                </span>
+              <span class="pas-item ticker-item">
+                <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4.9 2.9h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/><path d="M2.5 6.8h8.4l2.4 2.4H4.9L2.5 6.8Z" fill="#E8C766"/><path d="M4.9 10.7h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/></svg></span>
+                <span class="pas-label">SOL / USD</span>
+                <span class="pas-value" data-price="sol_usd">—</span>
+                <span class="ticker-chg" data-chg="sol">&nbsp;</span>
               </span>
             </div>
           </div>
         </div>
-
-        <div class="cotiz-fila cripto">
-          <span class="cotiz-rotulo" style="--i:5" aria-hidden="true">Criptomonedas</span>
-          <div class="cotiz-lista" id="lista-cripto" role="group" aria-label="Criptomonedas">
-            <div class="cot" style="--i:6">
-              <span class="cot-ico moneda"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5 2.5h5a2.4 2.4 0 0 1 0 4.8h-5M4.5 7.3h5.6a2.4 2.4 0 0 1 0 4.8H4.5M5.8 2.5v9.6M6.5 1v1.5M9 1v1.5M6.5 12.1v1.5M9 12.1v1.5" stroke="#E8C766" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-              <span class="cot-cuerpo">
-                <span class="cot-par">BTC / USD</span>
-                <span class="cot-linea">
-                  <span class="cot-precio" data-price="btc_usd">—</span>
-                  <span class="cot-var" data-chg="btc"></span>
-                </span>
-              </span>
-            </div>
-            <div class="cot" style="--i:7">
-              <span class="cot-ico moneda"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5 12.5 8 8 10.8 3.5 8 8 1.5Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 12.2 12 9.6 8 15 4 9.6l4 2.6Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/></svg></span>
-              <span class="cot-cuerpo">
-                <span class="cot-par">ETH / USD</span>
-                <span class="cot-linea">
-                  <span class="cot-precio" data-price="eth_usd">—</span>
-                  <span class="cot-var" data-chg="eth"></span>
-                </span>
-              </span>
-            </div>
-            <div class="cot" style="--i:8">
-              <span class="cot-ico moneda"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.9 2.9h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/><path d="M2.5 6.8h8.4l2.4 2.4H4.9L2.5 6.8Z" fill="#E8C766"/><path d="M4.9 10.7h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/></svg></span>
-              <span class="cot-cuerpo">
-                <span class="cot-par">SOL / USD</span>
-                <span class="cot-linea">
-                  <span class="cot-precio" data-price="sol_usd">—</span>
-                  <span class="cot-var" data-chg="sol"></span>
-                </span>
-              </span>
-            </div>
-          </div>
+        <button class="pas-pausa" id="pas-pausa" type="button" aria-pressed="false"
+                aria-label="Pausar el desfile de precios" title="Pausar el desfile" hidden>❚❚</button>
         </div>
-
-        <p id="cotiz-ayuda-scroll" class="visually-hidden">Lista desplazable en horizontal. Usa las flechas izquierda y derecha para recorrerla.</p>
       </div>
     </div>
     <!-- ============ 1. HERO ============ -->
@@ -4058,53 +4033,81 @@
     const fmtNum = (v, dec) => new Intl.NumberFormat('es-PE', { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(v);
 
     /* ---------- Pasarela: desfile, pausa y medición ---------- */
-    /* ---------- Barra de cotizaciones: movimiento y estados ----------
-       No hay desfile automático que gestionar. Lo único que se mueve es la
-       cifra que acaba de cambiar y el latido del indicador, y ambos se
-       apagan solos.                                                      */
     const Pasarela = (function(){
-      const barra = document.getElementById('cotiz');
-      const listas = [document.getElementById('lista-fiat'), document.getElementById('lista-cripto')].filter(Boolean);
-      if (!barra) return { remedir(){}, destellar(){} };
+      const PX_POR_SEGUNDO = 45;          // el ritmo que ya tenía, ahora constante
+      const ventana = document.getElementById('pasarela');
+      const pista   = document.getElementById('pasarela-track');
+      const grupo   = document.getElementById('pas-grupo');
+      const boton   = document.getElementById('pas-pausa');
+      if (!ventana || !pista || !grupo) return { remedir(){}, destellar(){} };
       const quieto = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let clon = null, enPausa = false;
 
-      /* Fuera de pantalla no hay nada que mirar: se detiene el latido en vez de
-         seguir repintando una barra que nadie ve. */
-      if ('IntersectionObserver' in window){
-        new IntersectionObserver(
-          es => es.forEach(e => barra.classList.toggle('fuera', !e.isIntersecting)),
-          { threshold: 0 }
-        ).observe(barra);
+      function pintarBoton(){
+        if (!boton) return;
+        boton.setAttribute('aria-pressed', String(enPausa));
+        boton.textContent = enPausa ? '▶' : '❚❚';
+        const t = enPausa ? 'Reanudar el desfile' : 'Pausar el desfile';
+        boton.title = t; boton.setAttribute('aria-label', t + ' de precios');
       }
-
-      /* Una lista que se desplaza a mano tiene que poder recorrerse con el
-         teclado; una que cabe entera NO debe ser una parada de tabulación
-         inútil. Por eso el tabindex se pone y se quita según haga falta. */
-      function revisarDesplazamiento(){
-        listas.forEach(l => {
-          const desborda = l.scrollWidth > l.clientWidth + 1;
-          if (desborda){
-            l.setAttribute('tabindex', '0');
-            l.setAttribute('aria-describedby', 'cotiz-ayuda-scroll');
-          } else {
-            l.removeAttribute('tabindex');
-            l.removeAttribute('aria-describedby');
-          }
-        });
+      function medir(){
+        if (quieto.matches){
+          // sin animación no hace falta clon ni botón: se navega a mano
+          if (clon){ clon.remove(); clon = null; }
+          pista.classList.remove('desfilando');
+          if (boton) boton.hidden = true;
+          return;
+        }
+        // el clon se quita ANTES de medir: con él, el ancho sería el doble
+        if (clon){ clon.remove(); clon = null; }
+        const cabe = grupo.scrollWidth <= ventana.clientWidth + 1;
+        ventana.classList.toggle('sin-desfile', cabe);
+        if (boton) boton.hidden = cabe;
+        if (cabe){
+          // una marquesina que se mueve sin necesidad es ruido, no información
+          pista.classList.remove('desfilando');
+          pista.style.removeProperty('--desfile-dur');
+          return;
+        }
+        /* El clon es lo que hace continuo el bucle: la animación lleva la
+           pista hasta -50 %, o sea exactamente un grupo, y en ese instante el
+           clon ocupa el sitio del original sin costura. Conserva los
+           data-price A PROPÓSITO, porque pintarTicker() escribe en todos los
+           nodos que los llevan y así el clon se mantiene al día solo; y va
+           con aria-hidden para que un lector de pantalla no lea los precios
+           por duplicado. */
+        clon = grupo.cloneNode(true);
+        clon.removeAttribute('id');
+        clon.setAttribute('aria-hidden', 'true');
+        pista.appendChild(clon);
+        pista.style.setProperty('--desfile-dur', (grupo.scrollWidth / PX_POR_SEGUNDO).toFixed(2) + 's');
+        pista.classList.add('desfilando');
+        pista.classList.toggle('en-pausa', enPausa);
       }
+      function alternarPausa(v){
+        enPausa = (v === undefined) ? !enPausa : v;
+        pista.classList.toggle('en-pausa', enPausa);
+        pintarBoton();
+      }
+      if (boton) boton.addEventListener('click', () => alternarPausa());
+      // en táctil no hay hover: tocar la pasarela la detiene
+      ventana.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') alternarPausa(); });
       let temp = null;
-      addEventListener('resize', () => { clearTimeout(temp); temp = setTimeout(revisarDesplazamiento, 150); });
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(revisarDesplazamiento);
-      revisarDesplazamiento();
+      addEventListener('resize', () => { clearTimeout(temp); temp = setTimeout(medir, 140); });
+      if (quieto.addEventListener) quieto.addEventListener('change', medir);
+      // las cifras reales son más anchas que los guiones del arranque, y la
+      // tipografía de respaldo mide distinto: hay que volver a medir
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(medir);
+      medir();
 
       return {
-        remedir: revisarDesplazamiento,
+        remedir: medir,
         destellar(nodos, clase){
           if (quieto.matches) return;
           nodos.forEach(el => {
-            if (!el.classList.contains('cot-precio')) return;   // solo en la barra
-            el.classList.remove('sube', 'baja');
-            void el.offsetWidth;                                 // reinicia si llega otro cambio encima
+            if (!el.classList.contains('pas-value')) return;   // solo en la pasarela
+            el.classList.remove('subio', 'bajo');
+            void el.offsetWidth;                                // reinicia si llega otro cambio encima
             el.classList.add(clase);
             setTimeout(() => el.classList.remove(clase), 700);
           });
@@ -4122,7 +4125,7 @@
         const antes = previosTicker[k];
         let dir = null;
         if (typeof n === 'number' && isFinite(n)){
-          if (typeof antes === 'number' && n !== antes) dir = n > antes ? 'sube' : 'baja';
+          if (typeof antes === 'number' && n !== antes) dir = n > antes ? 'subio' : 'bajo';
           previosTicker[k] = n;
         }
         nodos.forEach(el => { el.textContent = v; });
@@ -4139,8 +4142,7 @@
       const pintaChg = (clave, valor) => {
         document.querySelectorAll('[data-chg="' + clave + '"]').forEach(el => {
           if (typeof valor === 'number' && !isNaN(valor)){
-            // flecha + signo + periodo: se entiende sin depender del color
-            el.textContent = (valor >= 0 ? '▲ +' : '▼ −') + Math.abs(valor).toFixed(1) + '% 24h';
+            el.textContent = (valor >= 0 ? '▲ ' : '▼ ') + Math.abs(valor).toFixed(1) + '% 24h';
             el.classList.toggle('sube', valor >= 0);
             el.classList.toggle('baja', valor < 0);
           }
@@ -4156,7 +4158,6 @@
       const statusText = document.getElementById('ticker-status-text');
       const hora = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
       if (precios.enVivo){
-        precios.ultimoExito = hora;          // para poder fecharlo si luego falla
         status.classList.add('en-vivo'); status.classList.remove('referencial');
         // A la vista queda solo la hora, que es la prueba de que el dato está
         // fresco. El nombre de la fuente iría a costa de una segunda fila: el
@@ -4172,10 +4173,7 @@
         status.title = tUI('enVivo') + ' · ' + (precios.fuente || 'mercado') + ' · ' + hora;
       } else if (precios.primerIntentoHecho){
         status.classList.remove('en-vivo'); status.classList.add('referencial');
-        // No se inventa nada: se conserva el último valor recibido y se dice
-        // desde cuándo. Si nunca hubo uno, se omite la hora.
-        statusText.textContent = tUI('sinConexion') + (precios.ultimoExito ? ' · ' + precios.ultimoExito : '');
-        status.title = statusText.textContent;
+        statusText.textContent = tUI('sinConexion');
       }
       // Chip de estado dentro del cotizador
       const cotVivo = document.getElementById('cot-vivo');
