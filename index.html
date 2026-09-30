@@ -2371,6 +2371,128 @@
       .pasarela{ --fundido: 26px; }
     }
 
+    /* ── Pasarela viva (escritorio): el movimiento cuenta la actualización ──
+       Cinco piezas y un solo momento, el de los precios nuevos: el anillo
+       cuenta hacia él, el barrido lo anuncia, los dígitos dicen qué cambió,
+       la lámpara alumbra la barra bajo el cursor y los mini gráficos dicen
+       hacia dónde va el día. Solo con ratón (desde 561 px, fuera del layout
+       de celular): en el celular la barra ya está bien y aquí no se toca. Con movimiento reducido no se
+       mueve nada; los mini gráficos se quedan, quietos, porque son dato.
+       El JS vive en PasarelaViva y usa las mismas consultas de medios. */
+    .anillo-vivo, .pas-spark{ display: none; }
+    .cifra-lector{
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+    @media (hover: hover) and (pointer: fine) and (min-width: 561px) and (prefers-reduced-motion: no-preference){
+
+      /* 1 · Anillo. El punto de "en vivo" pasa a ser la cuenta regresiva del
+         próximo refresco: se llena y, cuando se completa, llegan precios.
+         Lo avanza el JS 4 veces por segundo (pasos de 0,17 px, invisibles)
+         en lugar de una animación a 60 fps, que repintaría en cada fotograma
+         durante toda la visita. Sustituye al latido, no se le suma. */
+      .ticker-status .dot-live{ display: none; }
+      .anillo-vivo{ display: block; flex: none; width: 16px; height: 16px; }
+      .av-pista{ fill: none; stroke: rgba(91,198,168,.22); stroke-width: 1.6; }
+      .av-carga{
+        fill: none; stroke: var(--exito-texto); stroke-width: 1.6; stroke-linecap: round;
+        stroke-dasharray: 100; stroke-dashoffset: 100;
+        transition: opacity .2s ease;
+      }
+      .av-carga.renueva{ opacity: 0; }   /* lleno → se apaga y vuelve vacío */
+      .av-punto{ fill: var(--exito-texto); }
+      .ticker-status.referencial .av-pista,
+      .ticker-status.referencial .av-carga{ opacity: 0; }
+      .ticker-status.referencial .av-punto{ fill: var(--humo-55); }
+
+      /* 2 · Barrido. Al llegar precios en vivo, un brillo cruza las tres
+         pastillas una tras otra, de izquierda a derecha, UNA vez. Es el
+         mismo gesto sesgado del botón "Cotizar ahora" de la cabecera, para
+         que la marca hable un solo idioma. Solo transform: no repinta. */
+      .pas-item.principal{ position: relative; overflow: hidden; }
+      .pas-item.principal::after{
+        content: ""; position: absolute; inset: 0; pointer-events: none;
+        background: linear-gradient(105deg, transparent 32%, rgba(255,243,203,.30) 50%, transparent 68%);
+        transform: translateX(-100%);
+      }
+      .pas-item.principal.barrido::after{ animation: pasBarrido .8s cubic-bezier(.45,0,.2,1); }
+      @keyframes pasBarrido{ to{ transform: translateX(100%); } }
+
+      /* 3 · Dígitos que ruedan. Solo giran los que cambiaron y siempre en la
+         dirección del precio (al subir, el dígito nuevo entra por abajo). El
+         destello de color se conserva, es el que dice sube o baja; lo que se
+         retira es el desplazamiento de la cifra entera, que ahora hace cada
+         dígito. Las celdas miden un alto de línea, así que la pastilla no
+         cambia de tamaño, y las cifras tabulares mantienen el ancho. */
+      .pas-value.rueda.subio{ animation: destelloSube .6s ease-out; }
+      .pas-value.rueda.bajo{ animation: destelloBaja .6s ease-out; }
+      .rodillo{ display: flex; line-height: 1.65; user-select: none; }
+      .rd, .rd-fijo{ display: block; height: 1.65em; }
+      /* Ventana de contador: la celda mide un alto de línea (la pastilla no
+         cambia), pero a mitad de giro eso dejaba asomar dos dígitos cortados.
+         Con los bordes fundidos, el que sale se desvanece y el que entra
+         aparece. El glifo en reposo ocupa la franja central (~28-71 %), así
+         que el fundido nunca lo toca. */
+      .rd{
+        overflow: hidden;
+        -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+                mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+      }
+      .rd-fijo{ white-space: pre; }   /* el espacio de "S/ 3.436" no debe colapsar */
+      .rd-tira{ display: block; transition: transform .55s cubic-bezier(.22,1,.36,1); }
+      .rd-tira > span{ display: block; height: 1.65em; }
+      .rd-tira.sin-transicion{ transition: none; }
+
+      /* 4 · Lámpara. La luz de minero que ya sigue al cursor por la página
+         no llegaba a la barra: su fondo casi opaco la tapaba. Aquí la barra
+         tiene la suya, que se mueve con transform (sin repintar), y aviva el
+         borde de oro de la pastilla más cercana, como una veta que brilla al
+         acercarle la lámpara. --cerca la pone el JS, de 0 a 1. */
+      .pasarela-wrap{ overflow: hidden; }
+      .pasarela-inner{ position: relative; z-index: 1; }
+      .pas-lampara{
+        position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none;
+        width: 460px; height: 220px; margin: -110px 0 0 -230px;
+        background: radial-gradient(closest-side, rgba(240,199,94,.11), transparent);
+        opacity: 0; transition: opacity .35s ease;
+        will-change: transform;
+      }
+      .pas-lampara.encendida{ opacity: 1; }
+      .pas-item.principal{
+        box-shadow: 0 0 0 1px rgba(232,199,102, calc(var(--cerca, 0) * .55)),
+                    0 0 22px -6px rgba(240,199,94, calc(var(--cerca, 0) * .5));
+        transition: box-shadow .2s ease;
+      }
+    }
+
+    /* 5 · Mini gráficos de 24 h. La franja de cripto tiene sitio de sobra en
+       escritorio ancho y solo decía el %. Cada uno reserva su hueco desde el
+       inicio (56 px) para que la fila no salte cuando llegan los datos, y
+       entra en la medición de Pasarela como cualquier otro dato. Si la API
+       de velas falla, el hueco queda vacío: nunca se dibuja una curva que no
+       venga de datos reales. El color sigue al % de 24 h del chip vecino. */
+    @media (hover: hover) and (pointer: fine) and (min-width: 1200px){
+      .pas-spark{ display: block; flex: none; width: 56px; height: 18px; overflow: visible; }
+      .pas-spark polyline{ fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+      .pas-spark .fin{ transform-box: fill-box; transform-origin: center; }
+      .pas-spark.sube polyline{ stroke: var(--exito-texto); }
+      .pas-spark.sube .fin{ fill: var(--exito-texto); }
+      .pas-spark.baja polyline{ stroke: #D8987F; }
+      .pas-spark.baja .fin{ fill: #D8987F; }
+      .pas-spark:not(.lista){ visibility: hidden; }
+    }
+    @media (hover: hover) and (pointer: fine) and (min-width: 1200px) and (prefers-reduced-motion: no-preference){
+      /* se trazan de izquierda a derecha al llegar, y el punto final aparece
+         al terminar el trazo; en cada refresco solo late el punto, que es
+         lo único que cambia */
+      .pas-spark.dibuja polyline{ stroke-dasharray: 100; animation: sparkTraza .9s cubic-bezier(.22,1,.36,1) both; }
+      .pas-spark.dibuja .fin{ animation: finAparece .3s ease-out .75s backwards; }
+      .pas-spark .fin.late{ animation: finLate .7s ease-out; }
+      @keyframes sparkTraza{ from{ stroke-dashoffset: 100; } to{ stroke-dashoffset: 0; } }
+      @keyframes finAparece{ from{ opacity: 0; transform: scale(.2); } }
+      @keyframes finLate{ 35%{ transform: scale(2.1); } }
+    }
+
     /* ---------- Film de marca (click-to-play) ---------- */
     .film-player{
       position: relative;
@@ -2597,6 +2719,8 @@
       <div class="container pasarela-inner num">
         <div class="ticker-status en-vivo" id="ticker-status">
           <span class="dot-live" aria-hidden="true"></span>
+          <!-- Escritorio: el punto se vuelve la cuenta regresiva del próximo refresco (PasarelaViva) -->
+          <svg class="anillo-vivo" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle class="av-pista" cx="8" cy="8" r="6.4"/><circle class="av-carga" cx="8" cy="8" r="6.4" pathLength="100" transform="rotate(-90 8 8)"/><circle class="av-punto" cx="8" cy="8" r="2.9"/></svg>
           <span id="ticker-status-text">Cargando precios…</span>
         </div>
         <!-- Anclados: siempre visibles, nunca desfilan -->
@@ -2628,18 +2752,21 @@
                 <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4.5 2.5h5a2.4 2.4 0 0 1 0 4.8h-5M4.5 7.3h5.6a2.4 2.4 0 0 1 0 4.8H4.5M5.8 2.5v9.6M6.5 1v1.5M9 1v1.5M6.5 12.1v1.5M9 12.1v1.5" stroke="#E8C766" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 <span class="pas-label">BTC / USD</span>
                 <span class="pas-value" data-price="btc_usd">—</span>
+                <svg class="pas-spark" data-spark="btc" viewBox="0 0 56 18" aria-hidden="true" focusable="false"><polyline pathLength="100"/><circle class="fin" r="1.7" cx="-9" cy="-9"/></svg>
                 <span class="ticker-chg" data-chg="btc">&nbsp;</span>
               </span>
               <span class="pas-item ticker-item">
                 <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1.5 12.5 8 8 10.8 3.5 8 8 1.5Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 12.2 12 9.6 8 15 4 9.6l4 2.6Z" stroke="#E8C766" stroke-width="1.3" stroke-linejoin="round"/></svg></span>
                 <span class="pas-label">ETH / USD</span>
                 <span class="pas-value" data-price="eth_usd">—</span>
+                <svg class="pas-spark" data-spark="eth" viewBox="0 0 56 18" aria-hidden="true" focusable="false"><polyline pathLength="100"/><circle class="fin" r="1.7" cx="-9" cy="-9"/></svg>
                 <span class="ticker-chg" data-chg="eth">&nbsp;</span>
               </span>
               <span class="pas-item ticker-item">
                 <span class="coin" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4.9 2.9h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/><path d="M2.5 6.8h8.4l2.4 2.4H4.9L2.5 6.8Z" fill="#E8C766"/><path d="M4.9 10.7h8.4l-2.4 2.4H2.5l2.4-2.4Z" fill="#E8C766"/></svg></span>
                 <span class="pas-label">SOL / USD</span>
                 <span class="pas-value" data-price="sol_usd">—</span>
+                <svg class="pas-spark" data-spark="sol" viewBox="0 0 56 18" aria-hidden="true" focusable="false"><polyline pathLength="100"/><circle class="fin" r="1.7" cx="-9" cy="-9"/></svg>
                 <span class="ticker-chg" data-chg="sol">&nbsp;</span>
               </span>
             </div>
@@ -4339,6 +4466,278 @@
         },
       };
     })();
+    /* ---------- Pasarela viva (escritorio): el movimiento cuenta la actualización ----------
+       Anillo, barrido, dígitos que ruedan, lámpara y mini gráficos de 24 h.
+       Todo gira en torno al instante en que llegan precios nuevos. Solo con
+       ratón (en el celular la barra ya está bien); con
+       movimiento reducido no se mueve nada. El CSS usa las mismas consultas. */
+    const PasarelaViva = (function(){
+      // Con ratón y fuera del layout de celular (≤ 560 px). No se exige más ancho:
+      // estas piezas no ocupan sitio extra, y una ventana de PC a media pantalla
+      // (unos 900 px) también es escritorio. Los mini gráficos sí piden espacio.
+      const ESCRITORIO = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 561px)');
+      const TENDENCIA  = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 1200px)');
+      const QUIETO     = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const barra      = document.querySelector('.pasarela-wrap');
+      const carga      = document.querySelector('.anillo-vivo .av-carga');
+      const pastillas  = [...document.querySelectorAll('.pas-anclados .pas-item.principal')];
+      const activo = () => ESCRITORIO.matches && !QUIETO.matches;
+      let barraVisible = true;
+
+      /* ── 1 · Anillo: cuenta regresiva del próximo refresco ──
+         inicioCiclo lo marca refrescarPrecios(), que agenda el siguiente
+         refresco exactamente REFRESH_MS después: el anillo lleno ES el
+         refresco, no un reloj aparte. */
+      let inicioCiclo = performance.now(), reloj = null;
+      function pintarAnillo(){
+        if (!carga || carga.classList.contains('renueva')) return;
+        const p = Math.min(1, (performance.now() - inicioCiclo) / CONFIG.REFRESH_MS);
+        carga.style.strokeDashoffset = (100 * (1 - p)).toFixed(2);
+      }
+      // el reloj solo corre si hay algo que mirar: barra en pantalla y pestaña visible
+      function gestionarReloj(){
+        const debe = activo() && barraVisible && !document.hidden;
+        if (debe && !reloj){ pintarAnillo(); reloj = setInterval(pintarAnillo, 250); }
+        else if (!debe && reloj){ clearInterval(reloj); reloj = null; }
+      }
+      function nuevoCiclo(t){
+        inicioCiclo = t;
+        if (!carga || !activo()) return;
+        // el anillo lleno se apaga un instante y vuelve a empezar vacío
+        carga.classList.add('renueva');
+        setTimeout(() => { carga.classList.remove('renueva'); pintarAnillo(); }, 220);
+      }
+
+      /* ── 2 · Barrido: anuncia los precios en vivo ── */
+      let primerBarrido = true;
+      function barrer(){
+        if (!activo() || !barraVisible || document.hidden) return;
+        // el primero espera a que termine la entrada de la barra (pasEntra)
+        const espera = primerBarrido ? Math.max(0, 900 - performance.now()) : 0;
+        primerBarrido = false;
+        pastillas.forEach((el, i) => setTimeout(() => {
+          el.classList.remove('barrido');
+          void el.offsetWidth;                  // reinicia si llega otro encima
+          el.classList.add('barrido');
+        }, espera + i * 90));
+      }
+      pastillas.forEach(el => el.addEventListener('animationend', e => {
+        if (e.animationName === 'pasBarrido') el.classList.remove('barrido');
+      }));
+
+      /* ── 3 · Dígitos que ruedan ──
+         Cada dígito es una tira de dos vueltas (0-9 0-9) dentro de una celda
+         de un alto de línea. Dos vueltas para girar siempre hacia donde va el
+         precio: de 8 a 2 subiendo se pasa por 9 y 0, en vez de retroceder. La
+         cifra real queda en un texto oculto a la vista para lectores de
+         pantalla; el rodillo va con aria-hidden. */
+      const ALTO = 1.65;          // em, el line-height de .rodillo (CSS)
+      const GIRO_MS = 550;        // la transición de .rd-tira (CSS)
+      const esDigito = c => c >= '0' && c <= '9';
+      function colocar(tira, i, animar){
+        tira.classList.toggle('sin-transicion', !animar);
+        tira.style.transform = 'translateY(' + (-i * ALTO) + 'em)';
+        tira.dataset.i = i;
+      }
+      function construir(el, texto){
+        const lector = document.createElement('span');
+        lector.className = 'cifra-lector';
+        lector.textContent = texto;
+        const rodillo = document.createElement('span');
+        rodillo.className = 'rodillo';
+        rodillo.setAttribute('aria-hidden', 'true');
+        for (const c of texto){
+          const celda = document.createElement('span');
+          if (esDigito(c)){
+            celda.className = 'rd';
+            const tira = document.createElement('span');
+            tira.className = 'rd-tira';
+            for (let n = 0; n < 20; n++){
+              const d = document.createElement('span');
+              d.textContent = n % 10;
+              tira.appendChild(d);
+            }
+            colocar(tira, +c, false);
+            celda.appendChild(tira);
+          } else {
+            celda.className = 'rd-fijo';
+            celda.textContent = c;
+          }
+          rodillo.appendChild(celda);
+        }
+        el.classList.add('rueda');
+        el.replaceChildren(lector, rodillo);
+      }
+      function rodar(tira, de, a, sube, retraso){
+        let desde = de, hasta = a;
+        if (sube && a < de) hasta = a + 10;      // 8 → 2 subiendo: 8, 9, 0, 1, 2
+        if (!sube && a > de) desde = de + 10;    // 2 → 8 bajando:  2, 1, 0, 9, 8
+        tira.style.transitionDelay = retraso + 'ms';
+        colocar(tira, desde, false);             // mismo glifo: el salto no se ve
+        void tira.offsetHeight;
+        colocar(tira, hasta, true);
+        if (hasta >= 10){
+          // terminado el giro, vuelve a la primera vuelta sin que se note
+          setTimeout(() => { if (+tira.dataset.i === hasta) colocar(tira, hasta - 10, false); },
+                     GIRO_MS + retraso + 40);
+        }
+      }
+      /* Escribe una cifra de la pasarela. pintarTicker() lo usa en lugar de
+         textContent; fuera del escritorio (o para el guion de carga) sigue
+         siendo texto plano, idéntico a antes. dir: 'subio' | 'bajo' | null. */
+      function escribir(el, texto, dir){
+        const rueda = activo() && el.classList.contains('pas-value') && barra && barra.contains(el);
+        if (!rueda || texto === '—'){
+          el.classList.remove('rueda');
+          el.textContent = texto;
+          el.dataset.cifra = texto;
+          return;
+        }
+        const previo = el.dataset.cifra || '';
+        const yaRueda = el.classList.contains('rueda');
+        if (yaRueda && previo === texto) return;
+        // misma forma: mismo largo y separadores en el mismo sitio ($83,494 → $83,512)
+        const mismaForma = yaRueda && previo.length === texto.length &&
+          [...texto].every((c, i) => esDigito(c) ? esDigito(previo[i]) : c === previo[i]);
+        el.dataset.cifra = texto;
+        if (!mismaForma || !dir){ construir(el, texto); return; }
+        el.querySelector('.cifra-lector').textContent = texto;
+        const celdas = el.querySelector('.rodillo').children;
+        let orden = 0;                            // de derecha a izquierda, 40 ms de cadencia
+        for (let i = texto.length - 1; i >= 0; i--){
+          if (!esDigito(texto[i]) || texto[i] === previo[i]) continue;
+          rodar(celdas[i].firstChild, +previo[i], +texto[i], dir === 'subio', orden++ * 40);
+        }
+      }
+      // al cambiar de modo (ventana más estrecha, movimiento reducido) las
+      // cifras pasan a texto plano o al rodillo en el acto
+      function reescribirTodo(){
+        if (!barra) return;
+        barra.querySelectorAll('.pas-value[data-cifra]').forEach(el => {
+          const t = el.dataset.cifra;
+          el.classList.remove('rueda');
+          el.dataset.cifra = '';
+          escribir(el, t, null);
+        });
+      }
+
+      /* ── 4 · Lámpara: alumbra la barra bajo el cursor ── */
+      if (barra){
+        const luz = document.createElement('div');
+        luz.className = 'pas-lampara';
+        luz.setAttribute('aria-hidden', 'true');
+        barra.prepend(luz);
+        let px = 0, py = 0, pendiente = false;
+        const mover = () => {
+          pendiente = false;
+          // se lee todo antes de escribir: una sola maquetación por cuadro
+          const b = barra.getBoundingClientRect();
+          const cajas = pastillas.map(p => p.getBoundingClientRect());
+          luz.style.transform = 'translate3d(' + (px - b.left) + 'px,' + (py - b.top) + 'px,0)';
+          pastillas.forEach((p, i) => {
+            const c = cajas[i];
+            const dx = Math.max(c.left - px, 0, px - c.right);
+            const dy = Math.max(c.top - py, 0, py - c.bottom);
+            p.style.setProperty('--cerca', Math.max(0, 1 - Math.hypot(dx, dy) / 140).toFixed(2));
+          });
+        };
+        barra.addEventListener('pointermove', e => {
+          if (e.pointerType !== 'mouse' || !activo()) return;
+          px = e.clientX; py = e.clientY;
+          luz.classList.add('encendida');
+          if (!pendiente){ pendiente = true; requestAnimationFrame(mover); }
+        });
+        barra.addEventListener('pointerleave', () => {
+          luz.classList.remove('encendida');
+          pastillas.forEach(p => p.style.removeProperty('--cerca'));
+        });
+      }
+
+      /* ── 5 · Mini gráficos de 24 h (cripto) ──
+         24 velas de 1 h de Binance, con el mismo espejo de respaldo que los
+         precios. La última vela es la hora en curso: se ajusta al precio en
+         vivo en cada refresco, así que la curva termina donde dice la cifra.
+         La ventana se recarga cada 10 min (se corre una vela por hora). */
+      const PARES = { btc: 'BTCUSDT', eth: 'ETHUSDT', sol: 'SOLUSDT' };
+      const RECARGA_MS = 10 * 60 * 1000;
+      const series = {};
+      let proximaCarga = 0, cargando = false;
+      function pedirVelas(par){
+        const ruta = '/api/v3/klines?symbol=' + par + '&interval=1h&limit=24';
+        return pedirJson('https://api.binance.com' + ruta)
+          .catch(() => pedirJson('https://data-api.binance.vision' + ruta));
+      }
+      async function cargarSeries(){
+        if (cargando) return;
+        cargando = true;
+        const res = await Promise.allSettled(Object.entries(PARES).map(([k, par]) =>
+          pedirVelas(par).then(velas => [k, velas])));
+        let alguna = false;
+        res.forEach(r => {
+          if (r.status !== 'fulfilled' || !Array.isArray(r.value[1])) return;
+          const cierres = r.value[1].map(v => parseFloat(v[4])).filter(isFinite);
+          if (cierres.length > 1){ series[r.value[0]] = cierres; alguna = true; }
+        });
+        // sin respuesta se reintenta en 2 min, no en cada refresco
+        proximaCarga = Date.now() + (alguna ? RECARGA_MS : 2 * 60 * 1000);
+        cargando = false;
+        pintarSeries(true);
+      }
+      function pintarSeries(primera){
+        Object.keys(PARES).forEach(k => {
+          const s = series[k];
+          if (!s) return;
+          const vivo = precios[k + '_usd'];
+          if (precios.enVivo && isFinite(vivo)) s[s.length - 1] = vivo;
+          const mn = Math.min(...s), rango = (Math.max(...s) - mn) || 1;
+          const pts = s.map((v, i) => [1 + i * 54 / (s.length - 1), 17 - (v - mn) / rango * 16]);
+          const chg = precios[k + '_chg'];
+          const sube = (typeof chg === 'number' && isFinite(chg)) ? chg >= 0 : s[s.length - 1] >= s[0];
+          const [fx, fy] = pts[pts.length - 1];
+          // también el clon del desfile, si lo hay: por eso se busca por atributo
+          document.querySelectorAll('[data-spark="' + k + '"]').forEach(svg => {
+            const primeraVez = !svg.classList.contains('lista');
+            svg.querySelector('polyline').setAttribute('points', pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '));
+            const fin = svg.querySelector('.fin');
+            fin.setAttribute('cx', fx.toFixed(1));
+            fin.setAttribute('cy', fy.toFixed(1));
+            svg.classList.toggle('sube', sube);
+            svg.classList.toggle('baja', !sube);
+            svg.classList.add('lista');
+            if (QUIETO.matches) return;
+            if (primeraVez){ svg.classList.remove('dibuja'); void svg.getBoundingClientRect(); svg.classList.add('dibuja'); }
+            else if (!primera){ fin.classList.remove('late'); void fin.getBoundingClientRect(); fin.classList.add('late'); }
+          });
+        });
+      }
+      function actualizarSeries(){
+        if (!TENDENCIA.matches) return;
+        if (Date.now() >= proximaCarga) cargarSeries();
+        else pintarSeries(false);
+      }
+
+      /* Precios nuevos: se anuncian y se actualizan las tendencias. Lo llama
+         traerPrecios() al terminar cada pedido. */
+      function llegaronPrecios(){
+        if (precios.enVivo) barrer();
+        actualizarSeries();
+      }
+
+      if (barra && 'IntersectionObserver' in window){
+        new IntersectionObserver(es => {
+          barraVisible = es[0].isIntersecting;
+          gestionarReloj();
+        }, { threshold: 0 }).observe(barra);
+      }
+      document.addEventListener('visibilitychange', gestionarReloj);
+      const alCambiarModo = () => { gestionarReloj(); reescribirTodo(); };
+      [ESCRITORIO, QUIETO].forEach(m => { if (m.addEventListener) m.addEventListener('change', alCambiarModo); });
+      if (TENDENCIA.addEventListener) TENDENCIA.addEventListener('change', () => { if (TENDENCIA.matches) actualizarSeries(); });
+      gestionarReloj();
+
+      return { escribir, nuevoCiclo, llegaronPrecios };
+    })();
+
     const previosTicker = {};
 
     function pintarTicker(){
@@ -4353,7 +4752,8 @@
           if (typeof antes === 'number' && n !== antes) dir = n > antes ? 'subio' : 'bajo';
           previosTicker[k] = n;
         }
-        nodos.forEach(el => { el.textContent = v; });
+        // en escritorio los dígitos ruedan; en el resto es textContent, como siempre
+        nodos.forEach(el => PasarelaViva.escribir(el, v, dir));
         if (dir) Pasarela.destellar(nodos, dir);
       };
       // Protagonistas de la pasarela: el dólar en soles y en reales, con sus símbolos
@@ -4505,6 +4905,7 @@
       precios.enVivo = fuente !== null;
       precios.primerIntentoHecho = true;
       pintarTicker();
+      PasarelaViva.llegaronPrecios();   // barrido y mini gráficos (escritorio)
     }
 
     /* ---------- Cotizador ---------- */
@@ -5659,17 +6060,24 @@
     pintarTicker();
 
     // Marca del último intento de fetch, para no saturar las APIs al recuperar el foco
-    let ultimoFetchTs = 0;
+    let ultimoFetchTs = 0, proximoRefresco = null;
     function refrescarPrecios(){
       ultimoFetchTs = performance.now();
+      /* El siguiente refresco se cuenta desde ESTE y no desde un reloj fijo.
+         Con setInterval, un refresco adelantado por el foco dejaba el ciclo
+         desfasado y podía pedir otra vez a los pocos segundos. Así cada ciclo
+         dura REFRESH_MS, y el anillo de la pasarela (escritorio) cuenta hacia
+         un refresco que ocurre de verdad cuando se completa. */
+      clearTimeout(proximoRefresco);
+      proximoRefresco = setTimeout(refrescoPeriodico, CONFIG.REFRESH_MS);
+      PasarelaViva.nuevoCiclo(ultimoFetchTs);
       return traerPrecios();
     }
+    // Refresco periódico. Los navegadores CONGELAN los temporizadores en pestañas
+    // en segundo plano, así que solo pedimos con la pestaña visible; al volver a
+    // ella, refrescarSiVisible() (abajo) pide de nuevo y retoma el ciclo.
+    function refrescoPeriodico(){ if (!document.hidden) refrescarPrecios(); }
     refrescarPrecios();
-
-    // Refresco periódico. Los navegadores CONGELAN setInterval en pestañas en
-    // segundo plano, así que solo pedimos cuando la pestaña está visible (y abajo
-    // refrescamos al volver a ella para que los precios estén siempre frescos).
-    setInterval(() => { if (!document.hidden) refrescarPrecios(); }, CONFIG.REFRESH_MS);
 
     // Precios siempre actualizados: cada vez que se mira la página (volver a la
     // pestaña o recuperar el foco de la ventana) se re-piden, con un tope de 1 vez
