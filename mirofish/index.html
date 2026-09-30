@@ -4,23 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#03040b" />
+    <meta name="color-scheme" content="dark" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
       rel="stylesheet"
     />
     <title>MIROFISH × TESLA 369 — Terminal Probabilístico · KIPU</title>
     <style>
+      /* vacío desde el primer pintado, antes de que cargue el bundle */
+      html,body{background:#03040b;color:#e7ecff}
       /* vuelta al escritorio, como en el resto de la dimensión */
       .kipu-volver{position:fixed;left:12px;bottom:12px;z-index:9999;display:inline-block;
-        font:600 11px/1 'Space Mono',ui-monospace,monospace;letter-spacing:.08em;text-decoration:none;
-        color:#1b1b16;background:#f7f7f1;border:2px solid #1b1b16;border-radius:999px;padding:8px 14px;
-        box-shadow:3px 3px 0 rgba(27,27,22,.25)}
-      .kipu-volver:hover{background:#1b1b16;color:#f7f7f1}
+        font:700 11px/1 'Space Mono',ui-monospace,monospace;letter-spacing:.1em;text-decoration:none;
+        color:#e7ecff;background:rgba(10,13,34,.82);border:1px solid rgba(94,242,255,.55);border-radius:999px;
+        padding:9px 15px;box-shadow:0 0 18px -4px rgba(94,242,255,.55),inset 0 0 12px -6px rgba(167,139,255,.8);
+        transition:background-color .2s ease,color .2s ease,box-shadow .2s ease}
+      .kipu-volver:hover{background:#5ef2ff;color:#03040b;box-shadow:0 0 26px -2px rgba(94,242,255,.85)}
+      .kipu-volver:focus-visible{outline:2px solid #5ef2ff;outline-offset:3px}
     </style>
-    <script type="module" crossorigin src="./assets/index-BG7HPOZ3.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-DrF5CRmd.css">
+    <script type="module" crossorigin src="./assets/index-CG73nzPF.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-jXTM0p2k.css">
   </head>
   <body>
     <div id="root"></div>
