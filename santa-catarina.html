@@ -274,6 +274,62 @@
     transition:background .2s,color .2s,text-shadow .2s;
   }
   .icono.activo .nombre{background:rgba(250,250,250,.95);color:#111;text-shadow:none}
+  /* distintivos: NUEVO arriba, punto verde = datos de mercado en vivo, ↗ = otra pestaña */
+  .icono .mini-caja{position:relative;display:block}
+  .icono .mini-caja > .mini{display:block}   /* fuera del flex del botón, el span volvería a ser "inline" y perdería sus 58 px */
+  .insignia-nuevo{
+    position:absolute;top:-9px;left:50%;transform:translateX(-50%);z-index:2;
+    padding:2px 7px;border-radius:999px;background:#F3CE86;color:#1a1408;
+    font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;
+    box-shadow:0 4px 10px rgba(0,0,0,.35);pointer-events:none;
+  }
+  .insignia-vivo{
+    position:absolute;top:-4px;right:-4px;z-index:2;width:12px;height:12px;border-radius:50%;
+    background:#3ddc97;border:2px solid rgba(10,12,16,.9);pointer-events:none;
+  }
+  .insignia-vivo::after{
+    content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid #3ddc97;
+    animation:latirVivo 2.2s ease-out infinite;
+  }
+  @keyframes latirVivo{from{transform:scale(1);opacity:.7}to{transform:scale(2.3);opacity:0}}
+  .icono .nombre .externo{font-style:normal;margin-left:4px;font-size:10px;opacity:.75}
+  /* foco de teclado visible (flechas o Tab) */
+  .icono button:focus{outline:none}
+  .icono button:focus-visible .mini{box-shadow:0 0 0 2px #F3CE86,0 0 0 6px rgba(243,206,134,.28),0 10px 26px rgba(0,0,0,.38)}
+  .icono button:focus-visible .nombre{background:rgba(250,250,250,.95);color:#111;text-shadow:none}
+  @media (prefers-reduced-motion:reduce){ .insignia-vivo::after{animation:none} }
+
+  /* ---------- Vista previa de cada app ---------- */
+  #vista-previa{
+    position:fixed;z-index:90;width:262px;padding:14px 16px 12px;border-radius:14px;
+    background:rgba(14,16,22,.86);color:#f3f3f3;border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 24px 60px rgba(0,0,0,.45);
+    backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);
+    font-size:12px;line-height:1.45;pointer-events:none;
+    opacity:0;visibility:hidden;transform:translateX(-6px) scale(.98);transform-origin:left center;
+    transition:opacity .18s ease,transform .22s cubic-bezier(.2,.7,.2,1),visibility 0s linear .22s;
+  }
+  #vista-previa.izq{transform:translateX(6px) scale(.98);transform-origin:right center}
+  #vista-previa.visible{opacity:1;visibility:visible;transform:none;transition:opacity .18s ease,transform .22s cubic-bezier(.2,.7,.2,1),visibility 0s}
+  .vp-cab{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+  .vp-cat{margin-right:auto;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,243,243,.62)}
+  .vp-chip{display:inline-flex;align-items:center;gap:5px;padding:1px 7px;border-radius:999px;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+  .vp-chip.nuevo{background:#F3CE86;color:#1a1408}
+  .vp-chip.vivo{background:rgba(61,220,151,.14);color:#7ee8bd;border:1px solid rgba(61,220,151,.35)}
+  .vp-chip.vivo i{width:6px;height:6px;border-radius:50%;background:#3ddc97}
+  .vp-tit{display:block;margin-bottom:3px;font-size:15px;font-weight:600}
+  .vp-res{margin:0 0 10px;color:rgba(243,243,243,.8)}
+  .vp-dato{margin-bottom:8px;padding:8px 0;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1)}
+  .vp-dato:empty{display:none}
+  .vd-fila{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:2px 0}
+  .vd-fila span{color:rgba(243,243,243,.62)}
+  .vd-fila b{font-weight:600;color:#F3CE86;text-align:right;font-variant-numeric:tabular-nums}
+  .vd-fila small{font-weight:400;color:rgba(243,243,243,.6)}
+  .vd-fila em{font-style:normal;font-weight:500}
+  .vd-fila .sube{color:#7ee8bd} .vd-fila .baja{color:#f4a198}
+  .vd-nota{font-size:10.5px;color:rgba(243,243,243,.55)}
+  .vp-pie{font-size:10.5px;color:rgba(243,243,243,.55)}
+  @media (prefers-reduced-motion:reduce){ #vista-previa,#vista-previa.visible{transition:none} }
   .icono.arrastrando{z-index:60}
   .icono.arrastrando .icono-inner{animation-play-state:paused}
   .icono.arrastrando .mini{transform:scale(1.18);box-shadow:0 26px 50px rgba(0,0,0,.5)}
@@ -541,7 +597,7 @@
     #cambio .par{gap:4px;font-size:0}
     #cambio .par::before{font-size:10px;letter-spacing:.06em}
     #cambio .par-brl::before{content:'BRL'}
-    #cambio .par-sol::before{content:'SOL'}
+    #cambio .par-sol::before{content:'PEN'}  /* PEN y no "SOL": en cripto, SOL es Solana */
     #cambio b{font-size:10.5px}
     /* hueco libre entre la columna izquierda y la derecha de la rejilla móvil */
     #sticker{width:44px;height:44px;left:47%;top:24%}
@@ -636,7 +692,7 @@
       <div id="cambio" title="Tipos de cambio de referencia (open.er-api.com)">
         <span class="punto"></span>
         <span class="par par-brl">USD/BRL <b id="tcBrl">—</b></span>
-        <span class="par par-sol">USD/SOL <b id="tcSol">—</b></span>
+        <span class="par par-sol">USD/PEN <b id="tcSol">—</b></span>
       </div>
       <div id="reloj"></div>
     </div>
@@ -714,16 +770,20 @@ const PROYECTOS = [
     enlacePagina:"kippuu-pro/", /* el catálogo completo, ahora como escritorio con ventanas */
     descripcion:"Catálogo de 10 terrenos en Santa Catarina, Brasil, en ventanas: ficha de cada lote con costos de cierre, simulador de soles a reales, guía legal para comprar desde Perú y preguntas frecuentes.",
     tags:["Catálogo","Simulador","Guía legal"],
+    resumen:"10 terrenos en Santa Catarina, con simulador de soles a reales y guía legal.",
+    vista:"cambio",
     enlace:"", portada:"", imagenes:[],
   },
   {
     id:"aurum", etiqueta:"AURUM",
     variante:"nucleo", acento:"#C9A96A",
-    x:70, y:13,  xm:72, ym:23,   /* en móvil baja: arriba está la píldora de Notas */
+    x:70, y:19,  xm:72, ym:23,   /* separado de la barra de cotizaciones; en móvil baja por la píldora de Notas */
     categoria:"Holding Empresarial", anio:"2026",
     enlacePagina:"aurum.html", /* esta carpeta ABRE la página del holding */
     descripcion:"Capital que se multiplica. Patrimonio que permanece: la matriz que agrupa ocho divisiones operativas.",
     tags:["Holding","8 divisiones"],
+    resumen:"La matriz que agrupa ocho divisiones operativas.",
+    vista:"oro",
     enlace:"", portada:"", imagenes:[],
   },
   {
@@ -734,6 +794,8 @@ const PROYECTOS = [
     enlacePagina:"https://www.vortex369.app/", /* externo: se abre en pestaña nueva */
     descripcion:"El oráculo probabilístico de la casa: análisis de BTC · ETH · SOL. No predice. Sintoniza.",
     tags:["Señales","BTC · ETH · SOL"],
+    resumen:"Oráculo probabilístico de BTC · ETH · SOL.",
+    vista:"cripto",
     enlace:"", portada:"", imagenes:[],
   },
   {
@@ -744,16 +806,21 @@ const PROYECTOS = [
     enlacePagina:"oraculo.html", /* terminal multi-activo autocontenido (en vivo, Binance spot+futures) */
     descripcion:"Terminal multi-activo BTC · ETH · SOL: señal Tesla 369, sweeps institucionales, filtros de no-operación, reloj lunar, diario de trading y alertas en vivo.",
     tags:["BTC · ETH · SOL","10 indicadores"],
+    resumen:"Terminal multi-activo: señal Tesla 369, sweeps y reloj lunar.",
+    vista:"luna", vivo:true,       /* vivo: el punto verde del icono (datos de mercado reales) */
     enlace:"", portada:"", imagenes:[],
   },
   {
     id:"prop06", etiqueta:"MIROFISH",
-    variante:"pez", acento:"#e0dbc8",
+    variante:"pez", acento:"#C9A227",
     x:84, y:52,  xm:72, ym:42,
     categoria:"Terminal de simulación · Tesla 369", anio:"2026",
     enlacePagina:"mirofish/", /* app React compilada: precios reales, operativa simulada */
     descripcion:"Terminal MIROFISH × Tesla 369: gráfico de TradingView y precios reales de Binance, con motor probabilístico, red de relaciones entre BTC · ETH · SOL y bitácora de paper trading. La operativa y el P&L son simulación, no dinero real.",
     tags:["Paper trading","TradingView"],
+    resumen:"TradingView, sweep institucional y paper trading con precios reales.",
+    vista:"sesion", vivo:true,
+    nuevoHasta:"2026-10-31",       /* muestra la marca NUEVO hasta esa fecha (rediseño Roca y oro) */
     enlace:"", portada:"", imagenes:[],
   },
   /* Notas Rápidas ya NO es un icono suelto del escritorio: vive en la
@@ -767,6 +834,7 @@ const PROYECTOS = [
     enlacePagina:"https://tesla369.app/", /* externo: se abre en pestaña nueva */
     descripcion:"La app del método Tesla 3·6·9 aplicado al análisis de mercado: el motor que late detrás de toda la división.",
     tags:["3 · 6 · 9","Método"],
+    resumen:"El método Tesla 3·6·9 aplicado al análisis de mercado.",
     enlace:"", portada:"", imagenes:[],
   },
   {
@@ -777,6 +845,7 @@ const PROYECTOS = [
     enlacePagina:"biblioteca.html",
     descripcion:"Archivo de trabajo sobre gnosticismo clásico y hermetismo: fuentes primarias, heresiología, tradiciones y estudios, con un método que separa lo que el texto dice de lo que la tradición interpreta.",
     tags:["Gnosis","Hermetismo"],
+    resumen:"Gnosticismo y hermetismo desde sus fuentes primarias.",
     enlace:"", portada:"", imagenes:[],
   },
 ];
@@ -971,29 +1040,33 @@ function svgMiniatura(variante, acento){
         <circle cx="27" cy="66" r="9" fill="url(#tsg${n})"/><text x="27" y="70.5">9</text>
       </g>${cierra}`;
     case "pez": return `${abre}
+      <!-- MIROFISH en "Roca y oro", igual que el terminal: roca mineral, curva
+           de equity en oro, el pez en marfil y velas verde mineral / arcilla -->
       <defs>
         <linearGradient id="pz${n}" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#faf8ee"/><stop offset="1" stop-color="#e6e2d0"/>
+          <stop offset="0" stop-color="#161a22"/><stop offset="1" stop-color="#07080b"/>
+        </linearGradient>
+        <linearGradient id="pzo${n}" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#a6851f"/><stop offset="1" stop-color="#e8c766"/>
         </linearGradient>
         <pattern id="pzg${n}" width="10" height="10" patternUnits="userSpaceOnUse">
-          <circle cx="1" cy="1" r=".7" fill="rgba(27,27,22,.13)"/>
+          <circle cx="1" cy="1" r=".7" fill="rgba(237,234,227,.07)"/>
         </pattern>
       </defs>
       <rect width="100" height="100" fill="url(#pz${n})"/>
       <rect width="100" height="100" fill="url(#pzg${n})"/>
-      <!-- curva de equity de la sesión, al estilo del terminal -->
-      <path d="M6 74 18 66 28 70 40 52 52 60 64 38 76 46 94 24" fill="none" stroke="#0d7a40" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M6 88h88" stroke="rgba(27,27,22,.28)" stroke-width="1.4" stroke-dasharray="3 4"/>
-      <!-- el pez espejo: cuerpo, cola y ojo -->
-      <g fill="#1b1b16">
+      <path d="M6 74 18 66 28 70 40 52 52 60 64 38 76 46 94 24" fill="none" stroke="url(#pzo${n})" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="94" cy="24" r="3" fill="#e8c766"/>
+      <path d="M6 88h88" stroke="rgba(237,234,227,.22)" stroke-width="1.4" stroke-dasharray="3 4"/>
+      <g fill="#edeae3">
         <path d="M30 62c0-9 9-15 19-15s19 6 19 15-9 15-19 15-19-6-19-15Z"/>
         <path d="M68 62l14-9v18Z"/>
         <path d="M46 47c1-6 8-9 12-6-4 2-6 4-6 7Z"/>
       </g>
-      <circle cx="40" cy="58" r="3.6" fill="#faf8ee"/><circle cx="40.8" cy="58" r="1.7" fill="#1b1b16"/>
-      <rect x="14" y="12" width="7" height="16" fill="#c03a32"/>
-      <rect x="25" y="16" width="7" height="12" fill="#0d7a40"/>
-      <rect x="36" y="10" width="7" height="18" fill="#0d7a40"/>${cierra}`;
+      <circle cx="40" cy="58" r="3.6" fill="#07080b"/><circle cx="40.8" cy="58" r="1.6" fill="#c9a227"/>
+      <rect x="14" y="12" width="7" height="16" rx="1" fill="#e5736a"/>
+      <rect x="25" y="16" width="7" height="12" rx="1" fill="#5bc6a8"/>
+      <rect x="36" y="10" width="7" height="18" rx="1" fill="#5bc6a8"/>${cierra}`;
     case "avion": return `${abre}
       <defs><linearGradient id="av${n}" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#17405E"/><stop offset="1" stop-color="#0C1626"/>
@@ -1081,8 +1154,45 @@ function sombrear(hex, pct){
 
 /* ---------- Render de iconos ---------- */
 const capaIconos = $("#iconos");
+const esExterno = p => /^https?:/.test(p.enlacePagina || "");
+const esNuevo = p => !!p.nuevoHasta && new Date() <= new Date(p.nuevoHasta + "T23:59:59");
+
+/* Posiciones recordadas: si arrastras un icono, el escritorio lo deja ahí
+   la próxima vez (solo en este navegador). "Reordenar" en la ayuda lo deshace. */
+const CLAVE_POS = "kipu_escritorio_pos";
+const POS_ORIGINAL = PROYECTOS.map(p => ({ id:p.id, x:p.x, y:p.y, xm:p.xm, ym:p.ym }));
+const enRango = (v, lo, hi) => typeof v === "number" && isFinite(v) ? Math.min(hi, Math.max(lo, v)) : undefined;
+function leerPosiciones(){
+  try{ return JSON.parse(localStorage.getItem(CLAVE_POS)) || {}; }catch(e){ return {}; }
+}
+function guardarPosicion(p){
+  try{
+    const t = leerPosiciones();
+    t[p.id] = { x:p.x, y:p.y, xm:p.xm, ym:p.ym };
+    localStorage.setItem(CLAVE_POS, JSON.stringify(t));
+  }catch(e){ /* sin almacenamiento: la posición vale solo para esta visita */ }
+}
+function aplicarPosicionesGuardadas(){
+  const t = leerPosiciones();
+  PROYECTOS.forEach(p => {
+    const s = t[p.id];
+    if (!s) return;
+    p.x  = enRango(s.x, 3, 97)  ?? p.x;   p.y  = enRango(s.y, 5, 88)  ?? p.y;
+    p.xm = enRango(s.xm, 3, 97) ?? p.xm;  p.ym = enRango(s.ym, 5, 88) ?? p.ym;
+  });
+}
+function reordenarIconos(){
+  try{ localStorage.removeItem(CLAVE_POS); }catch(e){}
+  POS_ORIGINAL.forEach(o => Object.assign(PROYECTOS.find(p => p.id === o.id), o));
+  $$(".icono").forEach(el => {
+    const p = PROYECTOS.find(x => x.id === el.dataset.id);
+    if (p) posicionarIcono(el, p);
+  });
+}
+
 function renderIconos(){
   capaIconos.innerHTML = "";
+  aplicarPosicionesGuardadas();
   PROYECTOS.forEach((p, i) => {
     const el = document.createElement("div");
     el.className = "icono oculto-inicial";
@@ -1092,13 +1202,20 @@ function renderIconos(){
     const visual = p.portada
       ? `<img src="${p.portada}" alt="">`
       : svgMiniatura(p.variante, p.acento);
+    const nuevo = esNuevo(p), externo = esExterno(p);
+    const extra = [nuevo && "nuevo", p.vivo && "datos en vivo", externo && "se abre en otra pestaña"].filter(Boolean).join(", ");
     el.innerHTML = `
       <div class="icono-inner">
-        <button type="button" aria-label="Abrir propiedad: ${p.etiqueta}">
-          <span class="mini ${esCarpeta ? "carpeta" : ""}">${visual}</span>
-          <span class="nombre">${p.etiqueta}</span>
+        <button type="button" aria-label="Abrir: ${p.etiqueta}${extra ? " (" + extra + ")" : ""}">
+          <span class="mini-caja">
+            <span class="mini ${esCarpeta ? "carpeta" : ""}">${visual}</span>
+            ${nuevo ? `<span class="insignia-nuevo" aria-hidden="true">Nuevo</span>` : ""}
+            ${p.vivo ? `<span class="insignia-vivo" aria-hidden="true"></span>` : ""}
+          </span>
+          <span class="nombre">${p.etiqueta}${externo ? `<i class="externo" aria-hidden="true">↗</i>` : ""}</span>
         </button>
       </div>`;
+    prepararVista(el, p);
     // el click se escucha en el contenedor: setPointerCapture puede
     // redirigir el evento fuera del botón interno
     el.addEventListener("click", () => {
@@ -1154,11 +1271,163 @@ function hacerArrastrable(el, p){
     if (id === null || (e.pointerId !== undefined && e.pointerId !== id)) return;
     id = null;
     el.classList.remove("arrastrando");
-    if (movio) el.dataset.arrastrado = "1";
+    if (movio){ el.dataset.arrastrado = "1"; guardarPosicion(p); }
   };
   el.addEventListener("pointerup", soltar);
   el.addEventListener("pointercancel", soltar);
 }
+
+/* ---------- Vista previa de cada app (al pasar el mouse o enfocar con teclado) ----------
+   Qué es la app y un dato real del momento: S/ → R$, oro, BTC · ETH · SOL,
+   la fase lunar o la sesión de Nueva York. Los precios se piden recién en el
+   primer hover (una sola petición a Binance) y se reutilizan durante 60 s. */
+const datos = { brl:null, pen:null, fxVivo:false, mercado:null, mercadoT:0, pidiendo:null, falloMercado:false };
+const conHover = matchMedia("(hover:hover) and (pointer:fine)").matches;
+const vistaEl = document.createElement("div");
+vistaEl.id = "vista-previa";
+vistaEl.setAttribute("role", "tooltip");
+document.body.appendChild(vistaEl);
+let vistaTimer = null, vistaDe = null;
+
+function pedirMercado(){
+  if (datos.mercado && Date.now() - datos.mercadoT < 60000) return Promise.resolve(datos.mercado);
+  if (datos.pidiendo) return datos.pidiendo;
+  const ruta = "/api/v3/ticker/24hr?symbols=" + encodeURIComponent('["BTCUSDT","ETHUSDT","SOLUSDT","PAXGUSDT"]');
+  const pedir = host => fetch(host + ruta).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
+  datos.pidiendo = pedir("https://api.binance.com")
+    .catch(() => pedir("https://data-api.binance.vision"))
+    .then(filas => {
+      const m = {};
+      filas.forEach(f => { m[f.symbol] = { precio: parseFloat(f.lastPrice), cambio: parseFloat(f.priceChangePercent) }; });
+      datos.mercado = m; datos.mercadoT = Date.now(); datos.falloMercado = false;
+      return m;
+    })
+    .finally(() => { datos.pidiendo = null; });
+  return datos.pidiendo;
+}
+
+// fase lunar: mes sinódico contado desde la luna nueva del 6 ene 2000, 18:14 UTC
+function lunaHoy(){
+  const SIN = 29.530588853;
+  const edad = (((Date.now() - Date.UTC(2000, 0, 6, 18, 14)) / 864e5) % SIN + SIN) % SIN;
+  const nombres = ["Luna nueva","Creciente","Cuarto creciente","Gibosa creciente","Luna llena","Gibosa menguante","Cuarto menguante","Menguante"];
+  return { nombre: nombres[Math.floor(edad / SIN * 8 + .5) % 8], ilum: (1 - Math.cos(2 * Math.PI * edad / SIN)) / 2 };
+}
+
+// bolsa de Nueva York: 9:30–16:00 hora de NY, lunes a viernes (sin feriados), en hora de Lima
+function sesionNY(){
+  const p = {};
+  new Intl.DateTimeFormat("en-US", { timeZone:"America/New_York", weekday:"short", hour:"2-digit", minute:"2-digit", hourCycle:"h23" })
+    .formatToParts(new Date()).forEach(x => { p[x.type] = x.value; });
+  const min = (+p.hour) * 60 + (+p.minute), habil = !["Sat","Sun"].includes(p.weekday);
+  const lima = new Date(Date.now() - 5 * 36e5);   // Lima: UTC-5 todo el año
+  const dif = ((lima.getUTCHours() * 60 + lima.getUTCMinutes() - min) % 1440 + 1440) % 1440;
+  const enLima = m => { const t = (m + dif) % 1440; return String(Math.floor(t / 60)).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0"); };
+  return { habil, abierta: habil && min >= 570 && min < 960, abre: enLima(570), cierra: enLima(960) };
+}
+
+const fmtUsd = v => v >= 1000 ? "$" + Math.round(v).toLocaleString("en-US") : "$" + v.toFixed(2);
+function filaPrecio(nombre, d){
+  if (!d) return "";
+  return `<div class="vd-fila"><span>${nombre}</span><b>${fmtUsd(d.precio)} <em class="${d.cambio >= 0 ? "sube" : "baja"}">${d.cambio >= 0 ? "+" : ""}${d.cambio.toFixed(2)}%</em></b></div>`;
+}
+function datoVista(p){
+  const m = datos.mercado;
+  const espera = datos.falloMercado
+    ? `<div class="vd-nota">Sin conexión con Binance ahora.</div>`
+    : `<div class="vd-nota">Cargando precios…</div>`;
+  switch(p.vista){
+    case "cambio":
+      if (!datos.brl || !datos.pen) return "";
+      return `<div class="vd-fila"><span>S/ 1 =</span><b>R$ ${(datos.brl / datos.pen).toFixed(3)}</b></div>
+        <div class="vd-nota">${datos.fxVivo ? "Tipo de cambio de referencia, en vivo." : "Valor de referencia (sin conexión)."}</div>`;
+    case "luna": {
+      const l = lunaHoy();
+      return `<div class="vd-fila"><span>Luna hoy</span><b>${l.nombre} · ${Math.round(l.ilum * 100)}%</b></div>`;
+    }
+    case "sesion": {
+      const s = sesionNY();
+      const ny = !s.habil ? "Cerrada · fin de semana" : s.abierta ? `Abierta · cierra ${s.cierra}` : `Cerrada · abre ${s.abre}`;
+      return `<div class="vd-fila"><span>Nueva York</span><b>${ny}${s.habil ? " <small>Lima</small>" : ""}</b></div>` +
+        (m ? filaPrecio("BTC", m.BTCUSDT) : espera);
+    }
+    case "oro":
+      return m ? filaPrecio("Oro (PAXG)", m.PAXGUSDT) + `<div class="vd-nota">Oro tokenizado: 1 PAXG = 1 onza troy.</div>` : espera;
+    case "cripto":
+      return m ? ["BTC", "ETH", "SOL"].map(a => filaPrecio(a, m[a + "USDT"])).join("") : espera;
+  }
+  return "";
+}
+
+function pintarVista(p){
+  const nuevo = esNuevo(p), externo = esExterno(p);
+  vistaEl.innerHTML = `
+    <div class="vp-cab"><span class="vp-cat">${p.categoria}</span>
+      ${nuevo ? `<span class="vp-chip nuevo">Nuevo</span>` : ""}${p.vivo ? `<span class="vp-chip vivo"><i></i>En vivo</span>` : ""}</div>
+    <strong class="vp-tit">${p.etiqueta}</strong>
+    <p class="vp-res">${p.resumen || ""}</p>
+    <div class="vp-dato">${datoVista(p)}</div>
+    <span class="vp-pie">${externo ? "Clic para abrir en otra pestaña ↗" : "Clic para abrir"}</span>`;
+}
+function ubicarVista(el){
+  const r = el.querySelector(".mini").getBoundingClientRect();
+  const w = vistaEl.offsetWidth, h = vistaEl.offsetHeight;
+  let x = r.right + 16;
+  const izq = x + w > innerWidth - 12;
+  if (izq) x = r.left - 16 - w;
+  vistaEl.style.left = Math.max(12, x) + "px";
+  vistaEl.style.top  = Math.min(innerHeight - h - 96, Math.max(64, r.top + r.height / 2 - h / 2)) + "px";
+  vistaEl.classList.toggle("izq", izq);
+}
+function mostrarVista(el, p){
+  if (ventanaActual || el.classList.contains("arrastrando")) return;
+  vistaDe = p;
+  pintarVista(p);
+  ubicarVista(el);
+  vistaEl.classList.add("visible");
+  el.querySelector("button").setAttribute("aria-describedby", "vista-previa");
+  if (["oro", "cripto", "sesion"].includes(p.vista) && !(datos.mercado && Date.now() - datos.mercadoT < 60000)){
+    pedirMercado()
+      .catch(() => { datos.falloMercado = true; })
+      .then(() => { if (vistaDe === p){ pintarVista(p); ubicarVista(el); } });
+  }
+}
+function ocultarVista(){
+  clearTimeout(vistaTimer); vistaTimer = null;
+  if (!vistaDe) return;
+  vistaDe = null;
+  vistaEl.classList.remove("visible");
+  $$(".icono button[aria-describedby]").forEach(b => b.removeAttribute("aria-describedby"));
+}
+function prepararVista(el, p){
+  if (conHover){
+    el.addEventListener("mouseenter", () => { clearTimeout(vistaTimer); vistaTimer = setTimeout(() => mostrarVista(el, p), 260); });
+    el.addEventListener("mouseleave", ocultarVista);
+  }
+  el.addEventListener("focusin", e => { if (e.target.matches(":focus-visible")) mostrarVista(el, p); });
+  el.addEventListener("focusout", ocultarVista);
+  el.addEventListener("pointerdown", ocultarVista);
+}
+
+/* ---------- Teclado: flechas para moverse entre iconos ---------- */
+capaIconos.addEventListener("keydown", e => {
+  const dir = { ArrowRight:[1,0], ArrowLeft:[-1,0], ArrowDown:[0,1], ArrowUp:[0,-1] }[e.key];
+  const actual = e.target.closest?.(".icono button");
+  if (!dir || !actual) return;
+  e.preventDefault();
+  const centro = b => { const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
+  const c = centro(actual);
+  let mejor = null, puntaje = Infinity;
+  $$(".icono button").forEach(b => {
+    if (b === actual) return;
+    const q = centro(b), dx = q.x - c.x, dy = q.y - c.y;
+    const avance = dx * dir[0] + dy * dir[1];          // cuánto avanza hacia donde apunta la flecha
+    if (avance <= 8) return;
+    const s = avance + Math.abs(dir[0] ? dy : dx) * 2;  // y cuánto se desvía de esa línea
+    if (s < puntaje){ puntaje = s; mejor = b; }
+  });
+  if (mejor) mejor.focus();
+});
 
 /* ---------- Ventanas ---------- */
 const capaVentanas = $("#capa-ventanas");
@@ -1176,6 +1445,7 @@ function cerrarVentana(inmediato){
 }
 
 function crearVentana(titulo, cuerpoHTML){
+  ocultarVista();
   cerrarVentana(true);
   const v = document.createElement("section");
   v.className = "ventana";
@@ -1296,19 +1566,24 @@ function abrirContacto(){
 }
 
 function abrirAyuda(){
-  crearVentana("Cómo personalizar", `
+  const v = crearVentana("Cómo personalizar", `
     <div class="ventana-cuerpo">
       <div class="ventana-info" style="padding:28px 32px">
         <h2 style="font-size:21px">Hazlo tuyo en 4 pasos</h2>
         <div class="texto-libre">
           <p><strong>1 · Tu información.</strong> Abre este archivo en un editor de texto y busca <strong>ZONA EDITABLE</strong> (al inicio del script). Ahí cambias el nombre, la presentación, el correo y el contenido de cada carpeta.</p>
-          <p><strong>2 · Tus propiedades.</strong> Cada entrada de <strong>PROYECTOS</strong> es una carpeta del escritorio: título, categoría, año, descripción, tags y enlace. Con <strong>x</strong> e <strong>y</strong> (en %) decides dónde flota. También puedes arrastrarlas con el ratón para probar posiciones.</p>
+          <p><strong>2 · Tus propiedades.</strong> Cada entrada de <strong>PROYECTOS</strong> es una carpeta del escritorio: título, categoría, año, descripción, tags y enlace. Con <strong>x</strong> e <strong>y</strong> (en %) decides dónde flota. También puedes arrastrarlas con el ratón: el escritorio recuerda dónde las dejas en este navegador. Con las flechas del teclado te mueves entre ellas.</p>
+          <p><button type="button" class="boton" data-reordenar>Reordenar los íconos</button></p>
           <p><strong>3 · Tus imágenes.</strong> Pon URLs en <strong>portada</strong> (miniatura y cabecera de la ventana) y en <strong>imagenes</strong> (galería). Mientras estén vacías se usan las miniaturas generadas.</p>
           <p><strong>4 · Tu foto de fondo.</strong> Busca <strong>FOTO PROPIA</strong> en el HTML y pega la URL de una imagen en el src; sustituirá a la figura abstracta y se mostrará en blanco y negro.</p>
           <p style="opacity:.6">Consejo: también puedes pedirle a Claude «pon mis propiedades en el escritorio» y lo edita por ti.</p>
         </div>
       </div>
     </div>`);
+  v.querySelector("[data-reordenar]").addEventListener("click", () => {
+    reordenarIconos();
+    mostrarToast("Íconos de vuelta en su lugar original.");
+  });
 }
 
 /* ---------- Dock ---------- */
@@ -1559,6 +1834,7 @@ function iniciarCambio(){
   const pinta = (brl, sol, vivo) => {
     elBrl.textContent = brl.toFixed(2);
     elSol.textContent = sol.toFixed(2);
+    datos.brl = brl; datos.pen = sol; datos.fxVivo = vivo;   // también los usa la vista previa (S/ → R$)
     caja.title = vivo
       ? "Tipos de cambio en vivo (open.er-api.com)"
       : "Sin conexión con el proveedor: valores de referencia";
