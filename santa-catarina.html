@@ -523,6 +523,17 @@
   }
 
   /* ---------- Llegada por el portal: estrellas desacelerando ---------- */
+  /* llegada desde el motion del portal: el oro del iris se abre y revela el escritorio */
+  .llegada-oro{
+    position:fixed;inset:0;z-index:3000;pointer-events:none;
+    background:radial-gradient(circle at 60% 48%,#fff6dc 0%,#f6d48e 45%,#e8b24a 100%);
+    animation:llegadaOro 1.15s cubic-bezier(.2,.7,.2,1) both;
+  }
+  @keyframes llegadaOro{
+    0%{opacity:1;clip-path:circle(150% at 60% 48%)}
+    100%{opacity:0;clip-path:circle(0% at 60% 48%)}
+  }
+  @media (prefers-reduced-motion:reduce){ .llegada-oro{display:none} }
   .warp-llegada{
     position:fixed;inset:0;z-index:4000;
     background:#050313;pointer-events:none;
@@ -1872,12 +1883,22 @@ addEventListener("resize", () => {
 
 /* ---------- Llegada por el portal (desde el orbe de KIPU) ---------- */
 function iniciarLlegada(){
-  let viaja = false;
+  let viaja = null;
   try{
-    viaja = sessionStorage.getItem("kipu_warp") === "1";
+    viaja = sessionStorage.getItem("kipu_warp");
     sessionStorage.removeItem("kipu_warp");
   }catch(e){ return; }
   if (!viaja || menosMovim) return;
+  /* "oro": el portal de KIPU termina en un iris de oro desde el sol; aquí ese
+     mismo oro se abre y deja ver el escritorio (corte continuo, mismo color). */
+  if (viaja === "oro"){
+    const velo = document.createElement("div");
+    velo.className = "llegada-oro";
+    velo.setAttribute("aria-hidden","true");
+    document.body.appendChild(velo);
+    setTimeout(() => velo.remove(), 1300);
+    return;
+  }
   const velo = document.createElement("div");
   velo.className = "warp-llegada";
   velo.setAttribute("aria-hidden","true");

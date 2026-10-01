@@ -1499,22 +1499,78 @@
       .portal-br{ position: absolute; top: -160px; left: 46%; transform: translateX(-50%); margin: 0; }
       .portal-br .esfera-oraculo{ width: 116px; height: 116px; }
     }
-    /* ---------- Viaje dimensional: velo warp + eco de llegada ---------- */
-    .warp-velo{
-      position: fixed; inset: 0; z-index: 3000;
-      background: #050313;
-      animation: warpEntra .16s ease-out both;
+    /* ---------- Portal a Santa Catarina: motion de 8 s ----------
+       El círculo nace en el orbe (--ox/--oy); barras de cine con código de
+       tiempo; datos de la ruta y título en DOM para que se lean nítidos. */
+    html.mt-abierto{ overflow: hidden; }
+    .mt-velo{
+      position: fixed; inset: 0; z-index: 10060; overflow: hidden;
+      background: #05030d; color: #fff6df; font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+      clip-path: circle(0px at var(--ox, 50%) var(--oy, 50%));
+      transition: clip-path .65s cubic-bezier(.76, 0, .24, 1);
     }
-    .warp-velo canvas{ position: absolute; inset: 0; width: 100%; height: 100%; }
-    .warp-velo::after{ /* destello del salto */
-      content: ""; position: absolute; inset: 0; opacity: 0; pointer-events: none;
-      background: radial-gradient(circle at 50% 50%, rgba(233,228,255,.95), rgba(178,107,255,.5) 40%, transparent 75%);
+    .mt-velo.abierto{ clip-path: circle(150vmax at var(--ox, 50%) var(--oy, 50%)); }
+    .mt-velo canvas{ position: absolute; inset: 0; width: 100%; height: 100%; }
+    .mt-barra{
+      position: absolute; left: 0; right: 0; z-index: 2; height: max(7vh, 40px);
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 22px;
+      background: #000; color: rgba(255,246,223,.55);
+      font: 500 11px/1 ui-monospace, 'JetBrains Mono', Menlo, monospace; letter-spacing: .18em;
+      animation: mtBarra .7s cubic-bezier(.2, .7, .2, 1) both;
     }
-    .warp-velo.destello::after{ animation: warpDestello .45s ease-out both; }
-    .warp-velo.irse{ animation: warpSale .55s ease both; }
-    @keyframes warpEntra{ from{ opacity: 0; } to{ opacity: 1; } }
-    @keyframes warpDestello{ 0%{ opacity: 0; } 30%{ opacity: 1; } 100%{ opacity: 0; } }
-    @keyframes warpSale{ from{ opacity: 1; } to{ opacity: 0; } }
+    .mt-arriba{ top: 0; --d: -100%; }
+    .mt-abajo{ bottom: 0; --d: 100%; }
+    @keyframes mtBarra{ from{ transform: translateY(var(--d)); } }
+    .mt-tc{ color: #F3CE86; font-variant-numeric: tabular-nums; }
+    .mt-prog{ position: absolute; left: 0; right: 0; top: 0; height: 2px; background: #E8B24A; transform-origin: left center; transform: scaleX(0); }
+    .mt-saltar{
+      padding: 8px 15px; border-radius: 999px; border: 1px solid rgba(255,246,223,.3); background: transparent;
+      color: #fff6df; font: 500 12px/1 'Space Grotesk', 'Segoe UI', sans-serif; letter-spacing: .08em; cursor: pointer;
+      transition: border-color .2s ease, color .2s ease;
+    }
+    .mt-saltar:hover{ border-color: #F3CE86; color: #F3CE86; }
+    .mt-saltar:focus-visible{ outline: 2px solid #F3CE86; outline-offset: 3px; }
+    .mt-datos{
+      position: absolute; left: 50%; bottom: calc(max(7vh, 40px) + 26px); z-index: 1; display: flex; gap: 34px;
+      opacity: 0; transform: translateX(-50%); font-variant-numeric: tabular-nums; white-space: nowrap;
+    }
+    .mt-datos small{ display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: rgba(255,246,223,.5); }
+    .mt-datos b{ font-size: clamp(16px, 1.8vw, 24px); font-weight: 600; }
+    .mt-datos .mt-km{ color: #F3CE86; }
+    .mt-titulo{
+      position: absolute; left: 0; right: 0; top: 17%; z-index: 1; margin: 0; padding: .08em 0; overflow: hidden;
+      text-align: center; font-size: clamp(34px, 8.2vw, 124px); font-weight: 700; line-height: 1; letter-spacing: .04em; color: #fff6df;
+    }
+    .mt-titulo span{ display: inline-block; opacity: 0; transform: translateY(105%); will-change: transform, opacity; }
+    .mt-sub, .mt-tag{ position: absolute; left: 0; right: 0; z-index: 1; margin: 0; text-align: center; opacity: 0; }
+    .mt-sub{ top: calc(17% + clamp(60px, 11.6vw, 172px)); font-size: clamp(11px, 1.2vw, 14px); letter-spacing: .32em; text-transform: uppercase; color: #ffe2a6; }
+    .mt-tag{ top: calc(17% + clamp(90px, 15.4vw, 222px)); font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,246,223,.72); }
+    /* regla de oro que se abre bajo el título */
+    .mt-regla{
+      position: absolute; left: 50%; top: calc(17% + clamp(54px, 10.8vw, 160px)); z-index: 1;
+      width: clamp(140px, 26vw, 400px); height: 2px; margin-left: calc(clamp(140px, 26vw, 400px) / -2);
+      background: linear-gradient(90deg, transparent, #F3CE86 30%, #F3CE86 70%, transparent);
+      transform: scaleX(0); transform-origin: center;
+    }
+    /* postproducción: grano de película y viñeta, sin costo para el canvas */
+    .mt-grano{
+      position: absolute; inset: -64px; z-index: 1; pointer-events: none; opacity: .16; mix-blend-mode: overlay;
+      background-repeat: repeat; animation: mtGrano .5s steps(6) infinite;
+    }
+    @keyframes mtGrano{
+      0%{ transform: translate(0,0); } 17%{ transform: translate(-22px,14px); } 34%{ transform: translate(18px,-26px); }
+      51%{ transform: translate(-30px,-8px); } 68%{ transform: translate(12px,24px); } 85%{ transform: translate(-14px,-18px); } 100%{ transform: translate(26px,6px); }
+    }
+    .mt-vineta{ position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse at 50% 50%, transparent 52%, rgba(5,3,13,.6) 100%); }
+    @media (max-width: 699px){
+      .mt-barra{ padding: 0 14px; font-size: 10px; letter-spacing: .12em; }
+      .mt-abajo .mt-hud{ display: none; }
+      .mt-datos{ gap: 18px; }
+      .mt-titulo{ top: 20%; }
+      .mt-regla{ top: calc(20% + 50px); }
+      .mt-sub{ top: calc(20% + 58px); }
+      .mt-tag{ top: calc(20% + 86px); }
+    }
     @media (prefers-reduced-motion: no-preference){
       .br-mundo.saludo::before{ animation: brSaludoCuerpo 1.3s ease-out 1; }
       .br-mundo.saludo::after{ animation: brSaludoAro 1.3s ease-out 2; }
@@ -5566,70 +5622,603 @@
       }
     })();
 
-    /* ---------- Viaje dimensional: warp del portal hacia Bienes Raíces ---------- */
+    /* ---------- Portal a Santa Catarina: motion de 8 s (reemplaza al warp) ----------
+       Plano a plano, cortado a un pulso de 0.5 s (120 BPM):
+         0.0–1.3  Ignición: el orbe se abre y su galaxia llena la pantalla
+         1.2–2.7  Hiperespacio: la cámara atraviesa el disco; los tres anillos
+                  del orbe pasan a cámara con PERÚ · KIPU · BRASIL
+         2.6–5.0  El globo: Sudamérica en puntos; un arco de oro une Lima con
+                  Santa Catarina mientras cuentan distancia y coordenadas;
+                  picada sobre el destino y corte con destello
+         5.0–7.2  Atardecer en la bahía: sube el skyline, cae el sol, entra el título
+         7.2–8.0  Iris de oro desde el sol: abre la puerta del escritorio, que
+                  recibe con el mismo oro (kipu_warp = "oro")
+       Canvas 2D + DOM, sin librerías ni videos. Se puede saltar (botón, Esc).
+       Con reduced-motion el enlace navega directo, sin teatro. */
     (function(){
       const portales = document.querySelectorAll('.portal-esfera, .portal-rotulo');
       if (!portales.length) return;
-      let viajando = false;
-      // Al volver con el botón atrás (bfcache) retirar cualquier velo vivo
+      const DUR = 8;
+      const TXT = {
+        es: { aria: 'Viaje a Santa Catarina', saltar: 'Saltar intro →', r1: 'PERÚ', r3: 'BRASIL', dist: 'Distancia',
+              titulo: 'SANTA CATARINA', sub: 'Brasil · 27°35′ S · 48°33′ O', tag: 'Bienes Raíces · KIPU', hud: 'LIMA → SANTA CATARINA' },
+        pt: { aria: 'Viagem a Santa Catarina', saltar: 'Pular intro →', r1: 'PERU', r3: 'BRASIL', dist: 'Distância',
+              titulo: 'SANTA CATARINA', sub: 'Brasil · 27°35′ S · 48°33′ O', tag: 'Imóveis · KIPU', hud: 'LIMA → SANTA CATARINA' },
+        en: { aria: 'Journey to Santa Catarina', saltar: 'Skip intro →', r1: 'PERU', r3: 'BRAZIL', dist: 'Distance',
+              titulo: 'SANTA CATARINA', sub: 'Brazil · 27°35′ S · 48°33′ W', tag: 'Real Estate · KIPU', hud: 'LIMA → SANTA CATARINA' }
+      };
+      const E = {
+        expoOut: x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x),
+        expoIn: x => x <= 0 ? 0 : Math.pow(2, 10 * x - 10),
+        expoInOut: x => x <= 0 ? 0 : x >= 1 ? 1 : x < .5 ? Math.pow(2, 20 * x - 10) / 2 : (2 - Math.pow(2, -20 * x + 10)) / 2,
+        cubicOut: x => 1 - Math.pow(1 - x, 3),
+        cubicInOut: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
+      };
+      const seg = (t, a, b) => t <= a ? 0 : t >= b ? 1 : (t - a) / (b - a);
+      const lerp = (a, b, k) => a + (b - a) * k;
+      const pulso = t => Math.exp(-(t % .5) / .09);
+      const rnd = seed => { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let q = Math.imul(s ^ (s >>> 15), 1 | s); q = (q + Math.imul(q ^ (q >>> 7), 61 | q)) ^ q; return ((q ^ (q >>> 14)) >>> 0) / 4294967296; }; };
+      const sprite = (rgb, n = 64) => {
+        const c = document.createElement('canvas'); c.width = c.height = n;
+        const x = c.getContext('2d'), g = x.createRadialGradient(n / 2, n / 2, 0, n / 2, n / 2, n / 2);
+        g.addColorStop(0, 'rgba(' + rgb + ',1)'); g.addColorStop(.22, 'rgba(' + rgb + ',.45)'); g.addColorStop(1, 'rgba(' + rgb + ',0)');
+        x.fillStyle = g; x.fillRect(0, 0, n, n); return c;
+      };
+
+      // Sudamérica simplificada (lon, lat) y la ruta Lima → Santa Catarina (Florianópolis)
+      const SA = [[-77.3,8.7],[-75.5,10.4],[-72,11.8],[-71.6,10.5],[-68,10.5],[-64,10.6],[-61.5,10],[-58,6.8],[-54,5.8],[-51.5,4.4],[-50,1.8],[-48.5,-1.4],[-44.3,-2.5],[-39,-3.7],[-35.2,-5.8],[-34.8,-7.1],[-35.7,-9.7],[-38.5,-13],[-39,-17.5],[-40.3,-20.3],[-43.2,-22.9],[-46.3,-24],[-48.5,-26.9],[-48.6,-28.5],[-51,-30.5],[-53.4,-33.7],[-55,-34.9],[-57.5,-36],[-57.6,-38.2],[-62.3,-38.8],[-65,-42],[-67.5,-46],[-69,-50],[-68.4,-52.4],[-67.5,-54.9],[-71,-55],[-74.5,-52.5],[-75.5,-48],[-74,-44],[-73.6,-40],[-73.2,-37],[-71.6,-33],[-71.4,-29.9],[-70.4,-23.6],[-70.3,-18.5],[-72,-17],[-76.2,-13.8],[-77.1,-12],[-79,-8.1],[-81.3,-4.6],[-80.4,-2.2],[-80.1,.9],[-78.8,1.8],[-77.5,4],[-77.4,7]];
+      const LIMA = [-12.05, -77.04], SC = [-27.59, -48.55], RAD = Math.PI / 180;
+      const vec = ([la, lo]) => [Math.cos(la * RAD) * Math.cos(lo * RAD), Math.cos(la * RAD) * Math.sin(lo * RAD), Math.sin(la * RAD)];
+      const VA = vec(LIMA), VB = vec(SC);
+      const OM = Math.acos(VA[0] * VB[0] + VA[1] * VB[1] + VA[2] * VB[2]);
+      const KM = Math.round(6371 * OM);   // distancia de gran círculo Lima → Florianópolis
+      const enRuta = u => {
+        const s0 = Math.sin((1 - u) * OM) / Math.sin(OM), s1 = Math.sin(u * OM) / Math.sin(OM);
+        const v = [VA[0] * s0 + VB[0] * s1, VA[1] * s0 + VB[1] * s1, VA[2] * s0 + VB[2] * s1];
+        return [Math.asin(v[2]) / RAD, Math.atan2(v[1], v[0]) / RAD];
+      };
+      const dms = (v, pos, neg) => { const m = Math.round(Math.abs(v) * 60); return Math.floor(m / 60) + '°' + String(m % 60).padStart(2, '0') + '′ ' + (v < 0 ? neg : pos); };
+
+      let activo = false;
       window.addEventListener('pageshow', () => {
-        document.querySelectorAll('.warp-velo').forEach(v => v.remove());
-        viajando = false;
+        document.querySelectorAll('.mt-velo').forEach(v => v.remove());
+        document.documentElement.classList.remove('mt-abierto');
+        activo = false;
       });
-      portales.forEach(portal => portal.addEventListener('click', (ev) => {
-        // Con reduced-motion el ancla navega normal, sin teatro
-        if (reducedMotion || viajando) return;
+      portales.forEach(p => p.addEventListener('click', ev => {
+        if (reducedMotion) return;   // sin teatro: el enlace navega normal
         ev.preventDefault();
-        viajando = true;
-        const velo = document.createElement('div');
-        velo.className = 'warp-velo';
-        velo.setAttribute('aria-hidden', 'true');
-        const cv = document.createElement('canvas');
-        velo.appendChild(cv);
-        document.body.appendChild(velo);
-        const ctx = cv.getContext('2d');
-        const DPR = Math.min(2, window.devicePixelRatio || 1);
-        const W = cv.width = Math.round(innerWidth * DPR);
-        const H = cv.height = Math.round(innerHeight * DPR);
-        const cx = W / 2, cy = H / 2;
-        const COLS = ['235,230,255', '235,230,255', '216,167,255', '255,207,122', '178,107,255'];
-        const estrellas = [];
-        for (let i = 0; i < 220; i++){
-          estrellas.push({ a: Math.random() * 6.2832, d: 20 + Math.random() * (W * .5), v: .6 + Math.random(), col: COLS[i % 5] });
-        }
-        const t0 = performance.now();
-        const DUR = 1050; /* [EDITABLE] duración del warp en ms */
-        requestAnimationFrame(function paso(t){
-          const p = Math.min(1, (t - t0) / DUR);
-          ctx.fillStyle = 'rgba(5,3,19,.5)'; /* estela */
-          ctx.fillRect(0, 0, W, H);
-          const vel = 2 + Math.pow(p, 2.2) * 90;
-          ctx.lineWidth = DPR;
-          for (const e of estrellas){
-            const len = vel * e.v * DPR;
-            const x = cx + Math.cos(e.a) * e.d, y = cy + Math.sin(e.a) * e.d;
-            ctx.strokeStyle = 'rgba(' + e.col + ',' + Math.min(1, .25 + p).toFixed(2) + ')';
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(cx + Math.cos(e.a) * (e.d + len), cy + Math.sin(e.a) * (e.d + len));
-            ctx.stroke();
-            e.d += vel * e.v;
-            if (e.d > Math.max(W, H) * .75) e.d = 10 + Math.random() * 60;
-          }
-          if (p >= 1){
-            // La otra dimensión es una página propia: el velo cubre la transición.
-            // La marca kipu_warp le dice al destino que reciba con la animación
-            // de llegada (estrellas desacelerando).
-            velo.classList.add('destello');
-            setTimeout(() => {
-              try{ sessionStorage.setItem('kipu_warp', '1'); }catch(err){}
-              location.href = 'santa-catarina';
-            }, 260);
-            return;
-          }
-          requestAnimationFrame(paso);
-        });
+        if (!activo) iniciar();
       }));
+
+      function iniciar(){
+        activo = true;
+        const T = TXT[idioma] || TXT.es;
+        const orbe = document.querySelector('.portal-esfera').getBoundingClientRect();
+        const ox = orbe.left + orbe.width / 2, oy = orbe.top + orbe.height / 2, oR = Math.max(24, orbe.width * .32);
+
+        const velo = document.createElement('div');
+        velo.className = 'mt-velo';
+        velo.setAttribute('role', 'dialog'); velo.setAttribute('aria-modal', 'true'); velo.setAttribute('aria-label', T.aria);
+        velo.style.setProperty('--ox', Math.round(ox) + 'px'); velo.style.setProperty('--oy', Math.round(oy) + 'px');
+        velo.innerHTML =
+          '<canvas aria-hidden="true"></canvas><div class="mt-grano" aria-hidden="true"></div><div class="mt-vineta" aria-hidden="true"></div>' +
+          '<div class="mt-barra mt-arriba" aria-hidden="true"><span class="mt-tc">00:00:00</span><span class="mt-hud">' + T.hud + '</span></div>' +
+          '<div class="mt-datos" aria-hidden="true"><div><small>' + T.dist + '</small><b class="mt-km">0 km</b></div>' +
+            '<div><small>Lat</small><b class="mt-lat"></b></div><div><small>Lon</small><b class="mt-lon"></b></div></div>' +
+          '<h2 class="mt-titulo"></h2><i class="mt-regla" aria-hidden="true"></i><p class="mt-sub">' + T.sub + '</p><p class="mt-tag">' + T.tag + '</p>' +
+          '<div class="mt-barra mt-abajo"><i class="mt-prog" aria-hidden="true"></i><span class="mt-hud" aria-hidden="true">KIPU · PORTAL 01</span>' +
+            '<button type="button" class="mt-saltar">' + T.saltar + '</button></div>';
+        document.body.appendChild(velo);
+        document.documentElement.classList.add('mt-abierto');
+        const $q = s => velo.querySelector(s);
+        const titulo = $q('.mt-titulo'), sub = $q('.mt-sub'), tag = $q('.mt-tag'), datos = $q('.mt-datos');
+        const km = $q('.mt-km'), lat = $q('.mt-lat'), lon = $q('.mt-lon'), tc = $q('.mt-tc'), prog = $q('.mt-prog'), regla = $q('.mt-regla');
+        const letras = [];
+        T.titulo.split('').forEach(ch => {
+          if (ch === ' '){ titulo.appendChild(document.createTextNode(' ')); return; }
+          const s = document.createElement('span'); s.textContent = ch; titulo.appendChild(s); letras.push(s);
+        });
+        // grano: una baldosa de ruido de 128 px que el CSS repite y mueve a saltos
+        const ruido = document.createElement('canvas'); ruido.width = ruido.height = 128;
+        const rx = ruido.getContext('2d'), img = rx.createImageData(128, 128);
+        for (let i = 0; i < img.data.length; i += 4){ const v = 80 + Math.random() * 96 | 0; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+        rx.putImageData(img, 0, 0);
+        $q('.mt-grano').style.backgroundImage = 'url(' + ruido.toDataURL() + ')';
+
+        const cv = velo.querySelector('canvas'), ctx = cv.getContext('2d');
+        let W = 0, H = 0, DPR = 1, movil = false, F = 1;
+        const medir = () => {
+          W = innerWidth; H = innerHeight; movil = W < 700;
+          DPR = Math.min(movil ? 1.5 : 2, window.devicePixelRatio || 1);
+          cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+          F = Math.min(W, H) * .95;
+        };
+        medir();
+        addEventListener('resize', medir);
+
+        // ---------- materiales ----------
+        const R = rnd(963);
+        const COLG = ['255,236,190', '178,107,255', '120,170,255', '226,180,255'];   // núcleo oro · violeta · azul · lila
+        const gal = [[], [], [], []];
+        for (let i = 0, n = movil ? 900 : 2200; i < n; i++){
+          const brazo = i % 2, r = Math.pow(R(), .62), core = r < .12;
+          const p = { r, a: brazo * Math.PI + r * 4.4 + (R() - .5) * (core ? 6.28 : .6), z: (R() - .5) * .07 * (1 - r), s: .5 + R() * 1.5 };
+          gal[core ? 0 : R() < .1 ? 2 : R() < .55 ? 1 : 3].push(p);
+        }
+        const tierra = [];
+        const dentro = (lo, la) => {
+          let ok = false;
+          for (let i = 0, j = SA.length - 1; i < SA.length; j = i++){
+            const [xi, yi] = SA[i], [xj, yj] = SA[j];
+            if ((yi > la) !== (yj > la) && lo < (xj - xi) * (la - yi) / (yj - yi) + xi) ok = !ok;
+          }
+          return ok;
+        };
+        const paso = movil ? 1.9 : 1.35;
+        for (let la = 13; la > -56; la -= paso){
+          for (let lo = -82; lo < -34; lo += paso / Math.max(.4, Math.cos(la * RAD))){ if (dentro(lo, la)) tierra.push([la, lo]); }
+        }
+        const edificios = [];
+        for (let i = 0, n = movil ? 30 : 54; i < n; i++){   // skyline esbelto: el sol y el título deben respirar
+          const torre = R() < .18;
+          edificios.push({ x: .14 + i / n * .7 + (R() - .5) * .008, w: .007 + R() * .011, h: torre ? .15 + R() * .1 : .035 + R() * .085, v: R() });
+        }
+        edificios.forEach(b => { b.o = Math.min(1, Math.abs(b.x - .6) / .46); });   // suben del sol hacia afuera
+        const tunel = [];   // líneas de velocidad del hiperespacio
+        for (let i = 0, n = movil ? 70 : 150; i < n; i++) tunel.push({ a: R() * 6.2832, r: R(), l: .08 + R() * .22, s: .5 + R() });
+        const nubes = [];   // nubes del atardecer: anchas, bajas, a la deriva
+        for (let i = 0; i < (movil ? 3 : 5); i++) nubes.push({ x: R(), y: .22 + R() * .32, w: .16 + R() * .2, h: .035 + R() * .03, v: .004 + R() * .006, o: .1 + R() * .16 });
+        const aves = [];    // una bandada que cruza el cielo
+        for (let i = 0; i < (movil ? 4 : 7); i++) aves.push({ x: .9 + i * .045 + R() * .03, y: .28 + i * .022 + R() * .04, f: R() * 6.28, s: .55 + R() * .5 });
+        const spOro = sprite('255,214,140'), spViol = sprite('178,107,255'), spSol = sprite('255,190,110', 128), spNube = sprite('255,214,180', 64);
+        // sacudida de cámara en cada corte (decae al cuadrado) + rumor creciente en el hiperespacio
+        const CORTES = [[0, 6], [1.25, 9], [2.62, 11], [5, 9]];
+        const sacudida = t => {
+          let a = 0;
+          for (const [tc, amp] of CORTES){ const k = seg(t, tc, tc + .42); if (k > 0 && k < 1) a = Math.max(a, Math.pow(1 - k, 2) * amp); }
+          a += seg(t, 1.3, 2.6) * 3.5 * (1 - seg(t, 2.5, 2.62));
+          return { x: Math.sin(t * 97.3) * a, y: Math.cos(t * 131.7) * a * .7, a };
+        };
+
+        // ---------- planos ----------
+        function galaxia(t){
+          const e1 = E.expoInOut(seg(t, 0, 1.3)), e2 = Math.pow(seg(t, 1.2, 2.65), 2.2);
+          const cam = lerp(F / oR, 1.5, e1) - e2 * 2.1;   // de tamaño-orbe a pantalla llena, y luego a través del disco
+          const cx = lerp(ox, W / 2, E.expoInOut(seg(t, 0, 1.1))), cy = lerp(oy, H / 2, E.expoInOut(seg(t, 0, 1.1)));
+          const giro = t * .55 + e2 * 1.4, tilt = 1.05 - e1 * .3;
+          const vel = t > 1.2 ? .04 + e2 * .4 : 0;    // estela: dónde estaba el punto hace un instante
+          const alfa = 1 - E.cubicInOut(seg(t, 2.45, 2.72));
+          if (alfa <= 0) return;
+          const ct = Math.cos(tilt), st = Math.sin(tilt);
+          ctx.lineCap = 'round';
+          // ignición: dos ondas de choque y los dos anillos del orbe se abren hacia la cámara
+          for (let i = 0; i < 2; i++){
+            const s = E.expoOut(seg(t, i * .14, .9 + i * .14));
+            if (s <= 0 || s >= 1) continue;
+            ctx.globalAlpha = (1 - s) * .8 * alfa;
+            ctx.strokeStyle = 'rgb(243,206,134)'; ctx.lineWidth = 2.5 - s * 1.5;
+            ctx.beginPath(); ctx.arc(cx, cy, oR + s * F * 1.3, 0, 6.2832); ctx.stroke();
+            const sa = E.cubicInOut(seg(t, .05 + i * .16, 1.2 + i * .16));
+            if (sa <= 0 || sa >= 1) continue;
+            const rxa = oR * 1.35 / Math.max(.03, 1 - sa * .99);   // se acerca a cámara: crece despacio y pasa de golpe
+            ctx.globalAlpha = (1 - sa) * .9 * alfa; ctx.lineWidth = 1.5 + sa * 3;
+            ctx.beginPath(); ctx.ellipse(cx, cy, rxa, rxa * .32, i ? -.38 : -.52, 0, 6.2832); ctx.stroke();
+          }
+          // rayos del núcleo, girando despacio
+          if (e1 > .25 && alfa > 0){
+            ctx.fillStyle = 'rgba(255,214,140,' + (.045 * Math.min(1, (e1 - .25) * 3) * alfa).toFixed(3) + ')';
+            ctx.globalAlpha = 1;
+            for (let i = 0; i < 9; i++){
+              const an = t * .35 + i * 6.2832 / 9;
+              ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, Math.max(W, H), an, an + .11); ctx.closePath(); ctx.fill();
+            }
+          }
+          // túnel de velocidad: líneas que nacen en el centro y se alargan al acelerar
+          if (e2 > 0){
+            ctx.strokeStyle = 'rgb(226,180,255)'; ctx.lineWidth = 1.2; ctx.globalAlpha = .55 * alfa;
+            ctx.beginPath();
+            const far = Math.max(W, H) * .95;
+            for (const l of tunel){
+              const q = (l.r + t * l.s * (.15 + e2 * 1.6)) % 1, rpx = q * q * far, len = (l.l + e2 * .3) * rpx * (.3 + q);
+              if (rpx < 30) continue;
+              ctx.moveTo(cx + Math.cos(l.a) * rpx, cy + Math.sin(l.a) * rpx);
+              ctx.lineTo(cx + Math.cos(l.a) * (rpx + len), cy + Math.sin(l.a) * (rpx + len));
+            }
+            ctx.stroke();
+          }
+          // las estelas se agrupan por color, opacidad y grosor: decenas de trazos en vez de miles
+          const cubos = new Map();
+          gal.forEach((grupo, gi) => {
+            ctx.strokeStyle = ctx.fillStyle = 'rgb(' + COLG[gi] + ')';
+            for (const p of grupo){
+              const a = p.a + giro * (1.25 - p.r * .6);   // rotación diferencial: el centro gira más rápido
+              const gx = p.r * Math.cos(a), gy = p.r * Math.sin(a);
+              const y = gy * ct - p.z * st, z = gy * st + p.z * ct, d = z + cam;
+              if (d < .04) continue;
+              const sx = cx + gx * F / d, sy = cy + y * F / d;
+              if (sx < -60 || sx > W + 60 || sy < -60 || sy > H + 60) continue;
+              const tam = Math.min(4.5, p.s * .45 + p.s * .5 / d);
+              const al = Math.min(1, .3 + .7 * (1 - p.r)) * alfa;
+              if (vel > 0){
+                const d2 = d + vel, clave = gi * 100 + Math.min(3, Math.floor(al * 4)) * 10 + (tam < 1.3 ? 0 : tam < 2.6 ? 1 : 2);
+                let cubo = cubos.get(clave);
+                if (!cubo) cubos.set(clave, cubo = []);
+                cubo.push(cx + gx * F / d2, cy + y * F / d2, sx, sy);
+              } else { ctx.globalAlpha = al; ctx.fillRect(sx - tam / 2, sy - tam / 2, tam, tam); }
+            }
+          });
+          cubos.forEach((seg4, clave) => {
+            ctx.strokeStyle = 'rgb(' + COLG[Math.floor(clave / 100)] + ')';
+            ctx.globalAlpha = (Math.floor(clave / 10) % 10 + .6) / 4;
+            ctx.lineWidth = [.9, 1.9, 3.4][clave % 10];
+            ctx.beginPath();
+            for (let i = 0; i < seg4.length; i += 4){ ctx.moveTo(seg4[i], seg4[i + 1]); ctx.lineTo(seg4[i + 2], seg4[i + 3]); }
+            ctx.stroke();
+          });
+          if (cam > .06){
+            const rr = Math.min(Math.max(W, H) * 1.4, .5 * F / cam);
+            ctx.globalAlpha = alfa * (.75 + .25 * pulso(t));
+            ctx.drawImage(spOro, cx - rr, cy - rr, rr * 2, rr * 2);
+            ctx.globalAlpha = alfa * .35;
+            ctx.drawImage(spViol, cx - rr * 2.4, cy - rr * 2.4, rr * 4.8, rr * 4.8);
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        function anillos(t){
+          const base = Math.min(W, H) * .34, cx = W / 2, cy = H / 2;
+          [[1.5, T.r1], [2, 'KIPU'], [2.5, T.r3]].forEach(([tk, palabra], k) => {
+            const d = tk + .25 - t;
+            if (d > 1 || d < .02) return;
+            const r = base * .25 / d;
+            const a = Math.min(1, (1 - d) * 1.8) * Math.min(1, (d - .02) / .1);
+            const giro = t * (k % 2 ? -.7 : .7);
+            ctx.globalAlpha = a;
+            ctx.strokeStyle = 'rgb(243,206,134)';
+            ctx.lineWidth = Math.max(1.4, r * .014);
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0, 6.2832); ctx.stroke();
+            ctx.lineWidth = Math.max(1, r * .004);
+            ctx.beginPath();
+            for (let i = 0; i < 72; i++){   // marcas de dial: el anillo como instrumento
+              const an = giro + i * Math.PI / 36, l = i % 6 ? .035 : .08;
+              ctx.moveTo(cx + Math.cos(an) * r * 1.03, cy + Math.sin(an) * r * 1.03);
+              ctx.lineTo(cx + Math.cos(an) * r * (1.03 + l), cy + Math.sin(an) * r * (1.03 + l));
+            }
+            ctx.stroke();
+            ctx.globalAlpha = a * .5;
+            ctx.beginPath(); ctx.arc(cx, cy, r * .86, giro, giro + 4.2); ctx.stroke();
+            const fs = r * .34;
+            const ap = Math.min(1, (t - (tk - .4)) / .15) * Math.min(1, (d - .04) / .12) * Math.max(0, Math.min(1, (1.7 - r / base) / .6));   // se apaga al pasar
+            if (ap > 0 && fs < 3000){
+              ctx.globalAlpha = ap;
+              ctx.font = '700 ' + fs.toFixed(1) + 'px "Space Grotesk", sans-serif';
+              ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+              ctx.fillStyle = '#fff6df';
+              ctx.fillText(palabra, cx, cy);
+            }
+          });
+          ctx.globalAlpha = 1;
+        }
+
+        function globo(t){
+          const e = E.cubicInOut(seg(t, 2.6, 5)), aparece = E.expoOut(seg(t, 2.55, 3.2));
+          const zoom = Math.pow(seg(t, 4.3, 5), 3);
+          const g = { cx: W / 2, cy: H / 2, R: Math.min(W, H) * (movil ? .36 : .3) * (.55 + .45 * aparece) * (1 + zoom * 10),
+                      lon0: lerp(-80, -48.55, e), lat0: lerp(-6, -27.59, e) };
+          const sf0 = Math.sin(g.lat0 * RAD), cf0 = Math.cos(g.lat0 * RAD);
+          const proy = (la, lo) => {
+            const f = la * RAD, l = (lo - g.lon0) * RAD, cf = Math.cos(f), sf = Math.sin(f), cl = Math.cos(l);
+            return { x: g.cx + g.R * cf * Math.sin(l), y: g.cy - g.R * (cf0 * sf - sf0 * cf * cl), v: sf0 * sf + cf0 * cf * cl };
+          };
+          const a = aparece * (1 - seg(t, 4.85, 5));
+          ctx.globalCompositeOperation = 'lighter';
+          ctx.globalAlpha = .45 * a;
+          ctx.drawImage(spViol, g.cx - g.R * 1.6, g.cy - g.R * 1.6, g.R * 3.2, g.R * 3.2);
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.globalAlpha = a;
+          const fondo = ctx.createRadialGradient(g.cx - g.R * .3, g.cy - g.R * .35, g.R * .1, g.cx, g.cy, g.R);
+          fondo.addColorStop(0, '#16123a'); fondo.addColorStop(1, '#06050f');
+          ctx.fillStyle = fondo;
+          ctx.beginPath(); ctx.arc(g.cx, g.cy, g.R, 0, 6.2832); ctx.fill();
+          ctx.strokeStyle = 'rgba(226,180,255,.35)'; ctx.lineWidth = 1.2; ctx.stroke();
+          // retícula: meridianos y paralelos (solo la cara visible)
+          if (g.R < Math.max(W, H) * 2){
+            ctx.strokeStyle = 'rgba(255,246,223,.07)'; ctx.lineWidth = 1;
+            ctx.beginPath();
+            for (let lo = -180; lo < 180; lo += 20){
+              let pen = false;
+              for (let la = -80; la <= 80; la += 5){ const q = proy(la, lo); if (q.v > 0){ pen ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); pen = true; } else pen = false; }
+            }
+            for (let la = -60; la <= 60; la += 20){
+              let pen = false;
+              for (let lo = -180; lo <= 180; lo += 5){ const q = proy(la, lo); if (q.v > 0){ pen ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); pen = true; } else pen = false; }
+            }
+            ctx.stroke();
+          }
+          // Sudamérica en puntos, sombreada según mira a cámara
+          const tam = Math.max(1.1, g.R * .0068);
+          ctx.fillStyle = 'rgb(255,236,200)';
+          for (const [la, lo] of tierra){
+            const q = proy(la, lo);
+            if (q.v <= 0 || q.x < -tam || q.x > W + tam || q.y < -tam || q.y > H + tam) continue;
+            ctx.globalAlpha = (.2 + .7 * q.v) * a;
+            ctx.fillRect(q.x - tam / 2, q.y - tam / 2, tam, tam);
+          }
+          ctx.globalCompositeOperation = 'lighter';
+          // ruta de oro elevada sobre el globo
+          const pr = E.expoInOut(seg(t, 3.1, 4.3));
+          // trayectoria de vuelo: el arco se levanta sobre el globo como un avión
+          const punto = u => { const [la, lo] = enRuta(u), q = proy(la, lo), s = Math.sin(Math.PI * u); return { x: g.cx + (q.x - g.cx) * (1 + .06 * s), y: g.cy + (q.y - g.cy) * (1 + .06 * s) - g.R * .2 * s, v: q.v, la, lo }; };
+          const pin = (q, t0, nombre, izq) => {
+            const s = E.expoOut(seg(t, t0, t0 + .35));
+            if (s <= 0 || q.v <= 0) return;
+            ctx.globalAlpha = a * s;
+            ctx.drawImage(spOro, q.x - 18, q.y - 18, 36, 36);
+            ctx.fillStyle = '#fff3cb'; ctx.beginPath(); ctx.arc(q.x, q.y, 3.2 * s, 0, 6.2832); ctx.fill();
+            const f = (t % .5) / .5;
+            ctx.strokeStyle = 'rgba(243,206,134,' + ((1 - f) * .8 * a).toFixed(3) + ')'; ctx.lineWidth = 1.2;
+            ctx.beginPath(); ctx.arc(q.x, q.y, 6 + f * 18, 0, 6.2832); ctx.stroke();
+            ctx.globalAlpha = a * s;
+            ctx.font = '600 ' + (movil ? 10 : 12) + 'px "Space Grotesk", sans-serif';
+            ctx.fillStyle = '#fff6df'; ctx.textBaseline = 'middle';
+            ctx.textAlign = izq ? 'right' : 'left';
+            ctx.fillText(nombre, q.x + (izq ? -14 : 14), q.y);
+          };
+          if (pr > 0){
+            const pts = [];
+            for (let i = 0; i <= 48; i++){ const q = punto(i / 48 * pr); if (q.v > -.05) pts.push(q); }
+            for (const [ancho, al] of [[8, .16], [2.2, 1]]){
+              ctx.strokeStyle = 'rgba(243,206,134,' + (al * a).toFixed(3) + ')'; ctx.lineWidth = ancho; ctx.lineCap = 'round';
+              ctx.beginPath(); pts.forEach((q, i) => i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y)); ctx.stroke();
+            }
+            for (let i = 1; i <= 10; i++){   // cola de cometa
+              const q = punto(Math.max(0, pr - i * .012));
+              ctx.globalAlpha = a * (1 - i / 11) * .8;
+              ctx.drawImage(spOro, q.x - 9, q.y - 9, 18, 18);
+            }
+            const cab = punto(pr);
+            ctx.globalAlpha = a; ctx.drawImage(spOro, cab.x - 26, cab.y - 26, 52, 52);
+            km.textContent = Math.round(KM * pr).toLocaleString('es-PE') + ' km';
+            lat.textContent = dms(cab.la, 'N', 'S'); lon.textContent = dms(cab.lo, 'E', 'O');
+          } else {
+            lat.textContent = dms(LIMA[0], 'N', 'S'); lon.textContent = dms(LIMA[1], 'E', 'O');
+          }
+          pin(proy(...LIMA), 2.95, 'LIMA', true);
+          pin(proy(...SC), 4.15, 'SANTA CATARINA', false);
+          // órbita inclinada como los anillos del orbe, con un satélite dando la vuelta
+          const ao = aparece * (1 - seg(t, 4.3, 4.55)) * a;
+          if (ao > 0){
+            const rot = -.42, rxo = g.R * 1.38, ryo = g.R * .4, th = t * 1.7;
+            ctx.globalAlpha = ao * .45; ctx.strokeStyle = 'rgb(226,180,255)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.ellipse(g.cx, g.cy, rxo, ryo, rot, 0, 6.2832); ctx.stroke();
+            const ex = Math.cos(th) * rxo, ey = Math.sin(th) * ryo;
+            const sx2 = g.cx + ex * Math.cos(rot) - ey * Math.sin(rot), sy2 = g.cy + ex * Math.sin(rot) + ey * Math.cos(rot);
+            ctx.globalAlpha = ao * (Math.sin(th) > 0 ? 1 : .35);   // delante o detrás del globo
+            ctx.drawImage(spOro, sx2 - 10, sy2 - 10, 20, 20);
+          }
+          // retícula de destino: los corchetes giran, se cierran y bloquean
+          const qd = proy(...SC), ret = E.expoOut(seg(t, 4.05, 4.5));
+          if (ret > 0 && qd.v > 0){
+            const r = lerp(64, 15, ret), rot = (1 - ret) * Math.PI / 2, b = r * .38;
+            ctx.save(); ctx.translate(qd.x, qd.y); ctx.rotate(rot);
+            ctx.globalAlpha = a * ret * (1 - seg(t, 4.85, 5)); ctx.strokeStyle = '#fff3cb'; ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            for (const [px, py] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]){
+              ctx.moveTo(px * r, py * (r - b)); ctx.lineTo(px * r, py * r); ctx.lineTo(px * (r - b), py * r);
+            }
+            ctx.stroke();
+            if (ret > .85){
+              ctx.font = '600 9px "Space Grotesk", sans-serif'; ctx.fillStyle = '#F3CE86'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+              ctx.fillText('DESTINO', 0, -r - 7);
+            }
+            ctx.restore();
+          }
+          ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+        }
+
+        function bahia(t){
+          const ent = seg(t, 4.95, 5.25), cal = E.cubicOut(seg(t, 5, 6.3));
+          const hz = H * (movil ? .58 : .62);
+          const mezcla = (a, b) => 'rgb(' + a.map((v, i) => Math.round(lerp(v, b[i], cal))).join(',') + ')';
+          ctx.globalAlpha = ent;
+          const cielo = ctx.createLinearGradient(0, 0, 0, hz);
+          cielo.addColorStop(0, mezcla([10, 6, 26], [26, 12, 40]));
+          cielo.addColorStop(.55, mezcla([30, 14, 52], [104, 40, 66]));
+          cielo.addColorStop(1, mezcla([70, 30, 80], [242, 160, 74]));
+          ctx.fillStyle = cielo; ctx.fillRect(0, 0, W, hz + 1);
+          // sol que cae despacio, con rayos
+          const sr = Math.min(W, H) * .075, sx = W * .6, sy = hz - H * .12 + E.cubicInOut(seg(t, 5, 8)) * H * .05;
+          // nubes a la deriva, encendidas por el sol
+          ctx.globalCompositeOperation = 'lighter';
+          for (const n of nubes){
+            const x = ((n.x + t * n.v) % 1.3 - .15) * W, w = n.w * W, h = n.h * H;
+            ctx.globalAlpha = n.o * ent * (.5 + .5 * cal);
+            ctx.drawImage(spNube, x - w / 2, n.y * hz - h / 2, w, h);
+          }
+          ctx.globalAlpha = ent * .9;
+          ctx.drawImage(spSol, sx - sr * 7, sr * 0 + sy - sr * 7, sr * 14, sr * 14);
+          ctx.fillStyle = 'rgba(255,220,150,.05)';
+          for (let i = 0; i < 12; i++){
+            const an = t * .12 + i * Math.PI / 6;
+            ctx.beginPath(); ctx.moveTo(sx, sy);
+            ctx.arc(sx, sy, Math.max(W, H), an, an + .09); ctx.closePath(); ctx.fill();
+          }
+          ctx.globalCompositeOperation = 'source-over';
+          const disco = ctx.createRadialGradient(sx, sy - sr * .3, sr * .1, sx, sy, sr);
+          disco.addColorStop(0, '#fff6dc'); disco.addColorStop(1, '#f7b24e');
+          ctx.fillStyle = disco; ctx.beginPath(); ctx.arc(sx, sy, sr, 0, 6.2832); ctx.fill();
+          // montañas al fondo (dos capas con paralaje suave) detrás de la ciudad
+          [[.07, .9, 5.1, 32, 18, 58], [.045, .35, 8.3, 20, 10, 36]].forEach(([alt, par, frec, r, gq, bq], i) => {
+            const dx = (1 - cal) * W * .04 * par;
+            ctx.fillStyle = mezcla([r, gq, bq], [r + 50, gq + 24, bq + 14]);
+            ctx.beginPath(); ctx.moveTo(0, hz + 2);
+            for (let x = 0; x <= W; x += 12){
+              const u = (x + dx) / W;
+              ctx.lineTo(x, hz - H * (alt * (.55 + .45 * Math.sin(u * frec + i)) + .02 * Math.sin(u * 23 + i * 2)));
+            }
+            ctx.lineTo(W, hz + 2); ctx.closePath(); ctx.fill();
+          });
+          // mar y reflejo del sol
+          const mar = ctx.createLinearGradient(0, hz, 0, H);
+          mar.addColorStop(0, mezcla([24, 14, 40], [58, 28, 48])); mar.addColorStop(1, '#07060c');
+          ctx.fillStyle = mar; ctx.fillRect(0, hz, W, H - hz);
+          ctx.globalCompositeOperation = 'lighter';
+          for (let i = 0; i < 18; i++){
+            const y = hz + 5 + i * (H - hz) / 19, w = sr * (1.7 - i * .06) * (.55 + .45 * Math.sin(t * 3 + i * 1.7));
+            ctx.fillStyle = 'rgba(255,196,110,' + ((.55 - i * .025) * ent * cal).toFixed(3) + ')';
+            ctx.fillRect(sx - w / 2 + Math.sin(t * 2 + i) * 6, y, w, 2);
+          }
+          ctx.globalCompositeOperation = 'source-over';
+          // la playa en media luna
+          ctx.strokeStyle = 'rgba(255,230,190,' + (.55 * ent).toFixed(3) + ')'; ctx.lineWidth = 1.4;
+          ctx.beginPath(); ctx.moveTo(W * .1, hz + 3); ctx.quadraticCurveTo(W * .5, hz + 20, W * .94, hz + 1); ctx.stroke();
+          // skyline: sube del sol hacia los lados
+          for (const b of edificios){
+            const k = E.expoOut(seg(t, 5.05 + b.o * .55, 5.75 + b.o * .55));
+            if (k <= 0) continue;
+            const x = b.x * W, w = b.w * W, h = b.h * H * k;
+            ctx.fillStyle = '#140b1a'; ctx.fillRect(x, hz - h, w, h);
+            const luz = x + w / 2 < sx;   // borde iluminado del lado que mira al sol
+            ctx.fillStyle = 'rgba(255,196,110,' + (.55 * k).toFixed(3) + ')';
+            ctx.fillRect(luz ? x + w - 1.2 : x, hz - h, 1.2, h);
+            if (b.h > .14 && t > 6){   // ventanas que se encienden
+              ctx.fillStyle = 'rgba(255,214,150,' + (.7 * seg(t, 6, 6.6)).toFixed(3) + ')';
+              for (let j = 0; j < 7; j++){
+                if (((j * 7 + Math.floor(b.v * 50)) % 3) === 0) continue;
+                ctx.fillRect(x + w * (.25 + (j % 2) * .4), hz - h + 8 + j * (h - 14) / 7, 1.6, 1.6);
+              }
+            }
+          }
+          // una bandada cruza de derecha a izquierda, aleteando
+          const av = seg(t, 5.3, 5.8) * ent;
+          if (av > 0){
+            ctx.strokeStyle = 'rgba(20,10,26,' + (.85 * av).toFixed(3) + ')'; ctx.lineWidth = 1.3; ctx.lineCap = 'round';
+            ctx.beginPath();
+            for (const b of aves){
+              const x = (b.x - seg(t, 5.3, 8) * .42 * b.s) * W, y = b.y * hz + Math.sin(t * 2 + b.f) * 4;
+              const ala = Math.sin(t * 9 * b.s + b.f) * 3.5, e = 5 + b.s * 2;
+              ctx.moveTo(x - e, y - ala); ctx.quadraticCurveTo(x - e * .3, y + 1.5, x, y); ctx.quadraticCurveTo(x + e * .3, y + 1.5, x + e, y - ala);
+            }
+            ctx.stroke();
+          }
+          // la península verde en primer plano
+          const sube = (1 - E.expoOut(seg(t, 5.2, 6))) * H * .2;
+          ctx.fillStyle = '#0a110c';
+          ctx.beginPath(); ctx.moveTo(W * .72, H);
+          ctx.bezierCurveTo(W * .78, hz - H * .02 + sube, W * .86, hz - H * .07 + sube, W * .95, hz + H * .02 + sube);
+          ctx.lineTo(W * 1.02, hz + H * .06 + sube); ctx.lineTo(W * 1.02, H); ctx.closePath(); ctx.fill();
+          // óptica: flare anamórfico sobre el sol y fantasmas de lente hacia el centro del cuadro
+          const fl = ent * (.25 + .75 * cal);
+          ctx.globalCompositeOperation = 'lighter';
+          const ana = ctx.createLinearGradient(sx - W * .48, 0, sx + W * .48, 0);
+          ana.addColorStop(0, 'rgba(255,224,170,0)'); ana.addColorStop(.5, 'rgba(255,240,210,.75)'); ana.addColorStop(1, 'rgba(255,224,170,0)');
+          ctx.globalAlpha = fl * .55; ctx.fillStyle = ana; ctx.fillRect(sx - W * .48, sy - sr * .08, W * .96, sr * .16);
+          ctx.globalAlpha = fl * .9; ctx.fillRect(sx - W * .34, sy - 1, W * .68, 2);
+          const mcx = W / 2, mcy = H / 2;
+          for (const [k, rr, al] of [[1.35, .22, .14], [1.8, .4, .09], [2.3, .14, .18], [2.9, .55, .06]]){
+            const gx = sx + (mcx - sx) * k, gy = sy + (mcy - sy) * k, rad = sr * rr;
+            ctx.globalAlpha = fl * al; ctx.fillStyle = k === 2.3 ? '#9dd6ff' : '#ffd79a';
+            ctx.beginPath(); ctx.arc(gx, gy, rad, 0, 6.2832); ctx.fill();
+            ctx.globalAlpha = fl * al * 1.6; ctx.lineWidth = 1; ctx.strokeStyle = '#ffe9bf';
+            ctx.beginPath(); ctx.arc(gx, gy, rad, 0, 6.2832); ctx.stroke();
+          }
+          ctx.globalCompositeOperation = 'source-over';
+          // iris de oro desde el sol: la puerta al escritorio
+          const ir = E.expoIn(seg(t, 7.15, 7.95));
+          if (ir > 0){
+            const rad = sr + Math.hypot(W, H) * 1.1 * ir;
+            const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, rad);
+            g.addColorStop(0, '#fff6dc'); g.addColorStop(.6, '#f6d48e'); g.addColorStop(1, '#e8b24a');
+            ctx.globalAlpha = 1; ctx.fillStyle = g;
+            ctx.beginPath(); ctx.arc(sx, sy, rad, 0, 6.2832); ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        function destello(t, tc, dur){
+          const k = seg(t, tc - .07, tc) * (1 - seg(t, tc, tc + dur));
+          if (k <= 0) return;
+          ctx.globalAlpha = k * .9; ctx.fillStyle = '#fff4dc'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1;
+        }
+
+        function capas(t){
+          const f = Math.floor(t * 24);
+          tc.textContent = '00:0' + Math.floor(t) + ':' + String(f % 24).padStart(2, '0');
+          prog.style.transform = 'scaleX(' + (t / DUR).toFixed(4) + ')';
+          const od = Math.min(E.cubicOut(seg(t, 2.95, 3.3)), 1 - seg(t, 4.55, 4.85));
+          datos.style.opacity = od.toFixed(3);
+          const fuera = 1 - seg(t, 7.2, 7.5);
+          letras.forEach((s, i) => {
+            const p = E.expoOut(seg(t, 5.35 + i * .035, 5.95 + i * .035));
+            s.style.opacity = (p * fuera).toFixed(3);
+            s.style.transform = 'translateY(' + ((1 - p) * 105).toFixed(1) + '%)';
+          });
+          // tipografía cinética: el título entra con tracking abierto y se asienta; la regla se abre debajo
+          titulo.style.letterSpacing = (.2 - .16 * E.expoOut(seg(t, 5.35, 6.5))).toFixed(3) + 'em';
+          regla.style.transform = 'scaleX(' + (E.expoOut(seg(t, 5.85, 6.45)) * fuera).toFixed(3) + ')';
+          const os = Math.min(E.cubicOut(seg(t, 6, 6.5)), fuera), ot = Math.min(E.cubicOut(seg(t, 6.35, 6.85)), fuera);
+          sub.style.opacity = os.toFixed(3); sub.style.letterSpacing = (.6 - .28 * E.expoOut(seg(t, 6, 7))).toFixed(3) + 'em';
+          tag.style.opacity = ot.toFixed(3); tag.style.transform = 'translateY(' + ((1 - ot) * 10).toFixed(1) + 'px)';
+        }
+
+        function dibujar(t){
+          ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+          ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+          ctx.fillStyle = '#05030d'; ctx.fillRect(0, 0, W, H);
+          // cámara: sacudida y leve punch-in en cada corte
+          const sk = sacudida(t);
+          if (sk.a > 0){
+            const z = 1 + sk.a * .0045;
+            ctx.translate(W / 2 + sk.x, H / 2 + sk.y); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
+          }
+          if (t < 2.75){ ctx.globalCompositeOperation = 'lighter'; galaxia(t); anillos(t); ctx.globalCompositeOperation = 'source-over'; }
+          if (t >= 2.55 && t < 5.02) globo(t);
+          if (t >= 4.95) bahia(t);
+          ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+          // doble fantasma en los impactos: el cuadro se desdobla unos píxeles y vuelve
+          if (sk.a > 3){
+            const dx = (sk.a - 3) * 1.6;
+            ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = Math.min(.5, (sk.a - 3) * .07);
+            ctx.drawImage(cv, 0, 0, cv.width, cv.height, dx, 0, W, H);
+            ctx.drawImage(cv, 0, 0, cv.width, cv.height, -dx, 0, W, H);
+            ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+          }
+          destello(t, 2.62, .3);
+          destello(t, 5, .35);
+          capas(t);
+        }
+
+        // ---------- reproducción ----------
+        let t0 = performance.now(), raf = 0, fin = false;
+        const ir = () => {
+          if (fin) return;
+          fin = true;
+          cancelAnimationFrame(raf);
+          removeEventListener('resize', medir);
+          removeEventListener('keydown', teclas);
+          try{ sessionStorage.setItem('kipu_warp', 'oro'); }catch(err){}
+          location.href = 'santa-catarina';
+        };
+        const saltar = () => {   // salta al iris de oro: el final se ve igual, solo que antes
+          const t = (performance.now() - t0) / 1000;
+          if (t < 7.15) t0 = performance.now() - 7.15 * 1000;
+        };
+        const teclas = e => { if (e.key === 'Escape'){ e.preventDefault(); saltar(); } };
+        addEventListener('keydown', teclas);
+        $q('.mt-saltar').addEventListener('click', saltar);
+        function bucle(now){
+          const t = Math.max(0, (now - t0) / 1000);
+          if (t >= DUR){ dibujar(DUR); ir(); return; }
+          dibujar(t);
+          raf = requestAnimationFrame(bucle);
+        }
+        dibujar(0);
+        void velo.offsetWidth;            // el círculo arranca en el orbe…
+        velo.classList.add('abierto');    // …y se abre a toda la pantalla
+        $q('.mt-saltar').focus({ preventScroll: true });
+        raf = requestAnimationFrame(bucle);
+      }
     })();
 
     /* ---------- Menú móvil ---------- */
