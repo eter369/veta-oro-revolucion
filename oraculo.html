@@ -9,7 +9,7 @@
      LUNAR ORACLE 369 — Terminal Multi-Activo (BTC · ETH · SOL)
      Evolución del "SOL Lunar Oracle": un solo archivo, sin build.
      Motor: Señal = Σ(indicador × peso) × multiplicador lunar.
-     Datos en vivo: Binance spot + futures + Alternative.me F&G.
+     Datos en vivo: Binance spot + futures + Deribit DVOL + Alternative.me F&G.
      [EDITABLE] Herramienta educativa de análisis probabilístico.
      No es asesoría financiera. Umbrales, pesos y parámetros por
      activo están marcados con [EDITABLE] en el script.
@@ -235,38 +235,105 @@ main.cambiando{animation:cambioActivo .45s ease}
 /* resumen en texto de cada canvas: los datos también existen fuera del dibujo */
 .resumen-canvas{margin-top:8px;font-size:11px;color:var(--tinta3);line-height:1.6}
 
-/* ---------- diario ---------- */
-.diario-form{display:grid;grid-template-columns:repeat(8,1fr) auto;gap:8px;align-items:end}
-@media(max-width:1100px){.diario-form{grid-template-columns:repeat(3,1fr)}}
-.diario-form label{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta3);margin-bottom:3px}
-.diario-form input,.diario-form select{width:100%;font-size:12px;font-family:var(--num)}
-.btn-v{background:linear-gradient(135deg,#7c3aed,#6366f1);border-radius:9px;padding:9px 16px;font-size:12px;font-weight:600;letter-spacing:.04em;white-space:nowrap}
-.btn-v:hover{filter:brightness(1.15)}
-/* las tablas anchas hacen scroll DENTRO de su caja: la página nunca se mueve en horizontal */
-.tabla-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:12px}
-.tabla-scroll table{min-width:640px}
-table.trades{width:100%;border-collapse:collapse;font-family:var(--num);font-size:11px}
-table.trades th{text-align:right;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta3);padding:6px 8px;border-bottom:1px solid var(--borde2)}
-table.trades th:first-child,table.trades td:first-child{text-align:left}
-table.trades td{padding:6px 8px;text-align:right;border-bottom:1px solid rgba(35,42,68,.6);color:var(--tinta2)}
-table.trades .cerrar{border:1px solid var(--borde2);border-radius:6px;padding:2px 8px;font-size:10px;color:var(--tinta3)}
-table.trades .cerrar:hover{color:var(--rojo);border-color:var(--rojo)}
-.riesgo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
-@media(max-width:900px){.riesgo-grid{grid-template-columns:1fr}}
-.rmed .rl{display:flex;justify-content:space-between;font-size:10.5px;color:var(--tinta3);font-family:var(--num);margin-bottom:4px}
-.rmed .rl b{color:var(--tinta)}
-.rmed .rb{height:8px;border-radius:99px;background:#20263f;overflow:hidden}
-.rmed .rb i{display:block;height:100%;border-radius:99px;transition:width .4s}
-.cap-fila{display:flex;gap:10px;align-items:center;font-size:11px;color:var(--tinta3);margin-top:10px}
-.cap-fila input{width:120px;font-family:var(--num);font-size:12px}
-
-/* ---------- alertas ---------- */
-#tablaAlertas{width:100%;border-collapse:collapse;font-family:var(--num);font-size:11px;min-width:420px}
-#tablaAlertas th{text-align:left;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta3);padding:6px 8px;border-bottom:1px solid var(--borde2)}
-#tablaAlertas td{padding:5px 8px;border-bottom:1px solid rgba(35,42,68,.6);color:var(--tinta2)}
-.sin-datos{color:var(--tinta3);font-size:12px;padding:8px 0}
+/* ---------- derivados y liquidaciones ---------- */
+.deriv-wrap{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px}
+@media(max-width:1100px){.deriv-wrap{grid-template-columns:1fr}}
+.deriv-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media(max-width:700px){.deriv-grid{grid-template-columns:1fr}}
+/* tarjeta por activo (derivados y rango comparten el armazón) */
+.dv,.rg,.lqd{background:var(--panel2);border:1px solid var(--borde);border-radius:12px;padding:11px 12px;display:flex;flex-direction:column;gap:7px;font-size:11px;min-width:0}
+/* el activo del gráfico se marca con el mismo borde índigo que la matriz */
+.dv.on,.rg.on{box-shadow:inset 0 0 0 1px var(--liq),0 0 12px rgba(165,180,252,.2)}
+.dv-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-family:var(--num)}
+.dv-top b{font-size:13px;letter-spacing:.08em;color:var(--tinta)}
+.dv-top span{font-size:9.5px;color:var(--tinta3);text-align:right}
+.dv-et{font-family:var(--num);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta3)}
+.dv-v{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;font-family:var(--num)}
+.dv-v b{font-size:17px;font-weight:700;color:var(--tinta)}
+.dv-v small{font-size:10px;color:var(--tinta3)}
+.dv-reloj{display:flex;justify-content:space-between;gap:8px;font-family:var(--num);font-size:10px;color:var(--tinta3)}
+.dv-reloj b{color:var(--tinta);font-weight:600;letter-spacing:.06em}
+.dv hr{border:0;border-top:1px dashed rgba(56,65,107,.55);margin:2px 0}
+.dv-vacio{color:var(--tinta3);font-size:11px;padding:18px 0;text-align:center}
+/* lectura automática: el tono lleva también palabra, no solo color */
+.lect{border:1px solid;border-radius:8px;padding:6px 9px;font-size:10.5px;line-height:1.42}
+.lect.t-verde{background:rgba(52,211,153,.09);border-color:rgba(52,211,153,.4);color:#a7f3d0}
+.lect.t-rojo{background:rgba(251,113,133,.09);border-color:rgba(251,113,133,.45);color:#fecdd3}
+.lect.t-ambar{background:rgba(250,204,21,.08);border-color:rgba(250,204,21,.4);color:#fde68a}
+.lect.t-violeta{background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.45);color:#ddd6fe}
+.lect.t-neutro{background:rgba(139,147,184,.07);border-color:rgba(139,147,184,.28);color:var(--tinta2)}
+.lqd-cab{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px}
+.lqd .filtro-tf{margin:0}
+.lqd-tot{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-family:var(--num)}
+.lqd-tot div{display:flex;flex-direction:column}
+.lqd-tot div:last-child{text-align:right}
+.lqd-tot span{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta3)}
+.lqd-tot b{font-size:16px;font-weight:700}
+.lqd-tot small{font-size:9.5px;color:var(--tinta3)}
+.lqd-barra{display:flex;height:7px;border-radius:99px;overflow:hidden;background:#20263f;margin-top:6px}
+.lqd-barra i{height:100%;transition:width .4s}
+.lqd-feed{max-height:236px;min-height:120px;overflow-y:auto;font-family:var(--num);font-size:10.5px;border-top:1px solid var(--borde)}
+.lqd-ev{display:grid;grid-template-columns:52px 30px minmax(0,1fr) auto;gap:6px;align-items:baseline;padding:5px 2px;border-bottom:1px solid rgba(35,42,68,.6);color:var(--tinta2)}
+.lqd-ev time{color:var(--tinta3)}
+.lqd-ev .lado{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lqd-ev .usd{font-weight:700;text-align:right}
+.lqd-ev.grande{background:rgba(167,139,250,.08)}
+.lqd-ev.nuevo{animation:lqdEntra 1.4s ease-out}
+@keyframes lqdEntra{from{background:rgba(167,139,250,.32)}to{background:transparent}}
+.lqd-vacio{color:var(--tinta3);font-size:11px;padding:18px 6px;text-align:center;line-height:1.5}
+.lqd-nota{font-size:9.5px;color:var(--tinta3);line-height:1.5}
 .filtro-tf{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:8px;font-family:var(--num);font-size:10px;color:var(--tinta3)}
-.filtro-tf span{margin-right:4px}
+
+.filtro-tf>span{margin-right:4px}
+
+/* ---------- backtest de la señal · 90 días ---------- */
+.btx-barra{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center;margin-bottom:8px}
+.btx-barra .filtro-tf{margin:0}
+.btx-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.btx{width:100%;border-collapse:collapse;font-family:var(--num);font-size:11px;min-width:700px}
+table.btx th{text-align:right;font-size:9px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta3);padding:6px 8px;border-bottom:1px solid var(--borde2);white-space:nowrap}
+table.btx th:first-child,table.btx td:first-child{text-align:left}
+table.btx td{padding:7px 8px;text-align:right;border-bottom:1px solid rgba(35,42,68,.6);color:var(--tinta2);vertical-align:top;white-space:nowrap}
+table.btx td b{color:var(--tinta);font-weight:600}
+table.btx td b.sube{color:var(--verde)}table.btx td b.baja{color:var(--rojo)}
+table.btx td small{display:block;font-size:9px;color:var(--tinta3);margin-top:1px}
+table.btx tbody tr[data-tf]{cursor:pointer}
+table.btx tbody tr[data-tf]:hover td{background:rgba(99,102,241,.06)}
+table.btx tr.on td{background:rgba(99,102,241,.12)}
+table.btx tr.on td:first-child{box-shadow:inset 2px 0 0 var(--liq)}
+.lect.btx-ver{display:inline-block;padding:2px 8px;font-size:9.5px;border-radius:6px}
+.btx-frase{font-size:12px;color:var(--tinta2);line-height:1.6;margin:10px 0 2px}
+.btx-frase b{color:var(--tinta);font-weight:600}
+.btx-cab2{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px;margin-top:12px}
+.btx-cab2 .filtro-tf{margin:0}
+.btx-lista{max-height:300px;overflow:auto;margin-top:6px;border-top:1px solid var(--borde)}
+.btx-ev{min-width:560px}
+.btx-ev th:nth-child(2),.btx-ev td:nth-child(2){text-align:left}
+.btx-ev thead th{position:sticky;top:0;background:#0d1122;z-index:1}
+.btx-prog{height:5px;border-radius:99px;background:#20263f;overflow:hidden;margin:12px auto 0;max-width:320px}
+.btx-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#6366f1,#a78bfa);transition:width .3s}
+
+/* ---------- rango esperado ---------- */
+.rango-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media(max-width:1100px){.rango-grid{grid-template-columns:1fr}}
+.rg-frase{font-size:12.5px;color:var(--tinta2);line-height:1.45}
+.rg-frase b{font-family:var(--num);color:var(--tinta);font-weight:600}
+.rg-frase span{font-family:var(--num);color:var(--liq)}
+/* pista logarítmica de ±2,5σ alrededor de la apertura */
+.rg-pista{position:relative;height:30px;margin-top:2px}
+.rg-pista i{position:absolute;display:block}
+.rg-pista .b2{top:11px;height:8px;border-radius:99px;background:rgba(99,102,241,.16)}
+.rg-pista .b1{top:11px;height:8px;background:rgba(165,180,252,.4)}
+.rg-pista .ap{top:6px;width:1px;height:18px;background:var(--tinta3)}
+.rg-pista .hoy{top:14px;height:2px;background:var(--ambar);opacity:.85}
+.rg-pista .pr{top:2px;width:3px;height:26px;border-radius:2px;background:#f0abfc;box-shadow:0 0 8px #f0abfc;transform:translateX(-50%);transition:left .4s}
+.rg-eje{position:relative;height:13px;font-family:var(--num);font-size:9px;color:var(--tinta3)}
+.rg-eje span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.rg-ley{display:flex;flex-wrap:wrap;gap:4px 12px;font-family:var(--num);font-size:9px;color:var(--tinta3)}
+.rg-ley i{font-style:normal}
+.rg-filas{display:flex;flex-direction:column;gap:3px}
+.rg-filas div{display:flex;justify-content:space-between;gap:10px;font-family:var(--num);font-size:10.5px;color:var(--tinta3)}
+.rg-filas b{color:var(--tinta);font-weight:600;text-align:right}
 
 /* ---------- barra de exportación ---------- */
 .barra-export{display:flex;flex-wrap:wrap;gap:8px;align-items:center;
@@ -296,11 +363,6 @@ table.trades .cerrar:hover{color:var(--rojo);border-color:var(--rojo)}
 .ayuda{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;flex:none;
   border:1px solid var(--borde2);color:var(--tinta3);font-family:var(--num);font-size:9px;font-weight:700;cursor:help}
 .ayuda:hover,.ayuda:focus-visible{color:var(--violeta);border-color:var(--violeta)}
-.btn-cancelar{border:1px solid var(--borde2);border-radius:9px;padding:9px 14px;font-size:12px;color:var(--tinta3);white-space:nowrap}
-.btn-cancelar:hover{color:var(--rojo);border-color:var(--rojo)}
-table.trades .editar{border:1px solid var(--borde2);border-radius:6px;padding:2px 8px;font-size:10px;color:var(--tinta3);margin-right:4px}
-table.trades .editar:hover{color:var(--violeta);border-color:var(--violeta)}
-tr.en-edicion td{background:rgba(124,58,237,.14)}
 
 footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(--tinta3);padding:6px 16px 30px;line-height:1.7;max-width:900px;margin:0 auto}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -439,59 +501,82 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
       <div class="bt-stats" id="btStats"></div>
     </section>
 
-    <!-- ============ 4 · DIARIO DE OPERACIONES ============ -->
+    <!-- ============ DERIVADOS Y LIQUIDACIONES EN VIVO ============ -->
     <section class="panel">
-      <h2 data-ayuda="diario">Diario de Operaciones · Control de Riesgo Acumulado <span class="mini">persistente en este navegador (localStorage)</span></h2>
-      <form class="diario-form" id="formTrade">
-        <!-- cada control va DENTRO de su <label>: así tiene nombre accesible sin depender de for/id -->
-        <div><label for="tAct">Activo</label><select id="tAct"><option>BTC</option><option>ETH</option><option selected>SOL</option></select></div>
-        <div><label for="tDir">Dirección</label><select id="tDir"><option>LONG</option><option>SHORT</option></select></div>
-        <div><label for="tEnt">Entrada</label><input id="tEnt" type="number" step="any" required></div>
-        <div><label for="tStop">Stop</label><input id="tStop" type="number" step="any" required></div>
-        <div><label for="tTgt">Target</label><input id="tTgt" type="number" step="any" required></div>
-        <div><label for="tTam">Tamaño (unid.)</label><input id="tTam" type="number" step="any" required></div>
-        <div><label for="tFase">Fase lunar</label><input id="tFase" readonly></div>
-        <div><label for="tSen">Señal al entrar</label><input id="tSen" readonly></div>
-        <button class="btn-v" id="btnRegistrar" type="submit">Registrar</button>
-        <button class="btn-cancelar" id="btnCancelarEdicion" type="button" style="display:none">Cancelar</button>
-      </form>
-      <div class="tabla-scroll" tabindex="0" role="region" aria-label="Operaciones registradas (desplazable)"><table class="trades"><thead><tr>
-        <th scope="col">Fecha</th><th scope="col">Activo</th><th scope="col">Dir</th><th scope="col">Entrada</th><th scope="col">Stop</th><th scope="col">Target</th><th scope="col">Tamaño</th><th scope="col">Fase</th><th scope="col">Señal</th><th scope="col">Estado</th><th scope="col">P&L</th><th></th>
-      </tr></thead><tbody id="cuerpoTrades"></tbody></table></div>
-      <div class="cap-fila">Capital de referencia: $ <input id="capital" type="number" min="100" step="100"> <span>(para los medidores de riesgo)</span></div>
-      <div class="riesgo-grid">
-        <div class="rmed"><div class="rl"><span>Riesgo consumido HOY <b id="rDiaV">0%</b></span><span>límite 5%</span></div><div class="rb"><i id="rDiaB"></i></div></div>
-        <div class="rmed"><div class="rl"><span>Riesgo consumido 7 días <b id="rSemV">0%</b></span><span>límite 10%</span></div><div class="rb"><i id="rSemB"></i></div></div>
-        <div class="rmed"><div class="rl"><span>Drawdown máximo de la curva <b id="rDdV">0%</b></span><span>alerta 20%</span></div><div class="rb"><i id="rDdB"></i></div></div>
-      </div>
-      <p class="resumen-canvas" style="margin-top:10px">
-        Riesgo consumido = riesgo vivo de las operaciones abiertas + pérdidas ya realizadas en el período.
-        Los límites del 5 % / 10 % / 20 % son los del propio modelo, no una recomendación personalizada.
+      <h2 data-ayuda="derivados">Derivados y liquidaciones en vivo <span class="mini" id="derivEstado">Binance futuros USDT-M · conectando…</span></h2>
+      <div class="deriv-wrap">
+        <div class="deriv-grid" id="derivGrid"></div>
+        <div class="lqd">
+          <div class="lqd-cab">
+            <span class="dv-et">Liquidaciones · última hora</span>
+            <div class="filtro-tf" id="filtroLiq" role="group" aria-label="Filtrar liquidaciones por activo">
+              <button class="tf-chip" type="button" data-f="todos">Los 3</button>
+              <button class="tf-chip" type="button" data-f="BTCUSDT">BTC</button>
+              <button class="tf-chip" type="button" data-f="ETHUSDT">ETH</button>
+              <button class="tf-chip" type="button" data-f="SOLUSDT">SOL</button>
+            </div>
+          </div>
+          <div id="lqdBalance"></div>
+          <div class="lqd-feed" id="lqdFeed" tabindex="0" role="region" aria-label="Liquidaciones de 50 mil dólares o más (desplazable)"></div>
+          <p class="lqd-nota" id="lqdNota"></p>
+        </div>
       </div>
     </section>
 
-    <!-- ============ 2 · HISTORIAL DE ALERTAS ============ -->
-    <section class="panel">
-      <h2 data-ayuda="alertas">Historial de Alertas Tesla 369 <span class="mini">umbrales: SWING ±0.40 · LONG/SHORT ±0.60 · MAX ±0.80 · evaluados en 1H, 4H, 1D y 1W</span></h2>
-      <div class="filtro-tf" id="filtroAlertas" role="group" aria-label="Filtrar alertas por timeframe">
-        <span>Timeframe:</span>
-        <button class="tf-chip on" type="button" data-f="todos" aria-pressed="true">Todos</button>
-        <button class="tf-chip" type="button" data-f="1h" aria-pressed="false">1H</button>
-        <button class="tf-chip" type="button" data-f="4h" aria-pressed="false">4H</button>
-        <button class="tf-chip" type="button" data-f="1d" aria-pressed="false">1D</button>
-        <button class="tf-chip" type="button" data-f="1w" aria-pressed="false">1W</button>
+    <!-- ============ BACKTEST DE LA SEÑAL · 90 DÍAS ============ -->
+    <section class="panel" id="panelBT">
+      <h2 data-ayuda="backtest">Backtest de la señal · 90 días <span class="mini" id="btxEstado">se calcula al llegar a esta sección</span></h2>
+      <div class="btx-barra">
+        <div class="filtro-tf" id="btxActivo" role="group" aria-label="Activo del backtest">
+          <span>Activo</span>
+          <button class="tf-chip" type="button" data-v="BTCUSDT">BTC</button>
+          <button class="tf-chip" type="button" data-v="ETHUSDT">ETH</button>
+          <button class="tf-chip" type="button" data-v="SOLUSDT">SOL</button>
+        </div>
+        <div class="filtro-tf" id="btxUmbral" role="group" aria-label="Umbral de la señal">
+          <span>Umbral</span>
+          <button class="tf-chip" type="button" data-v="0">±0.40 swing</button>
+          <button class="tf-chip" type="button" data-v="1">±0.60 long/short</button>
+          <button class="tf-chip" type="button" data-v="2">±0.80 max</button>
+        </div>
       </div>
-      <div class="tabla-scroll" style="margin-top:0" tabindex="0" role="region" aria-label="Historial de alertas (desplazable)"><table id="tablaAlertas">
-        <thead><tr><th scope="col">Fecha</th><th scope="col">Activo</th><th scope="col">TF</th><th scope="col">Alerta</th><th scope="col">Señal</th><th scope="col">Precio</th></tr></thead>
-        <tbody id="cuerpoAlertas"></tbody></table></div>
-      <div class="sin-datos" id="sinAlertas">Aún no se ha disparado ninguna alerta en este navegador.</div>
+      <div id="btxResumen"></div>
+      <p class="btx-frase" id="btxFrase"></p>
+      <div class="btx-cab2">
+        <span class="dv-et">Cada señal y qué hizo el precio después</span>
+        <div class="filtro-tf" id="btxTF" role="group" aria-label="Temporalidad de la lista">
+          <button class="tf-chip" type="button" data-v="1h">1H</button>
+          <button class="tf-chip" type="button" data-v="4h">4H</button>
+          <button class="tf-chip" type="button" data-v="1d">1D</button>
+        </div>
+      </div>
+      <div class="btx-lista" id="btxLista" tabindex="0" role="region" aria-label="Señales del backtest (desplazable)"></div>
+      <p class="resumen-canvas">
+        "A favor" es que el precio se movió hacia donde apuntaba la señal; "azar" es cuántas veces habría acertado una
+        apuesta en esa misma dirección en cualquier hora del periodo. Si la señal no lo supera con claridad, no aporta
+        ventaja. Se reconstruye sin Fear &amp; Greed ni futuros (no tienen histórico gratuito), sin comisiones ni
+        deslizamiento, y en 1H las señales pueden caer juntas y compartir el mismo movimiento, lo que hace que la muestra
+        parezca más grande de lo que es. El pasado no garantiza el futuro.
+      </p>
+    </section>
+
+    <!-- ============ RANGO ESPERADO ============ -->
+    <section class="panel">
+      <h2 data-ayuda="rango">Rango esperado · el ruido normal de un día <span class="mini" id="rangoFuente">BTC y ETH: volatilidad implícita (DVOL de Deribit) · SOL: volatilidad realizada de 30 días</span></h2>
+      <div class="rango-grid" id="rangoGrid"></div>
+      <p class="resumen-canvas">
+        El rango de hoy parte de la apertura de la vela diaria (00:00 UTC, 19:00 de Lima). Con 1σ cierran dentro
+        unos 2 de cada 3 días y con 2σ unos 19 de cada 20 en una distribución normal; las cripto tienen colas gordas,
+        así que los días extremos llegan más a menudo de lo que dice la cuenta. Es estadística sobre la volatilidad,
+        no una predicción de dirección.
+      </p>
     </section>
 
   </div><!-- /tablero -->
 </main>
 
 <footer>
-  Datos en vivo: WebSocket público de Binance (precio y vela en curso, cada segundo) sobre su API REST (spot + futures) y Alternative.me Fear &amp; Greed · Cálculo lunar astronómico local · Reconciliación completa según el intervalo del gráfico (30 s a 15 min)<br>
+  Datos en vivo: WebSocket público de Binance (precio y vela en curso, cada segundo; funding y liquidaciones de futuros) sobre su API REST (spot + futures), volatilidad implícita DVOL de Deribit y Alternative.me Fear &amp; Greed · Cálculo lunar astronómico local · Reconciliación completa según el intervalo del gráfico (30 s a 15 min)<br>
   Terminal descargable: el botón ⬇ de la cabecera entrega este mismo archivo, que funciona por su cuenta con doble clic.<br>
   Herramienta educativa de análisis probabilístico. No es asesoría financiera — la ejecución y el riesgo son tuyos.
 </footer>
@@ -504,7 +589,8 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
 /* ══════════════════════════════════════════════════════════════
    LUNAR ORACLE 369 — Terminal Multi-Activo
    Todo el motor original portado (indicadores, lunar, Tesla 369)
-   + multi-activo, alertas, filtros, diario, backtest y futuros.
+   + multi-activo, alertas, filtros, backtest, derivados en vivo y
+   rango esperado por volatilidad.
    ══════════════════════════════════════════════════════════════ */
 
 /* ---------- [EDITABLE] parámetros por activo ---------- */
@@ -556,7 +642,7 @@ const $ = id => document.getElementById(id);
    sitio deshabilitados, modo privado restrictivo, iframe sin same-origin), un
    getItem crudo lanzaría y abortaría TODO el script: la página se quedaría
    colgada en "Conectando…". Con este envoltorio el terminal sigue funcionando,
-   solo que sin diario persistente. */
+   solo que sin nada persistente. */
 const LS = {
   get(k, d = null) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch { return d; } },
   set(k, v)        { try { localStorage.setItem(k, v); } catch {} },
@@ -865,7 +951,6 @@ const estado = {
   velas1h: [], velas1hDe: null, tickers: {}, fg: null, fut: null,
   velasTF: [], velasTFde: { sym: null, tf: null },   /* velas del gráfico y a quién pertenecen */
   ultimoOkTF: null, errorTF: null, reintentoTF: false,
-  filtroAlertas: 'todos',
   señal: null, mtf: null, tfs: [], filtros: [], bloqueado: false,
   histSeñal: [],           /* [{t, s}] señal vela a vela 7d */
   bt: null,                /* stats del mini backtest */
@@ -1171,11 +1256,6 @@ function dispararAlerta(sym, tf, z, s, escalada) {
   caja.querySelector('.ok').addEventListener('click', () => { caja.remove(); if (!b.children.length) b.classList.remove('on'); });
   /* sonido (WebAudio, sin archivos) — solo en escaladas, no al desinflarse */
   if (estado.sonido && escalada) beep(z > 0);
-  /* historial persistente */
-  const h = leerLS('lo369_alertas', []);
-  h.unshift({ t: Date.now(), sym, tf, nombre, s: +s.toFixed(3), precio });
-  LS.set('lo369_alertas', JSON.stringify(h.slice(0, 50)));
-  pintarAlertas();
 }
 let audioCtx = null;
 function beep(alcista) {
@@ -1412,19 +1492,8 @@ function pintarTodo() {
   /* pintarHistorial NO va aquí: depende de calcularHistorial, que se difiere
      a requestIdleCallback para no bloquear el repintado del gráfico */
   pintarIndicadores(); pintarLiquidez(); pintarLunar();
-  pintarDiario(); pintarAlertas(); habilitarExportacion();
+  pintarDerivados(); pintarRango(); sincronizarBTActivo(); habilitarExportacion();
   $('chipFG').textContent = estado.fg ? `F&G ${estado.fg.v} · ${estado.fg.txt}` : 'F&G —';
-  /* Prellenar el formulario del diario con el contexto vivo — pero NUNCA pisar lo
-     que el usuario está escribiendo: si ya empezó a rellenar o tiene el foco
-     dentro del formulario, se respeta su entrada. */
-  const lun = faseLunar();
-  const form = $('formTrade');
-  const editando = editandoTrade !== null || form.contains(document.activeElement) || $('tEnt').value !== '';
-  if (!editando) {
-    $('tFase').value = `${lun.emoji} ${lun.nombre}`;
-    $('tSen').value = (estado.señal.score >= 0 ? '+' : '') + estado.señal.score.toFixed(3);
-    $('tAct').value = ACTIVOS[estado.sym].corto;
-  }
 }
 
 function pintarTabs() {
@@ -1958,162 +2027,743 @@ function pintarHistorial() {
     `hipotético sobre datos pasados: no incluye comisiones, deslizamiento ni ejecución real, y no anticipa resultados futuros.`;
 }
 
-/* ---------- 4 · diario + riesgo acumulado ---------- */
-const lsTrades = () => leerLS('lo369_trades', []);
-const guardarTrades = t => LS.set('lo369_trades', JSON.stringify(t));
-$('capital').value = LS.get('lo369_capital') || 10000;
-$('capital').addEventListener('input', () => { LS.set('lo369_capital', $('capital').value); pintarDiario(); });
+/* ══════════════════════════════════════════════════════════════
+   DERIVADOS Y LIQUIDACIONES EN VIVO
+   Funding, precio marca y hora del próximo cobro llegan cada segundo
+   por el stream markPrice de Binance futuros; las liquidaciones, por
+   su stream forceOrder. El open interest no tiene stream: se pide por
+   REST cada minuto, y su referencia de hace 24 h cada 5 minutos.
+   ══════════════════════════════════════════════════════════════ */
+/* Ruta /market: la heredada (/stream) todavía abre la conexión pero ya no
+   emite nada, y un socket mudo se confundiría con un mercado tranquilo. */
+const DERIV_WS = 'wss://fstream.binance.com/market/stream?streams=';
+const LIQ_MIN = 50000;            /* [EDITABLE] tamaño mínimo para entrar en la lista */
+const LIQ_GRANDE = 500000;        /* [EDITABLE] desde aquí la fila se destaca */
+const LIQ_VENTANA = 3600000;      /* totales de la última hora */
+const LIQ_HUECO = 30000;          /* más de 30 s sin escuchar = la hora tiene un agujero */
+/* [EDITABLE] umbrales de lectura. El funding se compara en su equivalente
+   a 8 h, que es el periodo estándar de Binance (0,01 % es la tasa base). */
+const FUND_CARO = 0.0005, FUND_ALTO = 0.0002, FUND_BASE = 0.00005, FUND_CORTOS = -0.0002;
+const OI_UMBRAL = 1.5, PRECIO_UMBRAL = 1.0;   /* % en 24 h para considerar que algo se movió */
 
-/* id de la operación que se está editando, o null si el formulario da de alta */
-let editandoTrade = null;
-function salirDeEdicion() {
-  editandoTrade = null;
-  $('btnRegistrar').textContent = 'Registrar';
-  $('btnCancelarEdicion').style.display = 'none';
-  $('formTrade').querySelectorAll('input:not([readonly])').forEach(i => i.value = '');
+const deriv = {
+  m: {},              /* por símbolo: { marca, indice, funding, prox } */
+  oi: {},             /* por símbolo: { ahora, hace24 } en monedas, no en dólares */
+  intervaloH: {},     /* horas entre cobros (fundingInfo de Binance) */
+  liqs: [],           /* { t, sym, lado:'L'|'S', usd, precio } — todas las recibidas */
+  desde: null,        /* desde cuándo se escucha sin cortes */
+  filtro: ['todos', ...SIMBOLOS].includes(LS.get('lo369_liqf')) ? LS.get('lo369_liqf') : 'todos',
+  ws: null, abierto: false, intentos: 0, temporizador: null, ultimoMensaje: 0,
+  ultimoHist: 0, ultimoRest: 0, ultimoIntento: 0, cargando: false,
+  vistos: new Set(),  /* filas ya pintadas: solo las nuevas se iluminan */
+};
+
+/* Una recarga no debe borrar la hora acumulada: se guarda la escucha y, si la
+   anterior seguía viva hace nada, se retoma. Con un hueco se empieza de cero,
+   porque sumar lo viejo a lo nuevo daría una "última hora" con agujeros. */
+const CLAVE_LIQ = 'lo369_liqs';
+(function restaurarLiqs() {
+  const d = leerLS(CLAVE_LIQ, null);
+  if (!d || !Array.isArray(d.ev) || !d.vivo || Date.now() - d.vivo > LIQ_HUECO) return;
+  const corte = Date.now() - LIQ_VENTANA;
+  deriv.liqs = d.ev.filter(e => e && e.t >= corte && ACTIVOS[e.sym] && e.usd > 0);
+  deriv.desde = Math.max(+d.desde || Date.now(), corte);
+  deriv.ultimoMensaje = d.vivo;
+})();
+function guardarLiqs() {
+  if (!deriv.abierto) return;
+  LS.set(CLAVE_LIQ, JSON.stringify({ desde: deriv.desde, vivo: deriv.ultimoMensaje, ev: deriv.liqs.slice(-3000) }));
 }
-function editarTrade(id) {
-  const t = lsTrades().find(x => x.id === id);
-  if (!t) return;
-  editandoTrade = id;
-  $('tAct').value = t.act; $('tDir').value = t.dir;
-  $('tEnt').value = t.ent; $('tStop').value = t.stop;
-  $('tTgt').value = t.tgt; $('tTam').value = t.tam;
-  /* fase y señal quedan como estaban al abrirla: son el contexto de ENTONCES,
-     no el de ahora, y reescribirlos falsearía el registro */
-  $('tFase').value = t.fase; $('tSen').value = t.sen;
-  $('btnRegistrar').textContent = 'Guardar cambios';
-  $('btnCancelarEdicion').style.display = '';
-  pintarDiario();
-  $('formTrade').scrollIntoView({ block: 'center', behavior: 'smooth' });
-  $('tEnt').focus();
+
+/* ---------- formato ---------- */
+const fmtUsdC = v => v >= 1e9 ? `$${(v / 1e9).toFixed(2)}B` : v >= 1e6 ? `$${(v / 1e6).toFixed(2)}M`
+  : v >= 1e3 ? `$${(v / 1e3).toFixed(0)}K` : `$${v.toFixed(0)}`;
+const fmtPct = (v, d = 2) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(d) + '%';
+const flecha = v => v >= 0 ? '▲' : '▼';
+const dosDig = n => String(n).padStart(2, '0');
+const horaLocal = t => new Date(t).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+function cuentaAtras(ms) {
+  if (ms <= 0) return 'cobrando…';
+  const s = Math.floor(ms / 1000);
+  return `${dosDig(Math.floor(s / 3600))}:${dosDig(Math.floor(s / 60) % 60)}:${dosDig(s % 60)}`;
 }
-$('btnCancelarEdicion').addEventListener('click', () => { salirDeEdicion(); pintarDiario(); });
-$('formTrade').addEventListener('submit', e => {
-  e.preventDefault();
-  const t = lsTrades();
-  const campos = {
-    act: $('tAct').value, dir: $('tDir').value,
-    ent: +$('tEnt').value, stop: +$('tStop').value, tgt: +$('tTgt').value, tam: +$('tTam').value,
+
+/* ---------- stream de futuros ---------- */
+function cerrarDeriv() {
+  clearTimeout(deriv.temporizador);
+  if (deriv.ws) {
+    const w = deriv.ws; deriv.ws = null;
+    w.onclose = null; w.onmessage = null; w.onerror = null; w.onopen = null;
+    try { w.close(); } catch {}
+  }
+  deriv.abierto = false;
+}
+function reconectarDeriv() {
+  clearTimeout(deriv.temporizador);
+  const espera = Math.min(30000, 1000 * Math.pow(2, deriv.intentos++));
+  deriv.temporizador = setTimeout(conectarDeriv, espera);
+}
+function conectarDeriv() {
+  cerrarDeriv();
+  const streams = SIMBOLOS.flatMap(s => [`${s.toLowerCase()}@forceOrder`, `${s.toLowerCase()}@markPrice@1s`]);
+  let ws;
+  try { ws = new WebSocket(DERIV_WS + streams.join('/')); }
+  catch { reconectarDeriv(); return; }
+  deriv.ws = ws;
+  ws.onopen = () => {
+    if (deriv.ws !== ws) return;
+    deriv.abierto = true;
+    pintarEstadoDeriv();
   };
-  if (editandoTrade !== null) {
-    const x = t.find(o => o.id === editandoTrade);
-    if (x) {
-      Object.assign(x, campos);
-      /* si ya estaba cerrada, el P&L se recalcula con la entrada corregida */
-      if (x.estadoT === 'cerrado' && x.salida !== null)
-        x.pl = (x.salida - x.ent) * x.tam * (x.dir === 'LONG' ? 1 : -1);
-      guardarTrades(t);
-      tostada('Operación actualizada.', 'ok', 3000);
+  ws.onmessage = ev => {
+    if (deriv.ws !== ws) return;
+    let d; try { d = JSON.parse(ev.data); } catch { return; }
+    const m = d && d.data; if (!m) return;
+    const ahora = Date.now();
+    /* primer mensaje tras un corte largo: la hora acumulada ya no es continua */
+    if (!deriv.desde || ahora - deriv.ultimoMensaje > LIQ_HUECO) {
+      deriv.liqs = []; deriv.vistos.clear(); deriv.desde = ahora;
     }
-    salirDeEdicion();
-  } else {
-    t.unshift({
-      id: Date.now(), fecha: Date.now(), ...campos,
-      fase: $('tFase').value, sen: $('tSen').value, estadoT: 'abierto', salida: null, pl: null,
-    });
-    guardarTrades(t);
-    e.target.querySelectorAll('input:not([readonly])').forEach(i => i.value = '');
-  }
-  pintarDiario();
-});
-
-function precioVivoDe(act) {
-  const sym = SIMBOLOS.find(s => ACTIVOS[s].corto === act);
-  return estado.tickers[sym]?.precio ?? null;
-}
-function pintarDiario() {
-  const trades = lsTrades();
-  const cap = +$('capital').value || 10000;
-  $('cuerpoTrades').innerHTML = trades.map(t => {
-    const vivo = precioVivoDe(t.act);
-    const pl = t.estadoT === 'cerrado' ? t.pl
-      : vivo !== null ? (vivo - t.ent) * t.tam * (t.dir === 'LONG' ? 1 : -1) : null;
-    const plTxt = pl === null ? '—' : (pl >= 0 ? '+' : '−') + fmt$(Math.abs(pl), 2);
-    const plCol = pl === null ? 'var(--tinta3)' : pl >= 0 ? '#34d399' : '#fb7185';
-    const d = new Date(t.fecha);
-    return `<tr class="${t.id === editandoTrade ? 'en-edicion' : ''}"><td>${d.getDate()}/${d.getMonth()+1} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</td>
-      <td>${t.act}</td><td style="color:${t.dir === 'LONG' ? '#34d399' : '#fb7185'}">${t.dir}</td>
-      <td>${t.ent}</td><td>${t.stop}</td><td>${t.tgt}</td><td>${t.tam}</td>
-      <td style="font-size:12px">${t.fase.split(' ')[0]}</td><td>${t.sen}</td>
-      <td>${t.estadoT}</td><td style="color:${plCol}">${plTxt}</td>
-      <td><button class="editar" data-id="${t.id}" aria-label="Editar la operación de ${t.act} abierta en ${t.ent}">editar</button>${
-        t.estadoT === 'abierto' ? `<button class="cerrar" data-id="${t.id}" aria-label="Cerrar la operación de ${t.act} abierta en ${t.ent}">cerrar</button>` : ''}</td></tr>`;
-  }).join('') || `<tr><td colspan="12" style="text-align:center;color:var(--tinta3);padding:16px 8px">
-      Aún no hay operaciones registradas. Al anotar una, aparecerá aquí con su riesgo y su P&amp;L.</td></tr>`;
-  $('cuerpoTrades').querySelectorAll('.editar').forEach(b =>
-    b.addEventListener('click', () => editarTrade(+b.dataset.id)));
-  $('cuerpoTrades').querySelectorAll('.cerrar').forEach(b => b.addEventListener('click', () => {
-    const trades2 = lsTrades();
-    const t = trades2.find(x => x.id === +b.dataset.id);
-    const vivo = precioVivoDe(t.act) ?? t.ent;
-    t.estadoT = 'cerrado'; t.salida = vivo;
-    t.pl = (vivo - t.ent) * t.tam * (t.dir === 'LONG' ? 1 : -1);
-    guardarTrades(trades2);
-    pintarDiario();
-  }));
-  /* ---- medidores de riesgo acumulado ----
-     El riesgo consumido de un período NO es solo lo que sigue abierto: una
-     operación que ya saltó por stop gastó ese riesgo igual. Se suma el riesgo
-     vivo de las abiertas MÁS las pérdidas ya realizadas del período. */
-  const hoy = new Date(); hoy.setHours(0,0,0,0);
-  const hace7 = Date.now() - 7 * 86400000;
-  const riesgoDe = t => Math.abs(t.ent - t.stop) * t.tam;
-  const consumido = desde => trades.reduce((a, t) => {
-    if (t.fecha < desde) return a;
-    if (t.estadoT === 'abierto') return a + riesgoDe(t);
-    return a + Math.max(0, -(t.pl || 0));            /* solo las pérdidas cuentan */
-  }, 0);
-  const rDia = consumido(hoy.getTime()) / cap * 100;
-  const rSem = consumido(hace7) / cap * 100;
-  /* Drawdown desde la CURVA de capital real (no desde un pico guardado en
-     localStorage, que se quedaba pegado y se disparaba al editar el capital). */
-  const cerrados = trades.filter(t => t.estadoT === 'cerrado').sort((a, b) => a.fecha - b.fecha);
-  let equity = cap, pico = cap, dd = 0;
-  for (const t of cerrados) {
-    equity += t.pl || 0;
-    if (equity > pico) pico = equity;
-    dd = Math.max(dd, pico > 0 ? (pico - equity) / pico * 100 : 0);
-  }
-  const med = (v, lim, elV, elB) => {
-    $(elV).textContent = v.toFixed(1) + '%';
-    const p = clamp(v / lim * 100, 0, 100);
-    const i = $(elB);
-    i.style.width = p + '%';
-    i.style.background = v >= lim ? '#fb7185' : v >= lim * 0.7 ? '#facc15' : '#34d399';
+    deriv.ultimoMensaje = ahora; deriv.intentos = 0;
+    if (m.e === 'markPriceUpdate') recibirMarca(m);
+    else if (m.e === 'forceOrder' && m.o) recibirLiq(m.o);
   };
-  med(rDia, 5, 'rDiaV', 'rDiaB');
-  med(rSem, 10, 'rSemV', 'rSemB');
-  med(dd, 20, 'rDdV', 'rDdB');
+  ws.onerror = () => {};
+  ws.onclose = () => {
+    if (deriv.ws !== ws) return;
+    deriv.abierto = false; deriv.ws = null;
+    pintarEstadoDeriv();
+    reconectarDeriv();
+  };
+}
+/* markPrice@1s late cada segundo: 20 s de silencio son una conexión muerta */
+setInterval(() => {
+  if (deriv.abierto && Date.now() - deriv.ultimoMensaje > 20000) { deriv.intentos = 0; conectarDeriv(); }
+}, 5000);
+
+function recibirMarca(m) {
+  if (!ACTIVOS[m.s]) return;
+  deriv.m[m.s] = { marca: +m.p, indice: +m.i, funding: +m.r, prox: +m.T };
+}
+function recibirLiq(o) {
+  if (!ACTIVOS[o.s]) return;
+  const cant = +o.z || +o.q, precio = +o.ap || +o.p;
+  const usd = cant * precio;
+  if (!(usd > 0)) return;
+  /* SELL: el motor de liquidación vende para cerrar un LARGO; BUY: recompra un CORTO */
+  deriv.liqs.push({ t: +o.T || Date.now(), sym: o.s, lado: o.S === 'SELL' ? 'L' : 'S', usd, precio });
+  if (deriv.liqs.length > 4000) deriv.liqs.splice(0, deriv.liqs.length - 3000);
+  pedirPintarLiqs();
 }
 
-/* ---------- historial de alertas ---------- */
-function pintarAlertas() {
-  const todas = leerLS('lo369_alertas', []);
-  const f = estado.filtroAlertas;
-  /* las alertas guardadas antes de esta versión no llevan tf: todas eran de 1H */
-  const h = f === 'todos' ? todas : todas.filter(a => (a.tf || '1h') === f);
-  $('sinAlertas').style.display = h.length ? 'none' : 'block';
-  $('sinAlertas').textContent = todas.length
-    ? `Ninguna alerta en ${INTERVALOS[f]?.etq ?? f} en este navegador (hay ${todas.length} en otros marcos).`
-    : 'Aún no se ha disparado ninguna alerta en este navegador.';
-  $('cuerpoAlertas').innerHTML = h.map(a => {
-    const d = new Date(a.t);
-    const col = a.nombre.includes('SHORT') ? '#fb7185' : '#34d399';
-    return `<tr><td>${d.getDate()}/${d.getMonth()+1} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</td>
-      <td>${ACTIVOS[a.sym]?.corto ?? a.sym}</td><td>${INTERVALOS[a.tf || '1h']?.etq ?? a.tf}</td><td style="color:${col}">${a.nombre}</td>
-      <td>${a.s >= 0 ? '+' : ''}${a.s}</td><td>${fmt$(a.precio)}</td></tr>`;
+/* ---------- REST: open interest, funding de respaldo y periodo de cobro ---------- */
+async function cargarDerivados() {
+  if (deriv.cargando) return;
+  deriv.cargando = true;
+  const ahora = Date.now();
+  deriv.ultimoIntento = ahora;     /* con la red caída se reintenta al minuto, no cada segundo */
+  const j = u => fetch(FAPI + u).then(r => r.ok ? r.json() : null).catch(() => null);
+  const pedirHist = ahora - deriv.ultimoHist > 300000;
+  try {
+    if (!Object.keys(deriv.intervaloH).length) {
+      const fi = await j('/fapi/v1/fundingInfo');
+      if (Array.isArray(fi)) fi.forEach(x => { if (ACTIVOS[x.symbol] && +x.fundingIntervalHours > 0) deriv.intervaloH[x.symbol] = +x.fundingIntervalHours; });
+    }
+    let algo = false, hist = false;
+    await Promise.all(SIMBOLOS.map(async s => {
+      const [oi, pi, h] = await Promise.all([
+        j(`/fapi/v1/openInterest?symbol=${s}`),
+        /* con el stream vivo el funding llega cada segundo: el REST sobra */
+        deriv.abierto && deriv.m[s] ? null : j(`/fapi/v1/premiumIndex?symbol=${s}`),
+        pedirHist ? j(`/futures/data/openInterestHist?symbol=${s}&period=1h&limit=25`) : null,
+      ]);
+      const o = deriv.oi[s] || (deriv.oi[s] = { ahora: null, hace24: null });
+      if (oi && +oi.openInterest > 0) { o.ahora = +oi.openInterest; algo = true; }
+      if (pi && pi.markPrice && !(deriv.abierto && deriv.m[s])) {
+        deriv.m[s] = { marca: +pi.markPrice, indice: +pi.indexPrice, funding: +pi.lastFundingRate, prox: +pi.nextFundingTime };
+        algo = true;
+      }
+      if (Array.isArray(h) && h.length) {
+        /* el punto horario más cercano a "hace 24 h" */
+        const obj = ahora - 86400000;
+        const ref = h.reduce((a, x) => Math.abs(x.timestamp - obj) < Math.abs(a.timestamp - obj) ? x : a);
+        if (+ref.sumOpenInterest > 0) { o.hace24 = +ref.sumOpenInterest; hist = true; }
+      }
+    }));
+    if (hist) deriv.ultimoHist = ahora;
+    if (algo) deriv.ultimoRest = ahora;
+  } finally {
+    deriv.cargando = false;
+  }
+  pintarDerivados();
+}
+
+/* ---------- lecturas ---------- */
+function leerFunding(r8) {
+  if (r8 >= FUND_CARO)   return { t: 't-rojo',    txt: 'Largos pagan caro: mucho apalancamiento al alza, terreno fértil para barridas de largos.' };
+  if (r8 >= FUND_ALTO)   return { t: 't-ambar',   txt: 'Largos pagan por encima de la tasa base: optimismo apalancado.' };
+  if (r8 >= FUND_BASE)   return { t: 't-neutro',  txt: 'Cerca de la tasa base (0.01 %): sin excesos de apalancamiento.' };
+  if (r8 >= 0)           return { t: 't-neutro',  txt: 'Por debajo de la tasa base: poco apetito apalancado al alza.' };
+  if (r8 > FUND_CORTOS)  return { t: 't-ambar',   txt: 'Cortos pagan: sesgo bajista apalancado, todavía leve.' };
+  return                        { t: 't-violeta', txt: 'Cortos pagan caro: muchos cortos apalancados, combustible para un short squeeze.' };
+}
+function leerOI(dOI, dP) {
+  const oiSube = dOI >= OI_UMBRAL, oiBaja = dOI <= -OI_UMBRAL;
+  const pSube = dP >= PRECIO_UMBRAL, pBaja = dP <= -PRECIO_UMBRAL;
+  if (oiSube && pSube) return { t: 't-verde',   txt: 'Entra dinero nuevo con la subida: compradores frescos abriendo largos.' };
+  if (oiSube && pBaja) return { t: 't-rojo',    txt: 'Entra dinero nuevo con la caída: vendedores abriendo cortos.' };
+  if (oiBaja && pSube) return { t: 't-ambar',   txt: 'Sube por cierre de cortos (short covering): subida con menos convicción.' };
+  if (oiBaja && pBaja) return { t: 't-ambar',   txt: 'Baja por cierre de largos: el mercado se desapalanca.' };
+  if (oiSube)          return { t: 't-violeta', txt: 'Se acumulan posiciones con el precio quieto: se carga un movimiento fuerte.' };
+  if (oiBaja)          return { t: 't-neutro',  txt: 'Se cierran posiciones con el precio quieto: el mercado se desarma.' };
+  return                      { t: 't-neutro',  txt: 'Sin cambios relevantes de posicionamiento en 24 h.' };
+}
+/* Todo lo que se pinta (y lo que va al PDF) sale de aquí: una sola cuenta. */
+function datosDeriv(s) {
+  const m = deriv.m[s], o = deriv.oi[s], tk = estado.tickers[s];
+  const r = { s, corto: ACTIVOS[s].corto, m, hayAlgo: !!(m || (o && o.ahora)) };
+  if (m && isFinite(m.funding)) {
+    const h = deriv.intervaloH[s] || 8;            /* 8 h es el periodo estándar de Binance */
+    r.h = h;
+    r.fundPct = m.funding * 100;
+    r.fundAnual = m.funding * (24 / h) * 365 * 100;
+    r.lectFund = leerFunding(m.funding * 8 / h);
+    r.prima = m.indice > 0 ? (m.marca - m.indice) / m.indice * 100 : null;
+  }
+  if (o && o.ahora && m && m.marca) r.oiUsd = o.ahora * m.marca;
+  if (o && o.ahora && o.hace24) r.dOI = (o.ahora - o.hace24) / o.hace24 * 100;
+  if (tk && isFinite(tk.chg)) r.dP = tk.chg;
+  if (r.dOI !== undefined && r.dP !== undefined) r.lectOI = leerOI(r.dOI, r.dP);
+  return r;
+}
+function totalesLiq(filtro = deriv.filtro) {
+  const corte = Date.now() - LIQ_VENTANA;
+  const t = { L: 0, S: 0, nL: 0, nS: 0 };
+  deriv.liqs.forEach(e => {
+    if (e.t < corte || (filtro !== 'todos' && e.sym !== filtro)) return;
+    t[e.lado] += e.usd; t['n' + e.lado]++;
+  });
+  return t;
+}
+
+/* ---------- pintado ---------- */
+function pintarEstadoDeriv() {
+  const el = $('derivEstado'); if (!el) return;
+  el.textContent = deriv.abierto
+    ? 'Binance futuros USDT-M · funding y precio marca cada segundo · OI cada minuto'
+    : deriv.ultimoRest ? 'stream de futuros caído: funding y OI por REST cada minuto, sin liquidaciones' : 'Binance futuros USDT-M · conectando…';
+}
+function pintarDerivados() {
+  const g = $('derivGrid'); if (!g) return;
+  const ahora = Date.now();
+  g.innerHTML = SIMBOLOS.map(s => {
+    const d = datosDeriv(s), on = s === estado.sym ? ' on' : '';
+    if (!d.hayAlgo) return `<div class="dv${on}"><div class="dv-top"><b>${d.corto}</b></div><div class="dv-vacio">Esperando datos de futuros…</div></div>`;
+    const prima = d.prima === null || d.prima === undefined ? '' : ` · prima ${fmtPct(d.prima, 3)}`;
+    const fund = d.fundPct === undefined ? '<div class="dv-vacio">Funding sin datos</div>' : `
+      <div><div class="dv-et">Funding · próximo cobro</div>
+        <div class="dv-v"><b class="${d.fundPct >= 0 ? 'sube' : 'baja'}">${fmtPct(d.fundPct, 4)}</b><small>cada ${d.h} h · ${fmtPct(d.fundAnual, 1)} anual</small></div></div>
+      <div class="dv-reloj"><span>Cobro en</span><b>${cuentaAtras(d.m.prox - ahora)}</b></div>
+      <div class="lect ${d.lectFund.t}">${d.lectFund.txt}</div>`;
+    const oi = d.oiUsd === undefined ? '<div class="dv-vacio">Open interest sin datos</div>' : `
+      <div><div class="dv-et">Open interest</div>
+        <div class="dv-v"><b>${fmtUsdC(d.oiUsd)}</b>${d.dOI === undefined ? '<small>24 h: cargando…</small>'
+          : `<small class="${d.dOI >= 0 ? 'sube' : 'baja'}">${flecha(d.dOI)} ${fmtPct(d.dOI, 1)} en 24 h</small>`}</div></div>
+      <div class="dv-reloj"><span>Precio 24 h</span><b class="${(d.dP ?? 0) >= 0 ? 'sube' : 'baja'}">${d.dP === undefined ? '—' : flecha(d.dP) + ' ' + fmtPct(d.dP, 1)}</b></div>
+      ${d.lectOI ? `<div class="lect ${d.lectOI.t}">${d.lectOI.txt}</div>` : ''}`;
+    return `<div class="dv${on}">
+      <div class="dv-top"><b>${d.corto}</b><span>${d.m && d.m.marca ? 'marca ' + fmt$(d.m.marca) + prima : ''}</span></div>
+      ${fund}<hr>${oi}</div>`;
   }).join('');
-  $('filtroAlertas').querySelectorAll('.tf-chip').forEach(c => {
+}
+let liqPendiente = false;
+function pedirPintarLiqs() {
+  if (liqPendiente) return;
+  liqPendiente = true;
+  setTimeout(() => { liqPendiente = false; pintarLiqs(); }, 250);
+}
+function pintarLiqs() {
+  const bal = $('lqdBalance'); if (!bal) return;
+  const ahora = Date.now(), corte = ahora - LIQ_VENTANA, f = deriv.filtro;
+  /* la ventana se recorta aquí, no en cada mensaje */
+  if (deriv.liqs.length && deriv.liqs[0].t < corte) deriv.liqs = deriv.liqs.filter(e => e.t >= corte);
+  const t = totalesLiq(f), tot = t.L + t.S;
+  const pL = tot ? t.L / tot * 100 : 50;
+  let lect;
+  if (!deriv.desde) lect = { t: 't-neutro', txt: 'Conectando con el stream de liquidaciones…' };
+  else if (tot < LIQ_MIN) lect = { t: 't-neutro', txt: 'Poca actividad de liquidaciones: el apalancamiento no está siendo castigado.' };
+  else if (t.L >= t.S * 2) lect = { t: 't-rojo', txt: 'Barrida de largos: el precio está cazando los stops de quienes compraron apalancados.' };
+  else if (t.S >= t.L * 2) lect = { t: 't-verde', txt: 'Barrida de cortos: el precio está forzando la salida de quienes vendieron apalancados.' };
+  else lect = { t: 't-neutro', txt: 'Liquidaciones repartidas entre largos y cortos: sin un lado dominante.' };
+  bal.innerHTML = `
+    <div class="lqd-tot">
+      <div><span>Largos liquidados</span><b class="baja">${fmtUsdC(t.L)}</b><small>${t.nL === 1 ? '1 orden' : t.nL + ' órdenes'}</small></div>
+      <div><span>Cortos liquidados</span><b class="sube">${fmtUsdC(t.S)}</b><small>${t.nS === 1 ? '1 orden' : t.nS + ' órdenes'}</small></div>
+    </div>
+    <div class="lqd-barra" role="img" aria-label="Largos ${pL.toFixed(0)} por ciento, cortos ${(100 - pL).toFixed(0)} por ciento">
+      <i style="width:${pL}%;background:${tot ? 'var(--rojo)' : '#2b3252'}"></i><i style="width:${100 - pL}%;background:${tot ? 'var(--verde)' : '#2b3252'}"></i>
+    </div>
+    <div class="lect ${lect.t}" style="margin-top:8px">${lect.txt}</div>`;
+  const lista = deriv.liqs.filter(e => e.usd >= LIQ_MIN && (f === 'todos' || e.sym === f)).slice(-40).reverse();
+  const feed = $('lqdFeed');
+  feed.innerHTML = lista.length ? lista.map(e => {
+    const id = `${e.t}-${e.sym}-${Math.round(e.usd)}`;
+    const nuevo = !deriv.vistos.has(id);
+    deriv.vistos.add(id);
+    return `<div class="lqd-ev${e.usd >= LIQ_GRANDE ? ' grande' : ''}${nuevo ? ' nuevo' : ''}">
+      <time>${horaLocal(e.t)}</time><b>${ACTIVOS[e.sym].corto}</b>
+      <span class="lado ${e.lado === 'L' ? 'baja' : 'sube'}">${e.lado === 'L' ? 'LARGO' : 'CORTO'} liquidado @ ${fmt$(e.precio)}</span>
+      <span class="usd ${e.lado === 'L' ? 'baja' : 'sube'}">${fmtUsdC(e.usd)}</span></div>`;
+  }).join('') : `<div class="lqd-vacio">${deriv.desde
+      ? `Sin liquidaciones de ${fmtUsdC(LIQ_MIN)} o más${f === 'todos' ? '' : ' en ' + ACTIVOS[f].corto} desde las ${horaLocal(Math.max(deriv.desde, corte)).slice(0, 5)}.<br>Aparecen aquí al instante.`
+      : 'Conectando…'}</div>`;
+  if (deriv.vistos.size > 2000) deriv.vistos = new Set([...deriv.vistos].slice(-500));
+  const cobertura = deriv.desde ? ahora - deriv.desde : 0;
+  $('lqdNota').textContent = (deriv.desde && cobertura < LIQ_VENTANA
+      ? `Contando desde las ${horaLocal(deriv.desde).slice(0, 5)} (${Math.max(1, Math.round(cobertura / 60000))} min): la ventana de una hora se completa sola. `
+      : 'Ventana móvil de 60 minutos. ') +
+    `Los totales suman todas las liquidaciones recibidas; la lista muestra las de ${fmtUsdC(LIQ_MIN)} o más. ` +
+    'Binance publica como máximo una por activo y por segundo (la mayor), así que los totales son un mínimo.';
+  $('filtroLiq').querySelectorAll('.tf-chip').forEach(c => {
     const on = c.dataset.f === f;
     c.classList.toggle('on', on); c.setAttribute('aria-pressed', on);
   });
 }
-$('filtroAlertas').addEventListener('click', e => {
+$('filtroLiq').addEventListener('click', e => {
   const b = e.target.closest('.tf-chip'); if (!b) return;
-  estado.filtroAlertas = b.dataset.f;
-  pintarAlertas();
+  deriv.filtro = b.dataset.f;
+  LS.set('lo369_liqf', deriv.filtro);
+  pintarLiqs();
 });
+
+/* ══════════════════════════════════════════════════════════════
+   RANGO ESPERADO
+   Cuánto se mueve normalmente cada activo en un día. BTC y ETH usan la
+   volatilidad implícita de sus opciones (índice DVOL de Deribit, anual a
+   30 días); SOL no tiene DVOL y usa la realizada de sus últimos 30 días.
+   1σ diario = σ anual / √365. El rango de hoy se ancla en la apertura de
+   la vela diaria (00:00 UTC = 19:00 de Lima) y es logarítmico.
+   ══════════════════════════════════════════════════════════════ */
+const DERIBIT = 'https://www.deribit.com/api/v2/public';
+const DVOL_DE = { BTCUSDT: 'BTC', ETHUSDT: 'ETH' };
+const rango = { iv: {}, rv: {}, dia: {}, cargando: false, ultimo: 0 };
+const inicioDiaUTC = (t = Date.now()) => { const d = new Date(t); d.setUTCHours(0, 0, 0, 0); return d.getTime(); };
+
+async function dvol(moneda) {
+  const fin = Date.now();
+  try {
+    const r = await fetch(`${DERIBIT}/get_volatility_index_data?currency=${moneda}&start_timestamp=${fin - 3 * 3600000}&end_timestamp=${fin}&resolution=3600`);
+    if (!r.ok) return null;
+    const a = (await r.json())?.result?.data;
+    const v = a && a.length ? +a[a.length - 1][4] : NaN;
+    return v > 0 ? v : null;
+  } catch { return null; }
+}
+/* Volatilidad realizada: desviación de los retornos logarítmicos diarios de
+   las últimas 30 velas CERRADAS (la de hoy está a medias), anualizada. */
+function volRealizada(v) {
+  const cerradas = v.slice(0, -1).slice(-31);
+  if (cerradas.length < 21) return null;
+  const rets = [];
+  for (let i = 1; i < cerradas.length; i++) rets.push(Math.log(cerradas[i].close / cerradas[i - 1].close));
+  const media = rets.reduce((a, b) => a + b, 0) / rets.length;
+  const varz = rets.reduce((a, b) => a + (b - media) ** 2, 0) / (rets.length - 1);
+  return Math.sqrt(varz) * Math.sqrt(365) * 100;
+}
+async function cargarRango() {
+  if (rango.cargando) return;
+  rango.cargando = true;
+  try {
+    const hoy = inicioDiaUTC();
+    const [ivB, ivE, ...ks] = await Promise.all([
+      dvol('BTC'), dvol('ETH'),
+      ...SIMBOLOS.map(s => velas(s, '1d', 33).catch(() => null)),
+    ]);
+    if (ivB) rango.iv.BTCUSDT = ivB;
+    if (ivE) rango.iv.ETHUSDT = ivE;
+    SIMBOLOS.forEach((s, i) => {
+      const v = ks[i];
+      if (!v || v.length < 2) return;
+      const rv = volRealizada(v);
+      if (rv) rango.rv[s] = rv;
+      const u = v[v.length - 1];
+      if (u.time * 1000 === hoy) rango.dia[s] = { t0: hoy, open: u.open, high: u.high, low: u.low };
+    });
+    rango.ultimo = Date.now();
+  } finally {
+    rango.cargando = false;
+  }
+  pintarRango();
+}
+function datosRango(s) {
+  const p = estado.tickers[s]?.precio, dia = rango.dia[s];
+  const iv = rango.iv[s], rv = rango.rv[s];
+  const sig = iv || rv;
+  const r = { s, corto: ACTIVOS[s].corto, iv, rv, fuente: iv ? 'DVOL' : rv ? (DVOL_DE[s] ? 'RV30 (DVOL no disponible)' : 'RV30') : null };
+  if (!p || !dia || !sig || dia.t0 !== inicioDiaUTC()) return r;
+  /* el precio vivo estira el máximo y el mínimo de la vela entre recargas */
+  dia.high = Math.max(dia.high, p); dia.low = Math.min(dia.low, p);
+  const m = sig / 100 / Math.sqrt(365), o = dia.open;
+  Object.assign(r, {
+    ok: true, p, o, m, sig,
+    lo1: o * Math.exp(-m), hi1: o * Math.exp(m), lo2: o * Math.exp(-2 * m), hi2: o * Math.exp(2 * m),
+    z: Math.log(p / o) / m,
+    ruido: p * m,
+    semLo: p * Math.exp(-m * Math.sqrt(7)), semHi: p * Math.exp(m * Math.sqrt(7)),
+    hoyPct: (dia.high - dia.low) / o * 100,
+    /* rango máx-mín típico de un día ≈ 1,6σ (Parkinson): con él se mide si el día ya se estiró */
+    tipicoPct: 1.596 * m * 100,
+    high: dia.high, low: dia.low,
+  });
+  const z = Math.abs(r.z), lado = r.z >= 0 ? 'por encima' : 'por debajo';
+  r.lectZ = z < 0.5 ? { t: 't-neutro', txt: 'Cerca de la apertura: el día todavía no eligió dirección.' }
+    : z < 1 ? { t: 't-neutro', txt: `Dentro del rango normal, a ${r.z >= 0 ? '+' : '−'}${z.toFixed(1)}σ ${lado} de la apertura.` }
+    : z < 2 ? { t: 't-ambar', txt: `Fuera de 1σ ${lado}: el movimiento de hoy ya es mayor que el de un día típico.` }
+    : { t: 't-rojo', txt: `Más allá de 2σ ${lado}: día extremo, de los que llegan ~1 de cada 20 (más a menudo en cripto).` };
+  if (iv && rv) {
+    const q = iv / rv;
+    r.lectIV = q > 1.25 ? { t: 't-ambar', txt: `Implícita ${iv.toFixed(1)} % frente a realizada ${rv.toFixed(1)} %: las opciones descuentan más movimiento del que hubo; el mercado se está cubriendo.` }
+      : q < 0.8 ? { t: 't-violeta', txt: `Implícita ${iv.toFixed(1)} % frente a realizada ${rv.toFixed(1)} %: las opciones descuentan menos movimiento del que hubo.` }
+      : { t: 't-neutro', txt: `Implícita ${iv.toFixed(1)} % en línea con la realizada de 30 días (${rv.toFixed(1)} %).` };
+  } else if (!iv && rv) {
+    r.lectIV = { t: 't-neutro', txt: DVOL_DE[s]
+      ? `DVOL no disponible ahora: se usa la volatilidad realizada de 30 días (${rv.toFixed(1)} %).`
+      : `Sin índice de volatilidad implícita: se usa la realizada de 30 días (${rv.toFixed(1)} % anual).` };
+  }
+  return r;
+}
+function pintarRango() {
+  const g = $('rangoGrid'); if (!g) return;
+  /* la pista cubre ±2,5σ en escala logarítmica alrededor de la apertura */
+  const pos = (d, x) => clamp((Math.log(x / d.o) / d.m + 2.5) / 5 * 100, 0, 100);
+  g.innerHTML = SIMBOLOS.map(s => {
+    const d = datosRango(s), on = s === estado.sym ? ' on' : '';
+    const cab = `<div class="dv-top"><b>${d.corto}</b><span>${d.fuente ? `σ anual ${(d.iv || d.rv).toFixed(1)} % · ${d.fuente}` : ''}</span></div>`;
+    if (!d.ok) return `<div class="rg${on}">${cab}<div class="dv-vacio">${rango.ultimo ? 'Sin datos de volatilidad o de la vela de hoy. Reintentando…' : 'Calculando volatilidad…'}</div></div>`;
+    const xl = pos(d, d.low), xh = pos(d, d.high);
+    return `<div class="rg${on}">${cab}
+      <div class="rg-frase">Hoy: entre <b>${fmt$(d.lo1)}</b> y <b>${fmt$(d.hi1)}</b> <span>(±${(d.m * 100).toFixed(1)} %)</span></div>
+      <div class="rg-pista" role="img" aria-label="Precio ${fmt$(d.p)} a ${d.z.toFixed(1)} sigmas de la apertura ${fmt$(d.o)}">
+        <i class="b2" style="left:10%;width:80%"></i><i class="b1" style="left:30%;width:40%"></i>
+        <i class="ap" style="left:50%"></i>
+        <i class="hoy" style="left:${xl}%;width:${Math.max(0.6, xh - xl)}%"></i>
+        <i class="pr" style="left:${pos(d, d.p)}%"></i>
+      </div>
+      <div class="rg-eje" aria-hidden="true">
+        <span style="left:10%">${fmt$(d.lo2)}</span><span style="left:30%">${fmt$(d.lo1)}</span><span style="left:50%">${fmt$(d.o)}</span><span style="left:70%">${fmt$(d.hi1)}</span><span style="left:90%">${fmt$(d.hi2)}</span>
+      </div>
+      <div class="rg-ley"><i style="color:#f0abfc">▮ precio ${fmt$(d.p)}</i><i>│ apertura 00:00 UTC</i><i style="color:var(--ambar)">━ recorrido de hoy</i><i>bandas 1σ y 2σ</i></div>
+      <div class="lect ${d.lectZ.t}">${d.lectZ.txt}</div>
+      <div class="rg-filas">
+        <div><span>Ruido de 24 h (1σ)</span><b>±${fmt$(d.ruido)}</b></div>
+        <div><span>Semana (1σ)</span><b>${fmt$(d.semLo)} – ${fmt$(d.semHi)}</b></div>
+        <div><span>Hoy, máx. a mín.</span><b>${d.hoyPct.toFixed(1)} % · típico ${d.tipicoPct.toFixed(1)} %</b></div>
+      </div>
+      ${d.lectIV ? `<div class="lect ${d.lectIV.t}">${d.lectIV.txt}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+/* ---------- reloj de los dos paneles ---------- */
+let tickDeriv = 0;
+function iniciarDerivados() {
+  conectarDeriv();
+  cargarDerivados();
+  cargarRango();
+  pintarLiqs();
+  setInterval(() => {
+    tickDeriv++;
+    if (!estado.hayDatos) return;
+    pintarDerivados();                               /* cuenta atrás y funding */
+    if (tickDeriv % 2 === 0) pintarRango();          /* el precio vivo mueve la marca */
+    if (tickDeriv % 5 === 0) { pintarLiqs(); pintarEstadoDeriv(); }
+    if (tickDeriv % 10 === 0) guardarLiqs();
+    const ahora = Date.now();
+    if (!document.hidden && ahora - deriv.ultimoIntento > 60000) cargarDerivados();
+    /* DVOL y velas diarias cada 10 min; si falta la vela de hoy (cambio de día
+       UTC o una carga fallida), al minuto */
+    const falta = SIMBOLOS.some(s => !rango.dia[s] || rango.dia[s].t0 !== inicioDiaUTC());
+    if (!document.hidden && (ahora - rango.ultimo > 600000 || (falta && ahora - rango.ultimo > 60000))) cargarRango();
+  }, 1000);
+  addEventListener('pagehide', guardarLiqs);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BACKTEST DE LA SEÑAL · 90 DÍAS
+   La señal Tesla 369 se recalcula vela a vela (velas CERRADAS de
+   Binance) en 1H, 4H y 1D. Cada cruce de umbral es un evento, con la
+   misma histéresis que las alertas, y se mide qué hizo el precio 4, 24
+   y 72 h después con las velas de 1H. Como en el historial de 7 días,
+   va sin Fear & Greed ni futuros: no tienen histórico gratuito y usar
+   el valor de hoy en el pasado sería mirar al futuro.
+   Son ~2.800 pasadas del motor por activo (~0,25 ms cada una): se
+   reparten en tramos cortos para no congelar la página, empiezan solo
+   cuando la sección se acerca a la pantalla y el resultado se guarda
+   una hora en este navegador.
+   ══════════════════════════════════════════════════════════════ */
+const BT_DIAS = 90;
+const BT_TF = { '1h': 3600, '4h': 14400, '1d': 86400 };      /* duración de la vela, en segundos */
+const BT_HORIZ = [4, 24, 72];                                /* horas después de la señal */
+const BT_VENTANA = 300;                                      /* velas por pasada: las medias llegan sembradas */
+const BT_CADUCA = 3600000;
+const BT_MIN_MUESTRA = 15;                                   /* [EDITABLE] por debajo, "muestra chica" */
+const CLAVE_BT = 'lo369_bt90';
+const bt90 = {
+  res: {},                   /* por símbolo: { v, t, base:[pUp4,pUp24,pUp72], tf:{ '1h':{ ev:[[…],[…],[…]] } } } */
+  sym: estado.sym, symPrincipal: estado.sym,
+  umbral: [0, 1, 2].includes(+LS.get('lo369_btu')) ? +LS.get('lo369_btu') : 0,
+  tf: BT_TF[LS.get('lo369_bttf')] ? LS.get('lo369_bttf') : '4h',
+  trabajando: null, progreso: 0, error: null, iniciado: false, enCola: false,
+};
+(function restaurarBT() {
+  const d = leerLS(CLAVE_BT, null);
+  if (!d || !d.res) return;
+  Object.entries(d.res).forEach(([s, r]) => { if (ACTIVOS[s] && r && r.v === 1 && r.tf) bt90.res[s] = r; });
+})();
+function guardarBT() { LS.set(CLAVE_BT, JSON.stringify({ res: bt90.res })); }
+const ceder = () => new Promise(r => window.requestIdleCallback ? requestIdleCallback(() => r(), { timeout: 120 }) : setTimeout(r, 0));
+
+/* Velas hacia atrás en páginas de 1000 (el máximo de Binance por petición). */
+async function velasHasta(sym, tf, total) {
+  let out = [], fin = null;
+  while (out.length < total) {
+    const lim = Math.min(1000, total - out.length);
+    const r = await fetch(`${SPOT}/api/v3/klines?symbol=${sym}&interval=${tf}&limit=${lim}` + (fin ? `&endTime=${fin}` : ''));
+    if (!r.ok) throw new Error('klines ' + r.status);
+    const a = (await r.json()).map(k => ({ time: Math.floor(k[0] / 1000), open: +k[1], high: +k[2], low: +k[3], close: +k[4], volume: +k[5] }));
+    if (!a.length) break;
+    out = a.concat(out);
+    fin = a[0].time * 1000 - 1;
+    if (a.length < lim) break;                  /* el activo no tiene más historia */
+  }
+  return out;
+}
+/* Cruces de un umbral con la histéresis de las alertas: entra con |s| ≥ U y,
+   para volver a contar en el mismo lado, antes tiene que caer por debajo de
+   U − HISTERESIS. Si la ventana empieza ya dentro, eso no es un cruce. */
+function eventosBT(serie, U) {
+  const ev = [];
+  let lado = serie.length ? (serie[0].s >= U ? 1 : serie[0].s <= -U ? -1 : 0) : 0;
+  for (let j = 1; j < serie.length; j++) {
+    const s = serie[j].s;
+    if (lado === 1 && s < U - HISTERESIS) lado = 0;
+    if (lado === -1 && s > -(U - HISTERESIS)) lado = 0;
+    if (lado === 0 && Math.abs(s) >= U) { lado = s > 0 ? 1 : -1; ev.push({ t: serie[j].t, dir: lado, s: +s.toFixed(3) }); }
+  }
+  return ev;
+}
+async function calcularBT(sym) {
+  bt90.trabajando = sym; bt90.progreso = 0; bt90.error = null;
+  pintarBTEstado();
+  const extra = BT_VENTANA + 2;                 /* siembra + la vela previa + la que está en curso */
+  const [v1, v4, vd] = await Promise.all([
+    velasHasta(sym, '1h', BT_DIAS * 24 + extra), velasHasta(sym, '4h', BT_DIAS * 6 + extra), velasHasta(sym, '1d', BT_DIAS + extra),
+  ]);
+  /* solo velas cerradas: la última está a medias */
+  const series = { '1h': v1.slice(0, -1), '4h': v4.slice(0, -1), '1d': vd.slice(0, -1) };
+  const h1 = series['1h'];
+  const idxCierre = new Map(h1.map((c, i) => [c.time + 3600, i]));
+  const desde = Math.floor(Date.now() / 1000) - BT_DIAS * 86400;
+  const tramos = Object.keys(BT_TF).map(tf => {
+    const v = series[tf], dur = BT_TF[tf];
+    const primera = v.findIndex(c => c.time + dur >= desde);
+    return { tf, v, dur, ini: Math.max(BT_VENTANA - 1, (primera < 0 ? v.length : primera) - 1) };
+  });
+  const total = tramos.reduce((a, x) => a + Math.max(0, x.v.length - x.ini), 0) || 1;
+  let hechos = 0;
+  const res = { v: 1, t: Date.now(), tf: {} };
+  for (const { tf, v, dur, ini } of tramos) {
+    const serie = [];
+    for (let i = ini; i < v.length; i++) {
+      const tc = v[i].time + dur;
+      serie.push({ t: tc, s: señalTesla(v.slice(i - BT_VENTANA + 1, i + 1), faseLunar(new Date(tc * 1000)), null, null).score });
+      if (++hechos % 40 === 0) { bt90.progreso = hechos / total; pintarBTEstado(); await ceder(); }
+    }
+    res.tf[tf] = { ev: UMBRALES.map(U => eventosBT(serie, U).map(e => {
+      /* qué hizo el precio después, con velas de 1H */
+      const i0 = idxCierre.get(e.t);
+      if (i0 === undefined) return { ...e, p: null, r: [null, null, null], mae: null };
+      const p0 = h1[i0].close;
+      const r = BT_HORIZ.map(h => { const j = idxCierre.get(e.t + h * 3600); return j === undefined ? null : +((h1[j].close - p0) / p0 * 100).toFixed(2); });
+      /* peor momento en contra durante las 24 h siguientes */
+      let mae = null;
+      const j24 = idxCierre.get(e.t + 24 * 3600);
+      if (j24 !== undefined) {
+        let ext = p0;
+        for (let j = i0 + 1; j <= j24; j++) ext = e.dir > 0 ? Math.min(ext, h1[j].low) : Math.max(ext, h1[j].high);
+        mae = +(-Math.abs(ext - p0) / p0 * 100).toFixed(2);
+      }
+      return { ...e, p: p0, r, mae };
+    })) };
+  }
+  /* Referencia "azar": en cualquier hora de los mismos 90 días, ¿cuántas veces
+     el precio estaba más arriba 4, 24 y 72 h después? */
+  res.base = BT_HORIZ.map(h => {
+    let n = 0, arriba = 0;
+    h1.forEach((c, i) => {
+      if (c.time + 3600 < desde) return;
+      const j = idxCierre.get(c.time + 3600 + h * 3600);
+      if (j === undefined) return;
+      n++; if (h1[j].close > c.close) arriba++;
+    });
+    return n ? arriba / n : 0.5;
+  });
+  bt90.res[sym] = res;
+  guardarBT();
+}
+/* Un solo trabajador: primero el activo que se está mirando, luego el resto. */
+async function colaBT() {
+  if (bt90.enCola) return;
+  bt90.enCola = true;
+  try {
+    for (;;) {
+      const viejo = s => !bt90.res[s] || Date.now() - bt90.res[s].t > BT_CADUCA;
+      const sig = [bt90.sym, ...SIMBOLOS].find(viejo);
+      if (!sig) break;
+      try { await calcularBT(sig); }
+      catch (e) { bt90.error = `${ACTIVOS[sig].corto}: ${e.message}`; bt90.trabajando = null; pintarBTEstado(); break; }
+      bt90.trabajando = null;
+      pintarBacktest();
+    }
+  } finally {
+    bt90.enCola = false;
+    bt90.trabajando = null;
+    pintarBTEstado();
+  }
+}
+
+/* ---------- estadística ---------- */
+function statsBT(evs, base) {
+  const n = evs.length, nL = evs.filter(e => e.dir > 0).length;
+  const h = BT_HORIZ.map((H, k) => {
+    const ev = evs.filter(e => e.r[k] !== null);
+    const m = ev.length;
+    const hits = ev.filter(e => e.dir * e.r[k] > 0).length;
+    /* acierto esperado al azar con la misma mezcla de largos y cortos */
+    const p0 = m ? ev.reduce((a, e) => a + (e.dir > 0 ? base[k] : 1 - base[k]), 0) / m : null;
+    const z = m && p0 > 0 && p0 < 1 ? (hits - m * p0) / Math.sqrt(m * p0 * (1 - p0)) : 0;
+    return { m, hits, tasa: m ? hits / m * 100 : null, azar: p0 === null ? null : p0 * 100,
+             media: m ? ev.reduce((a, e) => a + e.dir * e.r[k], 0) / m : null, z };
+  });
+  const maes = evs.map(e => e.mae).filter(x => x !== null);
+  return { n, nL, nS: n - nL, h,
+           maeMedia: maes.length ? maes.reduce((a, b) => a + b, 0) / maes.length : null,
+           maePeor: maes.length ? Math.min(...maes) : null };
+}
+/* Prueba binomial contra el azar. Las señales de 1H se solapan, así que
+   esto es optimista: si ni así supera al azar, no hay ventaja visible. */
+function veredictoBT(h) {
+  if (h.m < BT_MIN_MUESTRA) return { t: 't-neutro', txt: 'Muestra chica' };
+  if (h.z >= 1.96) return { t: 't-verde', txt: 'Mejor que el azar' };
+  if (h.z <= -1.96) return { t: 't-rojo', txt: 'Peor que el azar' };
+  return { t: 't-ambar', txt: 'No se distingue del azar' };
+}
+
+/* ---------- pintado ---------- */
+const ETQ_UMBRAL = ['±0.40', '±0.60', '±0.80'];
+function pintarBTEstado() {
+  const el = $('btxEstado'); if (!el) return;
+  const r = bt90.res[bt90.sym];
+  el.textContent = bt90.trabajando
+    ? `calculando ${ACTIVOS[bt90.trabajando].corto}… ${Math.round(bt90.progreso * 100)} %`
+    : bt90.error ? `no se pudo calcular (${bt90.error}); reintenta en unos minutos`
+    : r ? `velas reales de Binance · calculado a las ${new Date(r.t).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })} · se renueva cada hora`
+    : 'se calcula al llegar a esta sección';
+  const barra = $('btxProg');
+  if (barra && bt90.trabajando === bt90.sym) barra.style.width = (bt90.progreso * 100).toFixed(0) + '%';
+}
+function marcarChips(id, valor) {
+  $(id).querySelectorAll('.tf-chip').forEach(c => {
+    const on = c.dataset.v === String(valor);
+    c.classList.toggle('on', on); c.setAttribute('aria-pressed', on);
+  });
+}
+const pctCelda = v => v === null ? '<span style="color:var(--tinta3)">en curso</span>' : fmtPct(v, 1);
+/* una caída nula no lleva signo: "+0.0 %" en rojo confundiría */
+const fmtContra = (v, d) => Math.abs(v) < 0.05 ? '0.0%' : fmtPct(v, d);
+function pintarBacktest() {
+  const cont = $('btxResumen'); if (!cont) return;
+  marcarChips('btxActivo', bt90.sym); marcarChips('btxUmbral', bt90.umbral); marcarChips('btxTF', bt90.tf);
+  pintarBTEstado();
+  const r = bt90.res[bt90.sym], corto = ACTIVOS[bt90.sym].corto, k = bt90.umbral;
+  if (!r) {
+    cont.innerHTML = `<div class="dv-vacio">${bt90.iniciado ? `Recalculando la señal de ${corto} vela a vela en los últimos 90 días…` : 'El backtest se calcula cuando llegas a esta sección.'}
+      <div class="btx-prog"><i id="btxProg" style="width:${bt90.trabajando === bt90.sym ? (bt90.progreso * 100).toFixed(0) : 0}%"></i></div></div>`;
+    $('btxFrase').textContent = ''; $('btxLista').innerHTML = '';
+    return;
+  }
+  const filas = Object.keys(BT_TF).map(tf => {
+    const st = statsBT(r.tf[tf].ev[k], r.base), h = st.h;
+    const celda = x => x.tasa === null ? '—' : `<b>${x.tasa.toFixed(0)} %</b><small>${x.hits}/${x.m} · azar ${x.azar.toFixed(0)} %</small>`;
+    const ver = veredictoBT(h[1]);
+    return `<tr data-tf="${tf}" class="${tf === bt90.tf ? 'on' : ''}">
+      <td><b>${INTERVALOS[tf].etq}</b></td>
+      <td><b>${st.n}</b><small>${st.nL} ▲ · ${st.nS} ▼</small></td>
+      <td>${celda(h[0])}</td><td>${celda(h[1])}</td><td>${celda(h[2])}</td>
+      <td>${h[1].media === null ? '—' : `<b class="${h[1].media >= 0 ? 'sube' : 'baja'}">${fmtPct(h[1].media, 2)}</b>`}</td>
+      <td>${st.maeMedia === null ? '—' : `<b class="baja">${fmtContra(st.maeMedia, 2)}</b><small>peor ${fmtContra(st.maePeor, 1)}</small>`}</td>
+      <td><span class="lect btx-ver ${ver.t}">${ver.txt}</span></td></tr>`;
+  }).join('');
+  cont.innerHTML = `<div class="btx-scroll" tabindex="0" role="region" aria-label="Resumen del backtest por temporalidad (desplazable)">
+    <table class="btx"><thead><tr><th scope="col">Marco</th><th scope="col">Señales</th><th scope="col">A favor 4 h</th>
+      <th scope="col">A favor 24 h</th><th scope="col">A favor 72 h</th><th scope="col">Media 24 h</th>
+      <th scope="col">En contra 24 h</th><th scope="col">Veredicto 24 h</th></tr></thead><tbody>${filas}</tbody></table></div>`;
+  cont.querySelectorAll('tr[data-tf]').forEach(tr => tr.addEventListener('click', () => elegirTFBT(tr.dataset.tf)));
+
+  /* la frase y la lista, para el marco elegido */
+  const evs = r.tf[bt90.tf].ev[k], st = statsBT(evs, r.base), h24 = st.h[1], etq = INTERVALOS[bt90.tf].etq;
+  $('btxFrase').innerHTML = !st.n
+    ? `En 90 días, la señal ${etq} de ${corto} no cruzó el umbral ${ETQ_UMBRAL[k]} ni una vez.`
+    : `En 90 días, la señal ${etq} de ${corto} cruzó el umbral ${ETQ_UMBRAL[k]} <b>${st.n} ${st.n === 1 ? 'vez' : 'veces'}</b> (${st.nL} al alza, ${st.nS} a la baja).` +
+      (h24.m ? ` 24 h después el precio fue a favor en <b>${h24.hits} de ${h24.m}</b> (${h24.tasa.toFixed(0)} %; al azar habría sido ${h24.azar.toFixed(0)} %), ` +
+        `con <b>${fmtPct(h24.media, 1)}</b> de media` + (st.maeMedia === null ? '.' : ` y <b>${fmtContra(st.maeMedia, 1)}</b> de caída máxima en contra en promedio.`) +
+        ` Veredicto: ${veredictoBT(h24).txt.toLowerCase()}${h24.m < BT_MIN_MUESTRA ? ', no concluyente' : ''}.`
+      : ' Todavía no pasaron 24 h desde la primera.');
+  const nombre = (dir) => NOMBRE_ZONA[(k + 1) * dir];
+  const col = (v, dir) => v === null ? '' : dir * v > 0 ? 'sube' : 'baja';
+  $('btxLista').innerHTML = !evs.length ? `<div class="dv-vacio">Sin cruces de ${ETQ_UMBRAL[k]} en ${etq} en estos 90 días.</div>` :
+    `<table class="btx btx-ev"><thead><tr><th scope="col">Fecha</th><th scope="col">Señal</th><th scope="col">Precio</th>
+      <th scope="col">4 h</th><th scope="col">24 h</th><th scope="col">72 h</th><th scope="col">En contra 24 h</th></tr></thead><tbody>${
+      evs.slice().reverse().map(e => {
+        const d = new Date(e.t * 1000);
+        return `<tr><td>${dosDig(d.getDate())}/${dosDig(d.getMonth() + 1)} ${dosDig(d.getHours())}:${dosDig(d.getMinutes())}</td>
+          <td class="${e.dir > 0 ? 'sube' : 'baja'}" style="text-align:left">${e.dir > 0 ? '▲' : '▼'} ${nombre(e.dir)} <small style="display:inline">${e.s >= 0 ? '+' : '−'}${Math.abs(e.s).toFixed(2)}</small></td>
+          <td>${e.p === null ? '—' : fmt$(e.p)}</td>
+          ${e.r.map(v => `<td class="${col(v, e.dir)}">${pctCelda(v)}</td>`).join('')}
+          <td>${e.mae === null ? pctCelda(null) : `<span class="baja">${fmtContra(e.mae, 1)}</span>`}</td></tr>`;
+      }).join('')}</tbody></table>`;
+}
+function elegirTFBT(tf) { bt90.tf = tf; LS.set('lo369_bttf', tf); pintarBacktest(); }
+$('btxActivo').addEventListener('click', e => {
+  const b = e.target.closest('.tf-chip'); if (!b) return;
+  bt90.sym = b.dataset.v; pintarBacktest();
+  if (bt90.iniciado) colaBT();
+});
+$('btxUmbral').addEventListener('click', e => {
+  const b = e.target.closest('.tf-chip'); if (!b) return;
+  bt90.umbral = +b.dataset.v; LS.set('lo369_btu', bt90.umbral); pintarBacktest();
+});
+$('btxTF').addEventListener('click', e => {
+  const b = e.target.closest('.tf-chip'); if (b) elegirTFBT(b.dataset.v);
+});
+/* el panel sigue al activo de la cabecera; sus chips solo cambian lo que se mira aquí */
+function sincronizarBTActivo() {
+  if (bt90.symPrincipal === estado.sym) return;
+  bt90.symPrincipal = bt90.sym = estado.sym;
+  pintarBacktest();
+  if (bt90.iniciado) colaBT();
+}
+function iniciarBacktest() {
+  pintarBacktest();
+  const arrancar = () => { if (bt90.iniciado) return; bt90.iniciado = true; pintarBacktest(); colaBT(); };
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); arrancar(); } }, { rootMargin: '600px 0px' });
+    io.observe($('panelBT'));
+  } else setTimeout(arrancar, 5000);
+  /* cada hora se renueva; un fallo de red se reintenta a los 5 min */
+  setInterval(() => { if (bt90.iniciado && !document.hidden) { bt90.error = null; colaBT(); } }, 300000);
+}
+
 /* toggle de sonido */
 $('btnSonido').setAttribute('aria-pressed', estado.sonido);
 $('btnSonido').textContent = estado.sonido ? '🔔' : '🔕';
@@ -2144,7 +2794,7 @@ function adaptarCopiaLocal() {
   const ins = document.createElement('span');
   ins.className = 'insignia-local';
   ins.textContent = 'COPIA LOCAL';
-  ins.title = 'Estás usando una copia descargada. Los datos de mercado siguen llegando en vivo de Binance, y el diario se guarda en este navegador, aparte del que tengas en el sitio.';
+  ins.title = 'Estás usando una copia descargada. Los datos de mercado siguen llegando en vivo de Binance y Deribit, igual que en el sitio.';
   $('chipFG').before(ins);
   document.title = 'LUNAR ORACLE 369 — copia local';
 }
@@ -2256,7 +2906,7 @@ async function descargarTerminal() {
     via = 'reconstruido desde la página';
   }
   descargarBlob(new Blob([html], { type: 'text/html;charset=utf-8' }), `lunar-oracle-369-${selloFecha()}.html`);
-  tostada(`Terminal descargado, ${via}. Ábrelo con doble clic: se reconecta solo a Binance y guarda su propio diario.`, 'ok', 7000);
+  tostada(`Terminal descargado, ${via}. Ábrelo con doble clic: se reconecta solo a Binance.`, 'ok', 7000);
 }
 
 
@@ -2386,7 +3036,7 @@ async function exportarPDF() {
 
   const pie = () => {
     doc.setFont('helvetica', 'normal').setFontSize(7).setTextColor(130, 138, 170);
-    doc.text(txtPDF(DISCLAIMER + ' Datos publicos de Binance y Alternative.me. Calculo lunar local.'), M, H - 24);
+    doc.text(txtPDF(DISCLAIMER + ' Datos publicos de Binance, Deribit y Alternative.me. Calculo lunar local.'), M, H - 24);
     doc.text(String(pagina), W - M, H - 24, { align: 'right' });
   };
   const nuevaPagina = () => {
@@ -2494,30 +3144,49 @@ async function exportarPDF() {
     if (b.total < 20) parrafo('AVISO DE MUESTRA: con ' + b.total + ' operacion(es) simuladas el porcentaje de acierto no es estadisticamente informativo. La reconstruccion excluye Fear & Greed y futuros porque no tienen historico gratuito, y la simulacion no incluye comisiones ni deslizamiento.');
   }
 
-  /* — diario — */
-  titulo('8 · Diario de operaciones');
-  const trades = lsTrades();
-  if (!trades.length) parrafo('Sin operaciones registradas en este navegador.');
-  else {
-    const cols = [M, M + 74, M + 112, M + 148, M + 200, M + 252, M + 304, M + 360, M + 430];
-    const fila = (v, negrita) => {
-      sitio(14);
-      doc.setFont('helvetica', negrita ? 'bold' : 'normal').setFontSize(7.4).setTextColor(40, 40, 55);
-      v.forEach((x, i) => doc.text(txtPDF(x), cols[i], y));
-      y += 12;
-    };
-    fila(['Fecha', 'Activo', 'Dir', 'Entrada', 'Stop', 'Target', 'Tamano', 'Estado', 'P&L'], true);
-    trades.slice(0, 40).forEach(t => {
-      const d = new Date(t.fecha);
-      const pl = (t.pl === null || t.pl === undefined) ? '-' : (t.pl >= 0 ? '+' : '-') + Math.abs(t.pl).toFixed(2);
-      fila([`${d.getDate()}/${d.getMonth()+1}/${String(d.getFullYear()).slice(-2)}`, t.act, t.dir,
-            String(t.ent), String(t.stop), String(t.tgt), String(t.tam), t.estadoT, pl]);
+  /* — derivados — */
+  titulo('8 · Derivados (Binance futuros)');
+  SIMBOLOS.forEach(sm => {
+    const d = datosDeriv(sm);
+    if (!d.hayAlgo) { linea(d.corto, 'sin datos'); return; }
+    linea(d.corto + (d.m && d.m.marca ? `  · marca ${fmt$(d.m.marca)}` : ''), undefined, true);
+    if (d.fundPct !== undefined) {
+      linea(`   Funding cada ${d.h} h`, `${fmtPct(d.fundPct, 4)} (${fmtPct(d.fundAnual, 1)} anual)`);
+      parrafo('   ' + d.lectFund.txt);
+    }
+    if (d.oiUsd !== undefined) linea('   Open interest', fmtUsdC(d.oiUsd) + (d.dOI === undefined ? '' : ` · ${fmtPct(d.dOI, 1)} en 24 h`));
+    if (d.lectOI) parrafo('   ' + d.lectOI.txt);
+  });
+  const tl = totalesLiq('todos');
+  if (deriv.desde) {
+    const min = Math.min(60, Math.max(1, Math.round((Date.now() - deriv.desde) / 60000)));
+    linea(`Liquidaciones BTC+ETH+SOL, ultimos ${min} min`, `largos ${fmtUsdC(tl.L)} · cortos ${fmtUsdC(tl.S)}`, true);
+    parrafo('Binance publica como maximo una liquidacion por activo y por segundo (la mayor): los totales son un minimo.');
+  }
+
+  /* — rango esperado — */
+  titulo('9 · Rango esperado (1 sigma desde la apertura diaria UTC)');
+  SIMBOLOS.forEach(sm => {
+    const d = datosRango(sm);
+    if (!d.ok) { linea(d.corto, 'sin datos de volatilidad'); return; }
+    linea(`${d.corto}  · sigma anual ${d.sig.toFixed(1)}% (${d.fuente})`, `${fmt$(d.lo1)} - ${fmt$(d.hi1)} (+/-${(d.m * 100).toFixed(1)}%)`, true);
+    linea('   Rango 2 sigma hoy', `${fmt$(d.lo2)} - ${fmt$(d.hi2)}`);
+    linea('   Ruido de 24 h (1 sigma)', `+/-${fmt$(d.ruido)}`);
+    linea('   Hoy, max. a min.', `${d.hoyPct.toFixed(1)}% (tipico ${d.tipicoPct.toFixed(1)}%)`);
+    parrafo('   ' + d.lectZ.txt.replace(/σ/g, ' sigma'));
+  });
+  parrafo('BTC y ETH: volatilidad implicita DVOL de Deribit. SOL: volatilidad realizada de 30 dias. Es estadistica sobre la volatilidad, no una prediccion de direccion.');
+
+  /* — backtest 90 días (solo si ya se calculó en esta visita o la anterior) — */
+  const rb = bt90.res[estado.sym];
+  if (rb) {
+    titulo(`10 · Backtest de la senal, 90 dias (umbral ${ETQ_UMBRAL[bt90.umbral]})`);
+    Object.keys(BT_TF).forEach(tf => {
+      const st = statsBT(rb.tf[tf].ev[bt90.umbral], rb.base), h24 = st.h[1];
+      linea(`${INTERVALOS[tf].etq}: ${st.n} senales (${st.nL} al alza, ${st.nS} a la baja)`,
+        h24.m ? `a favor a 24 h ${h24.hits}/${h24.m} (${h24.tasa.toFixed(0)}%) · azar ${h24.azar.toFixed(0)}% · ${veredictoBT(h24).txt}` : 'sin resultados a 24 h');
     });
-    if (trades.length > 40) parrafo(`Se listan las 40 mas recientes de ${trades.length}.`);
-    y += 4;
-    linea('Riesgo consumido hoy', $('rDiaV').textContent + ' (limite 5%)');
-    linea('Riesgo consumido 7 dias', $('rSemV').textContent + ' (limite 10%)');
-    linea('Drawdown maximo de la curva', $('rDdV').textContent + ' (alerta 20%)');
+    parrafo(`Calculado a las ${new Date(rb.t).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: false })} h. Senal recalculada sin Fear & Greed ni futuros, sin comisiones ni deslizamiento. El pasado no garantiza el futuro.`);
   }
 
   pie();
@@ -2552,8 +3221,9 @@ const AYUDAS = {
   liquidez:'Precios donde el mercado ya giró varias veces. La hipótesis del modelo es que ahí se acumulan órdenes de protección: encima del precio, las de quienes están cortos; debajo, las de quienes están largos. Está deducido de máximos y mínimos, no leído del libro de órdenes.',
   lunar:'Fase lunar calculada localmente con el ciclo sinódico de 29.53 días, sin depender de ninguna API. El multiplicador escala la señal según la fase. La tarjeta de estrategia muestra los parámetros que el modelo asocia al activo seleccionado.',
   historial:'La señal recalculada hora a hora sobre los últimos siete días. La reconstrucción excluye Fear & Greed y los datos de futuros porque no tienen histórico gratuito, y meter el valor de hoy en velas pasadas sería mirar al futuro. La simulación es hipotética: sin comisiones, sin deslizamiento y sin ejecución real.',
-  diario:'Tus operaciones, guardadas solo en este navegador. Los medidores suman el riesgo vivo de lo que sigue abierto más las pérdidas ya realizadas del período. Los límites del 5, 10 y 20 por ciento son los del propio modelo.',
-  alertas:'Cada vez que la señal cruza un umbral en 1H, 4H, 1D o 1W queda anotado aquí. Para anunciar una salida hace falta que la señal caiga un poco por debajo del umbral, de modo que un valor oscilando justo en la frontera no genere avisos en bucle.',
+  derivados:'Funding: lo que pagan los largos a los cortos (o al revés) en cada cobro de los futuros perpetuos de Binance; alto y positivo indica un mercado apalancado al alza. Open interest: el total de contratos abiertos; su cambio en 24 horas, comparado con el del precio, dice si entra dinero nuevo o si el movimiento viene de cierres. Liquidaciones: posiciones que Binance cierra a la fuerza, en vivo. Binance publica como máximo la mayor de cada segundo por activo, así que los totales son un mínimo.',
+  backtest:'La señal Tesla 369 recalculada vela a vela con datos reales de Binance de los últimos 90 días, en 1H, 4H y 1D. Cada vez que cruzó el umbral elegido (con la misma histéresis que las alertas) se anota qué hizo el precio 4, 24 y 72 horas después y cuánto llegó a ir en contra en las primeras 24. "Azar" es cuántas veces habría acertado una apuesta en la misma dirección en cualquier hora del periodo. El veredicto es una prueba binomial contra ese azar; por debajo de 15 señales la muestra no alcanza para concluir nada.',
+  rango:'Cuánto se mueve normalmente cada activo en un día. Para BTC y ETH sale de la volatilidad implícita de sus opciones (índice DVOL de Deribit), es decir, lo que el mercado paga hoy por cubrirse. SOL no tiene DVOL y usa la volatilidad realizada de sus últimos 30 días. Un stop más cerca que el ruido de 24 horas queda expuesto al vaivén de un día normal. Es estadística, no una predicción.',
 };
 document.querySelectorAll('[data-ayuda]').forEach(h => {
   const texto = AYUDAS[h.dataset.ayuda];
@@ -2612,6 +3282,8 @@ if (document.fonts && document.fonts.ready) {
 cargar(true);
 programarRefresco();
 conectarVivo();
+iniciarDerivados();
+iniciarBacktest();
 /* el resize se agrupa: arrastrar el borde de la ventana disparaba un repintado
    completo (velas + historial) en cada píxel */
 let tempResize = null;
