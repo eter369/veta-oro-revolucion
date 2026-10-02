@@ -91,9 +91,6 @@ header.top{position:sticky;top:0;z-index:30;background:rgba(7,8,18,.86);backdrop
 
 /* ---------- layout ---------- */
 main{max-width:1440px;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:16px}
-.aviso-tope{border:1px solid rgba(139,92,246,.35);background:rgba(76,29,149,.14);border-radius:12px;
-  padding:11px 14px;font-size:11.5px;line-height:1.6;color:var(--tinta2)}
-.aviso-tope b{color:#c4b5fd;font-weight:600}
 main.cambiando{animation:cambioActivo .45s ease}
 @keyframes cambioActivo{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
 .panel{background:var(--panel);border:1px solid var(--borde);border-radius:16px;padding:14px 16px}
@@ -151,18 +148,49 @@ main.cambiando{animation:cambioActivo .45s ease}
 #tipVela b{color:var(--tinta)}
 
 /* ---------- gauge ---------- */
+/* En escritorio el panel vive en la columna de 300 px junto al gráfico y todo
+   va apilado. Por debajo de 1100 px ocupa el ancho entero: ahí se abre en dos
+   columnas (medidor | lectura) para no dejar el medidor solo en el centro. */
+.senal-cuerpo{display:flex;flex-direction:column;gap:10px}
+@media(min-width:700px) and (max-width:1100px){
+  .senal-cuerpo{display:grid;grid-template-columns:minmax(0,290px) minmax(0,1fr);gap:22px;align-items:start}
+}
+.senal-der{display:flex;flex-direction:column;gap:10px;min-width:0}
 .gauge-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
-#gaugeGlow{position:absolute;top:8px;width:200px;height:110px;border-radius:50%;filter:blur(28px);pointer-events:none;transition:opacity .6s}
-.gauge-lect{font-family:var(--num);text-align:center;margin-top:-6px}
+#gaugeGlow{position:absolute;top:10px;width:210px;height:116px;border-radius:50%;filter:blur(28px);pointer-events:none;transition:opacity .6s,background .6s}
+/* cerca de un umbral el halo late: la señal está a punto de cambiar de zona */
+#gaugeGlow.cerca{animation:halo 1.6s ease-in-out infinite}
+@keyframes halo{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.gauge-lect{font-family:var(--num);text-align:center;margin-top:-8px}
 .gauge-lect .cls{font-size:17px;font-weight:700;letter-spacing:.1em}
 .gauge-lect .acc{font-size:10.5px;color:var(--tinta3);letter-spacing:.14em;text-transform:uppercase;margin-top:2px}
 .gauge-lect .val{font-size:30px;font-weight:700;margin-top:4px}
-.bloqueo{display:none;margin-top:10px;border:1px solid rgba(251,113,133,.6);background:rgba(251,113,133,.1);color:#fecdd3;border-radius:10px;padding:8px 12px;font-family:var(--num);font-size:11px;letter-spacing:.1em;text-align:center}
+/* trayectoria de 24 h */
+.tray{display:flex;flex-direction:column;gap:4px}
+.tray svg{display:block;width:100%;height:50px}
+.tray .t-linea{font-family:var(--num);font-size:10.5px;color:var(--tinta2);line-height:1.45;text-align:center}
+.tray .t-linea b{color:var(--tinta);font-weight:600}
+.tray .t-eje{display:flex;justify-content:space-between;font-family:var(--num);font-size:9px;color:var(--tinta3)}
+.bloqueo{display:none;border:1px solid rgba(251,113,133,.6);background:rgba(251,113,133,.1);color:#fecdd3;border-radius:10px;padding:8px 12px;font-family:var(--num);font-size:11px;letter-spacing:.1em;text-align:center}
 .bloqueo.on{display:block;animation:vivoPulso 1.1s ease-in-out infinite}
-.confirmaciones{margin-top:12px;display:flex;flex-direction:column;gap:5px;font-size:12px}
+/* confirmaciones: condición a la izquierda, la cifra que la decide a la derecha */
+.confirmaciones{display:flex;flex-direction:column;gap:5px;font-size:11.5px}
+.confirmaciones div{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.confirmaciones small{font-family:var(--num);font-size:10px;color:var(--tinta3);text-align:right}
 .confirmaciones .c-ok{color:var(--tinta)}
 .confirmaciones .c-no{color:var(--tinta3)}
-.gauge-pie{margin-top:10px;padding-top:10px;border-top:1px solid var(--borde);font-family:var(--num);font-size:10.5px;color:var(--tinta3);display:flex;justify-content:space-between;width:100%}
+.motores{display:flex;flex-direction:column;gap:3px;font-family:var(--num);font-size:10.5px;color:var(--tinta3);line-height:1.45;border-top:1px dashed rgba(56,65,107,.55);padding-top:8px}
+.motores b{font-weight:600}
+/* plan de la escala del modelo */
+.plan{background:var(--panel2);border:1px solid var(--borde2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.plan-filas{display:flex;flex-direction:column;gap:3px}
+.plan-filas div{display:flex;justify-content:space-between;gap:10px;font-family:var(--num);font-size:10.5px;color:var(--tinta3)}
+.plan-filas b{color:var(--tinta);font-weight:600;text-align:right}
+.plan .pista-plan{font-size:10.5px;color:var(--tinta3);line-height:1.45}
+.avisos-sis{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.avisos-sis .filtro-tf{margin:0}
+#btnNotif[aria-pressed="true"]{color:#a7f3d0;border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.08)}
+.gauge-pie{padding-top:10px;border-top:1px solid var(--borde);font-family:var(--num);font-size:10.5px;color:var(--tinta3);display:flex;justify-content:space-between;width:100%}
 
 /* ---------- multi-timeframe ---------- */
 .mtf-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
@@ -235,13 +263,11 @@ main.cambiando{animation:cambioActivo .45s ease}
 /* resumen en texto de cada canvas: los datos también existen fuera del dibujo */
 .resumen-canvas{margin-top:8px;font-size:11px;color:var(--tinta3);line-height:1.6}
 
-/* ---------- derivados y liquidaciones ---------- */
-.deriv-wrap{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px}
-@media(max-width:1100px){.deriv-wrap{grid-template-columns:1fr}}
+/* ---------- derivados ---------- */
 .deriv-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 @media(max-width:700px){.deriv-grid{grid-template-columns:1fr}}
 /* tarjeta por activo (derivados y rango comparten el armazón) */
-.dv,.rg,.lqd{background:var(--panel2);border:1px solid var(--borde);border-radius:12px;padding:11px 12px;display:flex;flex-direction:column;gap:7px;font-size:11px;min-width:0}
+.dv,.rg{background:var(--panel2);border:1px solid var(--borde);border-radius:12px;padding:11px 12px;display:flex;flex-direction:column;gap:7px;font-size:11px;min-width:0}
 /* el activo del gráfico se marca con el mismo borde índigo que la matriz */
 .dv.on,.rg.on{box-shadow:inset 0 0 0 1px var(--liq),0 0 12px rgba(165,180,252,.2)}
 .dv-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-family:var(--num)}
@@ -262,26 +288,7 @@ main.cambiando{animation:cambioActivo .45s ease}
 .lect.t-ambar{background:rgba(250,204,21,.08);border-color:rgba(250,204,21,.4);color:#fde68a}
 .lect.t-violeta{background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.45);color:#ddd6fe}
 .lect.t-neutro{background:rgba(139,147,184,.07);border-color:rgba(139,147,184,.28);color:var(--tinta2)}
-.lqd-cab{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px}
-.lqd .filtro-tf{margin:0}
-.lqd-tot{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-family:var(--num)}
-.lqd-tot div{display:flex;flex-direction:column}
-.lqd-tot div:last-child{text-align:right}
-.lqd-tot span{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta3)}
-.lqd-tot b{font-size:16px;font-weight:700}
-.lqd-tot small{font-size:9.5px;color:var(--tinta3)}
-.lqd-barra{display:flex;height:7px;border-radius:99px;overflow:hidden;background:#20263f;margin-top:6px}
-.lqd-barra i{height:100%;transition:width .4s}
-.lqd-feed{max-height:236px;min-height:120px;overflow-y:auto;font-family:var(--num);font-size:10.5px;border-top:1px solid var(--borde)}
-.lqd-ev{display:grid;grid-template-columns:52px 30px minmax(0,1fr) auto;gap:6px;align-items:baseline;padding:5px 2px;border-bottom:1px solid rgba(35,42,68,.6);color:var(--tinta2)}
-.lqd-ev time{color:var(--tinta3)}
-.lqd-ev .lado{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lqd-ev .usd{font-weight:700;text-align:right}
-.lqd-ev.grande{background:rgba(167,139,250,.08)}
-.lqd-ev.nuevo{animation:lqdEntra 1.4s ease-out}
-@keyframes lqdEntra{from{background:rgba(167,139,250,.32)}to{background:transparent}}
-.lqd-vacio{color:var(--tinta3);font-size:11px;padding:18px 6px;text-align:center;line-height:1.5}
-.lqd-nota{font-size:9.5px;color:var(--tinta3);line-height:1.5}
+
 .filtro-tf{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:8px;font-family:var(--num);font-size:10px;color:var(--tinta3)}
 
 .filtro-tf>span{margin-right:4px}
@@ -364,7 +371,6 @@ table.btx tr.on td:first-child{box-shadow:inset 2px 0 0 var(--liq)}
   border:1px solid var(--borde2);color:var(--tinta3);font-family:var(--num);font-size:9px;font-weight:700;cursor:help}
 .ayuda:hover,.ayuda:focus-visible{color:var(--violeta);border-color:var(--violeta)}
 
-footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(--tinta3);padding:6px 16px 30px;line-height:1.7;max-width:900px;margin:0 auto}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -396,13 +402,6 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
 </header>
 
 <main id="principal">
-  <!-- aviso permanente: el modelo no recomienda, describe. Va arriba, no solo en el pie -->
-  <p class="aviso-tope">
-    <b>Herramienta educativa.</b> Este terminal describe la lectura de un modelo propio sobre datos
-    públicos de mercado; no es asesoría financiera ni una recomendación de compra o venta. Los
-    porcentajes de entrada, los targets y los límites de exposición son la escala interna del modelo,
-    no una recomendación personalizada. Ninguna cifra de esta página es una promesa de resultados.
-  </p>
   <div class="barra-export" id="barraExport">
     <span class="etq">Exportar</span>
     <button class="btn-exp destacado" id="expTerminal" type="button">⬇️ Descargar Terminal</button>
@@ -440,18 +439,38 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
       </section>
       <section class="panel">
         <h2 data-ayuda="senal">Señal Tesla 369 · 1H</h2>
-        <div class="gauge-wrap">
-          <div id="gaugeGlow"></div>
-          <svg id="gaugeSvg" width="230" height="132" viewBox="0 0 230 132"></svg>
-          <div class="gauge-lect">
-            <div class="cls" id="gCls">—</div>
-            <div class="acc" id="gAcc">—</div>
-            <div class="val num" id="gVal">0.000</div>
+        <div class="senal-cuerpo">
+          <div class="senal-izq">
+            <div class="gauge-wrap">
+              <div id="gaugeGlow"></div>
+              <svg id="gaugeSvg" width="254" height="146" viewBox="-12 -6 254 146" role="img" aria-label="Medidor de la señal Tesla 369, de −1 a +1"></svg>
+              <div class="gauge-lect">
+                <div class="cls" id="gCls">—</div>
+                <div class="acc" id="gAcc">—</div>
+                <div class="val num" id="gVal">0.000</div>
+              </div>
+            </div>
+            <div class="tray" id="gTray"></div>
+          </div>
+          <div class="senal-der">
+            <div class="bloqueo" id="gBloqueo">⛔ BLOQUEADO — FILTRO ACTIVO</div>
+            <div id="gCalidad"></div>
+            <div class="confirmaciones" id="gConfs"></div>
+            <div class="motores" id="gMotores"></div>
+            <div id="gPlan"></div>
+            <div class="avisos-sis">
+              <button class="btn-ref" id="btnNotif" type="button" aria-pressed="false"
+                title="Notificación del sistema cuando la señal del activo abierto cruza un umbral, aunque la pestaña esté en segundo plano">🖥️ Avisos del sistema</button>
+              <div class="filtro-tf" id="notifTF" role="group" aria-label="Temporalidades que envían aviso">
+                <button class="tf-chip" type="button" data-v="1h">1H</button>
+                <button class="tf-chip" type="button" data-v="4h">4H</button>
+                <button class="tf-chip" type="button" data-v="1d">1D</button>
+                <button class="tf-chip" type="button" data-v="1w">1W</button>
+              </div>
+            </div>
+            <div class="gauge-pie"><span id="gRaw">score técnico —</span><span id="gLunar">× lunar —</span></div>
           </div>
         </div>
-        <div class="bloqueo" id="gBloqueo">⛔ BLOQUEADO — FILTRO ACTIVO</div>
-        <div class="confirmaciones" id="gConfs"></div>
-        <div class="gauge-pie"><span id="gRaw">score técnico —</span><span id="gLunar">× lunar —</span></div>
       </section>
     </div>
 
@@ -503,24 +522,8 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
 
     <!-- ============ DERIVADOS Y LIQUIDACIONES EN VIVO ============ -->
     <section class="panel">
-      <h2 data-ayuda="derivados">Derivados y liquidaciones en vivo <span class="mini" id="derivEstado">Binance futuros USDT-M · conectando…</span></h2>
-      <div class="deriv-wrap">
-        <div class="deriv-grid" id="derivGrid"></div>
-        <div class="lqd">
-          <div class="lqd-cab">
-            <span class="dv-et">Liquidaciones · última hora</span>
-            <div class="filtro-tf" id="filtroLiq" role="group" aria-label="Filtrar liquidaciones por activo">
-              <button class="tf-chip" type="button" data-f="todos">Los 3</button>
-              <button class="tf-chip" type="button" data-f="BTCUSDT">BTC</button>
-              <button class="tf-chip" type="button" data-f="ETHUSDT">ETH</button>
-              <button class="tf-chip" type="button" data-f="SOLUSDT">SOL</button>
-            </div>
-          </div>
-          <div id="lqdBalance"></div>
-          <div class="lqd-feed" id="lqdFeed" tabindex="0" role="region" aria-label="Liquidaciones de 50 mil dólares o más (desplazable)"></div>
-          <p class="lqd-nota" id="lqdNota"></p>
-        </div>
-      </div>
+      <h2 data-ayuda="derivados">Derivados en vivo <span class="mini" id="derivEstado">Binance futuros USDT-M · conectando…</span></h2>
+      <div class="deriv-grid" id="derivGrid"></div>
     </section>
 
     <!-- ============ BACKTEST DE LA SEÑAL · 90 DÍAS ============ -->
@@ -574,12 +577,6 @@ footer{position:relative;z-index:2;text-align:center;font-size:11.5px;color:var(
 
   </div><!-- /tablero -->
 </main>
-
-<footer>
-  Datos en vivo: WebSocket público de Binance (precio y vela en curso, cada segundo; funding y liquidaciones de futuros) sobre su API REST (spot + futures), volatilidad implícita DVOL de Deribit y Alternative.me Fear &amp; Greed · Cálculo lunar astronómico local · Reconciliación completa según el intervalo del gráfico (30 s a 15 min)<br>
-  Terminal descargable: el botón ⬇ de la cabecera entrega este mismo archivo, que funciona por su cuenta con doble clic.<br>
-  Herramienta educativa de análisis probabilístico. No es asesoría financiera — la ejecución y el riesgo son tuyos.
-</footer>
 
 <div id="tipVela"></div>
 <div id="tostadas" role="status" aria-live="polite"></div>
@@ -869,7 +866,8 @@ function señalTesla(vel, lunar, fg, futuros) {
   const precio = cs[u];
   /* el <= cierra la frontera exacta de −0.400, donde la etiqueta ya dice SWING SHORT */
   const esLong = score > 0.40, esShort = score <= -0.40;
-  const confs = esShort ? [
+  /* las confirmaciones miran al lado hacia el que apunta la señal, también en HOLD */
+  const confs = score < 0 ? [
     { l:'Señal < −0.40', ok: score < -0.40 },
     { l:'ADX > 20', ok: adxV > 20 },
     { l:'Precio < VWAP', ok: precio < vwapNiv },
@@ -1256,6 +1254,8 @@ function dispararAlerta(sym, tf, z, s, escalada) {
   caja.querySelector('.ok').addEventListener('click', () => { caja.remove(); if (!b.children.length) b.classList.remove('on'); });
   /* sonido (WebAudio, sin archivos) — solo en escaladas, no al desinflarse */
   if (estado.sonido && escalada) beep(z > 0);
+  if (escalada) avisarSistema(tf, `${ACTIVOS[sym].corto} · ${etqTF}: ${nombre}`,
+    `Señal ${s >= 0 ? '+' : ''}${s.toFixed(3)} · ${fmt$(precio)} · Lunar Oracle 369`, `${sym}-${tf}`);
 }
 let audioCtx = null;
 function beep(alcista) {
@@ -1817,36 +1817,236 @@ $('lienzoVelas').addEventListener('mousemove', e => {
 });
 $('lienzoVelas').addEventListener('mouseleave', () => $('tipVela').style.display = 'none');
 
-/* ---------- gauge con glow proporcional ---------- */
-function pintarGauge() {
-  const s = estado.señal, svg = $('gaugeSvg');
-  /* El arco usa el mismo convenio que sin/cos de abajo: −90° = extremo izquierdo
-     (MAX SHORT), 0° = arriba (HOLD), +90° = extremo derecho (MAX LONG). Por eso
-     la aguja es score×90 a secas — restarle 90 la dejaba señalando MAX SHORT con
-     la señal en cero y la sacaba del SVG con señal negativa. */
-  const ang = (s.score * 90) * Math.PI / 180;
-  const cx = 115, cy = 118, R = 96;
+/* ---------- gauge: medidor, trayectoria, calidad histórica y plan ----------
+   El arco usa el mismo convenio que sin/cos: −90° = extremo izquierdo (MAX
+   SHORT), 0° = arriba (HOLD), +90° = extremo derecho (MAX LONG). La aguja es
+   score×90. El SVG se monta UNA vez y luego solo gira la aguja: antes se
+   rehacía entero cada 400 ms y no había forma de animarla.                */
+const G = { cx: 115, cy: 118, R: 96 };
+const RM_GAUGE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const gauge = { montado: false, actual: null, objetivo: 0, vel: 0, raf: 0 };
+const rotar = v => `rotate(${(v * 90).toFixed(2)} ${G.cx} ${G.cy})`;
+function montarGauge() {
+  const { cx, cy, R } = G;
+  const d = g => g * Math.PI / 180;
+  const pt = (a, r) => [cx + r * Math.sin(a), cy - r * Math.cos(a)];
   const arc = (a0, a1, col) => {
-    const p0 = [cx + R*Math.sin(a0), cy - R*Math.cos(a0)], p1 = [cx + R*Math.sin(a1), cy - R*Math.cos(a1)];
+    const p0 = pt(d(a0), R), p1 = pt(d(a1), R);
     return `<path d="M ${p0[0]} ${p0[1]} A ${R} ${R} 0 0 1 ${p1[0]} ${p1[1]}" fill="none" stroke="${col}" stroke-width="13" stroke-linecap="round"/>`;
   };
-  const d = g => g * Math.PI / 180;
-  svg.innerHTML =
-    arc(d(-90), d(-72), '#ff2d55') + arc(d(-72), d(-54), '#f87171') + arc(d(-54), d(-36), '#fb923c') +
-    arc(d(-36), d(36), '#3f4569') +
-    arc(d(36), d(54), '#a3e635') + arc(d(54), d(72), '#4ade80') + arc(d(72), d(90), '#00ff9d') +
-    /* marcas de umbral */
-    [0.4, 0.6, 0.8].flatMap(u => [u, -u]).map(u => {
-      const a = d(u * 90);
-      return `<line x1="${cx + (R-11)*Math.sin(a)}" y1="${cy - (R-11)*Math.cos(a)}" x2="${cx + (R+11)*Math.sin(a)}" y2="${cy - (R+11)*Math.cos(a)}" stroke="#0b0e1c" stroke-width="2.5"/>`;
+  const umbrales = [0.4, 0.6, 0.8].flatMap(u => [u, -u]);
+  $('gaugeSvg').innerHTML =
+    arc(-90, -72, '#ff2d55') + arc(-72, -54, '#f87171') + arc(-54, -36, '#fb923c') +
+    arc(-36, 36, '#3f4569') +
+    arc(36, 54, '#a3e635') + arc(54, 72, '#4ade80') + arc(72, 90, '#00ff9d') +
+    umbrales.map(u => {
+      const [x1, y1] = pt(d(u * 90), R - 11), [x2, y2] = pt(d(u * 90), R + 11);
+      return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#0b0e1c" stroke-width="2.5"/>`;
     }).join('') +
-    `<line x1="${cx}" y1="${cy}" x2="${cx + (R-20)*Math.sin(ang)}" y2="${cy - (R-20)*Math.cos(ang)}" stroke="${s.color}" stroke-width="3.5" stroke-linecap="round"/>
-     <circle cx="${cx}" cy="${cy}" r="7" fill="${s.color}"/>`;
-  /* glow ∝ |señal| */
-  const fuerza = Math.abs(s.score);
+    /* rótulos de umbral por fuera del arco (fuente del sistema: el PNG los rasteriza tal cual) */
+    umbrales.map(u => {
+      const [x, y] = pt(d(u * 90), R + 21);
+      return `<text x="${x.toFixed(1)}" y="${(y + 3).toFixed(1)}" text-anchor="middle" font-size="8.5" font-family="ui-monospace,Menlo,Consolas,monospace" fill="#7d86ae">${u > 0 ? '+' : '−'}${Math.abs(u).toFixed(1).slice(1)}</text>`;
+    }).join('') +
+    /* aguja fantasma: dónde estaba al cierre de la vela anterior */
+    `<line id="gFantasma" x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - (R - 26)}" stroke="#c4b5fd" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round" opacity="0"/>` +
+    `<g id="gAguja"><line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - (R - 20)}" stroke-width="3.5" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="7"/></g>`;
+  gauge.montado = true;
+}
+/* Muelle amortiguado: la aguja llega con un leve rebote en vez de saltar. */
+function animarAguja() {
+  gauge.raf = 0;
+  gauge.vel = (gauge.vel + (gauge.objetivo - gauge.actual) * 0.12) * 0.74;
+  gauge.actual += gauge.vel;
+  if (Math.abs(gauge.objetivo - gauge.actual) < 0.0008 && Math.abs(gauge.vel) < 0.0008) { gauge.actual = gauge.objetivo; gauge.vel = 0; }
+  $('gAguja').setAttribute('transform', rotar(gauge.actual));
+  if (gauge.actual !== gauge.objetivo) gauge.raf = requestAnimationFrame(animarAguja);
+}
+
+/* ---------- trayectoria de 24 h ----------
+   La señal al cierre de cada una de las últimas 24 velas de 1H, con el
+   mismo motor que la del medidor. Fear & Greed y futuros entran con su
+   valor ACTUAL (no tienen histórico gratuito): así la línea es comparable
+   con la aguja y lo que se ve moverse es lo técnico y la luna. Se recalcula
+   solo cuando cierra una vela o cambian esos datos, no cada segundo.      */
+const trayectoria = { clave: null, puntos: [] };
+function calcularTrayectoria() {
+  const v = estado.velasSeñal['1h'];
+  if (!v || v.length < 230) { trayectoria.puntos = []; return; }
+  const fgV = estado.fg ? estado.fg.v : null, f = estado.fut;
+  const clave = `${estado.sym}|${v[v.length - 2].time}|${fgV}|${f ? f.ratio + ':' + f.oi : ''}`;
+  if (clave === trayectoria.clave) return;
+  const pts = [];
+  for (let i = v.length - 25; i <= v.length - 2; i++) {
+    const tc = v[i].time + 3600;
+    pts.push({ t: tc, s: señalTesla(v.slice(Math.max(0, i - 499), i + 1), faseLunar(new Date(tc * 1000)), fgV, f).score });
+  }
+  trayectoria.clave = clave; trayectoria.puntos = pts;
+}
+const conSigno = (v, d = 2) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(d);
+const horaHM = t => new Date(t).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: false });
+function pintarTrayectoria(s) {
+  const T = trayectoria.puntos, el = $('gTray');
+  if (T.length < 4) { el.innerHTML = ''; return; }
+  const serie = [...T.map(p => p.s), s.score];
+  const W = 260, H = 50, n = serie.length;
+  const lo = Math.min(-0.5, ...serie) - 0.06, hi = Math.max(0.5, ...serie) + 0.06;
+  const x = i => (i / (n - 1) * W).toFixed(1), y = v => (H - (v - lo) / (hi - lo) * H).toFixed(1);
+  const guia = (v, col, dash) => `<line x1="0" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="${col}" stroke-width="1" ${dash ? 'stroke-dasharray="3 3"' : ''} vector-effect="non-scaling-stroke"/>`;
+  /* cambio frente al cierre de hace 3 velas y distancia al próximo umbral */
+  const ref = T[T.length - 3], delta = s.score - ref.s;
+  const tend = Math.abs(delta) < 0.03 ? { t: 'Estable', c: '' } : delta > 0 ? { t: 'Subiendo', c: 'sube' } : { t: 'Bajando', c: 'baja' };
+  const a = Math.abs(s.score), lado = s.score >= 0 ? 1 : -1;
+  let dist;
+  if (a < UMBRALES[0]) {
+    /* hacia dónde se dirige; si está quieta, el umbral más cercano */
+    const hacia = Math.abs(delta) >= 0.03 ? Math.sign(delta) : lado;
+    const U = UMBRALES[0] * hacia;
+    dist = `faltan <b>${Math.abs(U - s.score).toFixed(2)}</b> para ${NOMBRE_ZONA[hacia]} (${conSigno(U)})`;
+  } else {
+    const z = a >= UMBRALES[2] ? 3 : a >= UMBRALES[1] ? 2 : 1;
+    const salida = (UMBRALES[z - 1] - HISTERESIS) * lado;
+    dist = `en ${NOMBRE_ZONA[z * lado]}` +
+      (z < 3 ? ` · a <b>${(UMBRALES[z] - a).toFixed(2)}</b> de ${NOMBRE_ZONA[(z + 1) * lado]}` : '') +
+      ` · baja de nivel si cruza ${conSigno(salida)}`;
+  }
+  el.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Señal de las últimas 24 horas: de ${conSigno(serie[0])} a ${conSigno(s.score)}">
+      ${guia(0.4, '#5b6596', true)}${guia(-0.4, '#5b6596', true)}${guia(0, '#2f3758', false)}
+      <path d="${serie.map((v, i) => `${i ? 'L' : 'M'}${x(i)} ${y(v)}`).join(' ')}" fill="none" stroke="${s.color}" stroke-width="1.8" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+      <line x1="${x(n - 1)}" x2="${x(n - 1)}" y1="${y(s.score)}" y2="${y(s.score)}" stroke="${s.color}" stroke-width="6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+    </svg>
+    <div class="t-eje"><span>hace 24 h</span><span>líneas: ±0.40</span><span>ahora</span></div>
+    <div class="t-linea"><b class="${tend.c}">${tend.t} ${conSigno(delta)}</b> desde las ${horaHM(ref.t * 1000)} · ${dist}</div>`;
+}
+
+/* ---------- confirmaciones con la cifra que las decide ---------- */
+function pintarConfirmaciones(s) {
+  const dirLong = s.score >= 0;
+  const n = dirLong ? estado.mtf.nLong : estado.mtf.nShort;
+  const U = UMBRALES[0] * (dirLong ? 1 : -1);
+  const dv = s.vwapNiv ? (s.precio - s.vwapNiv) / s.vwapNiv * 100 : 0;
+  const det = [
+    s.confs[0].ok ? conSigno(s.score, 3) : `${conSigno(s.score, 3)} · faltan ${Math.abs(U - s.score).toFixed(2)}`,
+    `ADX ${s.adxV.toFixed(1)}`,
+    `${fmt$(s.precio)} vs ${fmt$(s.vwapNiv)} (${fmtPct(dv, 2)})`,
+    `${n} de 5`,
+  ];
+  const confs = [...s.confs, { l: '≥3/5 timeframes alineados', ok: n >= 3 }];
+  $('gConfs').innerHTML = confs.map((c, i) =>
+    `<div class="${c.ok ? 'c-ok' : 'c-no'}"><span>${c.ok ? '✓' : '○'} ${c.l}</span><small>${det[i]}</small></div>`).join('');
+}
+
+/* ---------- qué mueve la señal ---------- */
+const NOMBRE_CORTO = { rsi:'RSI', macd:'MACD', bb:'Bollinger', adx:'ADX', st:'SuperTrend', vwap:'VWAP', lunar:'Fase lunar', fg:'Fear & Greed', obv:'OBV', fut:'Futuros' };
+function pintarMotores(s) {
+  /* aporte de cada indicador a la cifra del medidor (ya multiplicada por la luna) */
+  const c = s.inds.map(i => ({ n: NOMBRE_CORTO[i.id] || i.nombre, v: i.ponderado * s.multLunar }));
+  const pos = c.filter(x => x.v > 0.005).sort((a, b) => b.v - a.v).slice(0, 2);
+  const neg = c.filter(x => x.v < -0.005).sort((a, b) => a.v - b.v).slice(0, 2);
+  const lista = (arr, cls) => arr.length ? arr.map(x => `${x.n} <b class="${cls}">${conSigno(x.v)}</b>`).join(' · ') : 'nada relevante';
+  $('gMotores').innerHTML =
+    `<div><span class="sube">▲ Empujan al alza:</span> ${lista(pos, 'sube')}</div>` +
+    `<div><span class="baja">▼ Empujan a la baja:</span> ${lista(neg, 'baja')}</div>`;
+}
+
+/* ---------- calidad histórica (del backtest de 90 días) ---------- */
+function pintarCalidad(s) {
+  const el = $('gCalidad');
+  const r = bt90.res[estado.sym];
+  if (!r) { el.innerHTML = `<div class="lect t-neutro"><b>Calidad histórica:</b> calculando el backtest de 90 días…</div>`; return; }
+  const a = Math.abs(s.score), dir = s.score >= 0 ? 1 : -1;
+  const k = a >= UMBRALES[2] ? 2 : a >= UMBRALES[1] ? 1 : 0;
+  const st = statsBT(r.tf['1h'].ev[k].filter(e => e.dir === dir), r.base), h = st.h[1];
+  const u = conSigno(UMBRALES[k] * dir);
+  const intro = a >= UMBRALES[0] ? `Cuando la señal 1H cruzó ${u}` : `Si cruza ${u}: en las veces que lo hizo`;
+  if (!h.m) { el.innerHTML = `<div class="lect t-neutro"><b>Calidad histórica:</b> ${intro}, no hay cruces con resultado a 24 h en 90 días.</div>`; return; }
+  const ver = veredictoBT(h);
+  el.innerHTML = `<div class="lect ${ver.t}"><b>Calidad histórica · ${ver.txt}.</b> ${intro} (90 días), el precio fue a favor ` +
+    `a 24 h en ${h.hits} de ${h.m} (${h.tasa.toFixed(0)} %; azar ${h.azar.toFixed(0)} %).</div>`;
+}
+
+/* ---------- plan de la escala del modelo ---------- */
+function nivelesAgrupados() {
+  const V = estado.velas1h.slice(-160);
+  const { hs, ls } = nivelesLiquidez(V, 5);
+  const px = estado.señal.precio;
+  const agrupar = arr => {
+    const grupos = [];
+    [...arr].sort((a, b) => a - b).forEach(v => {
+      const g = grupos.find(x => Math.abs(x.nivel - v) / v < 0.0015);
+      if (g) { g.n++; g.nivel = (g.nivel * (g.n - 1) + v) / g.n; } else grupos.push({ nivel: v, n: 1 });
+    });
+    return grupos;
+  };
+  /* los dos, del más cercano al precio al más lejano */
+  return { px,
+    arriba: agrupar(hs.filter(h => h > px)).sort((a, b) => a.nivel - b.nivel).slice(0, 4),
+    abajo: agrupar(ls.filter(l => l < px)).sort((a, b) => b.nivel - a.nivel).slice(0, 4) };
+}
+function pintarPlan(s) {
+  const el = $('gPlan');
+  if (!(s.esLong || s.esShort)) {
+    el.innerHTML = `<div class="plan" style="opacity:.75"><span class="pista-plan">El plan de la escala del modelo (entrada, stop y objetivos) aparece cuando la señal cruza ±0.40.</span></div>`;
+    return;
+  }
+  const dir = s.esLong ? 1 : -1, act = ACTIVOS[estado.sym];
+  const ent = estado.tickers[estado.sym]?.precio ?? s.precio;
+  const atrV = atr(estado.velasSeñal['1h'], 14).at(-1) || 0;
+  const riesgo = atrV * act.stopATR, stop = ent - dir * riesgo;
+  const { arriba, abajo } = nivelesAgrupados();
+  /* objetivos: niveles de liquidez del lado de la señal; si no hay, el % mínimo del modelo */
+  let objs = (dir > 0 ? arriba : abajo).map(g => ({ p: g.nivel, o: 'liquidez' }))
+    .filter(x => (x.p - ent) * dir > riesgo * 0.25).slice(0, 2);
+  if (!objs.length) objs = [{ p: ent * (1 + dir * act.tgtMin / 100), o: `modelo ${act.tgtMin} %` }];
+  const filasObj = objs.map((x, i) =>
+    `<div><span>Objetivo ${i + 1} (${x.o})</span><b class="${dir > 0 ? 'sube' : 'baja'}">${fmt$(x.p)} · R:R ${riesgo ? (Math.abs(x.p - ent) / riesgo).toFixed(1) : '—'}</b></div>`).join('');
+  /* ¿el stop sobrevive al vaivén normal? (panel de Rango esperado) */
+  let chequeo = '';
+  const dr = datosRango(estado.sym);
+  if (dr && dr.ok && riesgo) {
+    const r4 = ent * dr.m * Math.sqrt(4 / 24), r24 = dr.ruido;
+    chequeo = riesgo < r4
+      ? `<div class="lect t-rojo">El stop queda dentro del ruido normal de 4 h (±${fmt$(r4)}): un vaivén corriente puede tocarlo.</div>`
+      : riesgo < r24
+      ? `<div class="lect t-ambar">El stop aguanta el ruido de 4 h (±${fmt$(r4)}) pero no el de un día (±${fmt$(r24)}).</div>`
+      : `<div class="lect t-verde">El stop queda fuera del ruido normal de un día (±${fmt$(r24)}).</div>`;
+  }
+  el.innerHTML = `<div class="plan"${estado.bloqueado ? ' style="opacity:.7"' : ''}>
+    <div class="dv-top"><b class="${dir > 0 ? 'sube' : 'baja'}">Plan ${dir > 0 ? 'largo' : 'corto'} · escala del modelo</b><span>${s.acc}</span></div>
+    <div class="plan-filas">
+      <div><span>Entrada (precio actual)</span><b>${fmt$(ent)}</b></div>
+      <div><span>Stop (${act.stopATR}× ATR 1H)</span><b class="baja">${fmt$(stop)} · ${fmtPct((stop - ent) / ent * 100, 2)}</b></div>
+      ${filasObj}
+    </div>
+    ${estado.bloqueado ? '<div class="lect t-rojo">Filtro activo: el modelo no valida esta señal.</div>' : ''}${
+      riesgo && objs.every(x => Math.abs(x.p - ent) / riesgo < 1) ? '<div class="lect t-ambar">Ningún objetivo paga el riesgo (R:R menor que 1): la liquidez más cercana está más cerca que el stop.</div>' : ''}${chequeo}
+  </div>`;
+}
+
+function pintarGauge() {
+  const s = estado.señal;
+  if (!gauge.montado) montarGauge();
+  /* aguja: muelle hacia el valor nuevo (directo con movimiento reducido) */
+  gauge.objetivo = s.score;
+  const ag = $('gAguja');
+  ag.querySelector('line').setAttribute('stroke', s.color);
+  ag.querySelector('circle').setAttribute('fill', s.color);
+  if (gauge.actual === null || RM_GAUGE) { gauge.actual = s.score; gauge.vel = 0; ag.setAttribute('transform', rotar(s.score)); }
+  else if (!gauge.raf && gauge.actual !== s.score) gauge.raf = requestAnimationFrame(animarAguja);
+  /* trayectoria y aguja fantasma */
+  calcularTrayectoria();
+  const T = trayectoria.puntos, fant = $('gFantasma');
+  if (T.length) { fant.setAttribute('transform', rotar(T[T.length - 1].s)); fant.setAttribute('opacity', '0.55'); }
+  else fant.setAttribute('opacity', '0');
+  /* halo: crece con la fuerza y con la cercanía al próximo umbral, y late a < 0.05 */
+  const a = Math.abs(s.score);
+  const sig = UMBRALES.find(u => u > a);
+  const prox = sig === undefined ? 1 : clamp(1 - (sig - a) / 0.15, 0, 1);
   const glow = $('gaugeGlow');
   glow.style.background = s.color;
-  glow.style.opacity = (0.10 + fuerza * 0.5).toFixed(2);
+  glow.style.opacity = (0.10 + a * 0.45 + prox * 0.22).toFixed(2);
+  glow.classList.toggle('cerca', sig !== undefined && sig - a <= 0.05);
   const bloq = estado.bloqueado;
   $('gCls').textContent = bloq ? 'BLOQUEADO' : s.cls;
   $('gCls').style.color = bloq ? '#fb7185' : s.color;
@@ -1855,14 +2055,63 @@ function pintarGauge() {
   $('gVal').textContent = (s.score >= 0 ? '+' : '') + s.score.toFixed(3);
   $('gVal').style.color = s.color;
   $('gBloqueo').classList.toggle('on', bloq);
-  /* confirmaciones (3 propias + alineación MTF) */
-  const dirLong = estado.señal.score >= 0;
-  const alineadoDir = dirLong ? estado.mtf.nLong >= 3 : estado.mtf.nShort >= 3;
-  const confs = [...s.confs, { l:'≥3/5 timeframes alineados', ok: alineadoDir }];
-  $('gConfs').innerHTML = confs.map(c =>
-    `<div class="${c.ok ? 'c-ok' : 'c-no'}">${c.ok ? '✓' : '○'} ${c.l}</div>`).join('');
+  pintarTrayectoria(s);
+  pintarCalidad(s);
+  pintarConfirmaciones(s);
+  pintarMotores(s);
+  pintarPlan(s);
   $('gRaw').textContent = `score técnico ${s.rawScore >= 0 ? '+' : ''}${s.rawScore.toFixed(3)}`;
   $('gLunar').textContent = `× lunar ${s.multLunar}`;
+}
+
+/* ---------- avisos del sistema ----------
+   Notificación del navegador en cada cruce que escala (los mismos que suenan),
+   solo si la pestaña NO está delante: delante ya está el banner. Cubre el
+   activo abierto, que es el que el terminal evalúa en vivo.              */
+const NOTIF_OK = 'Notification' in window;
+const notif = {
+  on: LS.get('lo369_notif') === '1',
+  tfs: (() => { const v = leerLS('lo369_notif_tf', null); return Array.isArray(v) ? v.filter(x => TF_ALERTA.includes(x)) : [...TF_ALERTA]; })(),
+};
+function pintarNotif() {
+  const activo = notif.on && NOTIF_OK && Notification.permission === 'granted';
+  const b = $('btnNotif');
+  b.setAttribute('aria-pressed', activo);
+  b.textContent = activo ? '🖥️ Avisos del sistema: activos' : '🖥️ Avisos del sistema';
+  $('notifTF').querySelectorAll('.tf-chip').forEach(c => {
+    const on = notif.tfs.includes(c.dataset.v);
+    c.classList.toggle('on', on); c.setAttribute('aria-pressed', on);
+  });
+}
+$('btnNotif').addEventListener('click', async () => {
+  if (!NOTIF_OK) { tostada('Este navegador no admite notificaciones del sistema.', 'mal'); return; }
+  if (notif.on && Notification.permission === 'granted') {
+    notif.on = false; LS.set('lo369_notif', '0'); pintarNotif();
+    tostada('Avisos del sistema desactivados.', 'info'); return;
+  }
+  let p = Notification.permission;
+  if (p === 'default') { try { p = await Notification.requestPermission(); } catch { p = 'denied'; } }
+  notif.on = p === 'granted';
+  LS.set('lo369_notif', notif.on ? '1' : '0');
+  pintarNotif();
+  tostada(notif.on
+    ? 'Avisos del sistema activos: llegan aunque la pestaña esté en segundo plano.'
+    : 'El navegador tiene bloqueadas las notificaciones de este sitio. Actívalas desde el candado de la barra de direcciones.',
+    notif.on ? 'ok' : 'mal', 7000);
+});
+$('notifTF').addEventListener('click', e => {
+  const b = e.target.closest('.tf-chip'); if (!b) return;
+  const v = b.dataset.v;
+  notif.tfs = notif.tfs.includes(v) ? notif.tfs.filter(x => x !== v) : [...notif.tfs, v];
+  LS.set('lo369_notif_tf', JSON.stringify(notif.tfs));
+  pintarNotif();
+});
+pintarNotif();
+function avisarSistema(tf, titulo, cuerpo, etiqueta) {
+  if (!notif.on || !NOTIF_OK || Notification.permission !== 'granted' || !notif.tfs.includes(tf)) return;
+  if (!document.hidden && document.hasFocus()) return;
+  /* en Android, Chrome exige un service worker para esto y lanza: se ignora */
+  try { const n = new Notification(titulo, { body: cuerpo, tag: etiqueta }); n.onclick = () => { window.focus(); n.close(); }; } catch {}
 }
 
 function pintarMTF() {
@@ -1909,19 +2158,8 @@ function pintarIndicadores() {
 }
 
 function pintarLiquidez() {
-  const V = estado.velas1h.slice(-160);
-  const { hs, ls } = nivelesLiquidez(V, 5);
-  const px = estado.señal.precio;
-  const agrupar = (arr) => {
-    const grupos = [];
-    [...arr].sort((a,b) => a-b).forEach(v => {
-      const g = grupos.find(x => Math.abs(x.nivel - v) / v < 0.0015);
-      if (g) { g.n++; g.nivel = (g.nivel * (g.n-1) + v) / g.n; } else grupos.push({ nivel: v, n: 1 });
-    });
-    return grupos;
-  };
-  const arriba = agrupar(hs.filter(h => h > px)).sort((a,b) => a.nivel - b.nivel).slice(0, 4).reverse();
-  const abajo = agrupar(ls.filter(l => l < px)).sort((a,b) => b.nivel - a.nivel).slice(0, 4);
+  const niv = nivelesAgrupados(), px = niv.px, abajo = niv.abajo;
+  const arriba = niv.arriba.slice().reverse();   /* el más lejano arriba del todo */
   const maxN = Math.max(1, ...arriba.map(g => g.n), ...abajo.map(g => g.n));
   const fila = (g, col) => `<div class="liq-fila"><span class="precio">${g.nivel >= 1000 ? g.nivel.toFixed(0) : g.nivel.toFixed(2)}</span>
     <span class="b"><i style="width:${g.n/maxN*100}%;background:${col}"></i></span><span style="color:var(--tinta3)">${g.n}×</span></div>`;
@@ -2028,19 +2266,15 @@ function pintarHistorial() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   DERIVADOS Y LIQUIDACIONES EN VIVO
+   DERIVADOS EN VIVO
    Funding, precio marca y hora del próximo cobro llegan cada segundo
-   por el stream markPrice de Binance futuros; las liquidaciones, por
-   su stream forceOrder. El open interest no tiene stream: se pide por
+   por el stream markPrice de Binance futuros. El open interest no tiene
+   stream: se pide por
    REST cada minuto, y su referencia de hace 24 h cada 5 minutos.
    ══════════════════════════════════════════════════════════════ */
 /* Ruta /market: la heredada (/stream) todavía abre la conexión pero ya no
    emite nada, y un socket mudo se confundiría con un mercado tranquilo. */
 const DERIV_WS = 'wss://fstream.binance.com/market/stream?streams=';
-const LIQ_MIN = 50000;            /* [EDITABLE] tamaño mínimo para entrar en la lista */
-const LIQ_GRANDE = 500000;        /* [EDITABLE] desde aquí la fila se destaca */
-const LIQ_VENTANA = 3600000;      /* totales de la última hora */
-const LIQ_HUECO = 30000;          /* más de 30 s sin escuchar = la hora tiene un agujero */
 /* [EDITABLE] umbrales de lectura. El funding se compara en su equivalente
    a 8 h, que es el periodo estándar de Binance (0,01 % es la tasa base). */
 const FUND_CARO = 0.0005, FUND_ALTO = 0.0002, FUND_BASE = 0.00005, FUND_CORTOS = -0.0002;
@@ -2050,30 +2284,9 @@ const deriv = {
   m: {},              /* por símbolo: { marca, indice, funding, prox } */
   oi: {},             /* por símbolo: { ahora, hace24 } en monedas, no en dólares */
   intervaloH: {},     /* horas entre cobros (fundingInfo de Binance) */
-  liqs: [],           /* { t, sym, lado:'L'|'S', usd, precio } — todas las recibidas */
-  desde: null,        /* desde cuándo se escucha sin cortes */
-  filtro: ['todos', ...SIMBOLOS].includes(LS.get('lo369_liqf')) ? LS.get('lo369_liqf') : 'todos',
   ws: null, abierto: false, intentos: 0, temporizador: null, ultimoMensaje: 0,
   ultimoHist: 0, ultimoRest: 0, ultimoIntento: 0, cargando: false,
-  vistos: new Set(),  /* filas ya pintadas: solo las nuevas se iluminan */
 };
-
-/* Una recarga no debe borrar la hora acumulada: se guarda la escucha y, si la
-   anterior seguía viva hace nada, se retoma. Con un hueco se empieza de cero,
-   porque sumar lo viejo a lo nuevo daría una "última hora" con agujeros. */
-const CLAVE_LIQ = 'lo369_liqs';
-(function restaurarLiqs() {
-  const d = leerLS(CLAVE_LIQ, null);
-  if (!d || !Array.isArray(d.ev) || !d.vivo || Date.now() - d.vivo > LIQ_HUECO) return;
-  const corte = Date.now() - LIQ_VENTANA;
-  deriv.liqs = d.ev.filter(e => e && e.t >= corte && ACTIVOS[e.sym] && e.usd > 0);
-  deriv.desde = Math.max(+d.desde || Date.now(), corte);
-  deriv.ultimoMensaje = d.vivo;
-})();
-function guardarLiqs() {
-  if (!deriv.abierto) return;
-  LS.set(CLAVE_LIQ, JSON.stringify({ desde: deriv.desde, vivo: deriv.ultimoMensaje, ev: deriv.liqs.slice(-3000) }));
-}
 
 /* ---------- formato ---------- */
 const fmtUsdC = v => v >= 1e9 ? `$${(v / 1e9).toFixed(2)}B` : v >= 1e6 ? `$${(v / 1e6).toFixed(2)}M`
@@ -2081,7 +2294,6 @@ const fmtUsdC = v => v >= 1e9 ? `$${(v / 1e9).toFixed(2)}B` : v >= 1e6 ? `$${(v 
 const fmtPct = (v, d = 2) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(d) + '%';
 const flecha = v => v >= 0 ? '▲' : '▼';
 const dosDig = n => String(n).padStart(2, '0');
-const horaLocal = t => new Date(t).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 function cuentaAtras(ms) {
   if (ms <= 0) return 'cobrando…';
   const s = Math.floor(ms / 1000);
@@ -2105,7 +2317,7 @@ function reconectarDeriv() {
 }
 function conectarDeriv() {
   cerrarDeriv();
-  const streams = SIMBOLOS.flatMap(s => [`${s.toLowerCase()}@forceOrder`, `${s.toLowerCase()}@markPrice@1s`]);
+  const streams = SIMBOLOS.map(s => `${s.toLowerCase()}@markPrice@1s`);
   let ws;
   try { ws = new WebSocket(DERIV_WS + streams.join('/')); }
   catch { reconectarDeriv(); return; }
@@ -2119,14 +2331,8 @@ function conectarDeriv() {
     if (deriv.ws !== ws) return;
     let d; try { d = JSON.parse(ev.data); } catch { return; }
     const m = d && d.data; if (!m) return;
-    const ahora = Date.now();
-    /* primer mensaje tras un corte largo: la hora acumulada ya no es continua */
-    if (!deriv.desde || ahora - deriv.ultimoMensaje > LIQ_HUECO) {
-      deriv.liqs = []; deriv.vistos.clear(); deriv.desde = ahora;
-    }
-    deriv.ultimoMensaje = ahora; deriv.intentos = 0;
+    deriv.ultimoMensaje = Date.now(); deriv.intentos = 0;
     if (m.e === 'markPriceUpdate') recibirMarca(m);
-    else if (m.e === 'forceOrder' && m.o) recibirLiq(m.o);
   };
   ws.onerror = () => {};
   ws.onclose = () => {
@@ -2144,16 +2350,6 @@ setInterval(() => {
 function recibirMarca(m) {
   if (!ACTIVOS[m.s]) return;
   deriv.m[m.s] = { marca: +m.p, indice: +m.i, funding: +m.r, prox: +m.T };
-}
-function recibirLiq(o) {
-  if (!ACTIVOS[o.s]) return;
-  const cant = +o.z || +o.q, precio = +o.ap || +o.p;
-  const usd = cant * precio;
-  if (!(usd > 0)) return;
-  /* SELL: el motor de liquidación vende para cerrar un LARGO; BUY: recompra un CORTO */
-  deriv.liqs.push({ t: +o.T || Date.now(), sym: o.s, lado: o.S === 'SELL' ? 'L' : 'S', usd, precio });
-  if (deriv.liqs.length > 4000) deriv.liqs.splice(0, deriv.liqs.length - 3000);
-  pedirPintarLiqs();
 }
 
 /* ---------- REST: open interest, funding de respaldo y periodo de cobro ---------- */
@@ -2236,22 +2432,13 @@ function datosDeriv(s) {
   if (r.dOI !== undefined && r.dP !== undefined) r.lectOI = leerOI(r.dOI, r.dP);
   return r;
 }
-function totalesLiq(filtro = deriv.filtro) {
-  const corte = Date.now() - LIQ_VENTANA;
-  const t = { L: 0, S: 0, nL: 0, nS: 0 };
-  deriv.liqs.forEach(e => {
-    if (e.t < corte || (filtro !== 'todos' && e.sym !== filtro)) return;
-    t[e.lado] += e.usd; t['n' + e.lado]++;
-  });
-  return t;
-}
 
 /* ---------- pintado ---------- */
 function pintarEstadoDeriv() {
   const el = $('derivEstado'); if (!el) return;
   el.textContent = deriv.abierto
     ? 'Binance futuros USDT-M · funding y precio marca cada segundo · OI cada minuto'
-    : deriv.ultimoRest ? 'stream de futuros caído: funding y OI por REST cada minuto, sin liquidaciones' : 'Binance futuros USDT-M · conectando…';
+    : deriv.ultimoRest ? 'stream de futuros caído: funding y OI por REST cada minuto' : 'Binance futuros USDT-M · conectando…';
 }
 function pintarDerivados() {
   const g = $('derivGrid'); if (!g) return;
@@ -2276,66 +2463,6 @@ function pintarDerivados() {
       ${fund}<hr>${oi}</div>`;
   }).join('');
 }
-let liqPendiente = false;
-function pedirPintarLiqs() {
-  if (liqPendiente) return;
-  liqPendiente = true;
-  setTimeout(() => { liqPendiente = false; pintarLiqs(); }, 250);
-}
-function pintarLiqs() {
-  const bal = $('lqdBalance'); if (!bal) return;
-  const ahora = Date.now(), corte = ahora - LIQ_VENTANA, f = deriv.filtro;
-  /* la ventana se recorta aquí, no en cada mensaje */
-  if (deriv.liqs.length && deriv.liqs[0].t < corte) deriv.liqs = deriv.liqs.filter(e => e.t >= corte);
-  const t = totalesLiq(f), tot = t.L + t.S;
-  const pL = tot ? t.L / tot * 100 : 50;
-  let lect;
-  if (!deriv.desde) lect = { t: 't-neutro', txt: 'Conectando con el stream de liquidaciones…' };
-  else if (tot < LIQ_MIN) lect = { t: 't-neutro', txt: 'Poca actividad de liquidaciones: el apalancamiento no está siendo castigado.' };
-  else if (t.L >= t.S * 2) lect = { t: 't-rojo', txt: 'Barrida de largos: el precio está cazando los stops de quienes compraron apalancados.' };
-  else if (t.S >= t.L * 2) lect = { t: 't-verde', txt: 'Barrida de cortos: el precio está forzando la salida de quienes vendieron apalancados.' };
-  else lect = { t: 't-neutro', txt: 'Liquidaciones repartidas entre largos y cortos: sin un lado dominante.' };
-  bal.innerHTML = `
-    <div class="lqd-tot">
-      <div><span>Largos liquidados</span><b class="baja">${fmtUsdC(t.L)}</b><small>${t.nL === 1 ? '1 orden' : t.nL + ' órdenes'}</small></div>
-      <div><span>Cortos liquidados</span><b class="sube">${fmtUsdC(t.S)}</b><small>${t.nS === 1 ? '1 orden' : t.nS + ' órdenes'}</small></div>
-    </div>
-    <div class="lqd-barra" role="img" aria-label="Largos ${pL.toFixed(0)} por ciento, cortos ${(100 - pL).toFixed(0)} por ciento">
-      <i style="width:${pL}%;background:${tot ? 'var(--rojo)' : '#2b3252'}"></i><i style="width:${100 - pL}%;background:${tot ? 'var(--verde)' : '#2b3252'}"></i>
-    </div>
-    <div class="lect ${lect.t}" style="margin-top:8px">${lect.txt}</div>`;
-  const lista = deriv.liqs.filter(e => e.usd >= LIQ_MIN && (f === 'todos' || e.sym === f)).slice(-40).reverse();
-  const feed = $('lqdFeed');
-  feed.innerHTML = lista.length ? lista.map(e => {
-    const id = `${e.t}-${e.sym}-${Math.round(e.usd)}`;
-    const nuevo = !deriv.vistos.has(id);
-    deriv.vistos.add(id);
-    return `<div class="lqd-ev${e.usd >= LIQ_GRANDE ? ' grande' : ''}${nuevo ? ' nuevo' : ''}">
-      <time>${horaLocal(e.t)}</time><b>${ACTIVOS[e.sym].corto}</b>
-      <span class="lado ${e.lado === 'L' ? 'baja' : 'sube'}">${e.lado === 'L' ? 'LARGO' : 'CORTO'} liquidado @ ${fmt$(e.precio)}</span>
-      <span class="usd ${e.lado === 'L' ? 'baja' : 'sube'}">${fmtUsdC(e.usd)}</span></div>`;
-  }).join('') : `<div class="lqd-vacio">${deriv.desde
-      ? `Sin liquidaciones de ${fmtUsdC(LIQ_MIN)} o más${f === 'todos' ? '' : ' en ' + ACTIVOS[f].corto} desde las ${horaLocal(Math.max(deriv.desde, corte)).slice(0, 5)}.<br>Aparecen aquí al instante.`
-      : 'Conectando…'}</div>`;
-  if (deriv.vistos.size > 2000) deriv.vistos = new Set([...deriv.vistos].slice(-500));
-  const cobertura = deriv.desde ? ahora - deriv.desde : 0;
-  $('lqdNota').textContent = (deriv.desde && cobertura < LIQ_VENTANA
-      ? `Contando desde las ${horaLocal(deriv.desde).slice(0, 5)} (${Math.max(1, Math.round(cobertura / 60000))} min): la ventana de una hora se completa sola. `
-      : 'Ventana móvil de 60 minutos. ') +
-    `Los totales suman todas las liquidaciones recibidas; la lista muestra las de ${fmtUsdC(LIQ_MIN)} o más. ` +
-    'Binance publica como máximo una por activo y por segundo (la mayor), así que los totales son un mínimo.';
-  $('filtroLiq').querySelectorAll('.tf-chip').forEach(c => {
-    const on = c.dataset.f === f;
-    c.classList.toggle('on', on); c.setAttribute('aria-pressed', on);
-  });
-}
-$('filtroLiq').addEventListener('click', e => {
-  const b = e.target.closest('.tf-chip'); if (!b) return;
-  deriv.filtro = b.dataset.f;
-  LS.set('lo369_liqf', deriv.filtro);
-  pintarLiqs();
-});
-
 /* ══════════════════════════════════════════════════════════════
    RANGO ESPERADO
    Cuánto se mueve normalmente cada activo en un día. BTC y ETH usan la
@@ -2470,14 +2597,12 @@ function iniciarDerivados() {
   conectarDeriv();
   cargarDerivados();
   cargarRango();
-  pintarLiqs();
   setInterval(() => {
     tickDeriv++;
     if (!estado.hayDatos) return;
     pintarDerivados();                               /* cuenta atrás y funding */
     if (tickDeriv % 2 === 0) pintarRango();          /* el precio vivo mueve la marca */
-    if (tickDeriv % 5 === 0) { pintarLiqs(); pintarEstadoDeriv(); }
-    if (tickDeriv % 10 === 0) guardarLiqs();
+    if (tickDeriv % 5 === 0) pintarEstadoDeriv();
     const ahora = Date.now();
     if (!document.hidden && ahora - deriv.ultimoIntento > 60000) cargarDerivados();
     /* DVOL y velas diarias cada 10 min; si falta la vela de hoy (cambio de día
@@ -2485,7 +2610,6 @@ function iniciarDerivados() {
     const falta = SIMBOLOS.some(s => !rango.dia[s] || rango.dia[s].t0 !== inicioDiaUTC());
     if (!document.hidden && (ahora - rango.ultimo > 600000 || (falta && ahora - rango.ultimo > 60000))) cargarRango();
   }, 1000);
-  addEventListener('pagehide', guardarLiqs);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -2760,6 +2884,8 @@ function iniciarBacktest() {
     const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); arrancar(); } }, { rootMargin: '600px 0px' });
     io.observe($('panelBT'));
   } else setTimeout(arrancar, 5000);
+  /* sin esperar al scroll: la "calidad histórica" del medidor lo necesita */
+  setTimeout(() => window.requestIdleCallback ? requestIdleCallback(arrancar, { timeout: 4000 }) : arrancar(), 8000);
   /* cada hora se renueva; un fallo de red se reintenta a los 5 min */
   setInterval(() => { if (bt90.iniciado && !document.hidden) { bt90.error = null; colaBT(); } }, 300000);
 }
@@ -3157,12 +3283,6 @@ async function exportarPDF() {
     if (d.oiUsd !== undefined) linea('   Open interest', fmtUsdC(d.oiUsd) + (d.dOI === undefined ? '' : ` · ${fmtPct(d.dOI, 1)} en 24 h`));
     if (d.lectOI) parrafo('   ' + d.lectOI.txt);
   });
-  const tl = totalesLiq('todos');
-  if (deriv.desde) {
-    const min = Math.min(60, Math.max(1, Math.round((Date.now() - deriv.desde) / 60000)));
-    linea(`Liquidaciones BTC+ETH+SOL, ultimos ${min} min`, `largos ${fmtUsdC(tl.L)} · cortos ${fmtUsdC(tl.S)}`, true);
-    parrafo('Binance publica como maximo una liquidacion por activo y por segundo (la mayor): los totales son un minimo.');
-  }
 
   /* — rango esperado — */
   titulo('9 · Rango esperado (1 sigma desde la apertura diaria UTC)');
@@ -3221,7 +3341,7 @@ const AYUDAS = {
   liquidez:'Precios donde el mercado ya giró varias veces. La hipótesis del modelo es que ahí se acumulan órdenes de protección: encima del precio, las de quienes están cortos; debajo, las de quienes están largos. Está deducido de máximos y mínimos, no leído del libro de órdenes.',
   lunar:'Fase lunar calculada localmente con el ciclo sinódico de 29.53 días, sin depender de ninguna API. El multiplicador escala la señal según la fase. La tarjeta de estrategia muestra los parámetros que el modelo asocia al activo seleccionado.',
   historial:'La señal recalculada hora a hora sobre los últimos siete días. La reconstrucción excluye Fear & Greed y los datos de futuros porque no tienen histórico gratuito, y meter el valor de hoy en velas pasadas sería mirar al futuro. La simulación es hipotética: sin comisiones, sin deslizamiento y sin ejecución real.',
-  derivados:'Funding: lo que pagan los largos a los cortos (o al revés) en cada cobro de los futuros perpetuos de Binance; alto y positivo indica un mercado apalancado al alza. Open interest: el total de contratos abiertos; su cambio en 24 horas, comparado con el del precio, dice si entra dinero nuevo o si el movimiento viene de cierres. Liquidaciones: posiciones que Binance cierra a la fuerza, en vivo. Binance publica como máximo la mayor de cada segundo por activo, así que los totales son un mínimo.',
+  derivados:'Funding: lo que pagan los largos a los cortos (o al revés) en cada cobro de los futuros perpetuos de Binance; alto y positivo indica un mercado apalancado al alza. Open interest: el total de contratos abiertos; su cambio en 24 horas, comparado con el del precio, dice si entra dinero nuevo o si el movimiento viene de cierres.',
   backtest:'La señal Tesla 369 recalculada vela a vela con datos reales de Binance de los últimos 90 días, en 1H, 4H y 1D. Cada vez que cruzó el umbral elegido (con la misma histéresis que las alertas) se anota qué hizo el precio 4, 24 y 72 horas después y cuánto llegó a ir en contra en las primeras 24. "Azar" es cuántas veces habría acertado una apuesta en la misma dirección en cualquier hora del periodo. El veredicto es una prueba binomial contra ese azar; por debajo de 15 señales la muestra no alcanza para concluir nada.',
   rango:'Cuánto se mueve normalmente cada activo en un día. Para BTC y ETH sale de la volatilidad implícita de sus opciones (índice DVOL de Deribit), es decir, lo que el mercado paga hoy por cubrirse. SOL no tiene DVOL y usa la volatilidad realizada de sus últimos 30 días. Un stop más cerca que el ruido de 24 horas queda expuesto al vaivén de un día normal. Es estadística, no una predicción.',
 };
