@@ -20,15 +20,30 @@
       .kipu-volver{position:fixed;left:12px;bottom:12px;z-index:9999;display:inline-block;
         font:600 11px/1 'Inter','Segoe UI',sans-serif;letter-spacing:.08em;text-decoration:none;
         color:#edeae3;background:#0f1116;border:1px solid rgba(201,162,39,.55);border-radius:999px;
-        padding:9px 15px;transition:background-color .2s ease,color .2s ease}
+        padding:9px 15px;transition:background-color .2s ease,color .2s ease,transform .3s ease,opacity .3s ease}
       .kipu-volver:hover{background:#c9a227;color:#07080b}
       .kipu-volver:focus-visible{outline:2px solid #c9a227;outline-offset:3px}
+      /* al bajar se aparta para no tapar contenido; vuelve al subir o al final */
+      .kipu-volver.is-oculta{transform:translateY(calc(100% + 16px));opacity:0;pointer-events:none}
+      .kipu-volver.is-oculta:focus-visible{transform:none;opacity:1}
+      @media (prefers-reduced-motion:reduce){.kipu-volver{transition:none}}
     </style>
-    <script type="module" crossorigin src="./assets/index-i99KvMg3.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-g3jgdyYm.css">
+    <script type="module" crossorigin src="./assets/index-B1lKzrBN.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-D4v4pViL.css">
   </head>
   <body>
     <div id="root"></div>
     <a class="kipu-volver" href="../santa-catarina">← Escritorio</a>
+    <script>
+      (function () {
+        var a = document.querySelector('.kipu-volver'), y = scrollY;
+        addEventListener('scroll', function () {
+          var n = scrollY, alFinal = innerHeight + n >= document.documentElement.scrollHeight - 48;
+          if (Math.abs(n - y) < 6) return;
+          a.classList.toggle('is-oculta', n > y && n > 160 && !alFinal);
+          y = n;
+        }, { passive: true });
+      })();
+    </script>
   </body>
 </html>
