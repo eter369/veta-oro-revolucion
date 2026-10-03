@@ -291,35 +291,6 @@ main.cambiando{animation:cambioActivo .45s ease}
 
 .filtro-tf{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:8px;font-family:var(--num);font-size:10px;color:var(--tinta3)}
 
-.filtro-tf>span{margin-right:4px}
-
-/* ---------- backtest de la señal · 90 días ---------- */
-.btx-barra{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center;margin-bottom:8px}
-.btx-barra .filtro-tf{margin:0}
-.btx-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-table.btx{width:100%;border-collapse:collapse;font-family:var(--num);font-size:11px;min-width:700px}
-table.btx th{text-align:right;font-size:9px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:var(--tinta3);padding:6px 8px;border-bottom:1px solid var(--borde2);white-space:nowrap}
-table.btx th:first-child,table.btx td:first-child{text-align:left}
-table.btx td{padding:7px 8px;text-align:right;border-bottom:1px solid rgba(35,42,68,.6);color:var(--tinta2);vertical-align:top;white-space:nowrap}
-table.btx td b{color:var(--tinta);font-weight:600}
-table.btx td b.sube{color:var(--verde)}table.btx td b.baja{color:var(--rojo)}
-table.btx td small{display:block;font-size:9px;color:var(--tinta3);margin-top:1px}
-table.btx tbody tr[data-tf]{cursor:pointer}
-table.btx tbody tr[data-tf]:hover td{background:rgba(99,102,241,.06)}
-table.btx tr.on td{background:rgba(99,102,241,.12)}
-table.btx tr.on td:first-child{box-shadow:inset 2px 0 0 var(--liq)}
-.lect.btx-ver{display:inline-block;padding:2px 8px;font-size:9.5px;border-radius:6px}
-.btx-frase{font-size:12px;color:var(--tinta2);line-height:1.6;margin:10px 0 2px}
-.btx-frase b{color:var(--tinta);font-weight:600}
-.btx-cab2{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px;margin-top:12px}
-.btx-cab2 .filtro-tf{margin:0}
-.btx-lista{max-height:300px;overflow:auto;margin-top:6px;border-top:1px solid var(--borde)}
-.btx-ev{min-width:560px}
-.btx-ev th:nth-child(2),.btx-ev td:nth-child(2){text-align:left}
-.btx-ev thead th{position:sticky;top:0;background:#0d1122;z-index:1}
-.btx-prog{height:5px;border-radius:99px;background:#20263f;overflow:hidden;margin:12px auto 0;max-width:320px}
-.btx-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#6366f1,#a78bfa);transition:width .3s}
-
 /* ---------- rango esperado ---------- */
 .rango-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 @media(max-width:1100px){.rango-grid{grid-template-columns:1fr}}
@@ -524,43 +495,6 @@ table.btx tr.on td:first-child{box-shadow:inset 2px 0 0 var(--liq)}
     <section class="panel">
       <h2 data-ayuda="derivados">Derivados en vivo <span class="mini" id="derivEstado">Binance futuros USDT-M · conectando…</span></h2>
       <div class="deriv-grid" id="derivGrid"></div>
-    </section>
-
-    <!-- ============ BACKTEST DE LA SEÑAL · 90 DÍAS ============ -->
-    <section class="panel" id="panelBT">
-      <h2 data-ayuda="backtest">Backtest de la señal · 90 días <span class="mini" id="btxEstado">se calcula al llegar a esta sección</span></h2>
-      <div class="btx-barra">
-        <div class="filtro-tf" id="btxActivo" role="group" aria-label="Activo del backtest">
-          <span>Activo</span>
-          <button class="tf-chip" type="button" data-v="BTCUSDT">BTC</button>
-          <button class="tf-chip" type="button" data-v="ETHUSDT">ETH</button>
-          <button class="tf-chip" type="button" data-v="SOLUSDT">SOL</button>
-        </div>
-        <div class="filtro-tf" id="btxUmbral" role="group" aria-label="Umbral de la señal">
-          <span>Umbral</span>
-          <button class="tf-chip" type="button" data-v="0">±0.40 swing</button>
-          <button class="tf-chip" type="button" data-v="1">±0.60 long/short</button>
-          <button class="tf-chip" type="button" data-v="2">±0.80 max</button>
-        </div>
-      </div>
-      <div id="btxResumen"></div>
-      <p class="btx-frase" id="btxFrase"></p>
-      <div class="btx-cab2">
-        <span class="dv-et">Cada señal y qué hizo el precio después</span>
-        <div class="filtro-tf" id="btxTF" role="group" aria-label="Temporalidad de la lista">
-          <button class="tf-chip" type="button" data-v="1h">1H</button>
-          <button class="tf-chip" type="button" data-v="4h">4H</button>
-          <button class="tf-chip" type="button" data-v="1d">1D</button>
-        </div>
-      </div>
-      <div class="btx-lista" id="btxLista" tabindex="0" role="region" aria-label="Señales del backtest (desplazable)"></div>
-      <p class="resumen-canvas">
-        "A favor" es que el precio se movió hacia donde apuntaba la señal; "azar" es cuántas veces habría acertado una
-        apuesta en esa misma dirección en cualquier hora del periodo. Si la señal no lo supera con claridad, no aporta
-        ventaja. Se reconstruye sin Fear &amp; Greed ni futuros (no tienen histórico gratuito), sin comisiones ni
-        deslizamiento, y en 1H las señales pueden caer juntas y compartir el mismo movimiento, lo que hace que la muestra
-        parezca más grande de lo que es. El pasado no garantiza el futuro.
-      </p>
     </section>
 
     <!-- ============ RANGO ESPERADO ============ -->
@@ -1950,11 +1884,11 @@ function pintarMotores(s) {
     `<div><span class="baja">▼ Empujan a la baja:</span> ${lista(neg, 'baja')}</div>`;
 }
 
-/* ---------- calidad histórica (del backtest de 90 días) ---------- */
+/* ---------- calidad histórica (90 días de la señal en 1H) ---------- */
 function pintarCalidad(s) {
   const el = $('gCalidad');
   const r = bt90.res[estado.sym];
-  if (!r) { el.innerHTML = `<div class="lect t-neutro"><b>Calidad histórica:</b> calculando el backtest de 90 días…</div>`; return; }
+  if (!r) { el.innerHTML = `<div class="lect t-neutro"><b>Calidad histórica:</b> calculando el historial de 90 días…</div>`; return; }
   const a = Math.abs(s.score), dir = s.score >= 0 ? 1 : -1;
   const k = a >= UMBRALES[2] ? 2 : a >= UMBRALES[1] ? 1 : 0;
   const st = statsBT(r.tf['1h'].ev[k].filter(e => e.dir === dir), r.base), h = st.h[1];
@@ -2613,20 +2547,18 @@ function iniciarDerivados() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   BACKTEST DE LA SEÑAL · 90 DÍAS
-   La señal Tesla 369 se recalcula vela a vela (velas CERRADAS de
-   Binance) en 1H, 4H y 1D. Cada cruce de umbral es un evento, con la
-   misma histéresis que las alertas, y se mide qué hizo el precio 4, 24
-   y 72 h después con las velas de 1H. Como en el historial de 7 días,
-   va sin Fear & Greed ni futuros: no tienen histórico gratuito y usar
-   el valor de hoy en el pasado sería mirar al futuro.
-   Son ~2.800 pasadas del motor por activo (~0,25 ms cada una): se
-   reparten en tramos cortos para no congelar la página, empiezan solo
-   cuando la sección se acerca a la pantalla y el resultado se guarda
-   una hora en este navegador.
+   CALIDAD HISTÓRICA DE LA SEÑAL · 90 DÍAS EN 1H
+   Motor de la línea "Calidad histórica" del medidor. La señal Tesla 369
+   se recalcula vela a vela (velas CERRADAS de Binance) en 1H; cada cruce
+   de umbral es un evento, con la misma histéresis que las alertas, y se
+   mide qué hizo el precio 4, 24 y 72 h después. Va sin Fear & Greed ni
+   futuros: no tienen histórico gratuito y usar el valor de hoy en el
+   pasado sería mirar al futuro.
+   Son ~2.200 pasadas del motor (~0,25 ms cada una) y solo para el activo
+   abierto: se reparten en tramos cortos para no congelar la página y el
+   resultado se guarda una hora en este navegador.
    ══════════════════════════════════════════════════════════════ */
 const BT_DIAS = 90;
-const BT_TF = { '1h': 3600, '4h': 14400, '1d': 86400 };      /* duración de la vela, en segundos */
 const BT_HORIZ = [4, 24, 72];                                /* horas después de la señal */
 const BT_VENTANA = 300;                                      /* velas por pasada: las medias llegan sembradas */
 const BT_CADUCA = 3600000;
@@ -2634,15 +2566,12 @@ const BT_MIN_MUESTRA = 15;                                   /* [EDITABLE] por d
 const CLAVE_BT = 'lo369_bt90';
 const bt90 = {
   res: {},                   /* por símbolo: { v, t, base:[pUp4,pUp24,pUp72], tf:{ '1h':{ ev:[[…],[…],[…]] } } } */
-  sym: estado.sym, symPrincipal: estado.sym,
-  umbral: [0, 1, 2].includes(+LS.get('lo369_btu')) ? +LS.get('lo369_btu') : 0,
-  tf: BT_TF[LS.get('lo369_bttf')] ? LS.get('lo369_bttf') : '4h',
-  trabajando: null, progreso: 0, error: null, iniciado: false, enCola: false,
+  sym: estado.sym, iniciado: false, enCola: false,
 };
 (function restaurarBT() {
   const d = leerLS(CLAVE_BT, null);
   if (!d || !d.res) return;
-  Object.entries(d.res).forEach(([s, r]) => { if (ACTIVOS[s] && r && r.v === 1 && r.tf) bt90.res[s] = r; });
+  Object.entries(d.res).forEach(([s, r]) => { if (ACTIVOS[s] && r && r.v === 1 && r.tf && r.tf['1h']) bt90.res[s] = r; });
 })();
 function guardarBT() { LS.set(CLAVE_BT, JSON.stringify({ res: bt90.res })); }
 const ceder = () => new Promise(r => window.requestIdleCallback ? requestIdleCallback(() => r(), { timeout: 120 }) : setTimeout(r, 0));
@@ -2677,54 +2606,40 @@ function eventosBT(serie, U) {
   return ev;
 }
 async function calcularBT(sym) {
-  bt90.trabajando = sym; bt90.progreso = 0; bt90.error = null;
-  pintarBTEstado();
-  const extra = BT_VENTANA + 2;                 /* siembra + la vela previa + la que está en curso */
-  const [v1, v4, vd] = await Promise.all([
-    velasHasta(sym, '1h', BT_DIAS * 24 + extra), velasHasta(sym, '4h', BT_DIAS * 6 + extra), velasHasta(sym, '1d', BT_DIAS + extra),
-  ]);
-  /* solo velas cerradas: la última está a medias */
-  const series = { '1h': v1.slice(0, -1), '4h': v4.slice(0, -1), '1d': vd.slice(0, -1) };
-  const h1 = series['1h'];
+  /* siembra + la vela previa + la que está en curso; solo se usan las cerradas */
+  const h1 = (await velasHasta(sym, '1h', BT_DIAS * 24 + BT_VENTANA + 2)).slice(0, -1);
   const idxCierre = new Map(h1.map((c, i) => [c.time + 3600, i]));
   const desde = Math.floor(Date.now() / 1000) - BT_DIAS * 86400;
-  const tramos = Object.keys(BT_TF).map(tf => {
-    const v = series[tf], dur = BT_TF[tf];
-    const primera = v.findIndex(c => c.time + dur >= desde);
-    return { tf, v, dur, ini: Math.max(BT_VENTANA - 1, (primera < 0 ? v.length : primera) - 1) };
-  });
-  const total = tramos.reduce((a, x) => a + Math.max(0, x.v.length - x.ini), 0) || 1;
-  let hechos = 0;
-  const res = { v: 1, t: Date.now(), tf: {} };
-  for (const { tf, v, dur, ini } of tramos) {
-    const serie = [];
-    for (let i = ini; i < v.length; i++) {
-      const tc = v[i].time + dur;
-      serie.push({ t: tc, s: señalTesla(v.slice(i - BT_VENTANA + 1, i + 1), faseLunar(new Date(tc * 1000)), null, null).score });
-      if (++hechos % 40 === 0) { bt90.progreso = hechos / total; pintarBTEstado(); await ceder(); }
-    }
-    res.tf[tf] = { ev: UMBRALES.map(U => eventosBT(serie, U).map(e => {
-      /* qué hizo el precio después, con velas de 1H */
-      const i0 = idxCierre.get(e.t);
-      if (i0 === undefined) return { ...e, p: null, r: [null, null, null], mae: null };
-      const p0 = h1[i0].close;
-      const r = BT_HORIZ.map(h => { const j = idxCierre.get(e.t + h * 3600); return j === undefined ? null : +((h1[j].close - p0) / p0 * 100).toFixed(2); });
-      /* peor momento en contra durante las 24 h siguientes */
-      let mae = null;
-      const j24 = idxCierre.get(e.t + 24 * 3600);
-      if (j24 !== undefined) {
-        let ext = p0;
-        for (let j = i0 + 1; j <= j24; j++) ext = e.dir > 0 ? Math.min(ext, h1[j].low) : Math.max(ext, h1[j].high);
-        mae = +(-Math.abs(ext - p0) / p0 * 100).toFixed(2);
-      }
-      return { ...e, p: p0, r, mae };
-    })) };
+  const primera = h1.findIndex(c => c.time + 3600 >= desde);
+  const ini = Math.max(BT_VENTANA - 1, (primera < 0 ? h1.length : primera) - 1);
+  const serie = [];
+  for (let i = ini; i < h1.length; i++) {
+    const tc = h1[i].time + 3600;
+    serie.push({ t: tc, s: señalTesla(h1.slice(i - BT_VENTANA + 1, i + 1), faseLunar(new Date(tc * 1000)), null, null).score });
+    if ((i - ini + 1) % 40 === 0) await ceder();
   }
+  const res = { v: 1, t: Date.now(), tf: {} };
+  res.tf['1h'] = { ev: UMBRALES.map(U => eventosBT(serie, U).map(e => {
+    /* qué hizo el precio después */
+    const i0 = idxCierre.get(e.t);
+    if (i0 === undefined) return { ...e, p: null, r: [null, null, null], mae: null };
+    const p0 = h1[i0].close;
+    const r = BT_HORIZ.map(h => { const j = idxCierre.get(e.t + h * 3600); return j === undefined ? null : +((h1[j].close - p0) / p0 * 100).toFixed(2); });
+    /* peor momento en contra durante las 24 h siguientes */
+    let mae = null;
+    const j24 = idxCierre.get(e.t + 24 * 3600);
+    if (j24 !== undefined) {
+      let ext = p0;
+      for (let j = i0 + 1; j <= j24; j++) ext = e.dir > 0 ? Math.min(ext, h1[j].low) : Math.max(ext, h1[j].high);
+      mae = +(-Math.abs(ext - p0) / p0 * 100).toFixed(2);
+    }
+    return { ...e, p: p0, r, mae };
+  })) };
   /* Referencia "azar": en cualquier hora de los mismos 90 días, ¿cuántas veces
      el precio estaba más arriba 4, 24 y 72 h después? */
   res.base = BT_HORIZ.map(h => {
     let n = 0, arriba = 0;
-    h1.forEach((c, i) => {
+    h1.forEach(c => {
       if (c.time + 3600 < desde) return;
       const j = idxCierre.get(c.time + 3600 + h * 3600);
       if (j === undefined) return;
@@ -2735,27 +2650,22 @@ async function calcularBT(sym) {
   bt90.res[sym] = res;
   guardarBT();
 }
-/* Un solo trabajador: primero el activo que se está mirando, luego el resto. */
+/* Un solo trabajador, y solo para el activo abierto. Si el usuario cambia de
+   activo mientras calcula, al terminar sigue con el nuevo. Un fallo de red
+   corta la cola; el intervalo de 5 min la reintenta. */
 async function colaBT() {
   if (bt90.enCola) return;
   bt90.enCola = true;
   try {
     for (;;) {
-      const viejo = s => !bt90.res[s] || Date.now() - bt90.res[s].t > BT_CADUCA;
-      const sig = [bt90.sym, ...SIMBOLOS].find(viejo);
-      if (!sig) break;
-      try { await calcularBT(sig); }
-      catch (e) { bt90.error = `${ACTIVOS[sig].corto}: ${e.message}`; bt90.trabajando = null; pintarBTEstado(); break; }
-      bt90.trabajando = null;
-      pintarBacktest();
+      const s = bt90.sym, r = bt90.res[s];
+      if (r && Date.now() - r.t <= BT_CADUCA) break;
+      try { await calcularBT(s); } catch { break; }
     }
   } finally {
     bt90.enCola = false;
-    bt90.trabajando = null;
-    pintarBTEstado();
   }
 }
-
 /* ---------- estadística ---------- */
 function statsBT(evs, base) {
   const n = evs.length, nL = evs.filter(e => e.dir > 0).length;
@@ -2783,111 +2693,18 @@ function veredictoBT(h) {
   return { t: 't-ambar', txt: 'No se distingue del azar' };
 }
 
-/* ---------- pintado ---------- */
-const ETQ_UMBRAL = ['±0.40', '±0.60', '±0.80'];
-function pintarBTEstado() {
-  const el = $('btxEstado'); if (!el) return;
-  const r = bt90.res[bt90.sym];
-  el.textContent = bt90.trabajando
-    ? `calculando ${ACTIVOS[bt90.trabajando].corto}… ${Math.round(bt90.progreso * 100)} %`
-    : bt90.error ? `no se pudo calcular (${bt90.error}); reintenta en unos minutos`
-    : r ? `velas reales de Binance · calculado a las ${new Date(r.t).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })} · se renueva cada hora`
-    : 'se calcula al llegar a esta sección';
-  const barra = $('btxProg');
-  if (barra && bt90.trabajando === bt90.sym) barra.style.width = (bt90.progreso * 100).toFixed(0) + '%';
-}
-function marcarChips(id, valor) {
-  $(id).querySelectorAll('.tf-chip').forEach(c => {
-    const on = c.dataset.v === String(valor);
-    c.classList.toggle('on', on); c.setAttribute('aria-pressed', on);
-  });
-}
-const pctCelda = v => v === null ? '<span style="color:var(--tinta3)">en curso</span>' : fmtPct(v, 1);
-/* una caída nula no lleva signo: "+0.0 %" en rojo confundiría */
-const fmtContra = (v, d) => Math.abs(v) < 0.05 ? '0.0%' : fmtPct(v, d);
-function pintarBacktest() {
-  const cont = $('btxResumen'); if (!cont) return;
-  marcarChips('btxActivo', bt90.sym); marcarChips('btxUmbral', bt90.umbral); marcarChips('btxTF', bt90.tf);
-  pintarBTEstado();
-  const r = bt90.res[bt90.sym], corto = ACTIVOS[bt90.sym].corto, k = bt90.umbral;
-  if (!r) {
-    cont.innerHTML = `<div class="dv-vacio">${bt90.iniciado ? `Recalculando la señal de ${corto} vela a vela en los últimos 90 días…` : 'El backtest se calcula cuando llegas a esta sección.'}
-      <div class="btx-prog"><i id="btxProg" style="width:${bt90.trabajando === bt90.sym ? (bt90.progreso * 100).toFixed(0) : 0}%"></i></div></div>`;
-    $('btxFrase').textContent = ''; $('btxLista').innerHTML = '';
-    return;
-  }
-  const filas = Object.keys(BT_TF).map(tf => {
-    const st = statsBT(r.tf[tf].ev[k], r.base), h = st.h;
-    const celda = x => x.tasa === null ? '—' : `<b>${x.tasa.toFixed(0)} %</b><small>${x.hits}/${x.m} · azar ${x.azar.toFixed(0)} %</small>`;
-    const ver = veredictoBT(h[1]);
-    return `<tr data-tf="${tf}" class="${tf === bt90.tf ? 'on' : ''}">
-      <td><b>${INTERVALOS[tf].etq}</b></td>
-      <td><b>${st.n}</b><small>${st.nL} ▲ · ${st.nS} ▼</small></td>
-      <td>${celda(h[0])}</td><td>${celda(h[1])}</td><td>${celda(h[2])}</td>
-      <td>${h[1].media === null ? '—' : `<b class="${h[1].media >= 0 ? 'sube' : 'baja'}">${fmtPct(h[1].media, 2)}</b>`}</td>
-      <td>${st.maeMedia === null ? '—' : `<b class="baja">${fmtContra(st.maeMedia, 2)}</b><small>peor ${fmtContra(st.maePeor, 1)}</small>`}</td>
-      <td><span class="lect btx-ver ${ver.t}">${ver.txt}</span></td></tr>`;
-  }).join('');
-  cont.innerHTML = `<div class="btx-scroll" tabindex="0" role="region" aria-label="Resumen del backtest por temporalidad (desplazable)">
-    <table class="btx"><thead><tr><th scope="col">Marco</th><th scope="col">Señales</th><th scope="col">A favor 4 h</th>
-      <th scope="col">A favor 24 h</th><th scope="col">A favor 72 h</th><th scope="col">Media 24 h</th>
-      <th scope="col">En contra 24 h</th><th scope="col">Veredicto 24 h</th></tr></thead><tbody>${filas}</tbody></table></div>`;
-  cont.querySelectorAll('tr[data-tf]').forEach(tr => tr.addEventListener('click', () => elegirTFBT(tr.dataset.tf)));
-
-  /* la frase y la lista, para el marco elegido */
-  const evs = r.tf[bt90.tf].ev[k], st = statsBT(evs, r.base), h24 = st.h[1], etq = INTERVALOS[bt90.tf].etq;
-  $('btxFrase').innerHTML = !st.n
-    ? `En 90 días, la señal ${etq} de ${corto} no cruzó el umbral ${ETQ_UMBRAL[k]} ni una vez.`
-    : `En 90 días, la señal ${etq} de ${corto} cruzó el umbral ${ETQ_UMBRAL[k]} <b>${st.n} ${st.n === 1 ? 'vez' : 'veces'}</b> (${st.nL} al alza, ${st.nS} a la baja).` +
-      (h24.m ? ` 24 h después el precio fue a favor en <b>${h24.hits} de ${h24.m}</b> (${h24.tasa.toFixed(0)} %; al azar habría sido ${h24.azar.toFixed(0)} %), ` +
-        `con <b>${fmtPct(h24.media, 1)}</b> de media` + (st.maeMedia === null ? '.' : ` y <b>${fmtContra(st.maeMedia, 1)}</b> de caída máxima en contra en promedio.`) +
-        ` Veredicto: ${veredictoBT(h24).txt.toLowerCase()}${h24.m < BT_MIN_MUESTRA ? ', no concluyente' : ''}.`
-      : ' Todavía no pasaron 24 h desde la primera.');
-  const nombre = (dir) => NOMBRE_ZONA[(k + 1) * dir];
-  const col = (v, dir) => v === null ? '' : dir * v > 0 ? 'sube' : 'baja';
-  $('btxLista').innerHTML = !evs.length ? `<div class="dv-vacio">Sin cruces de ${ETQ_UMBRAL[k]} en ${etq} en estos 90 días.</div>` :
-    `<table class="btx btx-ev"><thead><tr><th scope="col">Fecha</th><th scope="col">Señal</th><th scope="col">Precio</th>
-      <th scope="col">4 h</th><th scope="col">24 h</th><th scope="col">72 h</th><th scope="col">En contra 24 h</th></tr></thead><tbody>${
-      evs.slice().reverse().map(e => {
-        const d = new Date(e.t * 1000);
-        return `<tr><td>${dosDig(d.getDate())}/${dosDig(d.getMonth() + 1)} ${dosDig(d.getHours())}:${dosDig(d.getMinutes())}</td>
-          <td class="${e.dir > 0 ? 'sube' : 'baja'}" style="text-align:left">${e.dir > 0 ? '▲' : '▼'} ${nombre(e.dir)} <small style="display:inline">${e.s >= 0 ? '+' : '−'}${Math.abs(e.s).toFixed(2)}</small></td>
-          <td>${e.p === null ? '—' : fmt$(e.p)}</td>
-          ${e.r.map(v => `<td class="${col(v, e.dir)}">${pctCelda(v)}</td>`).join('')}
-          <td>${e.mae === null ? pctCelda(null) : `<span class="baja">${fmtContra(e.mae, 1)}</span>`}</td></tr>`;
-      }).join('')}</tbody></table>`;
-}
-function elegirTFBT(tf) { bt90.tf = tf; LS.set('lo369_bttf', tf); pintarBacktest(); }
-$('btxActivo').addEventListener('click', e => {
-  const b = e.target.closest('.tf-chip'); if (!b) return;
-  bt90.sym = b.dataset.v; pintarBacktest();
-  if (bt90.iniciado) colaBT();
-});
-$('btxUmbral').addEventListener('click', e => {
-  const b = e.target.closest('.tf-chip'); if (!b) return;
-  bt90.umbral = +b.dataset.v; LS.set('lo369_btu', bt90.umbral); pintarBacktest();
-});
-$('btxTF').addEventListener('click', e => {
-  const b = e.target.closest('.tf-chip'); if (b) elegirTFBT(b.dataset.v);
-});
-/* el panel sigue al activo de la cabecera; sus chips solo cambian lo que se mira aquí */
+/* sigue al activo de la cabecera */
 function sincronizarBTActivo() {
-  if (bt90.symPrincipal === estado.sym) return;
-  bt90.symPrincipal = bt90.sym = estado.sym;
-  pintarBacktest();
+  if (bt90.sym === estado.sym) return;
+  bt90.sym = estado.sym;
   if (bt90.iniciado) colaBT();
 }
 function iniciarBacktest() {
-  pintarBacktest();
-  const arrancar = () => { if (bt90.iniciado) return; bt90.iniciado = true; pintarBacktest(); colaBT(); };
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); arrancar(); } }, { rootMargin: '600px 0px' });
-    io.observe($('panelBT'));
-  } else setTimeout(arrancar, 5000);
-  /* sin esperar al scroll: la "calidad histórica" del medidor lo necesita */
+  const arrancar = () => { if (bt90.iniciado) return; bt90.iniciado = true; colaBT(); };
+  /* a los 8 s, cuando el navegador esté ocioso: la carga inicial va primero */
   setTimeout(() => window.requestIdleCallback ? requestIdleCallback(arrancar, { timeout: 4000 }) : arrancar(), 8000);
   /* cada hora se renueva; un fallo de red se reintenta a los 5 min */
-  setInterval(() => { if (bt90.iniciado && !document.hidden) { bt90.error = null; colaBT(); } }, 300000);
+  setInterval(() => { if (bt90.iniciado && !document.hidden) colaBT(); }, 300000);
 }
 
 /* toggle de sonido */
@@ -3297,18 +3114,6 @@ async function exportarPDF() {
   });
   parrafo('BTC y ETH: volatilidad implicita DVOL de Deribit. SOL: volatilidad realizada de 30 dias. Es estadistica sobre la volatilidad, no una prediccion de direccion.');
 
-  /* — backtest 90 días (solo si ya se calculó en esta visita o la anterior) — */
-  const rb = bt90.res[estado.sym];
-  if (rb) {
-    titulo(`10 · Backtest de la senal, 90 dias (umbral ${ETQ_UMBRAL[bt90.umbral]})`);
-    Object.keys(BT_TF).forEach(tf => {
-      const st = statsBT(rb.tf[tf].ev[bt90.umbral], rb.base), h24 = st.h[1];
-      linea(`${INTERVALOS[tf].etq}: ${st.n} senales (${st.nL} al alza, ${st.nS} a la baja)`,
-        h24.m ? `a favor a 24 h ${h24.hits}/${h24.m} (${h24.tasa.toFixed(0)}%) · azar ${h24.azar.toFixed(0)}% · ${veredictoBT(h24).txt}` : 'sin resultados a 24 h');
-    });
-    parrafo(`Calculado a las ${new Date(rb.t).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: false })} h. Senal recalculada sin Fear & Greed ni futuros, sin comisiones ni deslizamiento. El pasado no garantiza el futuro.`);
-  }
-
   pie();
   doc.save(`lunar-oracle-369-${ACTIVOS[estado.sym].corto}-${selloFecha()}.pdf`);
   tostada(`Reporte PDF generado, ${pagina} pagina(s).`, 'ok');
@@ -3342,7 +3147,6 @@ const AYUDAS = {
   lunar:'Fase lunar calculada localmente con el ciclo sinódico de 29.53 días, sin depender de ninguna API. El multiplicador escala la señal según la fase. La tarjeta de estrategia muestra los parámetros que el modelo asocia al activo seleccionado.',
   historial:'La señal recalculada hora a hora sobre los últimos siete días. La reconstrucción excluye Fear & Greed y los datos de futuros porque no tienen histórico gratuito, y meter el valor de hoy en velas pasadas sería mirar al futuro. La simulación es hipotética: sin comisiones, sin deslizamiento y sin ejecución real.',
   derivados:'Funding: lo que pagan los largos a los cortos (o al revés) en cada cobro de los futuros perpetuos de Binance; alto y positivo indica un mercado apalancado al alza. Open interest: el total de contratos abiertos; su cambio en 24 horas, comparado con el del precio, dice si entra dinero nuevo o si el movimiento viene de cierres.',
-  backtest:'La señal Tesla 369 recalculada vela a vela con datos reales de Binance de los últimos 90 días, en 1H, 4H y 1D. Cada vez que cruzó el umbral elegido (con la misma histéresis que las alertas) se anota qué hizo el precio 4, 24 y 72 horas después y cuánto llegó a ir en contra en las primeras 24. "Azar" es cuántas veces habría acertado una apuesta en la misma dirección en cualquier hora del periodo. El veredicto es una prueba binomial contra ese azar; por debajo de 15 señales la muestra no alcanza para concluir nada.',
   rango:'Cuánto se mueve normalmente cada activo en un día. Para BTC y ETH sale de la volatilidad implícita de sus opciones (índice DVOL de Deribit), es decir, lo que el mercado paga hoy por cubrirse. SOL no tiene DVOL y usa la volatilidad realizada de sus últimos 30 días. Un stop más cerca que el ruido de 24 horas queda expuesto al vaivén de un día normal. Es estadística, no una predicción.',
 };
 document.querySelectorAll('[data-ayuda]').forEach(h => {
