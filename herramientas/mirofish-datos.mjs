@@ -3,10 +3,14 @@
 // Corre en GitHub Actions antes de publicar kippuu.com y escribe:
 //   mirofish/datos/macro.json     calendario macro (FOMC, CPI, NFP, PPI)
 //   mirofish/datos/mercados.json  S&P 500 y DXY diarios
+//   mirofish/datos/rr25.json      historial horario del risk reversal 25Δ (S5)
+//   mirofish/datos/netflows.json  netflows diarios de BTC, ETH y SOL (S6)
 // Fuentes gratuitas y sin clave:
 //   · Reserva Federal: calendario oficial de reuniones FOMC
 //   · ForexFactory (feed público de la semana): CPI, NFP, PPI, FOMC
 //   · Yahoo Finance (chart API): ^GSPC y DX-Y.NYB
+//   · Deribit (libro público de opciones): RR25 de 7 y 30 días
+//   · DeFiLlama (saldos diarios de exchanges): netflows, una vez al día
 // Si una fuente falla se conserva lo último publicado en kippuu.com,
 // con su fecha: el terminal la marca como vieja en vez de inventar.
 // Uso: node herramientas/mirofish-datos.mjs [carpetaSalida]
@@ -112,6 +116,90 @@ async function yahoo(simbolo) {
   return serie;
 }
 
+// ---------- S5: risk reversal 25Δ desde el libro de Deribit ----------
+// Misma cuenta que src/lib/modulos/s5Skew.ts de MIROFISH: delta Black-76 con
+// la IV de marca, IV interpolada en ±25Δ y RR = IV(put) − IV(call).
+const MESES_D = { JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5, JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11 };
+function normalCdf(x) {
+  const t = 1 / (1 + 0.3275911 * Math.abs(x) / Math.SQRT2);
+  const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-(x * x) / 2);
+  return x >= 0 ? (1 + y) / 2 : (1 - y) / 2;
+}
+function ivEnDelta(p, obj) {
+  p.sort((a, b) => a.d - b.d);
+  for (let i = 1; i < p.length; i++) {
+    const a = p[i - 1], b = p[i];
+    if ((a.d - obj) * (b.d - obj) <= 0 && a.d !== b.d) return a.iv + ((obj - a.d) / (b.d - a.d)) * (b.iv - a.iv);
+  }
+  return null;
+}
+async function rrMoneda(moneda, ahora) {
+  const j = await traer(`https://www.deribit.com/api/v2/public/get_book_summary_by_currency?currency=${moneda}&kind=option`);
+  const porVence = new Map();
+  for (const r of j.result) {
+    const m = r.instrument_name.match(/^[A-Z_]+-(\d{1,2})([A-Z]{3})(\d{2})-([\d.]+)-([CP])$/);
+    if (!m || !r.mark_iv || !r.underlying_price) continue;
+    const vence = Date.UTC(2000 + +m[3], MESES_D[m[2]], +m[1], 8);
+    if (vence <= ahora + 12 * 3_600_000) continue;
+    const T = (vence - ahora) / (365 * 86_400_000), s = r.mark_iv / 100, F = r.underlying_price, K = +m[4];
+    const d1 = (Math.log(F / K) + 0.5 * s * s * T) / (s * Math.sqrt(T));
+    const lista = porVence.get(vence) ?? { c: [], p: [] };
+    if (m[5] === 'C') lista.c.push({ d: normalCdf(d1), iv: r.mark_iv }); else lista.p.push({ d: normalCdf(d1) - 1, iv: r.mark_iv });
+    porVence.set(vence, lista);
+  }
+  const v = [];
+  for (const [vence, l] of porVence) {
+    const ic = ivEnDelta(l.c, 0.25), ip = ivEnDelta(l.p, -0.25);
+    if (ic !== null && ip !== null) v.push({ dias: (vence - ahora) / 86_400_000, rr: ip - ic });
+  }
+  v.sort((a, b) => a.dias - b.dias);
+  const tenor = (dias) => {
+    if (!v.length) return null;
+    if (dias <= v[0].dias) return v[0].rr;
+    for (let i = 1; i < v.length; i++) if (v[i].dias >= dias) return v[i - 1].rr + ((dias - v[i - 1].dias) / (v[i].dias - v[i - 1].dias)) * (v[i].rr - v[i - 1].rr);
+    return v[v.length - 1].rr;
+  };
+  return { r7: tenor(7), r30: tenor(30) };
+}
+
+// ---------- S6: netflows desde los saldos diarios de DeFiLlama ----------
+// Mismos exchanges que s6Netflows.exchanges en config.json de MIROFISH.
+const EXCHANGES_NETFLOW = ['binance-cex', 'okx', 'bybit', 'bitfinex', 'gate', 'bitget', 'gemini', 'htx', 'kucoin', 'crypto-com'];
+const ACTIVOS_NETFLOW = ['BTC', 'ETH', 'SOL'];
+async function netflows(ahora) {
+  const porActivo = Object.fromEntries(ACTIVOS_NETFLOW.map((a) => [a, new Map()]));
+  const avisos = [];
+  for (const slug of EXCHANGES_NETFLOW) {
+    try {
+      const res = await fetch(`https://api.llama.fi/protocol/${slug}`, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(120_000) });
+      if (!res.ok) throw new Error(String(res.status));
+      const j = await res.json();
+      // solo saldos de cierre de día (00:00 UTC) de los últimos 400 días
+      const dias = (j.tokens ?? []).filter((x) => x.date % 86_400 === 0 && x.date * 1000 > ahora - 400 * 86_400_000);
+      for (let i = 1; i < dias.length; i++) {
+        if (dias[i].date - dias[i - 1].date !== 86_400) continue;
+        for (const a of ACTIVOS_NETFLOW) {
+          const antes = dias[i - 1].tokens?.[a], ahoraSaldo = dias[i].tokens?.[a];
+          if (!(antes > 0) || !(ahoraSaldo >= 0)) continue;
+          const d = ahoraSaldo - antes;
+          // un salto de más del 30 % del saldo en un día es un cambio de etiquetado de billeteras, no un flujo
+          if (Math.abs(d) > 0.3 * antes) continue;
+          const t = dias[i].date * 1000;
+          const dia = porActivo[a].get(t) ?? { t, neto: 0, porExchange: {} };
+          dia.neto += d;
+          dia.porExchange[slug] = +d.toFixed(4);
+          porActivo[a].set(t, dia);
+        }
+      }
+    } catch (e) {
+      avisos.push(`${slug}: ${e.message}`);
+    }
+  }
+  const out = {};
+  for (const a of ACTIVOS_NETFLOW) out[a] = [...porActivo[a].values()].sort((x, y) => x.t - y.t).map((d) => ({ ...d, neto: +d.neto.toFixed(4) }));
+  return { out, avisos };
+}
+
 async function main() {
   await mkdir(SALIDA, { recursive: true });
   const ahora = Date.now();
@@ -156,6 +244,32 @@ async function main() {
     }
   }
   await writeFile(join(SALIDA, 'mercados.json'), JSON.stringify(mercados));
+
+  // --- S5: una muestra de RR25 por corrida (cada hora), historial de 100 días ---
+  const previoRR = await publicado('rr25.json');
+  const muestras = (previoRR?.muestras ?? []).filter((m) => m.t > ahora - 100 * 86_400_000);
+  const avisosRR = [];
+  try {
+    const [b, e] = await Promise.all([rrMoneda('BTC', ahora), rrMoneda('ETH', ahora)]);
+    const r = (v) => (v === null ? null : +v.toFixed(3));
+    // no dos muestras en la misma media hora
+    if (!muestras.some((m) => Math.abs(m.t - ahora) < 30 * 60_000)) muestras.push({ t: ahora, btc7: r(b.r7), btc30: r(b.r30), eth7: r(e.r7), eth30: r(e.r30) });
+  } catch (e) {
+    avisosRR.push(`Deribit: ${e.message}`);
+  }
+  await writeFile(join(SALIDA, 'rr25.json'), JSON.stringify({ generado: ahora, fuente: 'Deribit (libro público de opciones)', avisos: avisosRR, muestras }));
+
+  // --- S6: netflows, una vez al día (la descarga de DeFiLlama pesa ~150 MB) ---
+  const previoNF = await publicado('netflows.json');
+  let nf = previoNF;
+  if (!previoNF || ahora - previoNF.generado > 20 * 3_600_000 || process.env.FORZAR_NETFLOWS) {
+    const r = await netflows(ahora);
+    nf = { generado: ahora, fuente: 'DeFiLlama (saldos diarios de exchanges)', exchanges: EXCHANGES_NETFLOW, avisos: r.avisos, activos: r.out };
+  }
+  if (nf) await writeFile(join(SALIDA, 'netflows.json'), JSON.stringify(nf));
+
+  console.log(`rr25: ${muestras.length} muestras${avisosRR.length ? ' · ' + avisosRR.join(' ') : ''}`);
+  console.log(`netflows: ${nf ? Object.entries(nf.activos).map(([a, d]) => `${a} ${d.length} días`).join(', ') : 'sin datos'} (generado ${nf ? new Date(nf.generado).toISOString() : '—'})`);
 
   const prox = eventos.filter((e) => e.time > ahora).slice(0, 3).map((e) => `${e.tipo} ${new Date(e.time).toISOString()}`);
   console.log(`macro: ${eventos.length} eventos (próximos: ${prox.join(' · ') || 'ninguno'})`);

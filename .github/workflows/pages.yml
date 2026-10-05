@@ -3,10 +3,10 @@ name: Desplegar a GitHub Pages
 on:
   push:
     branches: [main]
-  # Cada 4 h: datos de MIROFISH que el navegador no puede pedir (sin CORS):
-  # calendario macro (Fed, ForexFactory) y cierres del S&P 500 y el DXY.
+  # Cada hora: datos de MIROFISH que el navegador no puede pedir o que necesitan
+  # historial (RR25 de Deribit cada hora, netflows una vez al día, macro y S&P/DXY):
   schedule:
-    - cron: "17 */4 * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 permissions:
