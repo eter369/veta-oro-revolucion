@@ -3,6 +3,10 @@ name: Desplegar a GitHub Pages
 on:
   push:
     branches: [main]
+  # Cada 4 h: datos de MIROFISH que el navegador no puede pedir (sin CORS):
+  # calendario macro (Fed, ForexFactory) y cierres del S&P 500 y el DXY.
+  schedule:
+    - cron: "17 */4 * * *"
   workflow_dispatch:
 
 permissions:
@@ -23,6 +27,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Si una fuente falla se publica lo último bueno (el terminal muestra su fecha);
+      # nunca debe impedir el despliegue del resto del sitio.
+      - name: Datos de MIROFISH
+        run: node herramientas/mirofish-datos.mjs mirofish/datos
+        continue-on-error: true
       - name: Configurar Pages
         uses: actions/configure-pages@v5
       - name: Subir artefacto del sitio
