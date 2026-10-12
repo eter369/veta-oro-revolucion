@@ -40,6 +40,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+      # Punto de partida: lo último guardado en la rama datos (incluye los
+      # archivos mensuales de la bitácora, que no viven en main). Si kippuu.com
+      # no responde, los scripts siguen teniendo el historial completo.
+      - name: Restaurar historial desde la rama datos
+        continue-on-error: true
+        run: |
+          if ls rama-datos/mirofish/datos/*.json >/dev/null 2>&1; then
+            cp rama-datos/mirofish/datos/*.json mirofish/datos/
+            ls -la mirofish/datos
+          else
+            echo "rama datos sin archivos"
+          fi
       # Si una fuente falla se publica lo último bueno (el terminal muestra su fecha);
       # nunca debe impedir el despliegue del resto del sitio.
       - name: Datos de MIROFISH

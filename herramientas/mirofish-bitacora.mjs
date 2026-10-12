@@ -723,6 +723,15 @@ var config_default = {
     fraccionRiesgo: 0.01,
     umbralesMaestro: [0.35, 0.4, 0.45]
   },
+  bitacora: {
+    _nota: "v4: memoria del servidor (scripts/bitacora.ts). Cada corrida reconstruye todas las horas cerradas que falten (hasta maxHorasRelleno) con los datos que exist\xEDan en ese instante, as\xED la bit\xE1cora tiene una fila por hora aunque el cron corra ~4 veces al d\xEDa. Las filas de m\xE1s de diasVivos d\xEDas pasan a bitacora-AAAA-MM.json. Liquidaciones de OKX agregadas por hora, tramo de precio (liqTramoPct) y lado, paginadas hasta lo ya guardado (liqMaxPaginas por activo).",
+    maxHorasRelleno: 36,
+    diasVivos: 35,
+    toleranciaRrHoras: 12,
+    liqRetencionDias: 30,
+    liqTramoPct: 0.2,
+    liqMaxPaginas: 40
+  },
   frescura: {
     _nota: "v4: la antig\xFCedad m\xE1xima depende del uso del dato, no del archivo. Un calendario con un FOMC a 16 d\xEDas no caduca a las 30 h; el OI de 4 h que se pide cada 5 min no puede caducar a los 5 min. rr25 caduca a N veces la cadencia real medida del cron. saltoRelojSeg: un tick de 1 s que llega con m\xE1s retraso que esto = el equipo durmi\xF3 \u2192 se refresca todo.",
     staleMin: 5,
@@ -1460,14 +1469,124 @@ function medirCadencia(tiempos, ahora, ventanaDias = 7) {
   if (t.length < 2) return vacio;
   const huecos = t.slice(1).map((x, i) => x - t[i]).sort((a, b) => a - b);
   const mediana = huecos[Math.floor(huecos.length / 2)];
-  const cubierto = Math.min(ventanaDias * DIA3, Math.max(t[t.length - 1] - t[0], DIA3 / 24));
+  const cubierto = t[t.length - 1] - t[0];
   return {
     ...vacio,
-    corridasPorDia: (t.length - 1) / (cubierto / DIA3),
+    // con menos de 12 h de marcas no se extrapola: dos corridas seguidas darían «24 al día»
+    corridasPorDia: cubierto >= DIA3 / 2 ? (t.length - 1) / (cubierto / DIA3) : null,
     huecoMedianoMs: mediana,
     huecoMaxMs: huecos[huecos.length - 1]
   };
 }
+
+// src/lib/historial.ts
+var H = 36e5;
+function elegirMasCompleto(cands, medida) {
+  let mejor = null;
+  for (const c of cands) if (!mejor || medida(c.v) > medida(mejor.v)) mejor = c;
+  return mejor;
+}
+function migrarFilas(filas, de, a) {
+  if (!de || de.join() === a.join()) return filas;
+  const idx = a.map((c) => de.indexOf(c));
+  return filas.map((f) => idx.map((i) => i < 0 ? null : f[i] ?? null));
+}
+var llenos = (f) => f.reduce((n, v) => n + (v === null ? 0 : 1), 0);
+function fusionarFilas(campos, ...grupos) {
+  const it = campos.indexOf("t"), ia = campos.indexOf("activo");
+  const porClave = /* @__PURE__ */ new Map();
+  for (const g of grupos) for (const f of g) {
+    const k = `${f[it]}-${f[ia]}`;
+    const prev = porClave.get(k);
+    if (!prev || llenos(f) > llenos(prev)) porClave.set(k, f);
+  }
+  return [...porClave.values()].sort((x, y) => x[it] - y[it] || String(x[ia]).localeCompare(String(y[ia])));
+}
+function horasPendientes(hechas, tCierre, maxHoras) {
+  const out = [];
+  for (let k = maxHoras - 1; k >= 0; k--) {
+    const t = tCierre - k * H;
+    if (!hechas.has(t)) out.push(t);
+  }
+  return out;
+}
+function rellenarRetornos(filas, campos, cierres, tCierre, horizontes) {
+  const it = campos.indexOf("t"), ia = campos.indexOf("activo");
+  let n = 0;
+  for (const f of filas) {
+    const t = f[it], mapa = cierres[f[ia]];
+    const p0 = mapa?.get(t);
+    if (!p0) continue;
+    for (const [c, h] of horizontes) {
+      const i = campos.indexOf(c);
+      if (i < 0 || f[i] !== null || t + h > tCierre) continue;
+      const p1 = mapa.get(t + h);
+      if (p1) {
+        f[i] = Math.round((p1 / p0 - 1) * 1e6) / 1e6;
+        n++;
+      }
+    }
+  }
+  return n;
+}
+var mesDe = (t) => new Date(t).toISOString().slice(0, 7);
+function particionarPorMes(filas, campos, desde) {
+  const it = campos.indexOf("t");
+  const vivas = [], porMes = /* @__PURE__ */ new Map();
+  for (const f of filas) {
+    const t = f[it];
+    if (t >= desde) {
+      vivas.push(f);
+      continue;
+    }
+    const m = mesDe(t);
+    if (!porMes.has(m)) porMes.set(m, []);
+    porMes.get(m).push(f);
+  }
+  return { vivas, porMes };
+}
+function sinPerdida(antes, despues, que) {
+  if (despues < antes) throw new Error(`${que} quedar\xEDa con ${despues} y antes ten\xEDa ${antes}: no se escribe`);
+}
+function tramoPrecio(precio, tramoPct) {
+  const b = Math.log(1 + tramoPct / 100);
+  const p = Math.exp(Math.round(Math.log(precio) / b) * b);
+  return Number(p.toPrecision(6));
+}
+function agregarLiquidaciones(prev, nuevas, tramoPct, desdeConsulta, ahora) {
+  const base = prev ? { hasta: prev.hasta, cobertura: prev.cobertura.map((c) => [...c]), filas: prev.filas.map((f) => [...f]) } : { hasta: 0, cobertura: [], filas: [] };
+  const idx = new Map(base.filas.map((f, i) => [`${f[0]}|${f[1]}|${f[2]}`, i]));
+  let max = base.hasta;
+  for (const l of nuevas) {
+    if (!(l.t > base.hasta) || !(l.usd > 0) || !(l.precio > 0)) continue;
+    const hora = Math.floor(l.t / H) * H, tramo = tramoPrecio(l.precio, tramoPct);
+    const k = `${hora}|${tramo}|${l.lado}`;
+    const i = idx.get(k);
+    if (i === void 0) {
+      idx.set(k, base.filas.length);
+      base.filas.push([hora, tramo, l.lado, Math.round(l.usd), 1]);
+    } else {
+      base.filas[i][3] += Math.round(l.usd);
+      base.filas[i][4]++;
+    }
+    max = Math.max(max, l.t);
+  }
+  const ult = base.cobertura[base.cobertura.length - 1];
+  if (ult && desdeConsulta <= ult[1]) ult[1] = Math.max(ult[1], ahora);
+  else base.cobertura.push([desdeConsulta, ahora]);
+  base.hasta = max;
+  base.filas.sort((x, y) => x[0] - y[0] || x[1] - y[1] || x[2] - y[2]);
+  return base;
+}
+function recortarLiquidaciones(l, desde) {
+  return {
+    hasta: l.hasta,
+    cobertura: l.cobertura.filter((c) => c[1] >= desde).map((c) => [Math.max(c[0], desde), c[1]]),
+    filas: l.filas.filter((f) => f[0] >= desde)
+  };
+}
+var usdLiquidaciones = (l) => l ? l.filas.reduce((s, f) => s + f[3], 0) : 0;
+var nLiquidaciones = (l) => l ? l.filas.reduce((s, f) => s + f[4], 0) : 0;
 
 // scripts/bitacora.ts
 var SALIDA = process.argv[2] ?? "mirofish/datos";
@@ -1475,58 +1594,26 @@ var PUBLICADO = process.env.PUBLICADO ?? "https://kippuu.com/mirofish/datos/";
 var RAMA = process.env.RAMA_DATOS ?? "https://raw.githubusercontent.com/eter369/veta-oro-revolucion/datos/mirofish/datos/";
 var UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36";
 var ACTIVOS = ["BTC", "ETH", "SOL"];
-var H = 36e5;
-var D = 24 * H;
+var H2 = 36e5;
+var D = 24 * H2;
 var MIN3 = 6e4;
+var B = CFG.bitacora;
 var VISION = "https://data-api.binance.vision/api/v3";
 var OKX = "https://www.okx.com/api/v5";
-var SIM = { vision: { BTC: "BTCUSDT", ETH: "ETHUSDT", SOL: "SOLUSDT" }, okx: { BTC: "BTC-USDT-SWAP", ETH: "ETH-USDT-SWAP", SOL: "SOL-USDT-SWAP" }, okxIdx: { BTC: "BTC-USDT", ETH: "ETH-USDT", SOL: "SOL-USDT" }, coinbase: { BTC: "BTC-USD", ETH: "ETH-USD", SOL: "SOL-USD" }, kraken: { BTC: "XBTUSD", ETH: "ETHUSD", SOL: "SOLUSD" } };
-var VERSION = 1;
-var RETENCION_DIAS = 400;
-var LIQ_RETENCION_DIAS = 30;
-var espera = (ms) => new Promise((r) => setTimeout(r, ms));
-async function traer(url, intentos = 2) {
-  let err = null;
-  for (let i = 0; i < intentos; i++) {
-    try {
-      const res = await fetch(url, { headers: { "User-Agent": UA, Accept: "application/json" }, signal: AbortSignal.timeout(25e3) });
-      if (!res.ok) throw new Error(`HTTP ${res.status} ${url}`);
-      return await res.json();
-    } catch (e) {
-      err = e;
-      await espera(800 * (i + 1));
-    }
-  }
-  throw err;
-}
-async function okx(path) {
-  const j = await traer(`${OKX}${path}`);
-  if (j.code !== "0") throw new Error(`OKX ${j.code} ${j.msg} ${path}`);
-  await espera(120);
-  return j.data;
-}
-async function candidatos(nombre) {
-  const out = [];
-  for (const [origen, base] of [["publicado", PUBLICADO], ["rama datos", RAMA]]) {
-    try {
-      out.push({ origen, v: await traer(`${base}${nombre}?v=${Date.now()}`, 1) });
-    } catch {
-    }
-  }
-  const local = join(SALIDA, nombre);
-  if (existsSync(local)) {
-    try {
-      out.push({ origen: "local", v: JSON.parse(readFileSync(local, "utf8")) });
-    } catch {
-    }
-  }
-  return out;
-}
+var SIM = {
+  vision: { BTC: "BTCUSDT", ETH: "ETHUSDT", SOL: "SOLUSDT" },
+  okx: { BTC: "BTC-USDT-SWAP", ETH: "ETH-USDT-SWAP", SOL: "SOL-USDT-SWAP" },
+  okxIdx: { BTC: "BTC-USDT", ETH: "ETH-USDT", SOL: "SOL-USDT" },
+  coinbase: { BTC: "BTC-USD", ETH: "ETH-USD", SOL: "SOL-USD" },
+  kraken: { BTC: "XBTUSD", ETH: "ETHUSD", SOL: "SOLUSD" }
+};
+var VERSION = 2;
 var CAMPOS = [
   "t",
   "activo",
   "precio",
   "corrida",
+  "relleno",
   "s1Score",
   "s1Z",
   "s1Conf",
@@ -1534,12 +1621,14 @@ var CAMPOS = [
   "s1Imb4h",
   "s1Imb1d",
   "s1SemScore",
+  "vivoT",
   "vivoBinanceImb",
   "vivoCoinbaseImb",
   "vivoKrakenImb",
   "vivoOkxImb",
   "vivoUsd",
   "vivoVentanaSeg",
+  "vivoPrecio",
   "perpCompraUsd1h",
   "perpVolUsd1h",
   "s2Score",
@@ -1595,42 +1684,139 @@ var CAMPOS = [
   "r24h",
   "r7d"
 ];
+var HORIZONTES = [["r1h", H2], ["r4h", 4 * H2], ["r24h", D], ["r7d", 7 * D]];
 var col = (c) => CAMPOS.indexOf(c);
 var r4 = (v) => v === null || v === void 0 || !Number.isFinite(v) ? null : Math.round(v * 1e4) / 1e4;
-async function vision(a, intervalo, limite, desde) {
-  const r = await traer(`${VISION}/klines?symbol=${SIM.vision[a]}&interval=${intervalo}&limit=${limite}${desde ? `&startTime=${desde}` : ""}`);
+var avisos = [];
+var espera = (ms) => new Promise((r) => setTimeout(r, ms));
+async function traer(url, intentos = 2) {
+  let err = null;
+  for (let i = 0; i < intentos; i++) {
+    try {
+      const res = await fetch(url, { headers: { "User-Agent": UA, Accept: "application/json" }, signal: AbortSignal.timeout(25e3) });
+      if (!res.ok) throw new Error(`HTTP ${res.status} ${url.replace(/\?.*/, "")}`);
+      return await res.json();
+    } catch (e) {
+      err = e;
+      if (i < intentos - 1) await espera(800 * (i + 1));
+    }
+  }
+  throw err;
+}
+async function okx(path) {
+  const j = await traer(`${OKX}${path}`);
+  if (j.code !== "0") throw new Error(`OKX ${j.code} ${j.msg} ${path.replace(/\?.*/, "")}`);
+  await espera(130);
+  return j.data;
+}
+async function candidatos(nombre) {
+  const out = [];
+  const local = join(SALIDA, nombre);
+  if (existsSync(local)) {
+    try {
+      out.push({ origen: "local", v: JSON.parse(readFileSync(local, "utf8")) });
+    } catch {
+    }
+  }
+  for (const [origen, base] of [["kippuu.com", PUBLICADO], ["rama datos", RAMA]]) {
+    try {
+      out.push({ origen, v: await traer(`${base}${nombre}?v=${Date.now()}`, 1) });
+    } catch {
+    }
+  }
+  return out;
+}
+var escribir = (nombre, v) => writeFileSync(join(SALIDA, nombre), JSON.stringify(v));
+async function vision(a, intervalo, limite) {
+  const r = await traer(`${VISION}/klines?symbol=${SIM.vision[a]}&interval=${intervalo}&limit=${limite}`);
   return r.map((k) => ({ time: +k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4], volUsd: +k[7], compraUsd: +k[10] }));
+}
+async function velasSwap5m(a, desde) {
+  const out = /* @__PURE__ */ new Map();
+  const meter = (d2) => {
+    for (const k of d2) if (k[8] === "1") out.set(+k[0], { high: +k[2], low: +k[3], close: +k[4], volUsd: +k[7] });
+  };
+  let d = await okx(`/market/candles?instId=${SIM.okx[a]}&bar=5m&limit=300`);
+  meter(d);
+  for (let i = 0; i < 12 && d.length; i++) {
+    const viejo = Math.min(...d.map((k) => +k[0]));
+    if (viejo <= desde) break;
+    d = await okx(`/market/history-candles?instId=${SIM.okx[a]}&bar=5m&limit=100&after=${viejo}`);
+    meter(d);
+  }
+  return out;
+}
+async function takerSwap5m(a, desde) {
+  const out = /* @__PURE__ */ new Map();
+  let end = null;
+  for (let i = 0; i < 14; i++) {
+    const d = await okx(`/rubik/stat/taker-volume-contract?instId=${SIM.okx[a]}&period=5m&unit=2&limit=100${end ? `&end=${end}` : ""}`);
+    if (!d.length) break;
+    for (const x of d) out.set(+x[0], { venta: +x[1], compra: +x[2] });
+    end = Math.min(...d.map((x) => +x[0]));
+    if (end <= desde) break;
+  }
+  return out;
+}
+async function fundingHist(a, dias) {
+  const out = [];
+  let after = null;
+  const desde = Date.now() - dias * D;
+  for (let i = 0; i < 5; i++) {
+    const d = await okx(`/public/funding-rate-history?instId=${SIM.okx[a]}&limit=100${after ? `&after=${after}` : ""}`);
+    if (!d.length) break;
+    for (const x of d) out.push({ time: +x.fundingTime, v: +x.fundingRate });
+    after = d[d.length - 1].fundingTime;
+    if (+after < desde) break;
+  }
+  return out.filter((x) => x.time >= desde).sort((x, y) => x.time - y.time);
+}
+var cierresOkx = (d) => d.map((k) => ({ time: +k[0], v: +k[4] })).sort((x, y) => x.time - y.time);
+async function cargarActivo(a, desde5m) {
+  const [v1h, v1d, v5m, v15, v4h, v1w] = await Promise.all([
+    vision(a, "1h", 1e3),
+    vision(a, "1d", 400),
+    vision(a, "5m", 1e3),
+    vision(a, "15m", 400),
+    vision(a, "4h", 300),
+    vision(a, "1w", 100)
+  ]);
+  let perp5 = [], perp5Desde = Infinity;
+  try {
+    const [velas, taker] = [await velasSwap5m(a, desde5m), await takerSwap5m(a, desde5m)];
+    perp5 = [...velas.entries()].filter(([t]) => taker.has(t)).map(([t, v]) => ({ time: t, high: v.high, low: v.low, close: v.close, volUsd: v.volUsd, compraUsd: taker.get(t).compra })).sort((x, y) => x.time - y.time);
+    perp5Desde = perp5[0]?.time ?? Infinity;
+  } catch (e) {
+    avisos.push(`${a} flujo del swap: ${e.message}`);
+  }
+  const seguro = async (fn, vacio, que) => {
+    try {
+      return await fn();
+    } catch (e) {
+      avisos.push(`${a} ${que}: ${e.message}`);
+      return vacio;
+    }
+  };
+  const funding = await seguro(() => fundingHist(a, CFG.m1Funding.diasDistribucion + 2), [], "funding");
+  const swap1h = await seguro(async () => cierresOkx(await okx(`/market/candles?instId=${SIM.okx[a]}&bar=1H&limit=300`)), [], "velas 1H del swap");
+  const idx1h = await seguro(async () => cierresOkx(await okx(`/market/index-candles?instId=${SIM.okxIdx[a]}&bar=1H&limit=100`)), [], "\xEDndice 1H");
+  const swap1d = await seguro(async () => cierresOkx(await okx(`/market/candles?instId=${SIM.okx[a]}&bar=1D&limit=100`)), [], "velas 1D del swap");
+  const idx1d = await seguro(async () => cierresOkx(await okx(`/market/index-candles?instId=${SIM.okxIdx[a]}&bar=1D&limit=100`)), [], "\xEDndice 1D");
+  const oi = await seguro(async () => (await okx(`/rubik/stat/contracts/open-interest-volume?ccy=${a}&period=1H`)).map((x) => ({ time: +x[0], v: +x[1] })).sort((x, y) => x.time - y.time), [], "OI");
+  return { v1h, v1d, v5m, v15, v4h, v1w, perp5, perp5Desde, funding, swap1h, idx1h, swap1d, idx1d, oi };
 }
 var aKline = (v) => ({ time: v.time, open: v.open, high: v.high, low: v.low, close: v.close, volume: v.volUsd });
 var aFlujo = (v) => v.map((k) => ({ time: k.time, compraUsd: k.compraUsd, ventaUsd: k.volUsd - k.compraUsd }));
 var aCvd = (v) => v.map((k) => ({ time: k.time, high: k.high, low: k.low, close: k.close, volUsd: k.volUsd, compraUsd: k.compraUsd }));
-async function tradesBinance(a) {
-  const r = await traer(`${VISION}/aggTrades?symbol=${SIM.vision[a]}&limit=1000`);
-  return r.map((x) => ({ t: x.T, lado: x.m ? -1 : 1, usd: +x.p * +x.q }));
-}
-async function tradesCoinbase(a) {
-  const r = await traer(`https://api.exchange.coinbase.com/products/${SIM.coinbase[a]}/trades?limit=1000`);
-  return r.map((x) => ({ t: Date.parse(x.time), lado: x.side === "sell" ? 1 : -1, usd: +x.price * +x.size }));
-}
-async function tradesKraken(a) {
-  const r = await traer(`https://api.kraken.com/0/public/Trades?pair=${SIM.kraken[a]}`);
-  const lista = Object.entries(r.result).find(([k]) => k !== "last")?.[1] ?? [];
-  return lista.map((x) => ({ t: +x[2] * 1e3, lado: x[3] === "b" ? 1 : -1, usd: +x[0] * +x[1] }));
-}
-async function tradesOkx(a) {
-  const r = await okx(`/market/trades?instId=${SIM.okx[a]}&limit=500`);
-  const ctVal = CT_VAL[a];
-  return r.map((x) => ({ t: +x.ts, lado: x.side === "buy" ? 1 : -1, usd: +x.px * +x.sz * ctVal }));
-}
-function instantanea(trades, hasta) {
-  if (!trades.length) return { imb: null, usd: 0, ventanaSeg: 0 };
-  const desde = Math.max(Math.min(...trades.map((x) => x.t)), hasta - 5 * MIN3);
-  const v = trades.filter((x) => x.t >= desde && x.t <= hasta);
-  let c = 0, s = 0;
-  for (const x of v) if (x.lado > 0) c += x.usd;
-  else s += x.usd;
-  return { imb: c + s > 0 ? imbalance(c, s) : null, usd: c + s, ventanaSeg: Math.round((hasta - desde) / 1e3) };
-}
+var cerradas = (v, dur, t) => v.filter((k) => k.time + dur <= t);
+var ultimoHasta = (s, t) => {
+  let r = null;
+  for (const x of s) {
+    if (x.time <= t) r = x;
+    else break;
+  }
+  return r;
+};
 var CT_VAL = { BTC: 0.01, ETH: 0.1, SOL: 1 };
 async function cargarCtVal() {
   for (const a of ACTIVOS) {
@@ -1641,379 +1827,420 @@ async function cargarCtVal() {
     }
   }
 }
-async function velasOkx(a, bar, limite) {
-  const d = await okx(`/market/candles?instId=${SIM.okx[a]}&bar=${bar}&limit=${limite}`);
-  return d.map((k) => ({ time: +k[0], high: +k[2], low: +k[3], close: +k[4], volUsd: +k[7] })).sort((x, y) => x.time - y.time);
-}
-async function indexOkx(a, bar, limite) {
-  const d = await okx(`/market/index-candles?instId=${SIM.okxIdx[a]}&bar=${bar}&limit=${limite}`);
-  return d.map((k) => ({ time: +k[0], close: +k[4] })).sort((x, y) => x.time - y.time);
-}
-async function takerOkx(a, periodo) {
-  const d = await okx(`/rubik/stat/taker-volume?ccy=${a}&instType=CONTRACTS&period=${periodo}`);
-  return d.map((x) => ({ time: +x[0], venta: +x[1], compra: +x[2] })).sort((x, y) => x.time - y.time);
-}
-function calibrarTaker(taker, velas, avisos, a) {
-  const porT = new Map(velas.map((v) => [v.time, v]));
-  let sumT = 0, sumV = 0, sumVb = 0;
-  for (const t of taker) {
-    const v = porT.get(t.time);
-    if (!v || !v.volUsd) continue;
-    sumT += t.venta + t.compra;
-    sumV += v.volUsd;
-    sumVb += v.volUsd / v.close;
+var TRADES = {
+  binance: async (a) => (await traer(`${VISION}/aggTrades?symbol=${SIM.vision[a]}&limit=1000`)).map((x) => ({ t: x.T, lado: x.m ? -1 : 1, usd: +x.p * +x.q, p: +x.p })),
+  // m = comprador maker → el agresor vendió
+  coinbase: async (a) => (await traer(`https://api.exchange.coinbase.com/products/${SIM.coinbase[a]}/trades?limit=1000`)).map((x) => ({ t: Date.parse(x.time), lado: x.side === "sell" ? 1 : -1, usd: +x.price * +x.size, p: +x.price })),
+  // side = lado del maker
+  kraken: async (a) => {
+    const r = await traer(`https://api.kraken.com/0/public/Trades?pair=${SIM.kraken[a]}`);
+    return (Object.entries(r.result).find(([k]) => k !== "last")?.[1] ?? []).map((x) => ({ t: +x[2] * 1e3, lado: x[3] === "b" ? 1 : -1, usd: +x[0] * +x[1], p: +x[0] }));
+  },
+  okx: async (a) => (await okx(`/market/trades?instId=${SIM.okx[a]}&limit=500`)).map((x) => ({ t: +x.ts, lado: x.side === "buy" ? 1 : -1, usd: +x.px * +x.sz * CT_VAL[a], p: +x.px }))
+  // side = agresor
+};
+function instantanea(trades, hasta) {
+  if (!trades.length) return { imb: null, usd: 0, ventanaSeg: 0 };
+  const desde = Math.max(Math.min(...trades.map((x) => x.t)), hasta - 5 * MIN3);
+  let c = 0, s = 0;
+  for (const x of trades) if (x.t >= desde && x.t <= hasta) {
+    if (x.lado > 0) c += x.usd;
+    else s += x.usd;
   }
-  if (!sumT || !sumV) return (v) => v;
-  const enUsd = sumT / sumV, enBase = sumT / sumVb;
-  if (enUsd > 0.2 && enUsd < 5) return (v) => v;
-  if (enBase > 0.2 && enBase < 5) return (v, time) => v * (porT.get(time)?.close ?? 0);
-  avisos.push(`${a}: taker volume de OKX con unidad desconocida (ratio USD ${enUsd.toFixed(2)}, base ${enBase.toFixed(2)}); se usa tal cual`);
-  return (v) => v;
+  return { imb: c + s > 0 ? imbalance(c, s) : null, usd: c + s, ventanaSeg: Math.round((hasta - desde) / 1e3) };
 }
-async function fundingOkx(a, dias) {
-  const out = [];
-  let after = null;
-  const desde = Date.now() - dias * D;
-  for (let i = 0; i < 4; i++) {
-    const d = await okx(`/public/funding-rate-history?instId=${SIM.okx[a]}&limit=100${after ? `&after=${after}` : ""}`);
-    if (!d.length) break;
-    for (const x of d) out.push({ time: +x.fundingTime, rate: +x.fundingRate });
-    after = d[d.length - 1].fundingTime;
-    if (+after < desde) break;
-  }
-  return out.filter((x) => x.time >= desde).sort((x, y) => x.time - y.time);
-}
-async function oiOkx(a) {
-  const d = await okx(`/rubik/stat/contracts/open-interest-volume?ccy=${a}&period=1H`);
-  return d.map((x) => ({ time: +x[0], oiUsd: +x[1] })).sort((x, y) => x.time - y.time);
-}
-async function liquidacionesOkx(a) {
-  const d = await okx(`/public/liquidation-orders?instType=SWAP&uly=${SIM.okxIdx[a]}&state=filled&limit=100`);
-  const out = [];
-  for (const g of d) for (const x of g.details ?? []) {
-    const precio = +x.bkPx, usd = +x.sz * CT_VAL[a] * precio;
-    if (precio > 0 && usd > 0) out.push({ t: +x.ts, precio, usd, lado: x.posSide === "long" ? "largos" : "cortos" });
-  }
+async function instantaneas() {
+  const out = {};
+  await Promise.all(ACTIVOS.map(async (a) => {
+    const porEx = {};
+    let precio = null, t = Date.now();
+    await Promise.all(Object.entries(TRADES).map(async ([ex, fn]) => {
+      try {
+        const tr = await fn(a);
+        const hasta = Date.now();
+        porEx[ex] = instantanea(tr, hasta);
+        if (ex === "binance" && tr.length) {
+          const u = tr.reduce((x, y) => y.t > x.t ? y : x);
+          precio = u.p;
+          t = hasta;
+        }
+      } catch (e) {
+        porEx[ex] = { imb: null, usd: 0, ventanaSeg: 0 };
+        avisos.push(`${a} trades ${ex}: ${e.message}`);
+      }
+    }));
+    out[a] = { t, precio, porEx };
+  }));
   return out;
+}
+async function liquidacionesNuevas(a, hasta) {
+  const crudas = [];
+  let after = null, desdeConsulta = Date.now(), paginas = 0;
+  for (; paginas < B.liqMaxPaginas; paginas++) {
+    const d = await okx(`/public/liquidation-orders?instType=SWAP&uly=${SIM.okxIdx[a]}&state=filled&limit=100${after ? `&after=${after}` : ""}`);
+    const det = d.flatMap((g) => g.details ?? []);
+    if (!det.length) break;
+    for (const x of det) {
+      const precio = +x.bkPx, t = +x.ts;
+      const lado = x.posSide === "long" ? 1 : x.posSide === "short" ? -1 : x.side === "sell" ? 1 : -1;
+      crudas.push({ t, precio, usd: +x.sz * CT_VAL[a] * precio, lado });
+    }
+    const min = Math.min(...det.map((x) => +x.ts));
+    desdeConsulta = Math.min(desdeConsulta, min);
+    if (min <= hasta || after !== null && min >= after) break;
+    after = min;
+  }
+  return { crudas, desdeConsulta, paginas: paginas + 1 };
+}
+function evaluarHora(a, t, d, c, corrida) {
+  const k1v = cerradas(d.v1h, H2, t);
+  const precio = k1v.at(-1)?.close ?? null;
+  if (!precio || k1v.at(-1).time + H2 !== t) return null;
+  const k1 = k1v.map(aKline);
+  const k4 = cerradas(d.v4h, 4 * H2, t).map(aKline);
+  const kd = cerradas(d.v1d, D, t).map(aKline);
+  const kw = cerradas(d.v1w, 7 * D, t).map(aKline);
+  const k15 = cerradas(d.v15, 15 * MIN3, t).slice(-61).map(aKline);
+  const ok = (v) => v === null || v === void 0 ? "caido" : "ok";
+  const s1 = evaluarS1(aFlujo(k1v));
+  const sem = evaluarS1Semanal(aFlujo(cerradas(d.v1d, D, t)));
+  const ancla = sesionDe(t).inicio;
+  const spot = aCvd(d.v5m.filter((k) => k.time >= ancla && k.time + 5 * MIN3 <= t));
+  const perpOk = d.perp5Desde <= ancla;
+  const perp = perpOk ? d.perp5.filter((k) => k.time >= ancla && k.time + 5 * MIN3 <= t) : [];
+  const s2 = evaluarS2(spot, perp, t);
+  const perpHora = perpOk || d.perp5Desde <= t - H2 ? d.perp5.filter((k) => k.time >= t - H2 && k.time + 5 * MIN3 <= t) : [];
+  const fh = d.funding.filter((f) => f.time <= t && f.time > t - CFG.m1Funding.diasDistribucion * D);
+  const sw = ultimoHasta(d.swap1h, t - H2), ix = ultimoHasta(d.idx1h, t - H2);
+  const basis = sw && ix && sw.time === ix.time && ix.v > 0 ? (sw.v - ix.v) / ix.v : null;
+  const idxD = new Map(d.idx1d.map((x) => [x.time, x.v]));
+  const basisHist = d.swap1d.filter((x) => x.time + D <= t).map((x) => {
+    const i = idxD.get(x.time);
+    return i ? (x.v - i) / i : null;
+  }).filter((x) => x !== null);
+  const oiT = d.oi.filter((o) => o.time + H2 <= t);
+  const oiAhora = oiT.at(-1) ?? null, oiHace4 = oiAhora ? oiT.find((o) => o.time === oiAhora.time - 4 * H2) : null;
+  const oi4hPct = oiAhora && oiHace4 && oiHace4.v > 0 ? (oiAhora.v / oiHace4.v - 1) * 100 : null;
+  const ult24 = k1.slice(-24);
+  const lv = kd.length && kw.length ? levelMap({ "1d": kd, "1w": kw }, precio, { high: Math.max(...ult24.map((k) => k.high)), low: Math.min(...ult24.map((k) => k.low)) }) : null;
+  const near = lv ? nearestLevels(lv, precio) : null;
+  const s3 = fh.length > 30 ? evaluarS3({
+    funding: fh[fh.length - 1].v,
+    fundingHist: fh.map((f) => f.v),
+    basis,
+    basisHist,
+    oiCambio4hPct: oi4hPct,
+    precioCambio4hPct: k1.length > 5 ? (precio / k1[k1.length - 5].close - 1) * 100 : null,
+    distResistenciaPct: near && Number.isFinite(near.upPct) ? near.upPct : null,
+    distSoportePct: near && Number.isFinite(near.downPct) ? near.downPct : null
+  }) : null;
+  const f7d = fh.length > 30 ? scoreFunding7d(fh.map((f) => f.v)) : null;
+  let s4 = null;
+  const oiBTC = ultimoHasta(c.oiBTC.filter((o) => o.time + H2 <= t), t);
+  const fracRef = fraccionReferencia(oiBTC?.v ?? null);
+  if (oiAhora) {
+    const k4Mapa = new Map(k4.map((k) => [k.time, k]));
+    const oi4 = oiT.filter((o) => o.time % (4 * H2) === 0);
+    const est = new EstimadorClusters();
+    for (let i = 1; i < oi4.length; i++) {
+      const v4 = k4Mapa.get(oi4[i].time - 4 * H2);
+      if (v4) est.paso(oi4[i - 1].v / v4.close, oi4[i].v / v4.close, v4);
+    }
+    if (oi4.length > 6) s4 = evaluarS4(agruparClusters(est.pos, precio), oiAhora.v, fracRef, s2.tendencia);
+  }
+  const rrHasta = c.rr.filter((m2) => m2.t <= t);
+  const rrAct = rrHasta.at(-1) ?? null;
+  const s5 = rrAct && t - rrAct.t <= B.toleranciaRrHoras * H2 ? evaluarS5(rrHasta.slice(0, -1), rrAct, a === "ETH" ? "ETH" : "BTC") : null;
+  const nf = c.netflows?.[a]?.filter((x) => x.t < Math.floor(t / D) * D) ?? [];
+  const s6 = nf.length > 20 ? evaluarS6(nf, t) : null;
+  const fgi = ultimoHasta(c.fgi, t)?.v ?? 50;
+  const an = k4.length && kd.length && kw.length ? fullAnalysis({ "4h": k4.slice(-120), "1d": kd.slice(-120), "1w": kw.slice(-80) }, k1.slice(-160), getLunarState(t), fgi) : null;
+  const porTF = an ? [an.perTF["4h"].signal, an.perTF["1d"].signal, an.perTF["1w"].signal] : [0, 0, 0];
+  const m = c.mercados;
+  const cerrado = (ts) => ts + 7 * H2 <= t;
+  const m3 = m && m.spx?.c?.length > 40 && m.dxy?.c?.length > 40 ? evaluarM3(
+    { t: m.spx.t.filter(cerrado), c: m.spx.c.filter((_, j) => cerrado(m.spx.t[j])) },
+    { t: m.dxy.t.filter(cerrado), c: m.dxy.c.filter((_, j) => cerrado(m.dxy.t[j])) },
+    { t: kd.map((k) => k.time), c: kd.map((k) => k.close) }
+  ) : null;
+  const macro = estadoMacro(c.eventos, t, CFG.scoreMaestro.umbralEntrada);
+  const gat = { largo: gatillo(k15, 1), corto: gatillo(k15, -1) };
+  const comps = [
+    { id: "orderflow", score: s1.score, confianza: CFG.s1OrderFlow.confianzaSoloBinance, estado: s1.z === null ? "caido" : "ok", actualizado: t },
+    { id: "cvd", score: s2.score, confianza: s2.suficiente ? 1 : 0, estado: perpOk ? "ok" : "caido", actualizado: t },
+    { id: "funding", score: s3?.score ?? 0, confianza: s3?.confianza ?? 0, estado: ok(s3), actualizado: t },
+    { id: "liquidaciones", score: s4?.score ?? 0, confianza: fracRef === null ? 0 : 1, estado: ok(s4), actualizado: t },
+    { id: "skew", score: s5?.score ?? 0, confianza: s5?.confianza ?? 0, estado: ok(s5), actualizado: t },
+    { id: "mtf", score: an?.confianza ?? 0, confianza: 1, estado: ok(an), actualizado: t }
+  ];
+  const swingComps = [
+    { id: "netflows", score: s6?.score ?? 0, confianza: 1, estado: ok(s6), actualizado: t },
+    { id: "orderflowSemanal", score: sem.score, confianza: 1, estado: sem.z === null ? "caido" : "ok", actualizado: t },
+    { id: "skew", score: s5?.score ?? 0, confianza: s5?.confianza ?? 0, estado: ok(s5), actualizado: t },
+    { id: "funding7d", score: f7d?.score ?? 0, confianza: 1, estado: ok(f7d), actualizado: t }
+  ];
+  const swg = scoreSwing(swingComps, PESOS_SWING);
+  const ctx = { m3, macro, porTF, defensivo: false, bloqueoDiarioHasta: null, gatillo: gat, swing: swg.score };
+  const dec = scoreMaestro(comps, ctx, PESOS);
+  const enc = scoreMaestro(comps, ctx, CFG.scoreMaestro.pesosEncargo);
+  const sumaPerp = (k) => perpHora.length === 12 ? Math.round(perpHora.reduce((s, x) => s + x[k], 0)) : null;
+  return {
+    t,
+    activo: a,
+    precio: r4(precio),
+    corrida,
+    relleno: 0,
+    s1Score: r4(s1.score),
+    s1Z: r4(s1.z),
+    s1Conf: r4(comps[0].confianza),
+    s1Imb1h: r4(s1.porVentana["1h"].imbalance),
+    s1Imb4h: r4(s1.porVentana["4h"].imbalance),
+    s1Imb1d: r4(s1.porVentana["1d"].imbalance),
+    s1SemScore: r4(sem.score),
+    vivoT: null,
+    vivoBinanceImb: null,
+    vivoCoinbaseImb: null,
+    vivoKrakenImb: null,
+    vivoOkxImb: null,
+    vivoUsd: null,
+    vivoVentanaSeg: null,
+    vivoPrecio: null,
+    perpCompraUsd1h: sumaPerp("compraUsd"),
+    perpVolUsd1h: sumaPerp("volUsd"),
+    s2Score: perpOk ? r4(s2.score) : null,
+    s2Suf: perpOk ? s2.suficiente ? 1 : 0 : null,
+    s2Lider: perpOk ? s2.lider : null,
+    s2Mult: perpOk ? r4(s2.mult) : null,
+    s2Tend: perpOk ? r4(s2.tendencia) : null,
+    s2Sesion: s2.sesion.nombre,
+    s3Score: r4(s3?.score),
+    s3Conf: r4(s3?.confianza),
+    s3Funding: fh.length ? r4(fh[fh.length - 1].v * 100) : null,
+    s3PctFunding: r4(s3?.percentilFunding),
+    s3Basis: basis === null ? null : r4(basis * 100),
+    s3PctBasis: r4(s3?.percentilBasis),
+    s3Oi4hPct: r4(oi4hPct),
+    s3Trampa: s3?.trampa ?? null,
+    f7dScore: r4(f7d?.score),
+    s4Score: r4(s4?.score),
+    s4Conf: r4(comps[3].confianza),
+    s4Dominante: s4?.dominante ?? null,
+    s4ObjDist: r4(s4?.objetivo?.distPct),
+    s4ObjUsd: s4?.objetivo ? Math.round(s4.objetivo.usd) : null,
+    s4Invertido: s4 ? s4.invertido ? 1 : 0 : null,
+    oiUsd: oiAhora ? Math.round(oiAhora.v) : null,
+    s5Score: r4(s5?.score),
+    s5Conf: r4(s5?.confianza),
+    s5Rr7: r4(s5?.rr7),
+    s5Z: r4(s5?.z),
+    s5Activo: s5 ? s5.activo ? 1 : 0 : null,
+    s5Dias: s5?.diasCubiertos ?? null,
+    s6Score: r4(s6?.score),
+    s6Z: r4(s6?.z),
+    s6Regimen: s6?.regimen ?? null,
+    mtfScore: r4(an?.confianza),
+    mtf4h: porTF[0],
+    mtf1d: porTF[1],
+    mtf1w: porTF[2],
+    m3Score: r4(m3?.score),
+    riskOff: m3 ? m3.riskOff ? 1 : 0 : null,
+    macroFase: macro.fase,
+    gatLargo: gat.largo.ok ? gat.largo.tipo : null,
+    gatCorto: gat.corto.ok ? gat.corto.tipo : null,
+    maestroBruto: r4(dec.bruto),
+    maestroFinal: r4(dec.final),
+    maestroDir: dec.dir,
+    maestroAbrir: dec.abrir ? 1 : 0,
+    maestroBloqueos: dec.bloqueos.length,
+    encargoBruto: r4(enc.bruto),
+    encargoFinal: r4(enc.final),
+    swing: r4(swg.score),
+    r1h: null,
+    r4h: null,
+    r24h: null,
+    r7d: null
+  };
 }
 async function main() {
   mkdirSync(SALIDA, { recursive: true });
   const ahora = Date.now();
-  const tCierre = Math.floor(ahora / H) * H;
-  const avisos = [];
-  console.log(`Bit\xE1cora \xB7 corrida ${new Date(ahora).toISOString()} \xB7 ancla ${new Date(tCierre).toISOString()}`);
+  const tCierre = Math.floor(ahora / H2) * H2;
+  console.log(`Bit\xE1cora \xB7 corrida ${new Date(ahora).toISOString()} \xB7 \xFAltima hora cerrada ${new Date(tCierre).toISOString()}`);
   const prevCands = await candidatos("bitacora.json");
-  const prev = prevCands.sort((x, y) => (y.v.filas?.length ?? 0) - (x.v.filas?.length ?? 0))[0];
-  const filasPrev = prev?.v.filas ?? [];
-  console.log(`historial previo: ${prev ? `${filasPrev.length} filas (${prev.origen})` : "ninguno"}; candidatos: ${prevCands.map((c) => `${c.origen}=${c.v.filas?.length ?? 0}`).join(", ") || "\u2014"}`);
-  if (prev && prev.v.campos && prev.v.campos.join() !== CAMPOS.join()) avisos.push(`el historial previo tiene otros campos (${prev.v.campos.length} vs ${CAMPOS.length}); se migra por nombre`);
-  const migrar = (f) => {
-    if (!prev?.v.campos || prev.v.campos.join() === CAMPOS.join()) return f;
-    const m = new Map(prev.v.campos.map((c, i) => [c, f[i]]));
-    return CAMPOS.map((c) => m.get(c) ?? null);
-  };
-  const filas = filasPrev.map(migrar);
-  const yaHay = new Set(filas.map((f) => `${f[col("t")]}-${f[col("activo")]}`));
-  const liqCands = await candidatos("liquidaciones-okx.json");
-  const liqPrev = liqCands.sort((x, y) => total(y.v) - total(x.v))[0]?.v;
-  const liqs = { generado: ahora, fuente: "OKX (\xF3rdenes de liquidaci\xF3n p\xFAblicas, swap USDT)", activos: { BTC: liqPrev?.activos.BTC ?? [], ETH: liqPrev?.activos.ETH ?? [], SOL: liqPrev?.activos.SOL ?? [] } };
-  const [macroJ, mercadosJ, rrJ, nfJ] = await Promise.all([
+  const prev = elegirMasCompleto(prevCands, (v) => v.filas?.length ?? 0);
+  console.log(`historial previo: ${prev ? `${prev.v.filas.length} filas (${prev.origen})` : "ninguno"} \xB7 candidatos ${prevCands.map((x) => `${x.origen}=${x.v.filas?.length ?? 0}`).join(", ") || "\u2014"}`);
+  const filasPrev = migrarFilas(prev?.v.filas ?? [], prev?.v.campos, CAMPOS);
+  if (prev?.v.campos && prev.v.campos.join() !== CAMPOS.join()) avisos.push(`esquema migrado por nombre (${prev.v.campos.length} \u2192 ${CAMPOS.length} campos)`);
+  const hechas = { BTC: /* @__PURE__ */ new Set(), ETH: /* @__PURE__ */ new Set(), SOL: /* @__PURE__ */ new Set() };
+  for (const f of filasPrev) hechas[f[col("activo")]]?.add(f[col("t")]);
+  const pendientes = { BTC: [], ETH: [], SOL: [] };
+  for (const a of ACTIVOS) pendientes[a] = horasPendientes(hechas[a], tCierre, B.maxHorasRelleno);
+  const masVieja = Math.min(tCierre, ...ACTIVOS.flatMap((a) => pendientes[a]));
+  const desde5m = sesionDe(masVieja).inicio - 15 * MIN3;
+  console.log(`horas pendientes: ${ACTIVOS.map((a) => `${a} ${pendientes[a].length}`).join(" \xB7 ")}`);
+  const [macroC, mercadosC, rrC, nfC] = await Promise.all([
     candidatos("macro.json"),
     candidatos("mercados.json"),
     candidatos("rr25.json"),
     candidatos("netflows.json")
   ]);
-  const eventos = macroJ[0]?.v.eventos ?? [];
-  const mercados = mercadosJ[0]?.v ?? null;
-  const rr = rrJ.sort((x, y) => (y.v.muestras?.length ?? 0) - (x.v.muestras?.length ?? 0))[0]?.v.muestras ?? [];
-  const netflows = nfJ[0]?.v.activos ?? null;
-  let fgi = 50;
+  const reciente = (c) => elegirMasCompleto(c, (v) => v.generado ?? 0)?.v ?? null;
+  let fgi = [];
   try {
-    const f = await traer("https://api.alternative.me/fng/?limit=1&format=json");
-    fgi = +f.data[0].value;
+    fgi = (await traer("https://api.alternative.me/fng/?limit=30&format=json")).data.map((x) => ({ time: +x.timestamp * 1e3, v: +x.value })).sort((x, y) => x.time - y.time);
   } catch {
-    avisos.push("Fear & Greed no respondi\xF3: 50");
+    avisos.push("Fear & Greed no respondi\xF3: se usa 50");
   }
   await cargarCtVal();
-  const macro = estadoMacro(eventos, tCierre, CFG.scoreMaestro.umbralEntrada);
-  const ok = (v) => v === null || v === void 0 ? "caido" : "ok";
+  const vivo = await instantaneas();
   let oiBTC = [];
   try {
-    oiBTC = await oiOkx("BTC");
+    oiBTC = (await okx("/rubik/stat/contracts/open-interest-volume?ccy=BTC&period=1H")).map((x) => ({ time: +x[0], v: +x[1] })).sort((x, y) => x.time - y.time);
   } catch (e) {
-    avisos.push(`OI BTC OKX: ${e.message}`);
+    avisos.push(`OI BTC: ${e.message}`);
   }
-  const oiBTCAhora = oiBTC.at(-1)?.oiUsd ?? null;
-  const fracRef = fraccionReferencia(oiBTCAhora);
-  const cierres = { BTC: /* @__PURE__ */ new Map(), ETH: /* @__PURE__ */ new Map(), SOL: /* @__PURE__ */ new Map() };
+  const comp = {
+    eventos: reciente(macroC)?.eventos ?? [],
+    mercados: reciente(mercadosC),
+    rr: elegirMasCompleto(rrC, (v) => v.muestras?.length ?? 0)?.v.muestras ?? [],
+    netflows: elegirMasCompleto(nfC, (v) => v.activos ? Object.values(v.activos).reduce((s, x) => s + x.length, 0) : 0)?.v.activos ?? null,
+    fgi,
+    oiBTC
+  };
+  const liqCands = await candidatos("liquidaciones-okx.json");
+  const aV2 = (v) => {
+    if (v.version === 2) return v;
+    const activos = {};
+    for (const [a, lista] of Object.entries(v.activos ?? {})) {
+      if (!lista.length) continue;
+      const crudas = lista.map((l) => ({ t: l.t, precio: l.precio, usd: l.usd, lado: l.lado === "largos" ? 1 : -1 }));
+      activos[a] = agregarLiquidaciones(null, crudas, B.liqTramoPct, Math.min(...crudas.map((x) => x.t)), Math.max(...crudas.map((x) => x.t)));
+    }
+    return { version: 2, generado: 0, fuente: "", tramoPct: B.liqTramoPct, activos };
+  };
+  const liqPrev = elegirMasCompleto(liqCands.map((x) => ({ origen: x.origen, v: aV2(x.v) })), (v) => ACTIVOS.reduce((s, a) => s + nLiquidaciones(v.activos[a]), 0))?.v ?? null;
+  const liqs = { version: 2, generado: ahora, fuente: "OKX swap USDT \xB7 \xF3rdenes de liquidaci\xF3n p\xFAblicas (state=filled), agregadas por hora, tramo de precio y lado", tramoPct: B.liqTramoPct, activos: {} };
+  const nuevas = [];
+  const cierres = {};
+  let rellenadas = 0;
   for (const a of ACTIVOS) {
+    console.log(`  ${a}\u2026`);
     try {
-      console.log(`  ${a}\u2026`);
-      const [v1h, v1d, v5m, v15, v4h, v1w] = await Promise.all([
-        vision(a, "1h", 1e3),
-        vision(a, "1d", 400),
-        vision(a, "5m", 300, sesionDe(tCierre - 1).inicio),
-        vision(a, "15m", 200),
-        vision(a, "4h", 300),
-        vision(a, "1w", 100)
-      ]);
-      for (const k of v1h) cierres[a].set(k.time + H, k.close);
-      const cerradas1h = v1h.filter((k) => k.time + H <= tCierre);
-      const precio = cerradas1h.at(-1)?.close ?? null;
-      if (!precio) throw new Error("sin velas de 1 h");
-      const k1 = cerradas1h.map(aKline);
-      const k4 = v4h.filter((k) => k.time + 4 * H <= tCierre).map(aKline);
-      const kd = v1d.filter((k) => k.time + D <= tCierre).map(aKline);
-      const kw = v1w.filter((k) => k.time + 7 * D <= tCierre).map(aKline);
-      const k15 = v15.filter((k) => k.time + 15 * MIN3 <= tCierre + 15 * MIN3).map(aKline);
-      const s1 = evaluarS1(aFlujo(cerradas1h));
-      const sem = evaluarS1Semanal(aFlujo(v1d.filter((k) => k.time + D <= tCierre)));
-      const inst = async (fn, nombre) => {
-        try {
-          return instantanea(await fn(), ahora);
-        } catch (e) {
-          avisos.push(`${a} ${nombre}: ${e.message}`);
-          return { imb: null, usd: 0, ventanaSeg: 0 };
+      const d = await cargarActivo(a, desde5m);
+      cierres[a] = new Map(d.v1h.map((k) => [k.time + H2, k.close]));
+      for (const t of pendientes[a]) {
+        const r = evaluarHora(a, t, d, comp, ahora);
+        if (!r) {
+          avisos.push(`${a} ${new Date(t).toISOString().slice(0, 13)}h: sin vela de esa hora`);
+          continue;
         }
-      };
-      const [iB, iC, iK, iO] = [await inst(() => tradesBinance(a), "binance"), await inst(() => tradesCoinbase(a), "coinbase"), await inst(() => tradesKraken(a), "kraken"), await inst(() => tradesOkx(a), "okx")];
-      let perpCvd = [], perp1h = null;
-      try {
-        const [velas5, taker5, taker1h] = [await velasOkx(a, "5m", 300), await takerOkx(a, "5m"), await takerOkx(a, "1H")];
-        const esc = calibrarTaker(taker5, velas5, avisos, a);
-        const porT = new Map(taker5.map((t) => [t.time, t]));
-        const ancla = sesionDe(tCierre - 1).inicio;
-        perpCvd = velas5.filter((v) => v.time >= ancla && v.time + 5 * MIN3 <= ahora).map((v) => {
-          const t = porT.get(v.time);
-          return { time: v.time, high: v.high, low: v.low, close: v.close, volUsd: v.volUsd, compraUsd: t ? esc(t.compra, v.time) : v.volUsd / 2 };
-        });
-        const u = taker1h.filter((t) => t.time + H <= tCierre).at(-1);
-        if (u) perp1h = { compra: esc(u.compra, u.time), vol: esc(u.compra + u.venta, u.time) };
-      } catch (e) {
-        avisos.push(`${a} OKX flujo: ${e.message}`);
-      }
-      const spotCvd = aCvd(v5m.filter((k) => k.time + 5 * MIN3 <= ahora));
-      const s2 = evaluarS2(spotCvd, perpCvd, ahora);
-      let s3 = null, f7d = null;
-      let fundingAct = null, basisAct = null, oi4hPct = null, oiUsdAct = null;
-      let oiSerie = [];
-      try {
-        const [fh, fAct, swapD, idxD, idxT, tick] = [
-          await fundingOkx(a, CFG.m1Funding.diasDistribucion),
-          await okx(`/public/funding-rate?instId=${SIM.okx[a]}`),
-          await velasOkx(a, "1D", 100),
-          await indexOkx(a, "1D", 100),
-          await okx(`/market/index-tickers?instId=${SIM.okxIdx[a]}`),
-          await okx(`/market/ticker?instId=${SIM.okx[a]}`)
-        ];
-        oiSerie = a === "BTC" ? oiBTC : await oiOkx(a);
-        fundingAct = +fAct[0].fundingRate;
-        const idx = +idxT[0].idxPx, last = +tick[0].last;
-        basisAct = idx > 0 ? (last - idx) / idx : null;
-        const idxPorT = new Map(idxD.map((x) => [x.time, x.close]));
-        const basisHist = swapD.filter((v) => v.time + D <= tCierre).map((v) => {
-          const i = idxPorT.get(v.time);
-          return i ? (v.close - i) / i : null;
-        }).filter((x) => x !== null);
-        const oiT = oiSerie.filter((o) => o.time <= tCierre);
-        const oiAhora = oiT.at(-1), oiHace4 = oiT.find((o) => o.time === (oiAhora?.time ?? 0) - 4 * H);
-        oi4hPct = oiAhora && oiHace4 && oiHace4.oiUsd > 0 ? (oiAhora.oiUsd / oiHace4.oiUsd - 1) * 100 : null;
-        oiUsdAct = oiAhora?.oiUsd ?? null;
-        const ult24 = k1.slice(-24);
-        const lv = levelMap({ "1d": kd, "1w": kw }, precio, { high: Math.max(...ult24.map((k) => k.high)), low: Math.min(...ult24.map((k) => k.low)) });
-        const near = lv ? nearestLevels(lv, precio) : null;
-        if (fh.length > 30) {
-          s3 = evaluarS3({
-            funding: fundingAct,
-            fundingHist: fh.map((f) => f.rate),
-            basis: basisAct,
-            basisHist,
-            oiCambio4hPct: oi4hPct,
-            precioCambio4hPct: k1.length > 5 ? (precio / k1[k1.length - 5].close - 1) * 100 : null,
-            distResistenciaPct: near && Number.isFinite(near.upPct) ? near.upPct : null,
-            distSoportePct: near && Number.isFinite(near.downPct) ? near.downPct : null
-          });
-          f7d = scoreFunding7d(fh.map((f) => f.rate));
+        if (t < tCierre) {
+          r.relleno = 1;
+          rellenadas++;
         }
-      } catch (e) {
-        avisos.push(`${a} OKX funding/OI/basis: ${e.message}`);
-      }
-      let s4 = null;
-      try {
-        const k4Mapa = new Map(k4.map((k) => [k.time, k]));
-        const oi4 = oiSerie.filter((o) => o.time % (4 * H) === 0 && o.time <= tCierre);
-        const est = new EstimadorClusters();
-        for (let i = 1; i < oi4.length; i++) {
-          const v4 = k4Mapa.get(oi4[i].time - 4 * H);
-          if (v4) est.paso(oi4[i - 1].oiUsd / v4.close, oi4[i].oiUsd / v4.close, v4);
+        if (t === tCierre) {
+          const v = vivo[a], e = v.porEx;
+          r.vivoT = v.t;
+          r.vivoPrecio = r4(v.precio);
+          r.vivoBinanceImb = r4(e.binance?.imb);
+          r.vivoCoinbaseImb = r4(e.coinbase?.imb);
+          r.vivoKrakenImb = r4(e.kraken?.imb);
+          r.vivoOkxImb = r4(e.okx?.imb);
+          r.vivoUsd = Math.round(Object.values(e).reduce((s2, x) => s2 + x.usd, 0));
+          const ventanas = Object.values(e).map((x) => x.ventanaSeg).filter((x) => x > 0);
+          r.vivoVentanaSeg = ventanas.length ? Math.min(...ventanas) : null;
         }
-        if (oi4.length > 6 && oiUsdAct) s4 = evaluarS4(agruparClusters(est.pos, precio), oiUsdAct, fracRef, s2.tendencia);
-      } catch (e) {
-        avisos.push(`${a} S4: ${e.message}`);
+        nuevas.push(CAMPOS.map((c) => r[c]));
       }
-      try {
-        const nuevas = await liquidacionesOkx(a);
-        const claves = new Set(liqs.activos[a].map((l) => `${l.t}-${l.precio}-${Math.round(l.usd)}`));
-        for (const l of nuevas) {
-          const k = `${l.t}-${l.precio}-${Math.round(l.usd)}`;
-          if (!claves.has(k)) {
-            claves.add(k);
-            liqs.activos[a].push(l);
-          }
-        }
-        liqs.activos[a] = liqs.activos[a].filter((l) => l.t >= ahora - LIQ_RETENCION_DIAS * D).sort((x, y) => x.t - y.t);
-      } catch (e) {
-        avisos.push(`${a} liquidaciones OKX: ${e.message}`);
-      }
-      const rrAct = rr.at(-1) ?? null;
-      const s5 = rrAct ? evaluarS5(rr.slice(0, -1), rrAct, a === "ETH" ? "ETH" : "BTC") : null;
-      const nf = netflows?.[a]?.filter((d) => d.t < Math.floor(tCierre / D) * D) ?? [];
-      const s6 = nf.length > 20 ? evaluarS6(nf, tCierre) : null;
-      const an = fullAnalysis({ "4h": k4.slice(-120), "1d": kd.slice(-120), "1w": kw.slice(-80) }, k1.slice(-160), getLunarState(tCierre), fgi);
-      const porTF = an ? [an.perTF["4h"].signal, an.perTF["1d"].signal, an.perTF["1w"].signal] : [0, 0, 0];
-      const m3 = mercados && mercados.spx?.c?.length > 40 && mercados.dxy?.c?.length > 40 ? evaluarM3(mercados.spx, mercados.dxy, { t: kd.map((k) => k.time), c: kd.map((k) => k.close) }) : null;
-      const gat = { largo: gatillo(k15, 1), corto: gatillo(k15, -1) };
-      const comps = [
-        { id: "orderflow", score: s1.score, confianza: CFG.s1OrderFlow.confianzaSoloBinance, estado: s1.z === null ? "caido" : "ok", actualizado: tCierre },
-        { id: "cvd", score: s2.score, confianza: s2.suficiente ? 1 : 0, estado: perpCvd.length ? "ok" : "caido", actualizado: tCierre },
-        { id: "funding", score: s3?.score ?? 0, confianza: s3?.confianza ?? 0, estado: ok(s3), actualizado: tCierre },
-        { id: "liquidaciones", score: s4?.score ?? 0, confianza: fracRef === null ? 0 : 1, estado: ok(s4), actualizado: tCierre },
-        { id: "skew", score: s5?.score ?? 0, confianza: s5?.confianza ?? 0, estado: ok(s5), actualizado: tCierre },
-        { id: "mtf", score: an?.confianza ?? 0, confianza: 1, estado: ok(an), actualizado: tCierre }
-      ];
-      const swingComps = [
-        { id: "netflows", score: s6?.score ?? 0, confianza: 1, estado: ok(s6), actualizado: tCierre },
-        { id: "orderflowSemanal", score: sem.score, confianza: 1, estado: sem.z === null ? "caido" : "ok", actualizado: tCierre },
-        { id: "skew", score: s5?.score ?? 0, confianza: s5?.confianza ?? 0, estado: ok(s5), actualizado: tCierre },
-        { id: "funding7d", score: f7d?.score ?? 0, confianza: 1, estado: ok(f7d), actualizado: tCierre }
-      ];
-      const sw = scoreSwing(swingComps, PESOS_SWING);
-      const ctx = { m3, macro, porTF, defensivo: false, bloqueoDiarioHasta: null, gatillo: gat, swing: sw.score };
-      const dec = scoreMaestro(comps, ctx, PESOS);
-      const decEnc = scoreMaestro(comps, ctx, CFG.scoreMaestro.pesosEncargo);
-      if (yaHay.has(`${tCierre}-${a}`)) {
-        console.log(`    ya hab\xEDa fila para esta hora; no se duplica`);
-        continue;
-      }
-      const fila = {
-        t: tCierre,
-        activo: a,
-        precio: r4(precio),
-        corrida: ahora,
-        s1Score: r4(s1.score),
-        s1Z: r4(s1.z),
-        s1Conf: r4(comps[0].confianza),
-        s1Imb1h: r4(s1.porVentana["1h"].imbalance),
-        s1Imb4h: r4(s1.porVentana["4h"].imbalance),
-        s1Imb1d: r4(s1.porVentana["1d"].imbalance),
-        s1SemScore: r4(sem.score),
-        vivoBinanceImb: r4(iB.imb),
-        vivoCoinbaseImb: r4(iC.imb),
-        vivoKrakenImb: r4(iK.imb),
-        vivoOkxImb: r4(iO.imb),
-        vivoUsd: Math.round(iB.usd + iC.usd + iK.usd + iO.usd),
-        vivoVentanaSeg: Math.min(iB.ventanaSeg || 300, iC.ventanaSeg || 300, iK.ventanaSeg || 300, iO.ventanaSeg || 300),
-        perpCompraUsd1h: perp1h ? Math.round(perp1h.compra) : null,
-        perpVolUsd1h: perp1h ? Math.round(perp1h.vol) : null,
-        s2Score: r4(s2.score),
-        s2Suf: s2.suficiente ? 1 : 0,
-        s2Lider: s2.lider,
-        s2Mult: r4(s2.mult),
-        s2Tend: r4(s2.tendencia),
-        s2Sesion: s2.sesion.nombre,
-        s3Score: r4(s3?.score),
-        s3Conf: r4(s3?.confianza),
-        s3Funding: fundingAct === null ? null : r4(fundingAct * 100),
-        s3PctFunding: r4(s3?.percentilFunding),
-        s3Basis: basisAct === null ? null : r4(basisAct * 100),
-        s3PctBasis: r4(s3?.percentilBasis),
-        s3Oi4hPct: r4(oi4hPct),
-        s3Trampa: s3?.trampa ?? null,
-        f7dScore: r4(f7d?.score),
-        s4Score: r4(s4?.score),
-        s4Conf: r4(comps[3].confianza),
-        s4Dominante: s4?.dominante ?? null,
-        s4ObjDist: r4(s4?.objetivo?.distPct),
-        s4ObjUsd: s4?.objetivo ? Math.round(s4.objetivo.usd) : null,
-        s4Invertido: s4 ? s4.invertido ? 1 : 0 : null,
-        oiUsd: oiUsdAct === null ? null : Math.round(oiUsdAct),
-        s5Score: r4(s5?.score),
-        s5Conf: r4(s5?.confianza),
-        s5Rr7: r4(s5?.rr7),
-        s5Z: r4(s5?.z),
-        s5Activo: s5 ? s5.activo ? 1 : 0 : null,
-        s5Dias: s5?.diasCubiertos ?? null,
-        s6Score: r4(s6?.score),
-        s6Z: r4(s6?.z),
-        s6Regimen: s6?.regimen ?? null,
-        mtfScore: r4(an?.confianza),
-        mtf4h: porTF[0],
-        mtf1d: porTF[1],
-        mtf1w: porTF[2],
-        m3Score: r4(m3?.score),
-        riskOff: m3 ? m3.riskOff ? 1 : 0 : null,
-        macroFase: macro.fase,
-        gatLargo: gat.largo.ok ? gat.largo.tipo : null,
-        gatCorto: gat.corto.ok ? gat.corto.tipo : null,
-        maestroBruto: r4(dec.bruto),
-        maestroFinal: r4(dec.final),
-        maestroDir: dec.dir,
-        maestroAbrir: dec.abrir ? 1 : 0,
-        maestroBloqueos: dec.bloqueos.length,
-        encargoBruto: r4(decEnc.bruto),
-        encargoFinal: r4(decEnc.final),
-        swing: r4(sw.score),
-        r1h: null,
-        r4h: null,
-        r24h: null,
-        r7d: null
-      };
-      filas.push(CAMPOS.map((c) => fila[c]));
-      console.log(`    s1 ${fila.s1Score} \xB7 s2 ${fila.s2Score} \xB7 s3 ${fila.s3Score} \xB7 s4 ${fila.s4Score} \xB7 s5 ${fila.s5Score} \xB7 s6 ${fila.s6Score} \xB7 mtf ${fila.mtfScore} \xB7 maestro ${fila.maestroFinal} (encargo ${fila.encargoFinal}) \xB7 swing ${fila.swing}`);
+      const u = nuevas.filter((f) => f[col("activo")] === a).at(-1);
+      if (u) console.log(`    ${pendientes[a].length} horas \xB7 \xFAltima: s1 ${u[col("s1Score")]} \xB7 s2 ${u[col("s2Score")]} \xB7 s3 ${u[col("s3Score")]} \xB7 s4 ${u[col("s4Score")]} \xB7 s5 ${u[col("s5Score")]} \xB7 s6 ${u[col("s6Score")]} \xB7 mtf ${u[col("mtfScore")]} \xB7 maestro ${u[col("maestroFinal")]} (encargo ${u[col("encargoFinal")]})`);
     } catch (e) {
       avisos.push(`${a}: ${e.message}`);
-      console.log(`    ${a} fall\xF3: ${e.message}`);
+      console.log(`    fall\xF3: ${e.message}`);
+    }
+    try {
+      const previo = liqPrev?.activos[a] ?? null;
+      const { crudas, desdeConsulta, paginas } = await liquidacionesNuevas(a, previo?.hasta ?? 0);
+      const agregado = agregarLiquidaciones(previo, crudas, B.liqTramoPct, desdeConsulta, ahora);
+      liqs.activos[a] = recortarLiquidaciones(agregado, ahora - B.liqRetencionDias * D);
+      console.log(`    liquidaciones: ${crudas.length} le\xEDdas en ${paginas} p\xE1ginas \xB7 ${nLiquidaciones(liqs.activos[a])} agregadas`);
+    } catch (e) {
+      if (liqPrev?.activos[a]) liqs.activos[a] = liqPrev.activos[a];
+      avisos.push(`${a} liquidaciones: ${e.message}`);
     }
   }
-  let rellenos = 0;
-  const horizontes = [["r1h", H], ["r4h", 4 * H], ["r24h", D], ["r7d", 7 * D]];
-  for (const f of filas) {
-    const a = f[col("activo")], t = f[col("t")];
-    const p0 = cierres[a]?.get(t);
-    if (!p0) continue;
-    for (const [c, h] of horizontes) {
-      if (f[col(c)] !== null || t + h > tCierre) continue;
-      const p1 = cierres[a].get(t + h);
-      if (p1) {
-        f[col(c)] = r4(p1 / p0 - 1);
-        rellenos++;
-      }
-    }
+  const todas = fusionarFilas(CAMPOS, filasPrev, nuevas);
+  sinPerdida(filasPrev.length, todas.length, "la bit\xE1cora");
+  const retornos = rellenarRetornos(todas, CAMPOS, cierres, tCierre, HORIZONTES);
+  const { vivas, porMes } = particionarPorMes(todas, CAMPOS, ahora - B.diasVivos * D);
+  const archivos = new Set(prev?.v.archivos ?? []);
+  for (const [mes, filasMes] of porMes) {
+    const nombre = `bitacora-${mes}.json`;
+    const prevMes = elegirMasCompleto(await candidatos(nombre), (v) => v.filas?.length ?? 0);
+    const base = migrarFilas(prevMes?.v.filas ?? [], prevMes?.v.campos, CAMPOS);
+    const unidas = fusionarFilas(CAMPOS, base, filasMes);
+    sinPerdida(base.length, unidas.length, nombre);
+    escribir(nombre, { version: VERSION, mes, campos: CAMPOS, filas: unidas });
+    archivos.add(nombre);
+    console.log(`archivo ${nombre}: ${unidas.length} filas`);
   }
-  const vivas = filas.filter((f) => f[col("t")] >= ahora - RETENCION_DIAS * D).sort((x, y) => x[col("t")] - y[col("t")] || String(x[col("activo")]).localeCompare(String(y[col("activo")])));
-  if (vivas.length < filasPrev.length) throw new Error(`la bit\xE1cora quedar\xEDa con ${vivas.length} filas y antes ten\xEDa ${filasPrev.length}: no se escribe`);
-  const corridas = [...(prev?.v.corridas ?? []).filter((c) => c >= ahora - 30 * D), ahora];
-  const salida = {
+  const corridas = [...(prev?.v.corridas ?? []).filter((x) => x >= ahora - 30 * D), ahora];
+  const cadencia = medirCadencia(corridas, ahora);
+  escribir("bitacora.json", {
     version: VERSION,
     generado: ahora,
-    fuentes: { spot: "Binance spot v\xEDa data-api.binance.vision (velas con volumen agresor, aggTrades)", perp: "OKX swap USDT (taker volume, velas, funding, OI, basis, liquidaciones)", vivo: "Binance spot, Coinbase, Kraken, OKX (\xFAltimos trades por REST)", opciones: "Deribit v\xEDa rr25.json", netflows: "DeFiLlama v\xEDa netflows.json", nota: "Serie del servidor: Binance spot + OKX swap. Binance bloquea su API desde los runners de GitHub (451) y Bybit devuelve 403." },
+    fuentes: {
+      spot: "Binance spot v\xEDa data-api.binance.vision (velas con volumen agresor, aggTrades)",
+      perp: "OKX swap USDT (taker-volume-contract en USDT, velas, funding, OI horario, basis contra el \xEDndice)",
+      vivo: "\xDAltimos trades por REST de Binance spot, Coinbase, Kraken y OKX: imbalance de los 5 min previos a vivoT (solo en la hora m\xE1s reciente de cada corrida). Para medir su informaci\xF3n, los retornos se cuentan desde vivoPrecio en vivoT, no desde t",
+      opciones: "Deribit v\xEDa rr25.json",
+      netflows: "DeFiLlama v\xEDa netflows.json",
+      nota: "Una fila por activo y hora cerrada t, calculada solo con datos \u2264 t. relleno=1: la hora se reconstruy\xF3 en una corrida posterior (el cron corre ~4 veces al d\xEDa). Binance bloquea su API a los runners de GitHub (451) y Bybit devuelve 403."
+    },
     corridas,
-    cadencia: medirCadencia(corridas, ahora),
+    cadencia,
     campos: CAMPOS,
     filas: vivas,
+    archivos: [...archivos].sort(),
+    avisos
+  });
+  for (const a of ACTIVOS) {
+    const antes = liqPrev?.activos[a] ? nLiquidaciones(recortarLiquidaciones(liqPrev.activos[a], ahora - B.liqRetencionDias * D)) : 0;
+    if (nLiquidaciones(liqs.activos[a]) < antes) {
+      avisos.push(`${a} liquidaciones: quedar\xEDan menos que antes; se conserva lo previo`);
+      liqs.activos[a] = liqPrev.activos[a];
+    }
+  }
+  escribir("liquidaciones-okx.json", liqs);
+  const porActivo = {};
+  for (const a of ACTIVOS) {
+    const fa = vivas.filter((f) => f[col("activo")] === a);
+    const pend = {};
+    for (const [c, h] of HORIZONTES) pend[c] = fa.filter((f) => f[col(c)] === null && f[col("t")] + h <= tCierre).length;
+    porActivo[a] = { filas: fa.length, ultima: fa.at(-1)?.[col("t")] ?? null, horas24: fa.filter((f) => f[col("t")] > tCierre - D).length, pendientes: pend };
+  }
+  const liqRes = {};
+  for (const a of ACTIVOS) {
+    const l = liqs.activos[a];
+    liqRes[a] = { n: nLiquidaciones(l), usd: usdLiquidaciones(l), cubiertoHoras: l ? Math.round(l.cobertura.reduce((s, c) => s + (c[1] - c[0]), 0) / H2) : 0, huecos: l ? Math.max(0, l.cobertura.length - 1) : 0 };
+  }
+  const resumen = {
+    generado: ahora,
+    filas: vivas.length,
+    desde: vivas[0]?.[col("t")] ?? null,
+    hasta: vivas.at(-1)?.[col("t")] ?? null,
+    archivos: [...archivos].sort(),
+    porActivo,
+    estaCorrida: { filasNuevas: nuevas.length, rellenadas, retornos },
+    liquidaciones: liqRes,
+    cadencia: { corridasPorDia: cadencia.corridasPorDia, huecoMedianoMs: cadencia.huecoMedianoMs },
     avisos
   };
-  writeFileSync(join(SALIDA, "bitacora.json"), JSON.stringify(salida));
-  const totalLiq = total(liqs), totalPrev = liqPrev ? total(liqPrev) : 0;
-  if (totalLiq >= totalPrev) writeFileSync(join(SALIDA, "liquidaciones-okx.json"), JSON.stringify(liqs));
-  else avisos.push(`liquidaciones: ${totalLiq} < ${totalPrev} previas; no se escribe`);
+  escribir("bitacora-resumen.json", resumen);
   const kb = (n) => `${(Buffer.byteLength(readFileSync(join(SALIDA, n))) / 1024).toFixed(0)} KB`;
-  console.log(`bit\xE1cora: ${vivas.length} filas (${kb("bitacora.json")}), ${rellenos} retornos rellenados, cadencia ${salida.cadencia?.corridasPorDia?.toFixed(1) ?? "\u2014"} corridas/d\xEDa \xB7 liquidaciones ${totalLiq}${avisos.length ? `
+  console.log(`bit\xE1cora: ${vivas.length} filas vivas (${kb("bitacora.json")}) \xB7 ${nuevas.length} nuevas (${rellenadas} reconstruidas) \xB7 ${retornos} retornos \xB7 liquidaciones ${kb("liquidaciones-okx.json")}${avisos.length ? `
 avisos:
  - ${avisos.join("\n - ")}` : ""}`);
-}
-function total(l) {
-  return ACTIVOS.reduce((s, a) => s + (l.activos?.[a]?.length ?? 0), 0);
 }
 main().catch((e) => {
   console.error(e);
