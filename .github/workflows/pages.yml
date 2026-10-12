@@ -3,14 +3,15 @@ name: Desplegar a GitHub Pages
 on:
   push:
     branches: [main]
-  # Cada hora: datos de MIROFISH que el navegador no puede pedir o que necesitan
-  # historial (RR25 de Deribit cada hora, netflows una vez al día, macro y S&P/DXY):
+  # Declarado cada hora; GitHub lo ejecuta cuando puede (medido: unas 4 veces al
+  # día). Datos de MIROFISH que el navegador no puede pedir o que necesitan
+  # historial (RR25 de Deribit, netflows, macro, S&P/DXY) y la bitácora de señales.
   schedule:
     - cron: "17 * * * *"
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write # la rama `datos` guarda el historial
   pages: write
   id-token: write
 
@@ -27,6 +28,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      # El historial (bitácora, RR25, netflows, liquidaciones) vive también en git:
+      # si el artefacto de Pages se pierde o kippuu.com no responde, no se pierde.
+      - name: Rama datos (historial)
+        uses: actions/checkout@v4
+        with:
+          ref: datos
+          path: rama-datos
+        continue-on-error: true
       - name: Node
         uses: actions/setup-node@v4
         with:
@@ -36,6 +45,29 @@ jobs:
       - name: Datos de MIROFISH
         run: node herramientas/mirofish-datos.mjs mirofish/datos
         continue-on-error: true
+      # Una fila por activo con el estado de todos los módulos y los retornos
+      # futuros (bundle de scripts/bitacora.ts del código fuente de MIROFISH).
+      - name: Bitácora de señales
+        run: node herramientas/mirofish-bitacora.mjs mirofish/datos
+        continue-on-error: true
+      - name: Guardar historial en la rama datos
+        if: always()
+        continue-on-error: true
+        run: |
+          if [ ! -d rama-datos/.git ]; then echo "sin rama datos"; exit 0; fi
+          mkdir -p rama-datos/mirofish/datos
+          cp mirofish/datos/*.json rama-datos/mirofish/datos/
+          cd rama-datos
+          git config user.name "mirofish-datos"
+          git config user.email "mirofish-datos@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "sin cambios"; exit 0; fi
+          git commit -q -m "datos: $(date -u +%Y-%m-%dT%H:%M)Z [skip ci]"
+          git push -q
+      # La rama no debe viajar dentro del sitio publicado
+      - name: Quitar la rama datos del artefacto
+        if: always()
+        run: rm -rf rama-datos
       - name: Configurar Pages
         uses: actions/configure-pages@v5
       - name: Subir artefacto del sitio

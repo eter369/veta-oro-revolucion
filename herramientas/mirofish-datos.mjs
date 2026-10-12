@@ -16,11 +16,13 @@
 // Uso: node herramientas/mirofish-datos.mjs [carpetaSalida]
 // ============================================================
 
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const SALIDA = process.argv[2] || 'mirofish/datos';
 const PUBLICADO = 'https://kippuu.com/mirofish/datos/';
+// respaldo del historial en git (la escribe el workflow en cada corrida)
+const RAMA = 'https://raw.githubusercontent.com/eter369/veta-oro-revolucion/datos/mirofish/datos/';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36';
 
 async function traer(url, tipo = 'json') {
@@ -29,9 +31,22 @@ async function traer(url, tipo = 'json') {
   return tipo === 'json' ? res.json() : res.text();
 }
 
-async function publicado(nombre) {
-  try { return await traer(PUBLICADO + nombre + '?v=' + Date.now()); } catch { return null; }
+// Lee lo último conocido de un archivo con cascada: kippuu.com → rama `datos` de
+// git → copia local. `mejor` ordena los candidatos (por defecto el más reciente;
+// para historiales, el que más muestras tenga): si kippuu.com no responde en una
+// corrida, el historial no se reescribe con una sola muestra.
+async function publicado(nombre, mejor = (a, b) => (b.generado ?? 0) - (a.generado ?? 0)) {
+  const cands = [];
+  for (const [origen, base] of [['kippuu.com', PUBLICADO], ['rama datos', RAMA]]) {
+    try { cands.push({ origen, v: await traer(base + nombre + '?v=' + Date.now()) }); } catch { /* siguiente */ }
+  }
+  try { cands.push({ origen: 'local', v: JSON.parse(await readFile(join(SALIDA, nombre), 'utf8')) }); } catch { /* no hay copia local */ }
+  if (!cands.length) return null;
+  cands.sort((a, b) => mejor(a.v, b.v));
+  console.log(`${nombre}: se parte de ${cands[0].origen} (disponibles: ${cands.map((c) => c.origen).join(', ')})`);
+  return cands[0].v;
 }
+const diasNetflow = (n) => (n?.activos ? Object.values(n.activos).reduce((s, d) => s + d.length, 0) : 0);
 
 // ---------- hora de Nueva York → UTC ----------
 function desfaseNY(ms) {
@@ -246,7 +261,7 @@ async function main() {
   await writeFile(join(SALIDA, 'mercados.json'), JSON.stringify(mercados));
 
   // --- S5: una muestra de RR25 por corrida (cada hora), historial de 100 días ---
-  const previoRR = await publicado('rr25.json');
+  const previoRR = await publicado('rr25.json', (a, b) => (b.muestras?.length ?? 0) - (a.muestras?.length ?? 0));
   const muestras = (previoRR?.muestras ?? []).filter((m) => m.t > ahora - 100 * 86_400_000);
   const avisosRR = [];
   try {
@@ -260,7 +275,7 @@ async function main() {
   await writeFile(join(SALIDA, 'rr25.json'), JSON.stringify({ generado: ahora, fuente: 'Deribit (libro público de opciones)', avisos: avisosRR, muestras }));
 
   // --- S6: netflows, una vez al día (la descarga de DeFiLlama pesa ~150 MB) ---
-  const previoNF = await publicado('netflows.json');
+  const previoNF = await publicado('netflows.json', (a, b) => diasNetflow(b) - diasNetflow(a));
   let nf = previoNF;
   if (!previoNF || ahora - previoNF.generado > 20 * 3_600_000 || process.env.FORZAR_NETFLOWS) {
     const r = await netflows(ahora);
