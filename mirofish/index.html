@@ -8,10 +8,13 @@
     <meta name="color-scheme" content="dark" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- fuentes sin bloquear el primer pintado (como en la portada de kippuu) -->
     <link
+      rel="preload" as="style"
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" /></noscript>
     <title>MIROFISH × TESLA 369 — Terminal Probabilístico · KIPU</title>
     <style>
       /* roca desde el primer pintado, antes de que cargue el bundle */
@@ -28,7 +31,7 @@
       .kipu-volver.is-oculta:focus-visible{transform:none;opacity:1}
       @media (prefers-reduced-motion:reduce){.kipu-volver{transition:none}}
     </style>
-    <script type="module" crossorigin src="./assets/index-2MhOT4GD.js"></script>
+    <script type="module" crossorigin src="./assets/index-Rj4ANPrL.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-BLtpibww.css">
   </head>
   <body>
