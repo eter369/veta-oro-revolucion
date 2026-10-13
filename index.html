@@ -450,7 +450,7 @@
         radial-gradient(ellipse 600px 420px at 92% 78%, rgba(201,162,39,.05), transparent 60%);
     }
     /* Cinta de oro: listón fluido animado del hero (canvas) */
-    #cinta-oro{ position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+    #cinta-oro{ position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     .hero-grid{ display: grid; gap: 2.5rem; align-items: center; position: relative; z-index: 1; }
     @media (min-width: 980px){ .hero-grid{ grid-template-columns: 1.15fr .85fr; gap: 3.5rem; } }
 
@@ -1914,7 +1914,7 @@
     }
     .footer-grid{ display: grid; gap: 2.2rem; }
     @media (min-width: 780px){ .footer-grid{ grid-template-columns: 1.4fr 1fr 1fr; } }
-    .site-footer h4{ font-size: .82rem; letter-spacing: .12em; text-transform: uppercase; color: var(--humo-55); margin-bottom: 1rem; }
+    .site-footer h3{ font-size: .82rem; letter-spacing: .12em; text-transform: uppercase; color: var(--humo-55); margin-bottom: 1rem; }
     .footer-links{ list-style: none; padding: 0; margin: 0; }
     .footer-links li{ margin-bottom: .6rem; }
     .footer-links a, .footer-links button{
@@ -2874,7 +2874,7 @@
           </div>
           <!-- [EDITABLE] Mascota de la marca: nombre y video (assets/mascota/) -->
           <figure class="mascota-hero">
-            <video id="mascota-video" poster="assets/mascota/kori-poster.jpg" muted loop playsinline preload="metadata" aria-label="Kori, la alpaca de KIPU, con su visor digital">
+            <video id="mascota-video" poster="assets/mascota/kori-poster.webp" muted loop playsinline preload="metadata" aria-label="Kori, la alpaca de KIPU, con su visor digital">
               <source src="assets/mascota/kori.mp4" type="video/mp4">
             </video>
             <figcaption class="mascota-chip"><strong>Kori</strong> · la alpaca de KIPU</figcaption>
@@ -3078,7 +3078,7 @@
               <div class="segmented" role="radiogroup" aria-labelledby="lbl-metodo">
                 <label><input type="radio" name="metodo" value="efectivo" checked>Efectivo</label>
                 <!-- [EDITABLE] Método Lemon Cash: se muestra el logo de la marca -->
-                <label class="metodo-lemon"><input type="radio" name="metodo" value="lemon" aria-label="Lemon Cash"><img class="lemon-logo" src="assets/pagos/lemon.png" alt="" aria-hidden="true" width="70" height="18"></label>
+                <label class="metodo-lemon"><input type="radio" name="metodo" value="lemon" aria-label="Lemon Cash"><img class="lemon-logo" src="assets/pagos/lemon.webp" alt="" aria-hidden="true" width="70" height="18"></label>
               </div>
             </div>
           </div>
@@ -3133,7 +3133,7 @@
           <div class="lemon-banner-veta" aria-hidden="true"></div>
           <div class="lemon-banner-inner">
             <div class="lemon-banner-texto">
-              <img class="lemon-banner-logo" src="assets/pagos/lemon.png" alt="Lemon" width="94" height="23" loading="lazy">
+              <img class="lemon-banner-logo" src="assets/pagos/lemon.webp" alt="Lemon" width="94" height="23" loading="lazy">
               <h3>Recibe tus dólares digitales con Lemon</h3>
               <p class="lemon-banner-sub">Comisión preferencial 3% · Disponible 24/7</p>
               <a class="lemon-banner-cta" href="https://lemon.me" target="_blank" rel="noopener sponsored">
@@ -3462,7 +3462,7 @@
         <p class="section-lead reveal">Nuestras raíces andinas y el sector minero que servimos, en 56 segundos. Protagoniza Kori, nuestra alpaca.</p>
 
         <div class="film-player reveal" data-film>
-          <video id="film-video" class="film-video" playsinline preload="none" poster="assets/marca/kipu-film-poster.jpg" src="assets/marca/kipu-film.mp4"></video>
+          <video id="film-video" class="film-video" playsinline preload="none" poster="assets/marca/kipu-film-poster.webp" src="assets/marca/kipu-film.mp4"></video>
           <button type="button" class="film-play" id="film-play" aria-label="Reproducir el video de KIPU">
             <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z" fill="#0C0E13"/></svg>
           </button>
@@ -3734,7 +3734,7 @@
         </div>
 
         <div>
-          <h4>Legal</h4>
+          <h3>Legal</h3>
           <ul class="footer-links">
             <li><button type="button" data-open-dialog="dlg-terminos">Términos y condiciones</button></li>
             <li><button type="button" data-open-dialog="dlg-privacidad">Política de privacidad</button></li>
@@ -3745,7 +3745,7 @@
         </div>
 
         <div>
-          <h4>Contacto</h4>
+          <h3>Contacto</h3>
           <ul class="footer-links">
             <li><a data-wa data-wa-msg="Hola KIPU, tengo una consulta." href="#contacto">WhatsApp</a></li>
             <li><a data-email href="mailto:contacto@kipu.com">contacto@kipu.com</a></li>
@@ -6446,6 +6446,8 @@
         }
       }
       function cuadro(t){
+        // 30 fps bastan: las partículas suben 5–14 px por segundo (lienzo a pantalla completa)
+        if (running && t - last < 30){ requestAnimationFrame(cuadro); return; }
         if (running){
           const dt = Math.min(t - last, 50); last = t;
           cx2.clearRect(0, 0, W, H);
@@ -6499,13 +6501,15 @@
       const ctx3 = cv.getContext('2d');
       if (!ctx3) return;
       const hero = cv.parentElement;
-      let W = 0, H = 0, corriendo = !document.hidden;
+      let W = 0, H = 0, corriendo = !document.hidden, enVista = true, raf = 0;
 
+      // El tamaño CSS lo da la hoja de estilo (100 % del hero); aquí solo la
+      // resolución del lienzo. Antes se medía en el evento load, lo que obligaba
+      // a recalcular el diseño de toda la página (~800 ms en un móvil medio).
       function redimCinta(){
         const DPR = Math.min(window.devicePixelRatio || 1, 1.6);
         W = hero.clientWidth; H = hero.clientHeight;
         cv.width = W * DPR; cv.height = H * DPR;
-        cv.style.width = W + 'px'; cv.style.height = H + 'px';
         ctx3.setTransform(DPR, 0, 0, DPR, 0, 0);
       }
 
@@ -6546,14 +6550,25 @@
           ctx3.globalAlpha = 1;
           ctx3.globalCompositeOperation = 'source-over';
         }
-        requestAnimationFrame(cuadroCinta);
+        raf = (corriendo && enVista) ? requestAnimationFrame(cuadroCinta) : 0;
       }
+      // solo se anima mientras el hero se ve y la pestaña está visible
+      // (antes seguía pintando al bajar por la página)
+      const reanudar = () => { if (!raf && corriendo && enVista) raf = requestAnimationFrame(cuadroCinta); };
 
-      window.addEventListener('resize', redimCinta);
-      window.addEventListener('load', redimCinta);
-      document.addEventListener('visibilitychange', () => { corriendo = !document.hidden; });
-      redimCinta();
-      requestAnimationFrame(cuadroCinta);
+      // ResizeObserver avisa después del diseño, sin forzarlo
+      if ('ResizeObserver' in window){
+        new ResizeObserver(redimCinta).observe(hero);
+      } else {
+        window.addEventListener('resize', redimCinta);
+        window.addEventListener('load', redimCinta);
+        redimCinta();
+      }
+      document.addEventListener('visibilitychange', () => { corriendo = !document.hidden; reanudar(); });
+      if ('IntersectionObserver' in window){
+        new IntersectionObserver(e => { enVista = e[0].isIntersecting; reanudar(); }).observe(hero);
+      }
+      reanudar();
     })();
 
     /* ---------- Mascota Kori (hero): autoplay respetuoso ---------- */
@@ -6678,11 +6693,26 @@
     document.addEventListener('visibilitychange', refrescarSiVisible);
     window.addEventListener('focus', refrescarSiVisible);
 
-    window.addEventListener('load', construirVeta);
-    if (document.fonts && document.fonts.ready){
-      document.fonts.ready.then(construirVeta);
+    // Se reconstruye cuando cambia el alto del contenido (fuentes, imágenes,
+    // traducciones…). ResizeObserver avisa justo después del diseño, así medir no
+    // obliga a recalcularlo entero; antes, en el evento load, eso costaba ~500 ms
+    // en un móvil medio. La veta está fuera de <main>: redibujarla no lo cambia.
+    const contenido = document.querySelector('main');
+    if ('ResizeObserver' in window && contenido){
+      let altoAnterior = -1;
+      new ResizeObserver(entradas => {
+        const alto = Math.round(entradas[0].contentRect.height);
+        if (alto === altoAnterior) return;
+        altoAnterior = alto;
+        construirVeta();
+      }).observe(contenido);
+    } else {
+      window.addEventListener('load', construirVeta);
+      if (document.fonts && document.fonts.ready){
+        document.fonts.ready.then(construirVeta);
+      }
+      construirVeta();
     }
-    construirVeta();
 
     /* ---------- Film de marca: reproducir con sonido al hacer clic ---------- */
     (function(){

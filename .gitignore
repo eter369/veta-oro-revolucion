@@ -11,3 +11,6 @@ Desktop.ini
 
 # Logs
 *.log
+
+# Sitio preparado para publicar (herramientas/preparar-sitio.mjs)
+_site/

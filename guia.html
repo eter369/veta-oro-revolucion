@@ -525,7 +525,7 @@
 
   <main>
     <section class="hero-guia">
-      <video class="hero-video" id="hero-video" autoplay muted loop playsinline preload="auto" poster="assets/guia/hero-poster.jpg" aria-hidden="true">
+      <video class="hero-video" id="hero-video" autoplay muted loop playsinline preload="auto" poster="assets/guia/hero-poster.webp" aria-hidden="true">
         <source src="assets/guia/hero.mp4" type="video/mp4">
       </video>
       <div class="hero-overlay" aria-hidden="true"></div>
@@ -686,7 +686,7 @@
     </ul>
 
     <div class="cta reveal">
-      <img src="assets/mascota/kori-poster.jpg" alt="Kori, la alpaca de KIPU">
+      <img src="assets/mascota/kori-poster.webp" alt="Kori, la alpaca de KIPU" width="960" height="540" loading="lazy">
       <h2>¿Listo para tu primera operación?</h2>
       <p>Una conversación por WhatsApp basta. Sin compromiso.</p>
       <a class="btn-wa" href="https://wa.me/51918616580?text=Hola%20KIPU%2C%20le%C3%AD%20la%20gu%C3%ADa%20para%20nuevos%20usuarios%20y%20quiero%20empezar." target="_blank" rel="noopener">
@@ -745,6 +745,9 @@
           const real = el.textContent;
           el.dataset.real = real;
           el.setAttribute('aria-label', real);
+          // altura fija mientras se descifra: las letras al azar cortan las
+          // líneas distinto en cada paso y empujaban lo de abajo (CLS 0,17)
+          el.style.height = el.offsetHeight + 'px';
           el.textContent = [...real].map(c => c === ' ' ? ' ' : rnd()).join('');
         });
       }
@@ -767,6 +770,7 @@
           if (rev >= len){
             clearInterval(id);
             el.textContent = real;
+            el.style.height = '';
             el.classList.remove('cifrando');
             el.removeAttribute('aria-label');
           }

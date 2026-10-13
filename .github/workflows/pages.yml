@@ -80,12 +80,32 @@ jobs:
       - name: Quitar la rama datos del artefacto
         if: always()
         run: rm -rf rama-datos
+      # Solo se publica el sitio (sin veta-hero, herramientas/, .claude/, README…)
+      # y con el CSS/JS escrito dentro de las páginas compactado. Los archivos del
+      # repo no cambian. Sin esbuild se copia sin compactar; si el script falla,
+      # se publica el repo tal cual, como antes.
+      - name: Instalar esbuild (compactar)
+        continue-on-error: true
+        run: npm i --prefix "$RUNNER_TEMP/esbuild" --no-audit --no-fund esbuild@0.28.2
+      - name: Preparar el sitio
+        continue-on-error: true
+        run: ESBUILD_DIR="$RUNNER_TEMP/esbuild" node herramientas/preparar-sitio.mjs . _site
+      - name: Respaldo si no se pudo preparar
+        if: always()
+        run: |
+          if [ ! -f _site/index.html ]; then
+            echo "preparar-sitio falló: se publica el repo sin compactar"
+            rm -rf _site && mkdir _site
+            for f in $(ls -A); do
+              case "$f" in .git|.github|_site|rama-datos) ;; *) cp -r "$f" _site/ ;; esac
+            done
+          fi
       - name: Configurar Pages
         uses: actions/configure-pages@v5
       - name: Subir artefacto del sitio
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
       - name: Desplegar
         id: deployment
         uses: actions/deploy-pages@v4

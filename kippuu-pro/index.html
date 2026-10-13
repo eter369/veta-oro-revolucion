@@ -24,7 +24,9 @@
      ============================================================ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- fuentes sin bloquear el primer pintado (como en la portada) -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Space+Grotesk:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Space+Grotesk:wght@400;500;600&display=swap"></noscript>
 <style>
 /* ============================================================
    SANTA CATARINA OS — KIPU Bienes Raíces
@@ -49,6 +51,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
   position:fixed;inset:-4%;z-index:0;
   /* fondo compartido con el escritorio de la división: una sola imagen para las dos */
   background:url('../assets/fondo-santa-catarina.jpg') center/cover no-repeat;
+  background-image:image-set(url('../assets/fondo-santa-catarina-1920.webp') type('image/webp'), url('../assets/fondo-santa-catarina.jpg') type('image/jpeg'));
   animation:kenburns 40s ease-in-out infinite alternate;
 }
 @keyframes kenburns{from{transform:scale(1) translate(0,0)}to{transform:scale(1.09) translate(-1.2%,1.5%)}}
@@ -461,9 +464,10 @@ const CONFIG = {
    fotografías que traía el sistema: los lotes que tienen foto propia la
    usan, y los otros siete se dibujan con la escena generada de KP.sceneSVG. */
 const FOTOS = {
-  2: 'assets/terreno-costa.jpg',   // Balneário Camboriú — la foto de costa
-  7: 'assets/terreno-colina.jpg',  // Itajaí, Praia Brava alto — la foto de colina
-  8: 'assets/terreno-valle.jpg',   // Blumenau — la foto de valle
+  // base de cada foto: hay versiones WebP de 480 y 960 px (los .jpg originales siguen en assets/)
+  2: 'assets/terreno-costa',   // Balneário Camboriú — la foto de costa
+  7: 'assets/terreno-colina',  // Itajaí, Praia Brava alto — la foto de colina
+  8: 'assets/terreno-valle',   // Blumenau — la foto de valle
 };
 
 
@@ -511,7 +515,7 @@ const ICONS = [
   /* Tres lotes destacados con fotografía real, como acceso directo desde el escritorio */
   ...Object.keys(FOTOS).map(id => {
     const l = (window.KP?.LOTES || []).find(x => String(x.id) === String(id));
-    return l ? { id:`lote:${l.id}`, label:l.ciudad, sub:l.barrio, img:FOTOS[id] } : null;
+    return l ? { id:`lote:${l.id}`, label:l.ciudad, sub:l.barrio, img:`${FOTOS[id]}-480.webp` } : null;
   }).filter(Boolean),
   { id:'simulador', label:'Simulador', sub:'De soles a m²', svg:'<svg viewBox="0 0 24 24" fill="none" stroke="#e3b85c" stroke-width="1.6"><rect x="4" y="2.5" width="16" height="19" rx="3"/><path d="M8 7h8" stroke-width="2"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01"/><path d="M15.5 16v2.5" stroke-width="2" stroke-linecap="round"/></svg>' },
   { id:'proceso', label:'Guía legal', sub:'7 pasos', svg:'<svg viewBox="0 0 24 24" fill="none" stroke="#e3b85c" stroke-width="1.6"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4" stroke-linecap="round"/></svg>' },
@@ -817,7 +821,7 @@ if (window.KP && typeof KP.sceneSVG === 'function') {
   KP.sceneSVG = function (lote, grande) {
     const foto = FOTOS[lote?.id];
     return foto
-      ? `<img src="${foto}" alt="Terreno en ${lote.ciudad}, ${lote.barrio}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">`
+      ? `<img src="${foto}-960.webp" srcset="${foto}-480.webp 480w, ${foto}-960.webp 960w" sizes="${grande ? '(min-width: 900px) 760px, 100vw' : '(min-width: 900px) 360px, 92vw'}" alt="Terreno en ${lote.ciudad}, ${lote.barrio}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">`
       : escenaOriginal(lote, grande);
   };
 }

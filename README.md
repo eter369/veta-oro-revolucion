@@ -81,6 +81,25 @@ Los cuatro documentos del footer (Términos, Privacidad, PLAFT, Aviso de riesgo)
 npx serve -l 4173 .
 ```
 
+## Publicación
+
+Cada push a `main` despliega con `.github/workflows/pages.yml`. Antes de subir,
+`herramientas/preparar-sitio.mjs` arma la carpeta `_site` con **solo el sitio**
+(sin `veta-hero/`, `herramientas/`, `.claude/`, este README…) y compacta con
+esbuild el CSS y el JS escritos dentro de las páginas y los `.js` sueltos. Los
+archivos del repo no cambian: se siguen editando legibles. `biblioteca.html`,
+`sweep/` y `mirofish/` se publican tal cual.
+
+Para ver localmente lo que se publicará:
+
+```bash
+node herramientas/preparar-sitio.mjs . _site
+```
+
+Las imágenes grandes tienen versión WebP al lado del original (`*-1280.webp`,
+`*-480.webp`…); los `.jpg` originales se conservan para las vistas previas en
+redes sociales (`og:image`) y como respaldo.
+
 ## Migración futura
 
 La estructura (secciones por anclas, tokens CSS en `:root`, config centralizada en
